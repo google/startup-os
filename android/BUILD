@@ -15,7 +15,7 @@ genrule(
 )
 
 android_library(
-    name = "firebase_integration",
+    name = "firestore",
     exports = [
         "@com_android_support_support_annotations_25_2_0//jar",
         "@com_android_support_support_compat_25_2_0//aar",
@@ -37,7 +37,7 @@ android_library(
 )
 
 android_binary(
-    name = "android",
+    name = "android_app",
     srcs = glob([
         "src/main/java/com/google/startupos/android/MainApplication.java",
         "src/main/java/com/google/startupos/android/activities/*.java",
@@ -48,5 +48,5 @@ android_binary(
     manifest = "src/main/java/com/google/startupos/android/AndroidManifest.xml",
     resource_files = glob(["src/main/java/com/google/startupos/android/res/**"]),
     visibility = ["//visibility:public"],
-    deps = [":firebase_integration"],
+    deps = [":firestore"],
 )
