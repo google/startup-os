@@ -1,7 +1,8 @@
 load('@gmaven_rules//:gmaven.bzl', 'gmaven_rules')
 gmaven_rules()
 
-# Uncomment to configure Android SDK:
+# Uncomment to configure Android SDK. For more details, see:
+# https://docs.bazel.build/versions/master/be/android.html#android_sdk_repository
 # android_sdk_repository(
 #    name = "androidsdk",
 #    path = "<path to sdk, e.g /Users/vmax/Library/Android/sdk",
