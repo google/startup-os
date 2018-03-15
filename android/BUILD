@@ -1,16 +1,16 @@
 py_binary(
-    name = "firestore-genrule-py-impl",
-    srcs = ["firestore-genrule-py-impl.py"],
+    name = "firestore_genrule_py_impl",
+    srcs = ["firestore_genrule_py_impl.py"],
     data = ["google-services.json"],
 )
 
 genrule(
     name = "firestore-genrule",
     outs = ["FirestoreConfig.java"],
-    cmd = "python android/firestore-genrule-py-impl.py > $(@)",
+    cmd = "python android/firestore_genrule_py_impl.py > $(@)",
     tools = [
         "google-services.json",
-        ":firestore-genrule-py-impl",
+        ":firestore_genrule_py_impl",
     ],
 )
 
