@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.bazel.example.android.activities;
+package com.google.startupos.android.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
-import com.google.bazel.example.android.R;
+import com.google.startupos.android.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends Activity {

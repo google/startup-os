@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.bazel.example.android;
+package com.google.startupos.android;
 
 import android.app.Application;
 import com.google.firebase.FirebaseApp;
+
+import com.google.bazel.example.android.FirestoreConfig;
 
 public class MainApplication extends Application {
   @Override

@@ -39,14 +39,14 @@ android_library(
 android_binary(
     name = "android",
     srcs = glob([
-        "src/main/java/com/google/bazel/example/android/MainApplication.java",
-        "src/main/java/com/google/bazel/example/android/activities/*.java",
+        "src/main/java/com/google/startupos/android/MainApplication.java",
+        "src/main/java/com/google/startupos/android/activities/*.java",
     ]) + [
         ":firestore-genrule",
     ],
-    custom_package = "com.google.bazel.example.android",
-    manifest = "src/main/java/com/google/bazel/example/android/AndroidManifest.xml",
-    resource_files = glob(["src/main/java/com/google/bazel/example/android/res/**"]),
+    custom_package = "com.google.startupos.android",
+    manifest = "src/main/java/com/google/startupos/android/AndroidManifest.xml",
+    resource_files = glob(["src/main/java/com/google/startupos/android/res/**"]),
     visibility = ["//visibility:public"],
     deps = [":firebase_integration"],
 )
