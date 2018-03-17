@@ -1,2 +1,6 @@
 .idea
 bazel-*
+
+# To avoid exposing credentials
+android/google-services.json
+
