@@ -15,7 +15,15 @@ genrule(
 )
 
 android_library(
+    name = "firestore_config_manager",
+    deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
+    visibility = ["//visibility:public"],
+    srcs = ["src/main/java/com/google/startupos/android/FirestoreConfigManager.java"]
+)
+
+android_library(
     name = "firestore",
+    visibility = ["//visibility:public"],
     exports = [
         "@com_android_support_support_annotations_25_2_0//jar",
         "@com_android_support_support_compat_25_2_0//aar",
