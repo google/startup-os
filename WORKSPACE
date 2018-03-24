@@ -25,3 +25,8 @@ maven_jar(
   name = "com_squareup_okio_okio_1_6_0",
   artifact = "com.squareup.okio:okio:jar:1.6.0"
 )
+
+maven_jar(
+  name = "org_json_json_jar_20180130",
+  artifact = "org.json:json:jar:20180130"
+)
