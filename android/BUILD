@@ -1,16 +1,18 @@
-py_binary(
-    name = "firestore_genrule_py_impl",
-    srcs = ["firestore_genrule_py_impl.py"],
+java_binary(
+    name = "firestore_genrule_java_impl",
+    srcs = ["FirestoreGenRuleImpl.java"],
     data = ["google-services.json"],
+    deps = ["@org_json_json_jar_20180130//jar"],
+    main_class = "com.google.startupos.android.FirestoreGenRuleImpl"
 )
 
 genrule(
     name = "firestore-genrule",
     outs = ["FirestoreConfig.java"],
-    cmd = "python android/firestore_genrule_py_impl.py > $(@)",
+    cmd = "java -jar ./bazel-out/host/bin/android/firestore_genrule_java_impl_deploy.jar > $(@)",
     tools = [
         "google-services.json",
-        ":firestore_genrule_py_impl",
+        ":firestore_genrule_java_impl_deploy.jar",
     ],
 )
 
