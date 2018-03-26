@@ -31,3 +31,4 @@ public class MainActivity extends Activity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
   }
 }
+

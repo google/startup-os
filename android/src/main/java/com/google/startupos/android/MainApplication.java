@@ -28,3 +28,4 @@ public class MainApplication extends Application {
     FirebaseApp.initializeApp(this, FirestoreConfig.getFirebaseConfig());
   }
 }
+
