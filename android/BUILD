@@ -1,19 +1,3 @@
-py_binary(
-    name = "firestore_genrule_py_impl",
-    srcs = ["firestore_genrule_py_impl.py"],
-    data = ["google-services.json"],
-)
-
-genrule(
-    name = "firestore-genrule",
-    outs = ["FirestoreConfig.java"],
-    cmd = "python android/firestore_genrule_py_impl.py > $(@)",
-    tools = [
-        "google-services.json",
-        ":firestore_genrule_py_impl",
-    ],
-)
-
 android_library(
     name = "firestore_config_manager",
     deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
