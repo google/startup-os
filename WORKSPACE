@@ -7,14 +7,15 @@ git_repository(
 load('@gmaven_rules//:gmaven.bzl', 'gmaven_rules')
 gmaven_rules()
 
-# Uncomment to configure Android SDK. For more details, see:
-# https://docs.bazel.build/versions/master/be/android.html#android_sdk_repository
-# android_sdk_repository(
-#    name = "androidsdk",
-#    path = "<path to sdk, e.g /Users/vmax/Library/Android/sdk",
-#    api_level = "<SDK API version, e.g 27>",
-#    build_tools_version = "<SDK Build Tools version, e.g 26.0.2>"
-#)
+# Set ANDROID_HOME environment variable to location of your Android SDK
+# i.e. on macOS with Android Studio this would be "$HOME/Library/Android/sdk"
+android_sdk_repository(
+    name = "androidsdk",
+    # specify params to have reproducible builds
+    # by default bazel uses the latest available versions
+    # api_level = <…>,
+    # build_tools_version = <…>,
+)
 
 maven_jar(
   name = "com_squareup_okhttp_okhttp_2_7_2",
