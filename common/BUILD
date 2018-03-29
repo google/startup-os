@@ -4,6 +4,11 @@ java_library(
   name = "common",
   srcs = [
     "FileUtils.java",
+    "Logger.java",
+    "StringBuilder.java",
+    "Strings.java",
+    "Time.java",
+    "MessageDifferencer.java",
   ],
   deps = [
     "//third_party/maven/com/google/auto/value:auto_value",
