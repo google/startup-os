@@ -1,4 +1,4 @@
-package il.org.hasadna.common;
+package com.google.startupos;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

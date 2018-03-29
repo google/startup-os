@@ -1,4 +1,4 @@
-package com.appstory.common;
+package com.google.startupos;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;

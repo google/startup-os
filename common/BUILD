@@ -6,10 +6,12 @@ java_library(
     "FileUtils.java",
   ],
   deps = [
+    "//third_party/maven/com/google/auto/value:auto_value",
     "//third_party/maven/com/google/code/findbugs:jsr305",
     "//third_party/maven/com/google/guava:guava",
     "//third_party/maven/com/google/protobuf:protobuf_java",
     "//third_party/maven/org/apache/commons:commons_lang3",
+    "//third_party/maven/org/slf4j:slf4j_api",
   ]
 )
 
@@ -19,9 +21,9 @@ java_library(
     "Git.java",
   ],
   deps = [
-    "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
     "//third_party/maven/com/google/guava:guava",
     "//third_party/maven/com/google/protobuf:protobuf_java",
     "//third_party/maven/com/jcraft:jsch",
+    "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
   ]
 )
