@@ -1,4 +1,4 @@
-
+package(default_visibility = ["//visibility:public"])
 
 java_library(
   name = "common",
@@ -10,5 +10,18 @@ java_library(
     "//third_party/maven/com/google/guava:guava",
     "//third_party/maven/com/google/protobuf:protobuf_java",
     "//third_party/maven/org/apache/commons:commons_lang3",
+  ]
+)
+
+java_library(
+  name = "git",
+  srcs = [
+    "Git.java",
+  ],
+  deps = [
+    "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
+    "//third_party/maven/com/google/guava:guava",
+    "//third_party/maven/com/google/protobuf:protobuf_java",
+    "//third_party/maven/com/jcraft:jsch",
   ]
 )
