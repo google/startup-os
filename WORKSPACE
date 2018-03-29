@@ -36,3 +36,8 @@ maven_jar(
   artifact = "com.squareup.okio:okio:jar:1.6.0"
 )
 
+http_archive(
+    name = "com_google_protobuf",
+    urls = ["https://github.com/google/protobuf/archive/3.5.1.1.zip"],
+    strip_prefix = "protobuf-3.5.1.1",
+)
