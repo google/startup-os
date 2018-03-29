@@ -1,4 +1,4 @@
-package com.google.startupos;
+package com.google.startupos.common;
 
 import java.lang.StackTraceElement;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.google.startupos;
+package com.google.startupos.common;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
