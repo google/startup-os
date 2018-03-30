@@ -1,0 +1,27 @@
+# Build every buildable Bazel target
+# Run this to ensure that everything still builds, kind of a regression test
+# This can take several minutes depending hardware and repo size
+bazel query //... | grep -v ^\/\/third_party | xargs bazel build
+
+# Format dependencies.yaml
+# format-deps command ensures that dependencies.yaml is formatted properly
+# and requirements are alphabetically sorted
+bazel run @bazel_deps//:parse -- format-deps --overwrite --deps `pwd`/dependencies.yaml
+
+# Adding Maven dependency
+# add-dep command adds dependency to dependencies.yaml
+# it does NOT regenerate build files tree (third_party/maven/), so do it manually
+# <maven_artifact> i.e. com.scireum:sirius-kernel:8.0.1
+bazel run @bazel_deps//:parse -- add-dep --deps `pwd`/dependencies.yaml --lang java <maven_artifact>
+
+# WARNING: any comments you had in dependencies.yaml
+# would be destroyed by add-dep or format-deps, see:
+# https://github.com/johnynek/bazel-deps/issues/137
+
+# Regenerate dependencies
+# Run this when you add a new Maven dependency to dependencies.yaml
+# This can take a few minutes, depending on how many dependencies there are.
+# <root_workspace> should be absolute path rather than relative, so use `pwd` instead of '.'
+# Usually there is already a folder 'third_party' but if there isn't, comment out loading of //third_party/maven:workspace.bzl in WORKSPACE
+bazel run @bazel_deps//:parse -- generate -r <root_workspace> -s third_party/maven/workspace.bzl -d dependencies.yaml
+

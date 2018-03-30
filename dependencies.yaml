@@ -1,0 +1,133 @@
+options:
+  languages: [ "java" ]
+  # permissive — Code that is under a license but does not require a notice.
+  # TODO: Either specify license per-dependency, or limit deps to permissive license.
+  licenses: [ "permissive" ]
+  resolvers: 
+    - id: "mavencentral"
+      type: "default"
+      url: https://repo.maven.apache.org/maven2/
+  thirdPartyDirectory: "third_party/maven/"
+  transitivity: runtime_deps
+  versionConflictPolicy: highest
+
+dependencies:
+  com.google.api:
+    api-common:
+      lang: java
+      version: "1.1.0"
+  
+  com.google.auto.value:
+    auto-value:
+      lang: java
+      processorClasses: [ "com.google.auto.value.processor.AutoValueProcessor" ]
+      version: "1.5"
+  
+  com.google.code.gson:
+    gson:
+      lang: java
+      version: "2.8.2"
+  
+  com.google.firebase:
+    firebase-admin:
+      lang: java
+      version: "5.9.0"
+  
+  com.google.googlejavaformat:
+    google-java-format:
+      lang: java
+      version: "1.5"
+  
+  com.google.guava:
+    guava:
+      lang: java
+      # we have to use -android instead of -jre
+      # because dexing cannot handle -jre version
+      # and we can't include both
+      version: "24.0-android"
+  
+  com.google.protobuf:
+    protobuf-java:
+      lang: java
+      version: "3.5.1"
+  
+  com.jcraft:
+    jsch:
+      lang: java
+      version: "0.1.54"
+  
+  commons-logging:
+    commons-logging:
+      lang: java
+      version: "1.2"
+  
+  javax.annotation:
+    javax.annotation-api:
+      lang: java
+      version: "1.3.2"
+  
+  junit:
+    junit:
+      lang: java
+      version: "4.12"
+  
+  org.apache.commons:
+    commons-csv:
+      lang: java
+      version: "1.5"
+    commons-lang3:
+      lang: java
+      version: "3.7"
+  
+  org.apache.httpcomponents:
+    fluent-hc:
+      lang: java
+      version: "4.5.5"
+  
+  org.apache.pdfbox:
+    fontbox:
+      lang: java
+      version: "2.0.8"
+    pdfbox:
+      lang: java
+      version: "2.0.8"
+  
+  org.eclipse.jgit:
+    org.eclipse.jgit:
+      lang: java
+      version: "4.10.0.201712302008-r"
+  
+  org.javassist:
+    javassist:
+      lang: java
+      version: "3.22.0-GA"
+  
+  org.json:
+    json:
+      lang: java
+      version: "20180130"
+  
+  org.jsoup:
+    jsoup:
+      lang: java
+      version: "1.11.2"
+  
+  org.mockito:
+    mockito-core:
+      lang: java
+      version: "2.15.0"
+  
+  org.objenesis:
+    objenesis:
+      lang: java
+      version: "2.6"
+  
+  org.reflections:
+    reflections:
+      lang: java
+      version: "0.9.11"
+  
+  org.slf4j:
+    slf4j-simple:
+      lang: java
+      version: "1.7.25"

@@ -1,0 +1,21 @@
+syntax = "proto3";
+package com.google.startupos.common.flags;
+
+option java_package = "com.google.startupos.common.flags";
+option java_outer_classname = "Proto";
+option java_multiple_files = true;
+
+message FlagData {
+  string name = 1;
+  string className = 2;
+  // For boolean flags, --flag_name means true and --noflag_name means false.
+  bool isBooleanFlag = 3;
+  string description = 4;
+  // The default value is a toString() of the given default value. It should
+  // be parsable back to the same value (of the original type).
+  string default = 5;
+  string value = 6;
+  // Since proto3 doesn't have a hasValue() method, we can't know if a flag was
+  // set to empty or not set at all. That's why we need this boolean.
+  bool hasValue = 7;
+}
