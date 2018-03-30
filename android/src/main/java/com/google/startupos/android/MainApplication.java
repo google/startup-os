@@ -36,9 +36,9 @@ public class MainApplication extends Application {
     try {
       FirestoreConfigLoader.load(this);
     } catch (IOException e) {
-      Log.e(TAG, "Unable to initialize Firebase: no google-services.json provided");
+      Log.e(TAG, "Firebase init failed: google-services.json not found");
     } catch (JSONException e) {
-      Log.e(TAG, "Unable to initialize Firebase: google-services.json has incorrect structure");
+      Log.e(TAG, "Firebase init failed: google-services.json has incorrect structure");
     }
   }
 }
