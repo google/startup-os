@@ -17,15 +17,29 @@
 package com.google.startupos.android;
 
 import android.app.Application;
-import com.google.firebase.FirebaseApp;
 
-import com.google.bazel.example.android.FirestoreConfig;
+import java.io.IOException;
+
+import com.google.firebase.FirebaseApp;
+import android.util.Log;
+import org.json.JSONException;
+
+import com.google.startupos.android.FirestoreInitializer;
 
 public class MainApplication extends Application {
+
+  public static final String TAG = MainApplication.class.getSimpleName();
+
   @Override
   public void onCreate() {
     super.onCreate();
-    FirebaseApp.initializeApp(this, FirestoreConfig.getFirebaseConfig());
+    try {
+      FirestoreInitializer.init(this);
+    } catch (IOException e) {
+      Log.e(TAG, "Firebase init failed: google-services.json not found");
+    } catch (JSONException e) {
+      Log.e(TAG, "Firebase init failed: google-services.json has incorrect structure");
+    }
   }
 }
 

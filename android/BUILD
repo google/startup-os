@@ -1,24 +1,8 @@
-py_binary(
-    name = "firestore_genrule_py_impl",
-    srcs = ["firestore_genrule_py_impl.py"],
-    data = ["google-services.json"],
-)
-
-genrule(
-    name = "firestore-genrule",
-    outs = ["FirestoreConfig.java"],
-    cmd = "python android/firestore_genrule_py_impl.py > $(@)",
-    tools = [
-        "google-services.json",
-        ":firestore_genrule_py_impl",
-    ],
-)
-
 android_library(
-    name = "firestore_config_manager",
-    deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
+    name = "firestore_config_manager_impl",
+    srcs = ["src/main/java/com/google/startupos/android/FirestoreInitializer.java"],
     visibility = ["//visibility:public"],
-    srcs = ["src/main/java/com/google/startupos/android/FirestoreConfigManager.java"]
+    deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
 )
 
 android_library(
@@ -44,17 +28,26 @@ android_library(
     ],
 )
 
+android_library(
+    name = "firestore_config_manager",
+    data = ["src/main/assets/google-services.json"],
+    exports = [":firestore_config_manager_impl"],
+)
+
 android_binary(
     name = "android_app",
     srcs = glob([
         "src/main/java/com/google/startupos/android/MainApplication.java",
         "src/main/java/com/google/startupos/android/activities/*.java",
-    ]) + [
-        ":firestore-genrule",
-    ],
+    ]),
+    assets = ["src/main/assets/google-services.json"],
+    assets_dir = "src/main/assets/",
     custom_package = "com.google.startupos.android",
     manifest = "src/main/java/com/google/startupos/android/AndroidManifest.xml",
     resource_files = glob(["src/main/java/com/google/startupos/android/res/**"]),
     visibility = ["//visibility:public"],
-    deps = [":firestore"],
+    deps = [
+        ":firestore",
+        ":firestore_config_manager",
+    ],
 )
