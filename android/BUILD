@@ -1,6 +1,6 @@
 android_library(
     name = "firestore_config_manager_impl",
-    srcs = ["src/main/java/com/google/startupos/android/FirestoreConfigLoader.java"],
+    srcs = ["src/main/java/com/google/startupos/android/FirestoreInitializer.java"],
     visibility = ["//visibility:public"],
     deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
 )

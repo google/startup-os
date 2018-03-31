@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public final class FirestoreConfigLoader {
+public final class FirestoreInitializer {
   private static FirebaseOptions fromJson(JSONObject obj) throws JSONException {
     JSONObject client = obj.getJSONArray("client").getJSONObject(0);
     JSONObject projectInfo = obj.getJSONObject("project_info");
@@ -27,11 +27,11 @@ public final class FirestoreConfigLoader {
         .build();
   }
 
-  public static void load(Context applicationContext) throws IOException, JSONException {
-    load(applicationContext, "google-services.json");
+  public static void init(Context applicationContext) throws IOException, JSONException {
+    init(applicationContext, "google-services.json");
   }
 
-  public static void load(Context applicationContext, String assetFileName)
+  public static void init(Context applicationContext, String assetFileName)
       throws IOException, JSONException {
 
     InputStream stream = applicationContext.getAssets().open(assetFileName);

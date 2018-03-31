@@ -24,7 +24,7 @@ import com.google.firebase.FirebaseApp;
 import android.util.Log;
 import org.json.JSONException;
 
-import com.google.startupos.android.FirestoreConfigLoader;
+import com.google.startupos.android.FirestoreInitializer;
 
 public class MainApplication extends Application {
 
@@ -34,7 +34,7 @@ public class MainApplication extends Application {
   public void onCreate() {
     super.onCreate();
     try {
-      FirestoreConfigLoader.load(this);
+      FirestoreInitializer.init(this);
     } catch (IOException e) {
       Log.e(TAG, "Firebase init failed: google-services.json not found");
     } catch (JSONException e) {
