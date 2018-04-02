@@ -131,13 +131,13 @@ public class FileUtils {
     }
   }
 
-  /** Writes a proto to proto binary file. */
+  /** Writes a proto to binary file. */
   public static void writeProtoBinary(Message proto, String path) throws IOException {
     mkdirs(path);
     proto.writeTo(new FileOutputStream(path));
   }
 
-  /** Writes a proto to proto binary file, rethrows exceptions as unchecked. */
+  /** Writes a proto to binary file, rethrows exceptions as unchecked. */
   public static void writeProtoBinaryUnchecked(Message proto, String path) {
     try {
       writeProtoBinary(proto, path);
