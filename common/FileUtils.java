@@ -24,6 +24,8 @@ import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -124,6 +126,36 @@ public class FileUtils {
   public static String readFileUnchecked(String path) {
     try {
       return readFile(path);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Writes a proto to proto binary file. */
+  public static void writeProtoBinary(Message proto, String path) throws IOException {
+    mkdirs(path);
+    proto.writeTo(new FileOutputStream(path));
+  }
+
+  /** Writes a proto to proto binary file, rethrows exceptions as unchecked. */
+  public static void writeProtoBinaryUnchecked(Message proto, String path) {
+    try {
+      writeProtoBinary(proto, path);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Reads a proto binary file into a proto. */
+  public static Message readProtoBinary(String path, Message.Builder builder) throws IOException {
+    InputStream input = new FileInputStream(path);
+    return builder.build().getParserForType().parseFrom(input);
+  }
+
+  /** Reads a proto binary file into a proto, rethrows exceptions as unchecked. */
+  public static Message readProtoBinaryUnchecked(String path, Message.Builder builder) {
+    try {
+      return readProtoBinary(path, builder);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
