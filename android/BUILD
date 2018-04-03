@@ -1,13 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
 android_library(
     name = "firestore_config_manager_impl",
     srcs = ["src/main/java/com/google/startupos/android/FirestoreInitializer.java"],
-    visibility = ["//visibility:public"],
     deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
 )
 
 android_library(
     name = "firestore",
-    visibility = ["//visibility:public"],
     exports = [
         "@com_android_support_support_annotations_27_0_2//jar",
         "@com_android_support_support_compat_27_0_2//aar",
@@ -45,7 +45,6 @@ android_binary(
     custom_package = "com.google.startupos.android",
     manifest = "src/main/java/com/google/startupos/android/AndroidManifest.xml",
     resource_files = glob(["src/main/java/com/google/startupos/android/res/**"]),
-    visibility = ["//visibility:public"],
     deps = [
         ":firestore",
         ":firestore_config_manager",
