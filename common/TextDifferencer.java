@@ -17,8 +17,11 @@
 package com.google.startup.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An implementation of text difference based on the Longest Common Subsequence problem (A.K.A LCS).
@@ -33,7 +36,41 @@ public class TextDifferencer {
    * @return A list which holds all the text differences.
    */
   public static List<CharDifference> getAllTextDifferences(String first, String second) {
-    return getDifferencesFromLCSMatrix(computeLCSMatrix(first, second), first, second);
+    List<CharDifference> footerDifferences = getFooterDifferences(first, second);
+    String firstBody = first.substring(0, first.length() - footerDifferences.size());
+    String secondBody = second.substring(0, second.length() - footerDifferences.size());
+    List<CharDifference> bodyDifference =
+        getDifferencesFromLCSMatrix(computeLCSMatrix(firstBody, secondBody), firstBody, secondBody);
+    return mergeDifferences(bodyDifference, footerDifferences);
+  }
+
+  /** Merges all the differences into a single list. */
+  private static List<CharDifference> mergeDifferences(
+      List<CharDifference> bodyDifference, List<CharDifference> footerDifferences) {
+    return Stream.of(bodyDifference, footerDifferences)
+        .flatMap(Collection::stream)
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Compute all the differences from the text footer.
+   *
+   * @param first The first string.
+   * @param second The second string.
+   * @return A list which holds all the text differences.
+   */
+  private static List<CharDifference> getFooterDifferences(String first, String second) {
+    List<CharDifference> footerDifferences = new ArrayList();
+    int i = first.length() - 1;
+    int j = second.length() - 1;
+    for (; i >= 0 && j >= 0; --i, --j) {
+      if (first.charAt(i) != second.charAt(j)) {
+        break;
+      }
+      footerDifferences.add(new CharDifference(i, first.charAt(i), DifferenceType.NO_CHANGE));
+    }
+    Collections.reverse(footerDifferences);
+    return footerDifferences;
   }
 
   /** Create an empty matrix based on the given dimentions. */
