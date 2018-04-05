@@ -3,6 +3,7 @@ package com.google.startup.common;
 import com.google.common.base.MoreObjects;
 import java.util.Objects;
 
+/** Holds information about a character difference. */
 public class CharDifference {
   private int index;
   private char difference;
@@ -14,14 +15,17 @@ public class CharDifference {
     this.differenceType = type;
   }
 
+  /** Returns the difference type of the character difference. */
   public DifferenceType getDifferenceType() {
     return this.differenceType;
   }
 
+  /** Returns the index of the character where the difference occurred. */
   public int getIndex() {
     return this.index;
   }
 
+  /** Returns the character of the difference. */
   public char getCharDifference() {
     return this.difference;
   }
