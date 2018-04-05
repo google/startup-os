@@ -21,6 +21,18 @@ java_library(
 )
 
 java_library(
+  name = "text_differencer",
+  srcs = [
+    "TextDifferencer.java",
+    "CharDifference.java",
+    "DifferenceType.java",
+  ],
+  deps = [
+    "//third_party/maven/com/google/guava:guava",
+  ],
+)
+
+java_library(
   name = "git",
   srcs = [
     "Git.java",
