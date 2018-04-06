@@ -38,6 +38,9 @@ def list_dependencies():
 # - com.google.guava:guava:24.0-android wanted version 1.3.9
 # - com.google.http-client:google-http-client:1.23.0 wanted version 1.3.9
     {"artifact": "com.google.code.findbugs:jsr305:3.0.0", "lang": "java", "sha1": "5871fb60dc68d67da54a663c3fd636a10a532948", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_code_findbugs_jsr305", "actual": "@com_google_code_findbugs_jsr305//jar", "bind": "jar/com/google/code/findbugs/jsr305"},
+# duplicates in com.google.code.gson:gson fixed to 2.8.2
+# - com.google.http-client:google-http-client-gson:1.23.0 wanted version 2.1
+# - com.google.protobuf:protobuf-java-util:3.5.1 wanted version 2.7
     {"artifact": "com.google.code.gson:gson:2.8.2", "lang": "java", "sha1": "3edcfe49d2c6053a70a2a47e4e1c2f94998a49cf", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_code_gson_gson", "actual": "@com_google_code_gson_gson//jar", "bind": "jar/com/google/code/gson/gson"},
 # duplicates in com.google.errorprone:error_prone_annotations promoted to 2.1.3
 # - com.google.guava:guava:24.0-android wanted version 2.1.3
@@ -50,6 +53,7 @@ def list_dependencies():
 # - com.google.api:api-common:1.1.0 wanted version 19.0
 # - com.google.firebase:firebase-admin:5.9.0 wanted version 20.0
 # - com.google.googlejavaformat:google-java-format:1.5 wanted version 22.0
+# - com.google.protobuf:protobuf-java-util:3.5.1 wanted version 19.0
 # - org.reflections:reflections:0.9.11 wanted version 20.0
     {"artifact": "com.google.guava:guava:24.0-android", "lang": "java", "sha1": "bfc941bd9285e7534ebde47236f14e5c7396a90c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_guava_guava", "actual": "@com_google_guava_guava//jar", "bind": "jar/com/google/guava/guava"},
     {"artifact": "com.google.http-client:google-http-client-appengine:1.23.0", "lang": "java", "sha1": "0eda0d0f758c1cc525866e52e1226c4eb579d130", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_appengine", "actual": "@com_google_http_client_google_http_client_appengine//jar", "bind": "jar/com/google/http_client/google_http_client_appengine"},
