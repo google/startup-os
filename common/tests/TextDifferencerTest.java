@@ -27,6 +27,13 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class TextDifferencerTest {
 
+  CharDifference.Builder newCharDifference(int index, char difference, DifferenceType type) {
+    return CharDifference.newBuilder()
+        .setIndex(index)
+        .setDifference(Character.toString(difference))
+        .setType(type);
+  }
+
   @Test
   public void testEmptyDiff() {
     assertEquals(TextDifferencer.getAllTextDifferences("", ""), ImmutableList.of());
@@ -36,15 +43,15 @@ public class TextDifferencerTest {
   public void testOnlyAdditions() throws Exception {
     assertEquals(
         ImmutableList.of(
-            new CharDifference(0, 'A', DifferenceType.ADDITION),
-            new CharDifference(1, 'd', DifferenceType.ADDITION),
-            new CharDifference(2, 'd', DifferenceType.ADDITION),
-            new CharDifference(3, 'i', DifferenceType.ADDITION),
-            new CharDifference(4, 't', DifferenceType.ADDITION),
-            new CharDifference(5, 'i', DifferenceType.ADDITION),
-            new CharDifference(6, 'o', DifferenceType.ADDITION),
-            new CharDifference(7, 'n', DifferenceType.ADDITION),
-            new CharDifference(8, '.', DifferenceType.ADDITION)),
+            newCharDifference(0, 'A', DifferenceType.ADDITION).build(),
+            newCharDifference(1, 'd', DifferenceType.ADDITION).build(),
+            newCharDifference(2, 'd', DifferenceType.ADDITION).build(),
+            newCharDifference(3, 'i', DifferenceType.ADDITION).build(),
+            newCharDifference(4, 't', DifferenceType.ADDITION).build(),
+            newCharDifference(5, 'i', DifferenceType.ADDITION).build(),
+            newCharDifference(6, 'o', DifferenceType.ADDITION).build(),
+            newCharDifference(7, 'n', DifferenceType.ADDITION).build(),
+            newCharDifference(8, '.', DifferenceType.ADDITION).build()),
         TextDifferencer.getAllTextDifferences("", "Addition."));
   }
 
@@ -52,15 +59,15 @@ public class TextDifferencerTest {
   public void testOnlyDeletions() throws Exception {
     assertEquals(
         ImmutableList.of(
-            new CharDifference(0, 'D', DifferenceType.DELETION),
-            new CharDifference(1, 'e', DifferenceType.DELETION),
-            new CharDifference(2, 'l', DifferenceType.DELETION),
-            new CharDifference(3, 'e', DifferenceType.DELETION),
-            new CharDifference(4, 't', DifferenceType.DELETION),
-            new CharDifference(5, 'i', DifferenceType.DELETION),
-            new CharDifference(6, 'o', DifferenceType.DELETION),
-            new CharDifference(7, 'n', DifferenceType.DELETION),
-            new CharDifference(8, '.', DifferenceType.DELETION)),
+            newCharDifference(0, 'D', DifferenceType.DELETION).build(),
+            newCharDifference(1, 'e', DifferenceType.DELETION).build(),
+            newCharDifference(2, 'l', DifferenceType.DELETION).build(),
+            newCharDifference(3, 'e', DifferenceType.DELETION).build(),
+            newCharDifference(4, 't', DifferenceType.DELETION).build(),
+            newCharDifference(5, 'i', DifferenceType.DELETION).build(),
+            newCharDifference(6, 'o', DifferenceType.DELETION).build(),
+            newCharDifference(7, 'n', DifferenceType.DELETION).build(),
+            newCharDifference(8, '.', DifferenceType.DELETION).build()),
         TextDifferencer.getAllTextDifferences("Deletion.", ""));
   }
 
@@ -68,16 +75,16 @@ public class TextDifferencerTest {
   public void testOnlyNoChanges() throws Exception {
     assertEquals(
         ImmutableList.of(
-            new CharDifference(0, 'N', DifferenceType.NO_CHANGE),
-            new CharDifference(1, 'o', DifferenceType.NO_CHANGE),
-            new CharDifference(2, ' ', DifferenceType.NO_CHANGE),
-            new CharDifference(3, 'C', DifferenceType.NO_CHANGE),
-            new CharDifference(4, 'h', DifferenceType.NO_CHANGE),
-            new CharDifference(5, 'a', DifferenceType.NO_CHANGE),
-            new CharDifference(6, 'n', DifferenceType.NO_CHANGE),
-            new CharDifference(7, 'g', DifferenceType.NO_CHANGE),
-            new CharDifference(8, 'e', DifferenceType.NO_CHANGE),
-            new CharDifference(9, '.', DifferenceType.NO_CHANGE)),
+            newCharDifference(0, 'N', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(1, 'o', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(2, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, '.', DifferenceType.NO_CHANGE).build()),
         TextDifferencer.getAllTextDifferences("No Change.", "No Change."));
   }
 
@@ -85,20 +92,20 @@ public class TextDifferencerTest {
   public void testMixedChanges() throws Exception {
     assertEquals(
         ImmutableList.of(
-            new CharDifference(0, 'N', DifferenceType.DELETION),
-            new CharDifference(1, 'o', DifferenceType.DELETION),
-            new CharDifference(0, 'W', DifferenceType.ADDITION),
-            new CharDifference(1, 'i', DifferenceType.ADDITION),
-            new CharDifference(2, 't', DifferenceType.ADDITION),
-            new CharDifference(3, 'h', DifferenceType.ADDITION),
-            new CharDifference(2, ' ', DifferenceType.NO_CHANGE),
-            new CharDifference(3, 'C', DifferenceType.NO_CHANGE),
-            new CharDifference(4, 'h', DifferenceType.NO_CHANGE),
-            new CharDifference(5, 'a', DifferenceType.NO_CHANGE),
-            new CharDifference(6, 'n', DifferenceType.NO_CHANGE),
-            new CharDifference(7, 'g', DifferenceType.NO_CHANGE),
-            new CharDifference(8, 'e', DifferenceType.NO_CHANGE),
-            new CharDifference(9, '.', DifferenceType.NO_CHANGE)),
+            newCharDifference(0, 'N', DifferenceType.DELETION).build(),
+            newCharDifference(1, 'o', DifferenceType.DELETION).build(),
+            newCharDifference(0, 'W', DifferenceType.ADDITION).build(),
+            newCharDifference(1, 'i', DifferenceType.ADDITION).build(),
+            newCharDifference(2, 't', DifferenceType.ADDITION).build(),
+            newCharDifference(3, 'h', DifferenceType.ADDITION).build(),
+            newCharDifference(2, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, '.', DifferenceType.NO_CHANGE).build()),
         TextDifferencer.getAllTextDifferences("No Change.", "With Change."));
   }
 }

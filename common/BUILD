@@ -21,18 +21,6 @@ java_library(
 )
 
 java_library(
-    name = "text_differencer",
-    srcs = [
-        "CharDifference.java",
-        "DifferenceType.java",
-        "TextDifferencer.java",
-    ],
-    deps = [
-        "//third_party/maven/com/google/guava",
-    ],
-)
-
-java_library(
     name = "git",
     srcs = [
         "Git.java",
@@ -42,6 +30,17 @@ java_library(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/jcraft:jsch",
         "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
+    ],
+)
+
+java_library(
+    name = "text_differencer",
+    srcs = [
+        "TextDifferencer.java",
+    ],
+    deps = [
+        ":char_difference_java_proto",
+        "//third_party/maven/com/google/guava",
     ],
 )
 
