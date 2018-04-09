@@ -17,7 +17,6 @@
 package com.google.startup.common;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,26 +35,22 @@ public class TextDifferencer {
    * @return A list which holds all the text differences.
    */
   public static List<CharDifference> getAllTextDifferences(String first, String second) {
-    List<CharDifference> footerDifferences = getFooterDifferences(first, second);
-    String firstBody = first.substring(0, first.length() - footerDifferences.size());
-    String secondBody = second.substring(0, second.length() - footerDifferences.size());
-    List<CharDifference> bodyDifference =
-        getDifferencesFromLCSMatrix(
-                computeLCSMatrix(firstBody.toCharArray(), secondBody.toCharArray()),
-                firstBody.toCharArray(),
-                secondBody.toCharArray())
-            .stream()
-            .map(builder -> builder.build())
-            .collect(Collectors.toList());
-    return mergeDifferences(bodyDifference, footerDifferences);
+    List<CharDifference.Builder> footerDifferences = getFooterDifferences(first, second);
+    char[] firstBody = first.substring(0, first.length() - footerDifferences.size()).toCharArray();
+    char[] secondBody =
+        second.substring(0, second.length() - footerDifferences.size()).toCharArray();
+    List<CharDifference.Builder> bodyDifference =
+        getDifferencesFromLCSMatrix(computeLCSMatrix(firstBody, secondBody), firstBody, secondBody);
+    return mergeDifferences(bodyDifference.stream(), footerDifferences.stream())
+        .map(builder -> builder.build())
+        .collect(Collectors.toList());
   }
 
-  /** Merges all the differences into a single list. */
-  private static List<CharDifference> mergeDifferences(
-      List<CharDifference> bodyDifference, List<CharDifference> footerDifferences) {
-    return Stream.of(bodyDifference, footerDifferences)
-        .flatMap(Collection::stream)
-        .collect(Collectors.toList());
+  /** Merges all the differences into a single Stream. */
+  private static Stream<CharDifference.Builder> mergeDifferences(
+      Stream<CharDifference.Builder> bodyDifference,
+      Stream<CharDifference.Builder> footerDifferences) {
+    return Stream.concat(bodyDifference, footerDifferences);
   }
 
   /**
@@ -65,8 +60,8 @@ public class TextDifferencer {
    * @param second The second string.
    * @return A list which holds all the text differences.
    */
-  private static List<CharDifference> getFooterDifferences(String first, String second) {
-    List<CharDifference> footerDifferences = new ArrayList();
+  private static List<CharDifference.Builder> getFooterDifferences(String first, String second) {
+    List<CharDifference.Builder> footerDifferences = new ArrayList();
     int i = first.length() - 1;
     int j = second.length() - 1;
     for (; i >= 0 && j >= 0; --i, --j) {
@@ -77,8 +72,7 @@ public class TextDifferencer {
           CharDifference.newBuilder()
               .setIndex(i)
               .setDifference(Character.toString(first.charAt(i)))
-              .setType(DifferenceType.NO_CHANGE)
-              .build());
+              .setType(DifferenceType.NO_CHANGE));
     }
     Collections.reverse(footerDifferences);
     return footerDifferences;
