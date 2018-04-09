@@ -44,3 +44,13 @@ java_library(
     "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
   ]
 )
+
+proto_library(
+  name = "char_difference_proto",
+  srcs = ["char_difference.proto"],
+)
+
+java_proto_library(
+  name = "char_difference_java_proto",
+  deps = [":char_difference_proto"],
+)
