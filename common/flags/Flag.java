@@ -141,7 +141,8 @@ public abstract class Flag<T> {
               prevValue, value));
     }
     if (required && value.equals(Flags.getDefaultFlagValue(name))) {
-      throw new IllegalArgumentException("Argument is required but was not supplied");
+      throw new IllegalArgumentException(
+          String.format("Argument '%s' is required but was not supplied", name));
     }
     return value;
   }
