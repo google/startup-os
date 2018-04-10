@@ -18,4 +18,6 @@ message FlagData {
   // Since proto3 doesn't have a hasValue() method, we can't know if a flag was
   // set to empty or not set at all. That's why we need this boolean.
   bool hasValue = 7;
+  // Throw exception if flag has no value
+  bool required = 8;
 }

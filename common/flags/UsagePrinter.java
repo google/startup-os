@@ -16,11 +16,8 @@
 
 package com.google.startupos.common.flags;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import java.io.PrintStream;
 import java.util.Map;
-import java.util.Set;
 
 public class UsagePrinter {
   public void printUsage(Map<String, FlagData> flags, PrintStream out) {
@@ -30,4 +27,3 @@ public class UsagePrinter {
     }
   }
 }
-

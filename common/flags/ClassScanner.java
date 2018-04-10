@@ -18,9 +18,9 @@ package com.google.startupos.common.flags;
 
 import com.google.common.base.CaseFormat;
 import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 import org.reflections.Reflections;
@@ -69,6 +69,7 @@ public class ClassScanner {
       }
       flags.put(flagData.getName(), flagData);
       flag.setName(flagData.getName());
+      flag.setRequired(flagData.getRequired());
     }
   }
 
@@ -105,7 +106,8 @@ public class ClassScanner {
             .setName(desc.name())
             .setClassName(declaringClass.getCanonicalName())
             .setIsBooleanFlag(isBooleanFlag(field))
-            .setDescription(desc.description());
+            .setDescription(desc.description())
+            .setRequired(desc.required());
     if (flag.getDefault() != null) {
       result.setDefault(flag.getDefault().toString());
     }
@@ -159,4 +161,3 @@ public class ClassScanner {
     }
   }
 }
-
