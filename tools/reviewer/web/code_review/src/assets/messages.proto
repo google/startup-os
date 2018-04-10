@@ -1,0 +1,64 @@
+syntax = "proto3";
+package messages;
+
+message Diff {
+  enum Status {
+    REVIEW_NOT_STARTED = 0;
+    NEEDS_MORE_WORK = 1;
+    UNDER_REVIEW = 2;
+    ACCEPTED = 3;
+    SUBMITTED = 4;
+    REVERTED = 5;
+  }
+
+  int64 number = 1;
+  string author = 2;
+  repeated string reviewers = 3;
+  string description = 4;
+  string bug = 5;
+  Status status = 6;
+
+  string workspace = 7;
+  int64 created_timestamp = 8;
+  int64 modified_timestamp = 9;
+  repeated File files = 10;
+  repeated Snapshot snapshots = 11;
+  repeated Thread threads = 12;
+  string pull_request_id = 13;
+  repeated string need_attention_of = 14;
+  repeated string cc = 15;
+}
+
+message Files { repeated File file = 1; }
+
+message File {
+  string file_position = 1;
+  enum FileAction {
+    ADD = 0;
+    DELETE = 1;
+    RENAME = 2;
+    MODIFY = 3;
+  }
+  FileAction file_action = 2;
+}
+
+message Snapshot {
+  int64 timestamp = 1;
+  string git_commit = 2;
+  bool for_review = 3;
+  repeated string files = 4;
+}
+
+message Thread {
+  int32 snapshot = 1;
+  string filename = 2;
+  int32 line_number = 3;
+  bool is_done = 4;
+  repeated Comment comments = 5;
+}
+
+message Comment {
+  string content = 1;
+  int64 timestamp = 2;
+  string created_by = 3;
+}
