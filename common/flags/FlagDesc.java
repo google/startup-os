@@ -30,5 +30,5 @@ public @interface FlagDesc {
 
   String description();
 
-  boolean required();
+  boolean required() default false;
 }
