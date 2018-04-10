@@ -21,23 +21,23 @@ import com.google.startupos.common.flags.FlagDesc;
 
 public class FlagDescTestClass {
   @SuppressWarnings("unused")
-  @FlagDesc(name = "string_flag", description = "A flag description", required = false)
+  @FlagDesc(name = "string_flag", description = "A flag description")
   private static final Flag<String> stringFlag = Flag.create("default value");
 
   @SuppressWarnings("unused")
-  @FlagDesc(name = "boolean_flag", description = "A flag description", required = false)
+  @FlagDesc(name = "boolean_flag", description = "A flag description")
   public static final Flag<Boolean> booleanFlag = Flag.create(true);
 
   @SuppressWarnings("unused")
-  @FlagDesc(name = "integer_flag", description = "A flag description", required = false)
+  @FlagDesc(name = "integer_flag", description = "A flag description")
   public static final Flag<Integer> integerFlag = Flag.create(123);
 
   @SuppressWarnings("unused")
-  @FlagDesc(name = "long_flag", description = "A flag description", required = false)
+  @FlagDesc(name = "long_flag", description = "A flag description")
   public static final Flag<Long> longFlag = Flag.create(123456789L);
 
   @SuppressWarnings("unused")
-  @FlagDesc(name = "double_flag", description = "A flag description", required = false)
+  @FlagDesc(name = "double_flag", description = "A flag description")
   public static final Flag<Double> doubleFlag = Flag.create(1.23);
 
   @SuppressWarnings("unused")
