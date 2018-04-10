@@ -49,7 +49,7 @@ java_binary(
     srcs = [
         "CodeReviewServer.java",
     ],
-    main_class = "com.appstory.review_server.CodeReviewServer",
+    main_class = "com.google.startupos.tools.reviewer.localserver.CodeReviewServer",
     deps = [
         ":code_review_lib",
         ":grpc_service",
@@ -63,7 +63,7 @@ java_binary(
     srcs = [
         "CodeReviewGateway.java",
     ],
-    main_class = "com.appstory.review_server.CodeReviewGateway",
+    main_class = "com.google.startupos.tools.reviewer.localserver.CodeReviewGateway",
     deps = [
         ":code_review_lib",
         ":grpc_client",
