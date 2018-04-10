@@ -201,5 +201,32 @@ public class FlagsTest {
     assertEquals("flag should have value", new Double(9.87), FlagDescTestClass.doubleFlag.get());
     assertEquals(leftOverArgs.size(), 0);
   }
-}
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testRequiredStringFlagNotSupplied() throws Exception {
+    List<String> leftOverArgs =
+        Arrays.asList(Flags.parse(new String[] {}, Arrays.asList(TESTFLAGS_PACKAGE)));
+
+    FlagDescTestClass.requiredFlag.get();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testRequiredStringFlagNoValue() throws Exception {
+    List<String> leftOverArgs =
+        Arrays.asList(
+            Flags.parse(new String[] {"--required_flag"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+
+    FlagDescTestClass.requiredFlag.get();
+  }
+
+  @Test
+  public void testRequiredStringFlagWithValue() throws Exception {
+    List<String> leftOverArgs =
+        Arrays.asList(
+            Flags.parse(
+                new String[] {"--required_flag", "required"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+
+    assertEquals(0, leftOverArgs.size());
+    assertEquals("flag should have value", "required", FlagDescTestClass.requiredFlag.get());
+  }
+}

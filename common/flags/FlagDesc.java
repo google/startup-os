@@ -29,5 +29,6 @@ public @interface FlagDesc {
   String name();
 
   String description();
-}
 
+  boolean required();
+}

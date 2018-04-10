@@ -103,6 +103,7 @@ public abstract class Flag<T> {
   protected T defaultValue;
   protected T value;
   protected String name;
+  protected boolean required;
 
   public Flag(T defaultValue) {
     this.defaultValue = defaultValue;
@@ -120,6 +121,10 @@ public abstract class Flag<T> {
     this.name = name;
   }
 
+  void setRequired(boolean required) {
+    this.required = required;
+  }
+
   public T get() {
     T prevValue = value;
     if (Flags.getFlagValue(name) != null) {
@@ -135,7 +140,9 @@ public abstract class Flag<T> {
                   + "Previous value is %s and current is %s",
               prevValue, value));
     }
+    if (required && value.equals(Flags.getDefaultFlagValue(name))) {
+      throw new IllegalArgumentException("Argument is required but was not supplied");
+    }
     return value;
   }
 }
-
