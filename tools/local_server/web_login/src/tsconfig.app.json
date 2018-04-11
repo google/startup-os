@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "exclude": [
+    "./**/*.spec.ts",
+    "./**/*.e2e-spec.ts"
+  ]
+}
