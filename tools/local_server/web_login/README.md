@@ -1,4 +1,4 @@
-# Log-in with Google
+# Firestore web login for StartupOS local server
 
 ### Setting
 Port: `./src/bootstrap/environments/port.ts`  

@@ -1,8 +1,8 @@
 export const config = {
-  apiKey: 'AIzaSyCec0Hd7z7P2z1PVn2BacziMuxSll4ME2s',
-  authDomain: 'tape-dev.firebaseapp.com',
-  databaseURL: 'https://tape-dev.firebaseio.com',
-  projectId: 'tape-dev',
-  storageBucket: 'tape-dev.appspot.com',
-  messagingSenderId: '630849373007'
+  apiKey: 'AIzaSyAn-A7YXlqR2JNOvlbhkVwcnsOigmphQIw',
+  authDomain: 'startupos-5f279.firebaseapp.com',
+  databaseURL: 'https://startupos-5f279.firebaseio.com',
+  projectId: 'startupos-5f279',
+  storageBucket: '',
+  messagingSenderId: '160348327132'
 };

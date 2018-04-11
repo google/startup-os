@@ -9,6 +9,6 @@ export class HomePageComponent {
   constructor(
     public title: Title
   ) {
-    this.title.setTitle('Log-in with Google');
+    this.title.setTitle('Log-in for StartupOS local server');
   }
 }
