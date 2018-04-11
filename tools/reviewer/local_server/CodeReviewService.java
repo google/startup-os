@@ -31,6 +31,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
  
   private String rootPath;
   private String firestoreToken;
+  private String firestoreProjectId;
 
   CodeReviewService(String rootPath) {
     this.rootPath = rootPath;
@@ -54,6 +55,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void postToken(TokenRequest req, StreamObserver<TokenResponse> responseObserver) {
     try {
+      firestoreProjectId = req.getProjectId();
       firestoreToken = req.getToken();
       responseObserver.onNext(TokenResponse.getDefaultInstance());
       responseObserver.onCompleted();

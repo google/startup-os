@@ -54,8 +54,11 @@ public class CodeReviewClient {
     }
   }
 
-  public void postToken(String token) {
-    final TokenRequest request = TokenRequest.newBuilder().setToken(token).build();
+  public void postToken(String projectId, String token) {
+    final TokenRequest request = TokenRequest.newBuilder()
+        .setProjectId(projectId)
+        .setToken(token)
+        .build();
     try {
       blockingStub.postToken(request);
     } catch (StatusRuntimeException e) {

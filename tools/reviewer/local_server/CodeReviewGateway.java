@@ -39,7 +39,7 @@ import org.json.JSONObject;
  * client (which in turn communicates to gRPC server and responds) and returns responses
  *
  * To run: bazel build //tools/reviewer/local_server:grpc_gateway_deploy.jar
- * java -jar bazel-bin/review_server/grpc/grpc_gateway_deploy.jar -- {absolute_path}
+ * java -jar bazel-bin/tools/reviewer/local_server/grpc_gateway_deploy.jar -- {absolute_path}
  * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
  */
 // TODO: Find an automated way to do this, e.g github.com/improbable-eng/grpc-web
@@ -97,8 +97,9 @@ public class CodeReviewGateway {
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.info("Handling token request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
+        String projectId = json.getString("project_id");
         String token = json.getString("token");
-        client.postToken(token);
+        client.postToken(projectId, token);
       }
 
       httpExchange.sendResponseHeaders(200, -1);

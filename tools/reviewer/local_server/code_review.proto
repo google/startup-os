@@ -17,7 +17,10 @@ service CodeReviewService {
   
   message FileResponse { string content = 1; }
   
-  message TokenRequest { string token = 1; }
+  message TokenRequest {
+    string projectId = 1;
+    string token = 2;
+  }
   
   // TODO: Use Empty: https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto
   message TokenResponse { }
