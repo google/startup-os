@@ -26,10 +26,10 @@ enum DifferenceType {
   // destination.
   NO_CHANGE = 0;
 
-  // An addition of new characters has occurred.
+  // An addition of a new character has occurred. Additional character was
+  // added to the source.
   ADDITION = 1;
 
-  // A deletion of characters has occurred. The source is missing several
-  // characters.
+  // A deletion of a character has occurred. The source is missing a character.
   DELETION = 2;
 }

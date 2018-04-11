@@ -81,7 +81,7 @@ public class TextDifferencer {
   /** Create an empty matrix based on the given dimensions. */
   private static int[][] createEmptyLCSMatrix(int rowSize, int colSize) {
     final int[][] lcsMatrix = new int[rowSize][];
-    for (int i = 0; i < lcsMatrix.length; ++i) {
+    for (int i = 0; i < lcsMatrix.length; i++) {
       lcsMatrix[i] = new int[colSize];
     }
     return lcsMatrix;
@@ -97,8 +97,8 @@ public class TextDifferencer {
    */
   private static int[][] computeLCSMatrix(char[] first, char[] second) {
     final int[][] lcsMatrix = createEmptyLCSMatrix(first.length + 1, second.length + 1);
-    for (int i = 1; i < first.length + 1; ++i) {
-      for (int j = 1; j < second.length + 1; ++j) {
+    for (int i = 1; i < first.length + 1; i++) {
+      for (int j = 1; j < second.length + 1; j++) {
         if (first[i - 1] == second[j - 1]) {
           lcsMatrix[i][j] = lcsMatrix[i - 1][j - 1] + 1;
         } else {
