@@ -65,4 +65,8 @@ public class CodeReviewClient {
       e.printStackTrace();
     }
   }
+
+  public GetTokenResponse getToken() throws StatusRuntimeException {
+    return blockingStub.getToken(GetTokenRequest.getDefaultInstance());
+  }
 }

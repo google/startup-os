@@ -95,11 +95,18 @@ public class CodeReviewGateway {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
           "Origin, X-Requested-With, Content-Type, Accept");
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
-        logger.info("Handling token request");
+        logger.info("Handling token post request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
-        String projectId = json.getString("project_id");
-        String token = json.getString("token");
-        client.postToken(projectId, token);
+        client.postToken(json.getString("projectId"), json.getString("token"));
+      } else if ("get".equalsIgnoreCase(httpExchange.getRequestMethod())) {
+        logger.info("Handling token get request");
+        GetTokenResponse response = client.getToken();
+
+        byte[] responseBytes = response.toByteArray();
+        httpExchange.sendResponseHeaders(200, responseBytes.length);
+        OutputStream stream = httpExchange.getResponseBody();
+        stream.write(responseBytes);
+        stream.close();
       }
 
       httpExchange.sendResponseHeaders(200, -1);
@@ -122,19 +129,19 @@ public class CodeReviewGateway {
 
       if (fileContents == null) {
         httpExchange.sendResponseHeaders(404, 0);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(
+        OutputStream stream = httpExchange.getResponseBody();
+        stream.write(
             String.format("{\"error\": \"No file at path '%s'\"}", relativeFilePath).getBytes());
-        os.close();
+        stream.close();
         return;
       }
 
       byte[] response = fileContents.getBytes();
 
       httpExchange.sendResponseHeaders(200, response.length);
-      OutputStream os = httpExchange.getResponseBody();
-      os.write(response);
-      os.close();
+      OutputStream stream = httpExchange.getResponseBody();
+      stream.write(response);
+      stream.close();
     }
   }
 

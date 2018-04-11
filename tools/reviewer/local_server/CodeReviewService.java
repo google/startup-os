@@ -59,7 +59,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       firestoreToken = req.getToken();
       responseObserver.onNext(TokenResponse.getDefaultInstance());
       responseObserver.onCompleted();
-      logger.info("Received token: " + firestoreToken);
+      logger.info("Received token for project " + firestoreProjectId);
     } catch (SecurityException e) {
       responseObserver.onError(
           Status.UNKNOWN
@@ -81,6 +81,35 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           Status.NOT_FOUND
               .withDescription(String.format("No such file %s", req.getFilename()))
               .asException());
+    }
+  }
+
+  @Override
+  public void getToken(GetTokenRequest req, StreamObserver<GetTokenResponse> responseObserver) {
+    if (firestoreToken == null || firestoreProjectId == null) {
+      String message = "Firestore project ID or token (or both) null. Project ID=" + firestoreProjectId;
+      responseObserver.onError(
+        Status.UNKNOWN
+            .withDescription(message)
+            .asException());
+      logger.info("GetToken failed: " + message);
+      return;
+    }
+
+    try {
+      responseObserver.onNext(
+          GetTokenResponse.newBuilder()
+              .setProjectId(firestoreProjectId)
+              .setToken(firestoreToken)
+              .build());
+      responseObserver.onCompleted();
+      logger.info("Sending token for project " + firestoreProjectId);
+    } catch (SecurityException e) {
+      responseObserver.onError(
+          Status.UNKNOWN
+              .withDescription("Cannot send token")
+              .asException());
+      logger.info("Cannot send token");
     }
   }
 }
