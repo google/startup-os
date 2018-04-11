@@ -21,13 +21,16 @@ import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
  */
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
-
+  private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
+ 
   private String rootPath;
+  private String firestoreToken;
 
   CodeReviewService(String rootPath) {
     this.rootPath = rootPath;
@@ -49,10 +52,27 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
+  public void postToken(TokenRequest req, StreamObserver<TokenResponse> responseObserver) {
+    try {
+      firestoreToken = req.getToken();
+      responseObserver.onNext(TokenResponse.getDefaultInstance());
+      responseObserver.onCompleted();
+      logger.info("Received token: " + firestoreToken);
+    } catch (SecurityException e) {
+      responseObserver.onError(
+          Status.UNKNOWN
+              .withDescription("Cannot get token from request")
+              .asException());
+      logger.info("Cannot get token from request");
+    }
+  }
+
+  @Override
   public void getFile(FileRequest req, StreamObserver<FileResponse> responseObserver) {
     try {
       String filePath = getAbsolutePath(req.getFilename());
-      responseObserver.onNext(FileResponse.newBuilder().setContent(readTextFile(filePath)).build());
+      responseObserver.onNext(
+          FileResponse.newBuilder().setContent(readTextFile(filePath)).build());
       responseObserver.onCompleted();
     } catch (SecurityException | IOException e) {
       responseObserver.onError(

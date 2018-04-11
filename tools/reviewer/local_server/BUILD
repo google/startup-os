@@ -70,5 +70,6 @@ java_binary(
         ":grpc_inprocess_server",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+        "//third_party/maven/org/json:json"
     ],
 )

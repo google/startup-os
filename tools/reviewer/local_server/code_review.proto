@@ -6,8 +6,18 @@ option java_outer_classname = "CodeReviewProto";
 
 package localserver;
 
-service CodeReviewService { rpc getFile(FileRequest) returns (FileResponse); }
-
-message FileRequest { string filename = 1; }
-
-message FileResponse { string content = 1; }
+service CodeReviewService { 
+    // Post a Firestore token.
+    rpc postToken(TokenRequest) returns (TokenResponse);
+    // Get a text file's contents
+    rpc getFile(FileRequest) returns (FileResponse);
+  }
+  
+  message FileRequest { string filename = 1; }
+  
+  message FileResponse { string content = 1; }
+  
+  message TokenRequest { string token = 1; }
+  
+  // TODO: Use Empty: https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto
+  message TokenResponse { }

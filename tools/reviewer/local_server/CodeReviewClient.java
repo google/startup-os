@@ -53,4 +53,13 @@ public class CodeReviewClient {
       return null;
     }
   }
+
+  public void postToken(String token) {
+    final TokenRequest request = TokenRequest.newBuilder().setToken(token).build();
+    try {
+      blockingStub.postToken(request);
+    } catch (StatusRuntimeException e) {
+      e.printStackTrace();
+    }
+  }
 }
