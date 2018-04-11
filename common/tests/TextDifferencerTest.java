@@ -89,7 +89,7 @@ public class TextDifferencerTest {
   }
 
   @Test
-  public void testMixedChanges() throws Exception {
+  public void testMixedChangesAtTheBeginning() throws Exception {
     assertEquals(
         ImmutableList.of(
             newCharDifference(0, 'N', DifferenceType.DELETION).build(),
@@ -107,5 +107,44 @@ public class TextDifferencerTest {
             newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
             newCharDifference(9, '.', DifferenceType.NO_CHANGE).build()),
         TextDifferencer.getAllTextDifferences("No Change.", "With Change."));
+  }
+
+  @Test
+  public void testMixedChangesAtTheMiddle() throws Exception {
+    assertEquals(
+        ImmutableList.of(
+            newCharDifference(0, 'W', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(1, 'i', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(2, 't', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 'a', DifferenceType.ADDITION).build(),
+            newCharDifference(6, ' ', DifferenceType.ADDITION).build(),
+            newCharDifference(5, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(10, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(11, '.', DifferenceType.NO_CHANGE).build()),
+        TextDifferencer.getAllTextDifferences("With Change.", "With a Change."));
+  }
+
+  @Test
+  public void testMixedChangesAtTheEnd() throws Exception {
+    assertEquals(
+        ImmutableList.of(
+            newCharDifference(0, 'N', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(1, 'o', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(2, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, '.', DifferenceType.DELETION).build(),
+            newCharDifference(9, '!', DifferenceType.ADDITION).build()),
+        TextDifferencer.getAllTextDifferences("No Change.", "No Change!"));
   }
 }

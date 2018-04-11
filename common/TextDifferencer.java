@@ -19,7 +19,9 @@ package com.google.startup.common;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -28,54 +30,95 @@ import java.util.stream.Stream;
 public class TextDifferencer {
 
   /**
-   * Returns all the text differences between two given strings.
+   * Return all the text differences between two given strings.
    *
    * @param first The first string.
    * @param second The second string.
    * @return A list which holds all the text differences.
    */
   public static List<CharDifference> getAllTextDifferences(String first, String second) {
-    List<CharDifference.Builder> footerDifferences = getFooterDifferences(first, second);
-    char[] firstBody = first.substring(0, first.length() - footerDifferences.size()).toCharArray();
+    int headerLength = getHeaderMatchingCharactersLength(first.toCharArray(), second.toCharArray());
+    int footerLength =
+        getFooterMatchingCharactersLength(
+            first.substring(headerLength).toCharArray(),
+            second.substring(headerLength).toCharArray());
+    char[] firstBody = first.substring(headerLength, first.length() - footerLength).toCharArray();
     char[] secondBody =
-        second.substring(0, second.length() - footerDifferences.size()).toCharArray();
-    List<CharDifference.Builder> bodyDifference =
-        getDifferencesFromLCSMatrix(computeLCSMatrix(firstBody, secondBody), firstBody, secondBody);
-    return mergeDifferences(bodyDifference.stream(), footerDifferences.stream())
+        second.substring(headerLength, second.length() - footerLength).toCharArray();
+    return mergeDifferences(
+        getMatchingCharDifferences(first.toCharArray(), 0, headerLength),
+        addOffestTo(getNonMatchingCharDifferences(firstBody, secondBody), headerLength),
+        getMatchingCharDifferences(
+            first.toCharArray(), first.length() - footerLength, footerLength));
+  }
+
+  /** Merge all the differences into a single {@link List}. */
+  private static List<CharDifference> mergeDifferences(
+      Stream<CharDifference.Builder> headerDifferences,
+      Stream<CharDifference.Builder> bodyDifference,
+      Stream<CharDifference.Builder> footerDifferences) {
+    return Stream.of(headerDifferences, bodyDifference, footerDifferences)
+        .flatMap(Function.identity())
         .map(builder -> builder.build())
         .collect(Collectors.toList());
   }
 
-  /** Merges all the differences into a single Stream. */
-  private static Stream<CharDifference.Builder> mergeDifferences(
-      Stream<CharDifference.Builder> bodyDifference,
-      Stream<CharDifference.Builder> footerDifferences) {
-    return Stream.concat(bodyDifference, footerDifferences);
+  /** Count the number of equal characters from the beginning of the given two strings. */
+  private static int getHeaderMatchingCharactersLength(final char[] first, final char[] second) {
+    int count = 0;
+    for (; count < first.length && count < second.length; count++) {
+      if (first[count] != second[count]) {
+        return count;
+      }
+    }
+    return count;
+  }
+
+  /** Count the number of equal characters from the end of the given two strings. */
+  private static int getFooterMatchingCharactersLength(final char[] first, final char[] second) {
+    int count = 0;
+    for (; count < first.length && count < second.length; count++) {
+      if (first[first.length - count - 1] != second[second.length - count - 1]) {
+        return count;
+      }
+    }
+    return count;
   }
 
   /**
-   * Compute all the differences from the text footer.
+   * Correct the offset to the given {@link CharDifference.Builder}.
+   *
+   * @param stream A stream of char difference builder.
+   * @param offset The offset required for correction.
+   * @return A stream with the corrected offset.
+   */
+  private static Stream<CharDifference.Builder> addOffestTo(
+      final Stream<CharDifference.Builder> stream, final int offset) {
+    return stream.map(diff -> diff.setIndex(offset + diff.getIndex()));
+  }
+
+  /** Return a stream of the non equal char differences of the given two strings. */
+  private static Stream<CharDifference.Builder> getNonMatchingCharDifferences(
+      final char[] first, final char[] second) {
+    return getDifferencesFromLCSMatrix(computeLCSMatrix(first, second), first, second).stream();
+  }
+
+  /**
+   * Generate matching char differences for the given range.
    *
    * @param first The first string.
    * @param second The second string.
    * @return A list which holds all the text differences.
    */
-  private static List<CharDifference.Builder> getFooterDifferences(String first, String second) {
-    List<CharDifference.Builder> footerDifferences = new ArrayList();
-    int i = first.length() - 1;
-    int j = second.length() - 1;
-    for (; i >= 0 && j >= 0; --i, --j) {
-      if (first.charAt(i) != second.charAt(j)) {
-        break;
-      }
-      footerDifferences.add(
-          CharDifference.newBuilder()
-              .setIndex(i)
-              .setDifference(Character.toString(first.charAt(i)))
-              .setType(DifferenceType.NO_CHANGE));
-    }
-    Collections.reverse(footerDifferences);
-    return footerDifferences;
+  private static Stream<CharDifference.Builder> getMatchingCharDifferences(
+      char[] content, int begin, int length) {
+    return IntStream.range(begin, begin + length)
+        .mapToObj(
+            (i) ->
+                CharDifference.newBuilder()
+                    .setIndex(i)
+                    .setDifference(Character.toString(content[i]))
+                    .setType(DifferenceType.NO_CHANGE));
   }
 
   /** Create an empty matrix based on the given dimensions. */
