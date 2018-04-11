@@ -41,6 +41,11 @@ dependencies:
       lang: java
       version: "24.0-android"
   
+  com.google.jimfs:
+    jimfs:
+      lang: java
+      version: "1.1"
+  
   com.google.protobuf:
     protobuf-java:
       lang: java

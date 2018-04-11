@@ -53,6 +53,7 @@ def list_dependencies():
 # - com.google.api:api-common:1.1.0 wanted version 19.0
 # - com.google.firebase:firebase-admin:5.9.0 wanted version 20.0
 # - com.google.googlejavaformat:google-java-format:1.5 wanted version 22.0
+# - com.google.jimfs:jimfs:1.1 wanted version 18.0
 # - com.google.protobuf:protobuf-java-util:3.5.1 wanted version 19.0
 # - org.reflections:reflections:0.9.11 wanted version 20.0
     {"artifact": "com.google.guava:guava:24.0-android", "lang": "java", "sha1": "bfc941bd9285e7534ebde47236f14e5c7396a90c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_guava_guava", "actual": "@com_google_guava_guava//jar", "bind": "jar/com/google/guava/guava"},
@@ -63,6 +64,7 @@ def list_dependencies():
     {"artifact": "com.google.http-client:google-http-client:1.23.0", "lang": "java", "sha1": "8e86c84ff3c98eca6423e97780325b299133d858", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client", "actual": "@com_google_http_client_google_http_client//jar", "bind": "jar/com/google/http_client/google_http_client"},
     {"artifact": "com.google.instrumentation:instrumentation-api:0.4.3", "lang": "java", "sha1": "41614af3429573dc02645d541638929d877945a2", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_instrumentation_instrumentation_api", "actual": "@com_google_instrumentation_instrumentation_api//jar", "bind": "jar/com/google/instrumentation/instrumentation_api"},
     {"artifact": "com.google.j2objc:j2objc-annotations:1.1", "lang": "java", "sha1": "ed28ded51a8b1c6b112568def5f4b455e6809019", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_j2objc_j2objc_annotations", "actual": "@com_google_j2objc_j2objc_annotations//jar", "bind": "jar/com/google/j2objc/j2objc_annotations"},
+    {"artifact": "com.google.jimfs:jimfs:1.1", "lang": "java", "sha1": "8fbd0579dc68aba6186935cc1bee21d2f3e7ec1c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_jimfs_jimfs", "actual": "@com_google_jimfs_jimfs//jar", "bind": "jar/com/google/jimfs/jimfs"},
     {"artifact": "com.google.oauth-client:google-oauth-client:1.23.0", "lang": "java", "sha1": "e57ea1e2220bda5a2bd24ff17860212861f3c5cf", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_oauth_client_google_oauth_client", "actual": "@com_google_oauth_client_google_oauth_client//jar", "bind": "jar/com/google/oauth_client/google_oauth_client"},
     {"artifact": "com.google.protobuf:protobuf-java-util:3.5.1", "lang": "java", "sha1": "6e40a6a3f52455bd633aa2a0dba1a416e62b4575", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java_util", "actual": "@com_google_protobuf_protobuf_java_util//jar", "bind": "jar/com/google/protobuf/protobuf_java_util"},
     {"artifact": "com.google.protobuf:protobuf-java:3.5.1", "lang": "java", "sha1": "8c3492f7662fa1cbf8ca76a0f5eb1146f7725acd", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java", "actual": "@com_google_protobuf_protobuf_java//jar", "bind": "jar/com/google/protobuf/protobuf_java"},
