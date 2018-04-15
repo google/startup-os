@@ -1,0 +1,14 @@
+syntax = "proto3";
+package com.appstory.tools.aa;
+
+option java_package = "com.appstory.tools.aa";
+option java_outer_classname = "Proto";
+option java_multiple_files = true;
+
+/* Config protos. */
+message Config {
+  // Base folder, typically /base
+  string base_path = 1;
+  // Remote git repo url
+  string remote_repo_url = 2;
+}
