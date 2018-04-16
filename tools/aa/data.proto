@@ -1,7 +1,7 @@
 syntax = "proto3";
-package com.appstory.tools.aa;
+package com.google.startupos.tools.aa;
 
-option java_package = "com.appstory.tools.aa";
+option java_package = "com.google.startupos.tools.aa";
 option java_outer_classname = "Protos";
 
 /* Config protos. */

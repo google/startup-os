@@ -16,7 +16,7 @@ java_binary(
         "*.java",
         "commands/*.java",
     ]),
-    main_class = "com.appstory.tools.aa.Aa",
+    main_class = "com.google.startupos.tools.aa.Aa",
     deps = [
         ":aa_java_proto",
         "//external:jar/com/google/protobuf/protobuf_java",
