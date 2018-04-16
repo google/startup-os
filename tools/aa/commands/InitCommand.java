@@ -1,7 +1,7 @@
 package com.appstory.tools.aa.commands;
 
 import com.appstory.tools.aa.Aa;
-import com.appstory.tools.aa.Config;
+import com.appstory.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;

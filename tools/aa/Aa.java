@@ -2,6 +2,7 @@ package com.appstory.tools.aa;
 
 import com.appstory.tools.aa.commands.AaCommand;
 import com.appstory.tools.aa.commands.InitCommand;
+import com.appstory.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flags;
 import java.io.IOException;
