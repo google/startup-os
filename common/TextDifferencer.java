@@ -104,11 +104,13 @@ public class TextDifferencer {
   }
 
   /**
-   * Generate matching char differences for the given range.
+   * Generate matching char differences for the given range. The implementation assumes that all the
+   * characters within the given range are equal.
    *
-   * @param first The first string.
-   * @param second The second string.
-   * @return A list which holds all the text differences.
+   * @param content The contents of the first string.
+   * @param begin The beginning index of the matching character range.
+   * @param length the length of the matching character range.
+   * @return A {@link Stream} which holds all the text differences.
    */
   private static Stream<CharDifference.Builder> getMatchingCharDifferences(
       char[] content, int begin, int length) {
