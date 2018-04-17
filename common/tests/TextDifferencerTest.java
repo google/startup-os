@@ -27,9 +27,12 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class TextDifferencerTest {
 
-  CharDifference.Builder newCharDifference(int index, char difference, DifferenceType type) {
+  /** package */
+  CharDifference.Builder newCharDifference(
+      int leftIndex, int rightIndex, char difference, DifferenceType type) {
     return CharDifference.newBuilder()
-        .setIndex(index)
+        .setFirstStringIndex(leftIndex)
+        .setSecondStringIndex(rightIndex)
         .setDifference(Character.toString(difference))
         .setType(type);
   }
@@ -43,15 +46,15 @@ public class TextDifferencerTest {
   public void testOnlyAdditions() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newCharDifference(0, 'A', DifferenceType.ADDITION).build(),
-            newCharDifference(1, 'd', DifferenceType.ADDITION).build(),
-            newCharDifference(2, 'd', DifferenceType.ADDITION).build(),
-            newCharDifference(3, 'i', DifferenceType.ADDITION).build(),
-            newCharDifference(4, 't', DifferenceType.ADDITION).build(),
-            newCharDifference(5, 'i', DifferenceType.ADDITION).build(),
-            newCharDifference(6, 'o', DifferenceType.ADDITION).build(),
-            newCharDifference(7, 'n', DifferenceType.ADDITION).build(),
-            newCharDifference(8, '.', DifferenceType.ADDITION).build()),
+            newCharDifference(0, 0, 'A', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 1, 'd', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 2, 'd', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 3, 'i', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 4, 't', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 5, 'i', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 6, 'o', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 7, 'n', DifferenceType.ADDITION).build(),
+            newCharDifference(0, 8, '.', DifferenceType.ADDITION).build()),
         TextDifferencer.getAllTextDifferences("", "Addition."));
   }
 
@@ -59,15 +62,15 @@ public class TextDifferencerTest {
   public void testOnlyDeletions() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newCharDifference(0, 'D', DifferenceType.DELETION).build(),
-            newCharDifference(1, 'e', DifferenceType.DELETION).build(),
-            newCharDifference(2, 'l', DifferenceType.DELETION).build(),
-            newCharDifference(3, 'e', DifferenceType.DELETION).build(),
-            newCharDifference(4, 't', DifferenceType.DELETION).build(),
-            newCharDifference(5, 'i', DifferenceType.DELETION).build(),
-            newCharDifference(6, 'o', DifferenceType.DELETION).build(),
-            newCharDifference(7, 'n', DifferenceType.DELETION).build(),
-            newCharDifference(8, '.', DifferenceType.DELETION).build()),
+            newCharDifference(0, 0, 'D', DifferenceType.DELETION).build(),
+            newCharDifference(1, 0, 'e', DifferenceType.DELETION).build(),
+            newCharDifference(2, 0, 'l', DifferenceType.DELETION).build(),
+            newCharDifference(3, 0, 'e', DifferenceType.DELETION).build(),
+            newCharDifference(4, 0, 't', DifferenceType.DELETION).build(),
+            newCharDifference(5, 0, 'i', DifferenceType.DELETION).build(),
+            newCharDifference(6, 0, 'o', DifferenceType.DELETION).build(),
+            newCharDifference(7, 0, 'n', DifferenceType.DELETION).build(),
+            newCharDifference(8, 0, '.', DifferenceType.DELETION).build()),
         TextDifferencer.getAllTextDifferences("Deletion.", ""));
   }
 
@@ -75,16 +78,16 @@ public class TextDifferencerTest {
   public void testOnlyNoChanges() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newCharDifference(0, 'N', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(1, 'o', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(2, ' ', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(3, 'C', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(4, 'h', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(5, 'a', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(6, 'n', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(7, 'g', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(9, '.', DifferenceType.NO_CHANGE).build()),
+            newCharDifference(0, 0, 'N', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(1, 1, 'o', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(2, 2, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 3, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 4, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 5, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 6, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 7, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 8, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, 9, '.', DifferenceType.NO_CHANGE).build()),
         TextDifferencer.getAllTextDifferences("No Change.", "No Change."));
   }
 
@@ -92,20 +95,20 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheBeginning() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newCharDifference(0, 'N', DifferenceType.DELETION).build(),
-            newCharDifference(1, 'o', DifferenceType.DELETION).build(),
-            newCharDifference(0, 'W', DifferenceType.ADDITION).build(),
-            newCharDifference(1, 'i', DifferenceType.ADDITION).build(),
-            newCharDifference(2, 't', DifferenceType.ADDITION).build(),
-            newCharDifference(3, 'h', DifferenceType.ADDITION).build(),
-            newCharDifference(2, ' ', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(3, 'C', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(4, 'h', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(5, 'a', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(6, 'n', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(7, 'g', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(9, '.', DifferenceType.NO_CHANGE).build()),
+            newCharDifference(0, 0, 'N', DifferenceType.DELETION).build(),
+            newCharDifference(1, 0, 'o', DifferenceType.DELETION).build(),
+            newCharDifference(1, 0, 'W', DifferenceType.ADDITION).build(),
+            newCharDifference(1, 1, 'i', DifferenceType.ADDITION).build(),
+            newCharDifference(1, 2, 't', DifferenceType.ADDITION).build(),
+            newCharDifference(1, 3, 'h', DifferenceType.ADDITION).build(),
+            newCharDifference(2, 4, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 5, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 6, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 7, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 8, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 9, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 10, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, 11, '.', DifferenceType.NO_CHANGE).build()),
         TextDifferencer.getAllTextDifferences("No Change.", "With Change."));
   }
 
@@ -113,20 +116,20 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheMiddle() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newCharDifference(0, 'W', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(1, 'i', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(2, 't', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(3, 'h', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(4, ' ', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(5, 'a', DifferenceType.ADDITION).build(),
-            newCharDifference(6, ' ', DifferenceType.ADDITION).build(),
-            newCharDifference(5, 'C', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(6, 'h', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(7, 'a', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(8, 'n', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(9, 'g', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(10, 'e', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(11, '.', DifferenceType.NO_CHANGE).build()),
+            newCharDifference(0, 0, 'W', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(1, 1, 'i', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(2, 2, 't', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 3, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 4, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 5, 'a', DifferenceType.ADDITION).build(),
+            newCharDifference(5, 6, ' ', DifferenceType.ADDITION).build(),
+            newCharDifference(5, 7, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 8, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 9, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 10, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, 11, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(10, 12, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(11, 13, '.', DifferenceType.NO_CHANGE).build()),
         TextDifferencer.getAllTextDifferences("With Change.", "With a Change."));
   }
 
@@ -134,17 +137,17 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheEnd() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newCharDifference(0, 'N', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(1, 'o', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(2, ' ', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(3, 'C', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(4, 'h', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(5, 'a', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(6, 'n', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(7, 'g', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(8, 'e', DifferenceType.NO_CHANGE).build(),
-            newCharDifference(9, '.', DifferenceType.DELETION).build(),
-            newCharDifference(9, '!', DifferenceType.ADDITION).build()),
+            newCharDifference(0, 0, 'N', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(1, 1, 'o', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(2, 2, ' ', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(3, 3, 'C', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(4, 4, 'h', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(5, 5, 'a', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(6, 6, 'n', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(7, 7, 'g', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(8, 8, 'e', DifferenceType.NO_CHANGE).build(),
+            newCharDifference(9, 9, '.', DifferenceType.DELETION).build(),
+            newCharDifference(9, 9, '!', DifferenceType.ADDITION).build()),
         TextDifferencer.getAllTextDifferences("No Change.", "No Change!"));
   }
 }

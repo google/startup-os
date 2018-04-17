@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import javax.swing.text.Segment;
 
 /**
@@ -48,12 +47,13 @@ public class TextDifferencer {
         new Segment(second, headerLength, second.length - footerLength - headerLength);
 
     List<CharDifference> allDifferences = new ArrayList<>();
-    allDifferences.addAll(getMatchingCharDifferences(first, 0, headerLength));
+    allDifferences.addAll(getMatchingCharDifferences(first, 0, 0, headerLength));
     allDifferences.addAll(
         getDifferencesFromLCSMatrix(
             computeLCSMatrix(firstView, secondView), firstView, secondView));
     allDifferences.addAll(
-        getMatchingCharDifferences(first, first.length - footerLength, footerLength));
+        getMatchingCharDifferences(
+            first, first.length - footerLength, second.length - footerLength, footerLength));
     return allDifferences;
   }
 
@@ -82,21 +82,22 @@ public class TextDifferencer {
 
   /**
    * Generate matching char differences for the given range. The implementation assumes that all the
-   * characters within the given range are equal.
    *
-   * @param content The contents of the first string.
-   * @param begin The beginning index of the matching character range.
+   * @param contentFirst The contents of the first string.
+   * @param beginFirst The beginning index of the matching character range of the first string.
+   * @param beginSecond The beginning index of the matching character range of the second string.
    * @param length the length of the matching character range.
-   * @return A {@link Stream} which holds all the text differences.
+   * @return A {@link List} which holds all the text differences.
    */
   private static List<CharDifference> getMatchingCharDifferences(
-      char[] content, int begin, int length) {
-    return IntStream.range(begin, begin + length)
+      char[] content, int beginFirst, int beginSecond, int length) {
+    return IntStream.range(0, length)
         .mapToObj(
             (i) ->
                 CharDifference.newBuilder()
-                    .setIndex(i)
-                    .setDifference(Character.toString(content[i]))
+                    .setFirstStringIndex(i + beginFirst)
+                    .setSecondStringIndex(i + beginSecond)
+                    .setDifference(Character.toString(content[beginFirst + i]))
                     .setType(DifferenceType.NO_CHANGE)
                     .build())
         .collect(Collectors.toList());
@@ -151,7 +152,8 @@ public class TextDifferencer {
       if (i > 0 && j > 0 && first.charAt(i - 1) == second.charAt(j - 1)) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(first.getBeginIndex() + i - 1)
+                .setFirstStringIndex(first.getBeginIndex() + i - 1)
+                .setSecondStringIndex(second.getBeginIndex() + j - 1)
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(DifferenceType.NO_CHANGE)
                 .build());
@@ -160,7 +162,8 @@ public class TextDifferencer {
       } else if (j > 0 && (i == 0 || lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j])) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(second.getBeginIndex() + j - 1)
+                .setFirstStringIndex(first.getBeginIndex() + Math.max(0, i - 1))
+                .setSecondStringIndex(second.getBeginIndex() + j - 1)
                 .setDifference(Character.toString(second.charAt(j - 1)))
                 .setType(DifferenceType.ADDITION)
                 .build());
@@ -168,7 +171,8 @@ public class TextDifferencer {
       } else if (i > 0 && (j == 0 || lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j])) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(first.getBeginIndex() + i - 1)
+                .setFirstStringIndex(first.getBeginIndex() + i - 1)
+                .setSecondStringIndex(second.getBeginIndex() + Math.max(0, j - 1))
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(DifferenceType.DELETION)
                 .build());
