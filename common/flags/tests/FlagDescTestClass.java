@@ -18,7 +18,6 @@ package com.google.startupos.common.flags.testpackage1;
 
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
-import com.google.common.annotations.VisibleForTesting;
 
 public class FlagDescTestClass {
   @SuppressWarnings("unused")
@@ -42,10 +41,13 @@ public class FlagDescTestClass {
   public static final Flag<Double> doubleFlag = Flag.create(1.23);
 
   @SuppressWarnings("unused")
+  @FlagDesc(name = "required_flag", description = "A flag description", required = true)
+  public static final Flag<String> requiredFlag = Flag.create("");
+
+  @SuppressWarnings("unused")
   public static final String notAFlag = "";
 
   public static String getStringFlagValue() {
     return stringFlag.get();
   }
 }
-

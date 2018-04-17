@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.google.startupos.tools.reviewer.localserver";
+option java_outer_classname = "CodeReviewProto";
+
+package localserver;
+
+service CodeReviewService { 
+    // Post a Firestore token.
+    rpc postToken(TokenRequest) returns (TokenResponse);
+    // Get a text file's contents
+    rpc getFile(FileRequest) returns (FileResponse);
+    // Get a Firestore token.
+    // TODO: Remove this request. It's temporary until we use gRPC Web.
+    // Reason: Ideally the local server will keep token in memory and expose endpoints for local
+    // cmd tools to communicate with Firestore through it. Since currently gRPC is an in-process
+    // server, we have to create an HTTP gateway for each request and response, which we want to
+    // avoid doing. As a workaround, we pass the token to the local cmd tools.
+    rpc getToken(GetTokenRequest) returns (GetTokenResponse);
+  }
+  
+  message FileRequest { string filename = 1; }
+  
+  message FileResponse { string content = 1; }
+  
+  message TokenRequest {
+    string projectId = 1;
+    string token = 2;
+  }
+  
+  // TODO: Use Empty: https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto
+  message TokenResponse { }
+
+  message GetTokenRequest { }
+  
+  message GetTokenResponse {
+    string projectId = 1;
+    string token = 2;
+  }

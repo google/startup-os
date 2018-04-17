@@ -21,6 +21,11 @@ java_library(
     licenses = [
         "permissive"
     ],
+    runtime_deps = [
+        "//third_party/maven/com/google/code/gson:gson",
+        "//third_party/maven/com/google/guava:guava",
+        ":protobuf_java"
+    ],
     visibility = [
         "//visibility:public"
     ]

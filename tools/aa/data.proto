@@ -1,0 +1,13 @@
+syntax = "proto3";
+package com.google.startupos.tools.aa;
+
+option java_package = "com.google.startupos.tools.aa";
+option java_outer_classname = "Protos";
+
+/* Config protos. */
+message Config {
+  // Base folder, typically /base
+  string base_path = 1;
+  // Remote git repo url
+  string remote_repo_url = 2;
+}

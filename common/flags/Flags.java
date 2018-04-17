@@ -18,7 +18,6 @@ package com.google.startupos.common.flags;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,4 +108,3 @@ public class Flags {
     return parser.parse(args).unusedArgs.toArray(new String[0]);
   }
 }
-

@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "types": [
+      "jasmine",
+      "node"
+    ]
+  },
+  "files": [
+    "./dev/unit/test.ts"
+  ],
+  "exclude": [
+    "./**/*.e2e-spec.ts"
+  ]
+}

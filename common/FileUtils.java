@@ -63,15 +63,28 @@ public class FileUtils {
 
   /** Writes a proto to file. */
   public static void writePrototxt(Message proto, String path) throws IOException {
-    mkdirs(path);
-    String text = TextFormat.printToUnicodeString(proto);
-    java.nio.file.Files.write(Paths.get(expandHomeDirectory(path)), text.getBytes());
+    writeString(TextFormat.printToUnicodeString(proto), path);
   }
 
   /** Writes a proto to file, rethrows exceptions as unchecked. */
   public static void writePrototxtUnchecked(Message proto, String path) {
     try {
       writePrototxt(proto, path);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Writes a string to file. */
+  public static void writeString(String text, String path) throws IOException {
+    mkdirs(path);
+    java.nio.file.Files.write(Paths.get(expandHomeDirectory(path)), text.getBytes());
+  }
+
+  /** Writes a string to file, rethrows exceptions as unchecked. */
+  public static void writeStringUnchecked(String text, String path) {
+    try {
+      writeString(text, path);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
