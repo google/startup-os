@@ -19,9 +19,8 @@ bazel run @bazel_deps//:parse -- add-dep --deps `pwd`/dependencies.yaml --lang j
 # https://github.com/johnynek/bazel-deps/issues/137
 
 # Regenerate dependencies
-# Run this when you add a new Maven dependency to dependencies.yaml
+# Run this from the workspace root when you add a new Maven dependency to dependencies.yaml
 # This can take a few minutes, depending on how many dependencies there are.
-# <root_workspace> should be absolute path rather than relative, so use `pwd` instead of '.'
 # Usually there is already a folder 'third_party' but if there isn't, comment out loading of //third_party/maven:workspace.bzl in WORKSPACE
-bazel run @bazel_deps//:parse -- generate -r <root_workspace> -s third_party/maven/workspace.bzl -d dependencies.yaml
+bazel run @bazel_deps//:parse -- generate -r `pwd` -s third_party/maven/workspace.bzl -d dependencies.yaml
 
