@@ -17,8 +17,11 @@
 package com.google.startupos.common.flags;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.Package;
+
 
 /**
  * Static API for creating and reading flags.
@@ -38,6 +41,27 @@ public class Flags {
   private static Flags instance;
   private final ClassScanner classScanner;
   private final Map<String, FlagData> flags;
+
+  /**
+   * Initializes flag values from command-line style arguments.
+   *
+   * @param args command-line arguments to parse values from
+   * @param package1 package root to scan for flags
+   */
+  public static String[] parse(String[] args, Package package1) {
+    return parse(args, Arrays.asList(package1.getName()));
+  }
+
+  /**
+   * Initializes flag values from command-line style arguments.
+   *
+   * @param args command-line arguments to parse values from
+   * @param package1 package root to scan for flags
+   * @param package2 another package root to scan for flags
+   */
+  public static String[] parse(String[] args, Package package1, Package package2) {
+    return parse(args, Arrays.asList(package1.getName(), package2.getName()));
+  }
 
   /**
    * Initializes flag values from command-line style arguments.
