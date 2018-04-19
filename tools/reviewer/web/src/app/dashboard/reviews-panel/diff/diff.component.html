@@ -1,0 +1,80 @@
+
+<div class="file-header">
+  <div fxFlex="200px">Diff - {{ diff?.number }} </div>
+  <div fxFlex>File - {{ filePath }} </div>
+</div>
+
+<div class="file-wrapper">
+  <!-- 
+    Iterate over all the line-containers; each line-container 
+    has an array of objects explaining how each code line was
+    made from another by insertion and removal operations.
+  -->
+  <div class="line" *ngFor="let line of differences; let i = index">
+    <!-- 
+      Iterate of all the panels; each panel corresponds to 
+      a version/state of line of code in time
+    -->
+    <div class="code-panel" fxFlex="{{flexWidth}}" 
+      *ngFor="let snapshot of snapshots"
+      >
+      <!-- 
+        Right now we have only two panels/snapshots, leftSnapshot and 
+        rightSnapshot. Upon click a new thread is added if
+        none exists on this snapshot and lineNumber
+
+        An empty thread displays an empty comment box
+        for user to add a comment.
+       -->
+      <div (dblclick)="addNewThread(snapshot, i)">
+        <div class="line-number-container" fxFlex="40px">
+          <!-- 
+            Line number is printed out on the left side
+            of each line
+           -->
+          <div class="line-number" fxFlexAlign="start">{{ i }}</div>
+          <!-- Add comment icon shown upon hover -->
+          <div fxFlex class="add_sign" 
+            (click)="addNewThread(snapshot, i)">
+            <mat-icon>add_box</mat-icon>
+          </div>
+        </div>
+        <div class="code-line">
+          <!-- 
+            Each character is printed out and given a class
+            based on which panel/snapshot it is in and which operation 
+            was applied on the character.
+           -->
+          <div class="code-character" *ngFor="let diff of line">
+
+            <div class="minus" 
+              *ngIf="snapshot === 'leftSnapshot' && diff.operation === '-'">
+              {{ diff.character }}
+            </div>
+            <div class="plus"
+              *ngIf="snapshot === 'rightSnapshot' && diff.operation === '+'">
+              {{ diff.character }}
+            </div>
+            <div class="regular" 
+              *ngIf="diff.operation === ' '">
+              {{ diff.character }}
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <!-- 
+        Display a thread if it exists for this snapshot and lineNumber
+       -->
+      <div *ngIf="tryGetThread(snapshot, i); let thread">
+        <cr-thread 
+          [thread]="thread" 
+          (onUpdateThread)="updateThread()"
+          (removeCurrentThread)="removeThread($event)"
+          [user]="user"
+          >
+        </cr-thread>
+      </div>
+    </div>
+  </div>
+</div>
