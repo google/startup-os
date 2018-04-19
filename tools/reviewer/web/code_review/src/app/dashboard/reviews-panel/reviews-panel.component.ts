@@ -23,15 +23,6 @@ export class ReviewsPanelComponent implements OnInit {
     private auth: AuthService
   ) {}
 
-  // This is a temporary fix for getting username
-  // using email address
-  EMAIL_USER = {
-    'tutenstine@gmail.com': 'mahinkhan',
-    'kuttareturns@gmail.com': 'mahinreturns',
-    'blueofer@gmail.com': 'blueofer',
-    'webdevelopland@gmail.com': 'vadim'
-  };
-
   ngOnInit() {
     // Get username from url if there is no user.
     // Get the loggedIn username from its email.
@@ -40,7 +31,7 @@ export class ReviewsPanelComponent implements OnInit {
       // Get user from AuthService
       this.auth.getUser().subscribe(user => {
         const email = user.email;
-        this.username = this.EMAIL_USER[email];
+        this.username = email.split('@')[0];
       });
     }
     this.getReviews();

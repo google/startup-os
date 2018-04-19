@@ -51,15 +51,6 @@ export class DiffComponent implements OnInit {
   // Threads for leftSnapshot will be added to ls and
   // threads for rightSnapshot will be added to rs
   threads: { ls: Array<Thread>; rs: Array<Thread> } = { ls: [], rs: [] };
-
-  // This is a temporary fix for getting username
-  // using email address
-  EMAIL_USER = {
-    'tutenstine@gmail.com': 'mahinkhan',
-    'kuttareturns@gmail.com': 'mahinreturns',
-    'blueofer@gmail.com': 'blueofer',
-    'webdevelopland@gmail.com': 'vadim'
-  };
   user: string;
 
   constructor(
@@ -103,7 +94,7 @@ export class DiffComponent implements OnInit {
     // Get current user
     this.auth.getUser().subscribe(user => {
       const email = user.email;
-      this.user = this.EMAIL_USER[email];
+      this.user = email.split('@')[0];
     });
 
     // Iterate over each file and load
