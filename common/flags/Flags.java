@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.lang.Package;
+import java.util.stream.Collectors;
 
 
 /**
@@ -46,21 +47,13 @@ public class Flags {
    * Initializes flag values from command-line style arguments.
    *
    * @param args command-line arguments to parse values from
-   * @param package1 package root to scan for flags
+   * @param packages list of package roots to scan for flags
    */
-  public static String[] parse(String[] args, Package package1) {
-    return parse(args, Arrays.asList(package1.getName()));
-  }
-
-  /**
-   * Initializes flag values from command-line style arguments.
-   *
-   * @param args command-line arguments to parse values from
-   * @param package1 package root to scan for flags
-   * @param package2 another package root to scan for flags
-   */
-  public static String[] parse(String[] args, Package package1, Package package2) {
-    return parse(args, Arrays.asList(package1.getName(), package2.getName()));
+  public static String[] parse(String[] args, Package... packages) {
+    String[] packageNames =
+        Arrays.stream(packages).map(Package::getName).collect(Collectors.toList())
+            .toArray((new String[0]));
+    return parse(args, packageNames);
   }
 
   /**
@@ -69,8 +62,8 @@ public class Flags {
    * @param args command-line arguments to parse values from
    * @param packages list of package roots to scan flags
    */
-  public static String[] parse(String[] args, Iterable<String> packages) {
-    instance().scan(packages);
+  public static String[] parse(String[] args, String... packages) {
+    instance().scan(Arrays.asList(packages));
     return instance._parse(args);
   }
 
