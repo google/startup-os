@@ -14,24 +14,30 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.localserver;
+package com.google.startupos.tools.reviewer.service;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import java.util.concurrent.TimeUnit;
+import com.google.startupos.tools.reviewer.service.Protos.GetTokenRequest;
+import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
+import com.google.startupos.tools.reviewer.service.Protos.TokenRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TokenResponse;
+import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 
 public class CodeReviewClient {
 
   private final ManagedChannel channel;
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
 
-  CodeReviewClient(String host, int port) {
+  public CodeReviewClient(String host, int port) {
     this(ManagedChannelBuilder.forAddress(host, port).usePlaintext(true).build());
   }
 
-  CodeReviewClient(String inProcessServerName) {
+  public CodeReviewClient(String inProcessServerName) {
     this(InProcessChannelBuilder.forName(inProcessServerName).directExecutor().build());
   }
 

@@ -1,10 +1,9 @@
 syntax = "proto3";
 
-option java_multiple_files = true;
-option java_package = "com.google.startupos.tools.reviewer.localserver";
-option java_outer_classname = "CodeReviewProto";
+option java_package = "com.google.startupos.tools.reviewer.service";
+option java_outer_classname = "Protos";
 
-package localserver;
+package com.google.startupos.tools.reviewer.service;
 
 service CodeReviewService { 
     // Post a Firestore token.

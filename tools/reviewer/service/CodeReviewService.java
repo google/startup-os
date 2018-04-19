@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.localserver;
+package com.google.startupos.tools.reviewer.service;
 
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -22,6 +22,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
+import com.google.startupos.tools.reviewer.service.Protos.GetTokenRequest;
+import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
+import com.google.startupos.tools.reviewer.service.Protos.TokenRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TokenResponse;
+import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -33,7 +39,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private String firestoreToken;
   private String firestoreProjectId;
 
-  CodeReviewService(String rootPath) {
+  public CodeReviewService(String rootPath) {
     this.rootPath = rootPath;
   }
 

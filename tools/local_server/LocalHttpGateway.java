@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.localserver;
+package com.google.startupos.tools.localserver;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -33,34 +33,36 @@ import com.google.common.collect.ImmutableMap;
 import java.util.stream.Collectors;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.google.startupos.tools.reviewer.service.CodeReviewClient;
+import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
 
 /*
- * CodeReviewGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
+ * LocalHttpGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
  * client (which in turn communicates to gRPC server and responds) and returns responses
  *
- * To run: bazel build //tools/reviewer/local_server:grpc_gateway_deploy.jar
- * java -jar bazel-bin/tools/reviewer/local_server/grpc_gateway_deploy.jar -- {absolute_path}
+ * To run: bazel build //tools/local_server:http_gateway_deploy.jar
+ * java -jar bazel-bin/tools/local_server/http_gateway_deploy.jar -- {absolute_path}
  * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
  */
 // TODO: Find an automated way to do this, e.g github.com/improbable-eng/grpc-web
-public class CodeReviewGateway {
-  private static final Logger logger = Logger.getLogger(CodeReviewGateway.class.getName());
+public class LocalHttpGateway {
+  private static final Logger logger = Logger.getLogger(LocalHttpGateway.class.getName());
 
   // TODO: Receive port and root path as flags.
   public static final int HTTP_GATEWAY_PORT = 7000;
 
   private final HttpServer httpServer;
-  private final CodeReviewInProcessServer grpcServer;
+  private final LocalInProcessServer grpcServer;
   private String grpcServerName;
 
   private static final String GET_FILE_PATH = "/get_file";
   private static final String TOKEN_PATH = "/token";
 
-  private CodeReviewGateway(int gatewayPort, String rootPath) throws Exception {
+  private LocalHttpGateway(int gatewayPort, String rootPath) throws Exception {
     logger.info(String.format("Starting gateway at port %d for path %s", gatewayPort, rootPath));
     grpcServerName = java.util.UUID.randomUUID().toString();
     httpServer = HttpServer.create(new InetSocketAddress(gatewayPort), 0);
-    grpcServer = new CodeReviewInProcessServer(rootPath, grpcServerName);
+    grpcServer = new LocalInProcessServer(rootPath, grpcServerName);
     CodeReviewClient client = new CodeReviewClient(grpcServerName);
 
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
@@ -79,7 +81,7 @@ public class CodeReviewGateway {
       logger.severe("Please specify root path for file serving as argument");
       return;
     }
-    new CodeReviewGateway(HTTP_GATEWAY_PORT, args[1]).serve();
+    new LocalHttpGateway(HTTP_GATEWAY_PORT, args[1]).serve();
   }
 
   /* Handler for receiving Firestore token */
