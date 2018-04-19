@@ -3,27 +3,6 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class DifferenceService {
-  /*
-  * TODO(mahin) Delete If not used till 14th Feb
-  * Old difference tool: compares only line i to line i
-  */
-
-  // computes the differences by comparing line i to line i
-  // and returns the contents specifying which lines were different
-  computeDifferencesOld(c1: Array<string>, c2: Array<string>): Array<Line> {
-    const arr: Array<Line> = [];
-    for (let i = 0; i < c1.length; i++) {
-      // pushes an object specifying old line, new line
-      //  and if the lines were different
-      const obj: Line = {
-        oldLine: c1[i],
-        newLine: c2[i],
-        difference: c1[i] !== c2[i]
-      };
-      arr.push(obj);
-    }
-    return arr;
-  }
 
   // implementation of algo found here
   // https://en.wikipedia.org/wiki/Longest_common_subsequence_problem
