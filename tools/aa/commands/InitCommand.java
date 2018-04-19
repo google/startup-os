@@ -16,7 +16,6 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.startupos.tools.aa.Aa;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
@@ -24,6 +23,9 @@ import com.google.startupos.common.flags.FlagDesc;
 import java.io.IOException;
 
 public class InitCommand implements AaCommand {
+  @FlagDesc(name = "config_path", description = "Path to config file", required = true)
+  public static Flag<String> configPath = Flag.create("");
+
   @FlagDesc(name = "base_path", description = "Base path", required = true)
   public static Flag<String> basePath = Flag.create("");
 
@@ -38,7 +40,7 @@ public class InitCommand implements AaCommand {
               .setBasePath(basePath.get())
               .setRemoteRepoUrl(remoteRepoUrl.get())
               .build();
-      FileUtils.writePrototxt(config, Aa.CONFIG_FILE);
+      FileUtils.writePrototxt(config, configPath.get());
 
     } catch (IOException ex) {
       ex.printStackTrace();
