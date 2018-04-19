@@ -19,6 +19,7 @@ package com.google.startupos.tools.aa.commands;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
 import java.io.IOException;
 
@@ -33,7 +34,9 @@ public class InitCommand implements AaCommand {
   public static Flag<String> remoteRepoUrl = Flag.create("");
 
   @Override
-  public void run() {
+  public void run(String[] args) {
+    Flags.parse(args, InitCommand.class.getPackage());
+
     try {
       Config config =
           Config.newBuilder()
@@ -41,9 +44,13 @@ public class InitCommand implements AaCommand {
               .setRemoteRepoUrl(remoteRepoUrl.get())
               .build();
       FileUtils.writePrototxt(config, configPath.get());
-
-    } catch (IOException ex) {
-      ex.printStackTrace();
+      
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      System.out.println("Input flags:");
+      Flags.printUsage();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -52,4 +59,3 @@ public class InitCommand implements AaCommand {
     return "init";
   }
 }
-

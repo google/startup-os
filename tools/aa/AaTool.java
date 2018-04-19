@@ -20,13 +20,12 @@ import com.google.startupos.tools.aa.commands.AaCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.common.flags.Flags;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 
-/** aa logic. */
+/** aa tool. */
 public class AaTool {
   private static HashMap<String, AaCommand> commands = new HashMap<>();
 
@@ -38,21 +37,14 @@ public class AaTool {
   public static void printUsage() {
     System.out.println(
         String.format(
-            "Invalid usage; available commands are %s", String.join(", ", commands.keySet())));
-    Flags.printUsage();
+            "Invalid usage. Available commands are: %s", String.join(", ", commands.keySet())));
   }
 
   public static void main(String[] args) {
-    String[] leftOverArgs =
-        Flags.parse(
-            args,
-            Arrays.asList(
-              AaTool.class.getPackage().getName(), AaCommand.class.getPackage().toString()));
-
-    if (leftOverArgs.length == 1) {
-      String command = leftOverArgs[0];
+    if (args.length > 0) {
+      String command = args[0];
       if (commands.containsKey(command)) {
-        commands.get(command).run();
+        commands.get(command).run(args);
       } else {
         System.out.println("");
         printUsage();
@@ -62,4 +54,3 @@ public class AaTool {
     }
   }
 }
-
