@@ -11,12 +11,12 @@ java_proto_library(
 )
 
 java_binary(
-    name = "aa",
+    name = "aa_tool",
     srcs = glob([
-        "*.java",
+        "AaTool.java",
         "commands/*.java",
     ]),
-    main_class = "com.google.startupos.tools.aa.Aa",
+    main_class = "com.google.startupos.tools.aa.AaTool",
     deps = [
         ":aa_java_proto",
         "//external:jar/com/google/protobuf/protobuf_java",

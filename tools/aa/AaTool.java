@@ -27,19 +27,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 /** aa logic. */
-public class Aa {
-  public static final String CONFIG_FILE = "~/.aaconfig.prototxt";
-
+public class AaTool {
   private static HashMap<String, AaCommand> commands = new HashMap<>();
-  private static Config config;
 
   static {
     AaCommand init = new InitCommand();
     commands.put(init.getName(), init);
-  }
-
-  public static void readConfig() throws IOException, ParseException {
-    config = (Config) FileUtils.readPrototxt(CONFIG_FILE, Config.newBuilder());
   }
 
   public static void printUsage() {
@@ -54,7 +47,7 @@ public class Aa {
         Flags.parse(
             args,
             Arrays.asList(
-                Aa.class.getPackage().getName(), AaCommand.class.getPackage().toString()));
+              AaTool.class.getPackage().getName(), AaCommand.class.getPackage().toString()));
 
     if (leftOverArgs.length == 1) {
       String command = leftOverArgs[0];
