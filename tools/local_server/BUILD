@@ -10,6 +10,7 @@ java_library(
         "//tools/reviewer/service:grpc_service",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
 
@@ -24,11 +25,13 @@ java_binary(
         "//tools/reviewer/service:grpc_service",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+        "//common/flags",
+        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
 
 java_binary(
-    name = "http_gateway",
+    name = "local_http_gateway",
     srcs = [
         "LocalHttpGateway.java",
     ],
@@ -39,6 +42,8 @@ java_binary(
         ":local_inprocess_server",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
-        "//third_party/maven/org/json:json"
+        "//third_party/maven/org/json:json",
+        "//common/flags",
+        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )

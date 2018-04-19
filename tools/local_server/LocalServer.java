@@ -21,34 +21,37 @@ import io.grpc.ServerBuilder;
 import java.io.IOException;
 import java.util.logging.Logger;
 import com.google.startupos.tools.reviewer.service.CodeReviewService;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.common.collect.ImmutableList;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
  */
 
 /* To run: bazel build //tools/local_server:local_server_deploy.jar
- * java -jar bazel-bin/tools/local_server/local_server_deploy.jar -- {absolute_path}
+ * bazel-bin/tools/local_server/local_server -- {absolute_path}
  * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
  */
 public class LocalServer {
-  public static final int GRPC_PORT = 50051;
-
   private static final Logger logger = Logger.getLogger(LocalServer.class.getName());
 
-  private Server server;
-  private String rootPath;
+  @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
+  public static final Flag<Integer> localServerPort = Flag.create(8001);
 
-  LocalServer(String rootPath) {
-    this.rootPath = rootPath;
-  }
+  @FlagDesc(name = "root_path", description = "Root path for serving files for reviewer service")
+  public static final Flag<String> rootPath = Flag.create("");
+
+  private Server server;
 
   private void start() throws IOException {
     server =
-        ServerBuilder.forPort(GRPC_PORT)
-            .addService(new CodeReviewService(this.rootPath))
+        ServerBuilder.forPort(localServerPort.get())
+            .addService(new CodeReviewService(rootPath.get()))
             .build()
             .start();
-    logger.info("Server started, listening on " + GRPC_PORT);
+    logger.info("Server started, listening on " + localServerPort.get());
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(
@@ -72,12 +75,19 @@ public class LocalServer {
     }
   }
 
-  public static void main(String[] args) throws IOException, InterruptedException {
-    if (args.length != 2) {
-      logger.severe("Specify root path to serve files over as command-line argument");
-      return;
+  private static void checkFlags() {
+    if (rootPath.get().isEmpty()) {
+        System.out.println("Error: Please set --root_path");
+        System.exit(1);
     }
-    final LocalServer server = new LocalServer(args[1]);
+  }
+
+  public static void main(String[] args) throws IOException, InterruptedException {
+    Iterable<String> packages = ImmutableList.of(LocalServer.class.getPackage().getName());
+    Flags.parse(args, packages);
+    checkFlags();
+
+    final LocalServer server = new LocalServer();
     server.start();
     server.blockUntilShutdown();
   }

@@ -26,7 +26,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.logging.Logger;
 import java.util.Map;
-import io.grpc.inprocess.InProcessServerBuilder;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import com.google.common.collect.ImmutableMap;
@@ -35,53 +34,50 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.google.startupos.tools.reviewer.service.CodeReviewClient;
 import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.common.collect.ImmutableList;
 
 /*
  * LocalHttpGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
  * client (which in turn communicates to gRPC server and responds) and returns responses
  *
- * To run: bazel build //tools/local_server:http_gateway_deploy.jar
- * java -jar bazel-bin/tools/local_server/http_gateway_deploy.jar -- {absolute_path}
+ * To run:
+ * bazel build //tools/local_server:local_http_gateway_deploy.jar
+ * bazel-bin/tools/local_server/local_http_gateway -- {absolute_path}
  * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
  */
 // TODO: Find an automated way to do this, e.g github.com/improbable-eng/grpc-web
 public class LocalHttpGateway {
   private static final Logger logger = Logger.getLogger(LocalHttpGateway.class.getName());
 
-  // TODO: Receive port and root path as flags.
-  public static final int HTTP_GATEWAY_PORT = 7000;
-
   private final HttpServer httpServer;
-  private final LocalInProcessServer grpcServer;
-  private String grpcServerName;
 
   private static final String GET_FILE_PATH = "/get_file";
   private static final String TOKEN_PATH = "/token";
 
-  private LocalHttpGateway(int gatewayPort, String rootPath) throws Exception {
-    logger.info(String.format("Starting gateway at port %d for path %s", gatewayPort, rootPath));
-    grpcServerName = java.util.UUID.randomUUID().toString();
-    httpServer = HttpServer.create(new InetSocketAddress(gatewayPort), 0);
-    grpcServer = new LocalInProcessServer(rootPath, grpcServerName);
-    CodeReviewClient client = new CodeReviewClient(grpcServerName);
+  @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
+  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
+
+  @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
+  public static final Flag<Integer> localServerPort = Flag.create(8001);
+
+  private LocalHttpGateway(int httpGatewayPort, int localServerPort) throws Exception {
+    logger.info(String.format(
+        "Starting gateway at port %d (local server at port %d)",
+        httpGatewayPort,
+        localServerPort));
+    httpServer = HttpServer.create(new InetSocketAddress(httpGatewayPort), 0);
+    CodeReviewClient client = new CodeReviewClient("localhost", localServerPort);
 
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
     httpServer.createContext(GET_FILE_PATH, new GetFileHandler(client));
-    httpServer.setExecutor(null); // creates a default executor
+    httpServer.setExecutor(null); // Creates a default executor
   }
 
   public void serve() throws Exception {
     httpServer.start();
-    grpcServer.start();
-    grpcServer.blockUntilShutdown();
-  }
-
-  public static void main(String[] args) throws Exception {
-    if (args.length != 2) {
-      logger.severe("Please specify root path for file serving as argument");
-      return;
-    }
-    new LocalHttpGateway(HTTP_GATEWAY_PORT, args[1]).serve();
   }
 
   /* Handler for receiving Firestore token */
@@ -168,5 +164,20 @@ public class LocalHttpGateway {
       }
     }
     return result.build();
+  }
+
+  private static void checkFlags() {
+    if (httpGatewayPort.get().equals(localServerPort.get())) {
+      System.out.println(
+          "Error: HttpGatewayServer and LocalServer ports are the same: " + localServerPort.get());
+      System.exit(1);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    Iterable<String> packages = ImmutableList.of(LocalHttpGateway.class.getPackage().getName());
+    Flags.parse(args, packages);
+    checkFlags();
+    new LocalHttpGateway(httpGatewayPort.get(), localServerPort.get()).serve();
   }
 }

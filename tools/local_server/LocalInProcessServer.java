@@ -24,8 +24,7 @@ import com.google.startupos.tools.reviewer.service.CodeReviewService;
 
 
 /*
- * LocalInprocessServer is a gRPC server, wrapped by LocalHttpGateway to
- * provide an HTTP endpoint.
+ * LocalInprocessServer is a gRPC server, wrapped by LocalHttpGateway to provide an HTTP endpoint.
  */
 public class LocalInProcessServer {
   private static final Logger logger = Logger.getLogger(LocalInProcessServer.class.getName());
