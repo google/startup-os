@@ -37,7 +37,6 @@ import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
-import com.google.common.collect.ImmutableList;
 
 /*
  * LocalHttpGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
@@ -175,8 +174,7 @@ public class LocalHttpGateway {
   }
 
   public static void main(String[] args) throws Exception {
-    Iterable<String> packages = ImmutableList.of(LocalHttpGateway.class.getPackage().getName());
-    Flags.parse(args, packages);
+    Flags.parse(args, LocalHttpGateway.class.getPackage());
     checkFlags();
     new LocalHttpGateway(httpGatewayPort.get(), localServerPort.get()).serve();
   }

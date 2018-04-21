@@ -24,7 +24,6 @@ import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
-import com.google.common.collect.ImmutableList;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
@@ -83,8 +82,7 @@ public class LocalServer {
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
-    Iterable<String> packages = ImmutableList.of(LocalServer.class.getPackage().getName());
-    Flags.parse(args, packages);
+    Flags.parse(args, LocalServer.class.getPackage());
     checkFlags();
 
     final LocalServer server = new LocalServer();

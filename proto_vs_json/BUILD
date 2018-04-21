@@ -18,7 +18,6 @@ java_binary(
         ":data_java_proto",
         "//common",
         "//common/flags",
-        "//third_party/maven/com/google/guava:guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/org/slf4j:slf4j_api",
