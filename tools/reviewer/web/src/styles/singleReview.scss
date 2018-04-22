@@ -29,6 +29,11 @@
         text-decoration: underline;
       }
     }
+    .reviewers,
+    .CCs {
+      margin-bottom: 0px;
+      height: 55px;
+    }
     .thread {
       border: 1px solid $borderColor;
       border-radius: 3px;

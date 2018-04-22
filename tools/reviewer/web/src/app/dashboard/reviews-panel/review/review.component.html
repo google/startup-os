@@ -45,28 +45,36 @@
         </ng-container>
       </div>
     </div>
-    
+
     <!-- Reviwers -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
+    <div 
+      fxLayout="row"
+      fxLayoutAlign="start center"
+      fxLayout.xs="column"
+      fxLayoutGap.xs="10px"
+      class="reviewers">
       <div fxFlex="150px" fxFlex.xs="" 
         fxLayoutAlign="start center" 
         class="property">
         Reviewers:
       </div>
-      <div class="detail">
+      <div fxFlex class="detail">
         <!-- Print out reviewer's list if length is more than zero -->
         <ng-container>
-          <div *ngIf="!showEditableReviewers" (click)="showEditableReviewers = true">
+          <div 
+            *ngIf="!showEditableReviewers"
+            (click)="showEditableReviewers = true"
+            fxLayoutAlign="start center">
             <a
-            *ngFor="let reviewer of diff.reviewers; let last = last"
-            [ngClass]="{ 
-              'bold-text': 
-                diff.needAttentionOf.includes(reviewer)
-              }"
-            >
-            {{ last ? reviewer : reviewer + ',' }}
-          </a>
-        </div>
+              *ngFor="let reviewer of diff.reviewers; let last = last"
+              [ngClass]="{ 
+                'bold-text': 
+                  diff.needAttentionOf.includes(reviewer)
+                }"
+              >
+              {{ last ? reviewer : reviewer + ',' }}
+            </a>
+          </div>
           <mat-form-field class="editableInput" *ngIf="showEditableReviewers">
             <input matInput placeholder="" 
               [(ngModel)]="reviewers"
@@ -85,15 +93,23 @@
     </div>
 
     <!-- CC's -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
+    <div 
+      fxLayout="row"
+      fxLayout.xs="column"
+      fxLayoutGap.xs="10px"
+      fxLayoutAlign="start center" 
+      class="CCs">
       <div fxFlex="150px" fxFlex.xs="" 
-        class="property"
-        fxLayoutAlign="start center">
+        fxLayoutAlign="start center"
+        class="property">
         CC:
       </div>
-      <div fxFlex class="detail">
+      <div fxFlex fxLayoutAlign="start center" class="detail">
         <ng-container>
-          <div *ngIf="!showEditableCCs" (click)="showEditableCCs = true">
+          <div 
+            *ngIf="!showEditableCCs"
+            (click)="showEditableCCs = true"
+            fxLayoutAlign="start center">
             <a *ngFor="let cc of diff.cc; let last = last ">
               {{ last ? cc : cc + ',' }}
             </a>
@@ -113,6 +129,7 @@
         </ng-container>
       </div>
     </div>
+
 
     <!-- Created At timestamp -->
     <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
