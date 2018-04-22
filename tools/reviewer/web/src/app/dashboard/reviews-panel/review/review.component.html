@@ -48,11 +48,16 @@
     
     <!-- Reviwers -->
     <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Reviewers:</div>
+      <div fxFlex="150px" fxFlex.xs="" 
+        fxLayoutAlign="start center" 
+        class="property">
+        Reviewers:
+      </div>
       <div class="detail">
         <!-- Print out reviewer's list if length is more than zero -->
         <ng-container>
-          <a 
+          <div *ngIf="!showEditableReviewers" (click)="showEditableReviewers = true">
+            <a
             *ngFor="let reviewer of diff.reviewers; let last = last"
             [ngClass]="{ 
               'bold-text': 
@@ -61,6 +66,14 @@
             >
             {{ last ? reviewer : reviewer + ',' }}
           </a>
+        </div>
+          <mat-form-field class="editableInput" *ngIf="showEditableReviewers">
+            <input matInput placeholder="" 
+              [(ngModel)]="reviewers"
+              (keyup.enter)="showEditableReviewers = false; saveReviewers()"
+              (blur)="showEditableReviewers = false; getReviewers()"
+              >
+          </mat-form-field>
         </ng-container>
         <!-- If no reviewers are present -->
         <ng-container *ngIf="diff.reviewers.length === 0">
@@ -73,12 +86,25 @@
 
     <!-- CC's -->
     <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">CC:</div>
+      <div fxFlex="150px" fxFlex.xs="" 
+        class="property"
+        fxLayoutAlign="start center">
+        CC:
+      </div>
       <div fxFlex class="detail">
-        <ng-container *ngIf="diff.cc.length > 0">
-          <a *ngFor="let cc of diff.cc; let last = last ">
-            {{ last ? cc : cc + ',' }}
-          </a>
+        <ng-container>
+          <div *ngIf="!showEditableCCs" (click)="showEditableCCs = true">
+            <a *ngFor="let cc of diff.cc; let last = last ">
+              {{ last ? cc : cc + ',' }}
+            </a>
+          </div>
+          <mat-form-field class="editableInput" *ngIf="showEditableCCs">
+            <input matInput placeholder="" 
+              [(ngModel)]="ccs"
+              (keyup.enter)="showEditableCCs = false; saveCCs()"
+              (blur)="showEditableCCs = false; getCCs()"
+              >
+          </mat-form-field>
         </ng-container>
         <ng-container *ngIf="diff.cc.length === 0">
           <span>
