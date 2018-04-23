@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.swing.text.Segment;
 
 /**
  * An implementation of text difference based on the Longest Common Subsequence problem (A.K.A LCS).
@@ -41,10 +42,10 @@ public class TextDifferencer {
     final char[] second = secondString.toCharArray();
     int headerLength = getHeaderMatchingCharactersLength(first, second);
     int footerLength = getFooterMatchingCharactersLength(headerLength, first, second);
-    StringView firstView =
-        new StringView(first, headerLength, first.length - footerLength - headerLength);
-    StringView secondView =
-        new StringView(second, headerLength, second.length - footerLength - headerLength);
+    Segment firstView =
+        new Segment(first, headerLength, first.length - footerLength - headerLength);
+    Segment secondView =
+        new Segment(second, headerLength, second.length - footerLength - headerLength);
 
     List<CharDifference> allDifferences = new ArrayList<>();
     allDifferences.addAll(getMatchingCharDifferences(first, 0, headerLength));
@@ -118,7 +119,7 @@ public class TextDifferencer {
    * @param second The second string out of two strings for precomputing a common subsequence.
    * @return A length of the common subsequence for the two strings.
    */
-  private static int[][] computeLCSMatrix(final StringView first, final StringView second) {
+  private static int[][] computeLCSMatrix(final Segment first, final Segment second) {
     final int[][] lcsMatrix = createEmptyLCSMatrix(first.length() + 1, second.length() + 1);
     for (int i = 1; i < first.length() + 1; i++) {
       for (int j = 1; j < second.length() + 1; j++) {
@@ -142,7 +143,7 @@ public class TextDifferencer {
    * @return A list of all the character differences
    */
   private static List<CharDifference> getDifferencesFromLCSMatrix(
-      final int[][] lcsMatrix, final StringView first, final StringView second) {
+      final int[][] lcsMatrix, final Segment first, final Segment second) {
     List<CharDifference> differences = new ArrayList<>();
     int i = first.length();
     int j = second.length();
@@ -150,7 +151,7 @@ public class TextDifferencer {
       if (i > 0 && j > 0 && first.charAt(i - 1) == second.charAt(j - 1)) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(first.begin() + i - 1)
+                .setIndex(first.getBeginIndex() + i - 1)
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(DifferenceType.NO_CHANGE)
                 .build());
@@ -159,7 +160,7 @@ public class TextDifferencer {
       } else if (j > 0 && (i == 0 || lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j])) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(second.begin() + j - 1)
+                .setIndex(second.getBeginIndex() + j - 1)
                 .setDifference(Character.toString(second.charAt(j - 1)))
                 .setType(DifferenceType.ADDITION)
                 .build());
@@ -167,7 +168,7 @@ public class TextDifferencer {
       } else if (i > 0 && (j == 0 || lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j])) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(first.begin() + i - 1)
+                .setIndex(first.getBeginIndex() + i - 1)
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(DifferenceType.DELETION)
                 .build());
@@ -181,32 +182,4 @@ public class TextDifferencer {
   }
 
   private TextDifferencer() {}
-
-  /** Holds a partial substring of a string. */
-  private static class StringView {
-
-    private final char[] content;
-    private int begin;
-    private int length;
-
-    StringView(final char[] content, int begin, int length) {
-      this.content = content;
-      this.begin = begin;
-      this.length = length;
-    }
-
-    /** Returns the begin index in which the substring starts. */
-    int begin() {
-      return begin;
-    }
-
-    /** Returns the length of the substring. */
-    int length() {
-      return length;
-    }
-
-    char charAt(int i) {
-      return this.content[begin() + i];
-    }
-  }
 }
