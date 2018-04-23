@@ -1,6 +1,6 @@
 <div class="google" *ngIf="!firebaseService.isLoading">
   <div class="gbutton" *ngIf="!(firebaseService.access.authState | async)">
-    <img (click)="firebaseService.login()" src="/assets/login-with-google.png">
+    <img (click)="login()" src="/assets/login-with-google.png">
   </div>
   <div class="gbutton" *ngIf="firebaseService.access.authState | async">
     <button (click)="firebaseService.logout()">
