@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "com.google.startupos.tools.localserver.service";
+option java_outer_classname = "Protos";
+
+package com.google.startupos.tools.localserver.service;
+
+service AuthService { 
+  rpc postAuthData(AuthDataRequest) returns (AuthDataResponse);
+}
+
+message AuthDataRequest {
+  string projectId = 1;
+  // Firestore token
+  string token = 2;
+}
+
+// TODO: Use Empty: https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto
+message AuthDataResponse { }

@@ -32,8 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import java.util.stream.Collectors;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.google.startupos.tools.reviewer.service.CodeReviewClient;
-import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
@@ -68,7 +66,8 @@ public class LocalHttpGateway {
         httpGatewayPort,
         localServerPort));
     httpServer = HttpServer.create(new InetSocketAddress(httpGatewayPort), 0);
-    CodeReviewClient client = new CodeReviewClient("localhost", localServerPort);
+    LocalHttpGatewayGrpcClient client =
+        new LocalHttpGatewayGrpcClient("localhost", localServerPort);
 
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
     httpServer.createContext(GET_FILE_PATH, new GetFileHandler(client));
@@ -81,9 +80,9 @@ public class LocalHttpGateway {
 
   /* Handler for receiving Firestore token */
   static class FirestoreTokenHandler implements HttpHandler {
-    private CodeReviewClient client;
+    private LocalHttpGatewayGrpcClient client;
 
-    FirestoreTokenHandler(CodeReviewClient client) {
+    FirestoreTokenHandler(LocalHttpGatewayGrpcClient client) {
       this.client = client;
     }
 
@@ -94,27 +93,17 @@ public class LocalHttpGateway {
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.info("Handling token post request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
-        client.postToken(json.getString("projectId"), json.getString("token"));
-      } else if ("get".equalsIgnoreCase(httpExchange.getRequestMethod())) {
-        logger.info("Handling token get request");
-        GetTokenResponse response = client.getToken();
-
-        byte[] responseBytes = response.toByteArray();
-        httpExchange.sendResponseHeaders(200, responseBytes.length);
-        OutputStream stream = httpExchange.getResponseBody();
-        stream.write(responseBytes);
-        stream.close();
+        client.postAuthData(json.getString("projectId"), json.getString("token"));
       }
-
       httpExchange.sendResponseHeaders(200, -1);
     }
   }
 
   /* Handler for serving /get_file/{fn} endpoint where {fn} is relative path */
   static class GetFileHandler implements HttpHandler {
-    private CodeReviewClient client;
+    private LocalHttpGatewayGrpcClient client;
 
-    GetFileHandler(CodeReviewClient client) {
+    GetFileHandler(LocalHttpGatewayGrpcClient client) {
       this.client = client;
     }
 

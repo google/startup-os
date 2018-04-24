@@ -14,36 +14,38 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.service;
+package com.google.startupos.tools.localserver;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import java.util.concurrent.TimeUnit;
-import com.google.startupos.tools.reviewer.service.Protos.GetTokenRequest;
-import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
-import com.google.startupos.tools.reviewer.service.Protos.TokenRequest;
-import com.google.startupos.tools.reviewer.service.Protos.TokenResponse;
+import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
+import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
+import com.google.startupos.tools.localserver.service.AuthServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
+import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 
-public class CodeReviewClient {
+public class LocalHttpGatewayGrpcClient {
 
   private final ManagedChannel channel;
-  private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
+  private final AuthServiceGrpc.AuthServiceBlockingStub authBlockingStub;
+  private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
-  public CodeReviewClient(String host, int port) {
+  public LocalHttpGatewayGrpcClient(String host, int port) {
     this(ManagedChannelBuilder.forAddress(host, port).usePlaintext(true).build());
   }
 
-  public CodeReviewClient(String inProcessServerName) {
+  public LocalHttpGatewayGrpcClient(String inProcessServerName) {
     this(InProcessChannelBuilder.forName(inProcessServerName).directExecutor().build());
   }
 
-  private CodeReviewClient(ManagedChannel channel) {
+  private LocalHttpGatewayGrpcClient(ManagedChannel channel) {
     this.channel = channel;
-    blockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
+    authBlockingStub = AuthServiceGrpc.newBlockingStub(channel);
+    codeReviewBlockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
   public void shutdown() throws InterruptedException {
@@ -53,26 +55,22 @@ public class CodeReviewClient {
   public String getFile(String name) {
     final FileRequest request = FileRequest.newBuilder().setFilename(name).build();
     try {
-      return blockingStub.getFile(request).getContent();
+      return codeReviewBlockingStub.getFile(request).getContent();
     } catch (StatusRuntimeException e) {
       e.printStackTrace();
       return null;
     }
   }
 
-  public void postToken(String projectId, String token) {
-    final TokenRequest request = TokenRequest.newBuilder()
+  public void postAuthData(String projectId, String token) {
+    final AuthDataRequest request = AuthDataRequest.newBuilder()
         .setProjectId(projectId)
         .setToken(token)
         .build();
     try {
-      blockingStub.postToken(request);
+      authBlockingStub.postAuthData(request);
     } catch (StatusRuntimeException e) {
       e.printStackTrace();
     }
-  }
-
-  public GetTokenResponse getToken() throws StatusRuntimeException {
-    return blockingStub.getToken(GetTokenRequest.getDefaultInstance());
   }
 }
