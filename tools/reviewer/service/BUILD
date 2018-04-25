@@ -15,6 +15,7 @@ java_library(
     ],
     deps = [
         ":code_review_service_lib",
+        "//tools/local_server/service:auth_service",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
     ],
