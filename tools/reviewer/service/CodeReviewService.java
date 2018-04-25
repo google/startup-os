@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
+import com.google.startupos.tools.localserver.service.AuthService;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -31,9 +32,11 @@ import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
  
+  private AuthService authService;
   private String rootPath;
 
-  public CodeReviewService(String rootPath) {
+  public CodeReviewService(AuthService authService, String rootPath) {
+    this.authService = authService;
     this.rootPath = rootPath;
   }
 

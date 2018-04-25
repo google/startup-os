@@ -46,10 +46,11 @@ public class LocalServer {
   private Server server;
 
   private void start() throws IOException {
+    AuthService authService = new AuthService();
     server =
         ServerBuilder.forPort(localServerPort.get())
             .addService(new AuthService())
-            .addService(new CodeReviewService(rootPath.get()))
+            .addService(new CodeReviewService(authService, rootPath.get()))
             .build()
             .start();
     logger.info("Server started, listening on " + localServerPort.get());
