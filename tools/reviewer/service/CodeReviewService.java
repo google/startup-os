@@ -32,8 +32,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
  
   private String rootPath;
-  private String firestoreToken;
-  private String firestoreProjectId;
 
   public CodeReviewService(String rootPath) {
     this.rootPath = rootPath;

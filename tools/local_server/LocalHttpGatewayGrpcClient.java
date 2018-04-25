@@ -22,10 +22,8 @@ import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import java.util.concurrent.TimeUnit;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
-import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
 import com.google.startupos.tools.localserver.service.AuthServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 
 public class LocalHttpGatewayGrpcClient {

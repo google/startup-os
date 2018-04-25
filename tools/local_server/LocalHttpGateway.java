@@ -30,7 +30,6 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import com.google.common.collect.ImmutableMap;
 import java.util.stream.Collectors;
-import org.json.JSONException;
 import org.json.JSONObject;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;

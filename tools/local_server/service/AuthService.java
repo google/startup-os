@@ -18,9 +18,6 @@ package com.google.startupos.tools.localserver.service;
 
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.logging.Logger;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
