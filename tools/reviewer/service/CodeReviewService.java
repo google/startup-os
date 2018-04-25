@@ -22,10 +22,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
-import com.google.startupos.tools.reviewer.service.Protos.GetTokenRequest;
-import com.google.startupos.tools.reviewer.service.Protos.GetTokenResponse;
-import com.google.startupos.tools.reviewer.service.Protos.TokenRequest;
-import com.google.startupos.tools.reviewer.service.Protos.TokenResponse;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 
@@ -36,8 +32,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
  
   private String rootPath;
-  private String firestoreToken;
-  private String firestoreProjectId;
 
   public CodeReviewService(String rootPath) {
     this.rootPath = rootPath;
@@ -59,23 +53,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
-  public void postToken(TokenRequest req, StreamObserver<TokenResponse> responseObserver) {
-    try {
-      firestoreProjectId = req.getProjectId();
-      firestoreToken = req.getToken();
-      responseObserver.onNext(TokenResponse.getDefaultInstance());
-      responseObserver.onCompleted();
-      logger.info("Received token for project " + firestoreProjectId);
-    } catch (SecurityException e) {
-      responseObserver.onError(
-          Status.UNKNOWN
-              .withDescription("Cannot get token from request")
-              .asException());
-      logger.info("Cannot get token from request");
-    }
-  }
-
-  @Override
   public void getFile(FileRequest req, StreamObserver<FileResponse> responseObserver) {
     try {
       String filePath = getAbsolutePath(req.getFilename());
@@ -87,35 +64,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           Status.NOT_FOUND
               .withDescription(String.format("No such file %s", req.getFilename()))
               .asException());
-    }
-  }
-
-  @Override
-  public void getToken(GetTokenRequest req, StreamObserver<GetTokenResponse> responseObserver) {
-    if (firestoreToken == null || firestoreProjectId == null) {
-      String message = "Firestore project ID or token (or both) null. Project ID=" + firestoreProjectId;
-      responseObserver.onError(
-        Status.UNKNOWN
-            .withDescription(message)
-            .asException());
-      logger.info("GetToken failed: " + message);
-      return;
-    }
-
-    try {
-      responseObserver.onNext(
-          GetTokenResponse.newBuilder()
-              .setProjectId(firestoreProjectId)
-              .setToken(firestoreToken)
-              .build());
-      responseObserver.onCompleted();
-      logger.info("Sending token for project " + firestoreProjectId);
-    } catch (SecurityException e) {
-      responseObserver.onError(
-          Status.UNKNOWN
-              .withDescription("Cannot send token")
-              .asException());
-      logger.info("Cannot send token");
     }
   }
 }

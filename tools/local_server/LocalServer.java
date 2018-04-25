@@ -20,6 +20,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
 import java.util.logging.Logger;
+import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
@@ -37,16 +38,17 @@ public class LocalServer {
   private static final Logger logger = Logger.getLogger(LocalServer.class.getName());
 
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
-  public static final Flag<Integer> localServerPort = Flag.create(8001);
+  private static final Flag<Integer> localServerPort = Flag.create(8001);
 
   @FlagDesc(name = "root_path", description = "Root path for serving files for reviewer service")
-  public static final Flag<String> rootPath = Flag.create("");
+  private static final Flag<String> rootPath = Flag.create("");
 
   private Server server;
 
   private void start() throws IOException {
     server =
         ServerBuilder.forPort(localServerPort.get())
+            .addService(new AuthService())
             .addService(new CodeReviewService(rootPath.get()))
             .build()
             .start();
