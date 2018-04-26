@@ -19,9 +19,19 @@
       }
       .detail {
         font-size: 16px;
+        .mat-icon-button {
+          margin-left: 20px;
+          background-color: #f9f6f6;
+        }
+      }
+      .editableInput,
+      .reviewer-detail {
+        width: 400px;
       }
       .editableInput {
-        width: 400px;
+        div mat-form-field {
+          width: 100%;
+        }
       }
       .filePosition {
         cursor: pointer;
@@ -29,11 +39,27 @@
         text-decoration: underline;
       }
     }
-    .reviewers,
-    .CCs {
-      margin-bottom: 0px;
-      height: 55px;
+    // .reviewers,
+    // .CCs {
+    //   margin-bottom: 0px;
+    // }
+    .reviewer-name,
+    .cc-name {
+      .add-to-list {
+        display: none;
+        position: absolute;
+        margin-top: -35px;
+      }
+      &:hover {
+        // background-color: #ebf74c;
+        .add-to-list {
+          display: block;
+        }
+      }
     }
+    // .add-to-list {
+    //   display: none;
+    // }
     .thread {
       border: 1px solid $borderColor;
       border-radius: 3px;

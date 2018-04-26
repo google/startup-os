@@ -95,6 +95,8 @@ export class ReviewComponent implements OnInit {
     this.updateDiff(this.diff, 'CCs Saved');
   }
 
+  onAddToList(): void {}
+
   updateDiff(diff: Diff, message: string): void {
     this.firebaseService
       .updateDiff(diff)
@@ -105,5 +107,11 @@ export class ReviewComponent implements OnInit {
       .catch(err => {
         this.notify.error('Some Error Occured');
       });
+  }
+
+  getButtonText(reviewer: string): string {
+    return this.diff.needAttentionOf.indexOf(reviewer) > -1
+      ? 'Remove From List'
+      : 'Add To List';
   }
 }

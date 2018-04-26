@@ -61,27 +61,67 @@
       <div fxFlex class="detail">
         <!-- Print out reviewer's list if length is more than zero -->
         <ng-container>
-          <div 
+          <div
+            class="reviewer-detail"
             *ngIf="!showEditableReviewers"
             (click)="showEditableReviewers = true"
             fxLayoutAlign="start center">
-            <a
+            <span
               *ngFor="let reviewer of diff.reviewers; let last = last"
               [ngClass]="{ 
                 'bold-text': 
-                  diff.needAttentionOf.includes(reviewer)
+                  diff.needAttentionOf.includes(reviewer),
+                'reviewer-name': true
                 }"
               >
+              <button mat-raised-button 
+                class="add-to-list"
+                (click)="onAddToList(reviewer);
+                $event.stopPropagation()"
+                >
+                {{ getButtonText(reviewer) }}
+              </button>
               {{ last ? reviewer : reviewer + ',' }}
-            </a>
+            </span>
+            <button mat-icon-button><mat-icon>edit</mat-icon></button> 
           </div>
-          <mat-form-field class="editableInput" *ngIf="showEditableReviewers">
-            <input matInput placeholder="" 
-              [(ngModel)]="reviewers"
-              (keyup.enter)="showEditableReviewers = false; saveReviewers()"
-              (blur)="showEditableReviewers = false; getReviewers()"
-              >
-          </mat-form-field>
+          <div class="editableInput" *ngIf="showEditableReviewers">
+            <div>
+              <mat-form-field>
+                <input matInput placeholder="" 
+                  [(ngModel)]="reviewers"
+                  (keyup.enter)="showEditableReviewers = false; saveReviewers()"
+                  >
+              </mat-form-field>
+            </div>
+            <div>
+              <div
+                class="actions"
+                fxFlex
+                fxLayoutAlign="end end"
+                fxLayoutGap="10px"
+                >
+                <span class="input save">
+                  <button 
+                    mat-raised-button 
+                    color="primary"
+                    (click)="showEditableReviewers = false; 
+                    saveReviewers()"
+                    >
+                    Save
+                  </button>
+                </span>
+                <span class="input cancel">
+                  <button 
+                    mat-raised-button 
+                    (click)="showEditableReviewers = false; getReviewers()"
+                    >
+                    Cancel
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
         </ng-container>
         <!-- If no reviewers are present -->
         <ng-container *ngIf="diff.reviewers.length === 0">
@@ -110,7 +150,7 @@
             *ngIf="!showEditableCCs"
             (click)="showEditableCCs = true"
             fxLayoutAlign="start center">
-            <a *ngFor="let cc of diff.cc; let last = last ">
+            <a *ngFor="let cc of diff.cc; let last = last" class="cc-name">
               {{ last ? cc : cc + ',' }}
             </a>
           </div>
