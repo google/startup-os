@@ -111,7 +111,7 @@ export class ReviewComponent implements OnInit {
 
   getButtonText(reviewer: string): string {
     return this.diff.needAttentionOf.indexOf(reviewer) > -1
-      ? 'Remove From List'
-      : 'Add To List';
+      ? 'Remove From Needs Attention'
+      : 'Add to Needs Attention';
   }
 }

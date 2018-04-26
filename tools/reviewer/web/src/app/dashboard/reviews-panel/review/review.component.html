@@ -144,23 +144,71 @@
         class="property">
         CC:
       </div>
-      <div fxFlex fxLayoutAlign="start center" class="detail">
+      <div 
+        fxFlex
+        fxLayoutAlign="start center"
+        class="detail">
         <ng-container>
-          <div 
+          <div
             *ngIf="!showEditableCCs"
             (click)="showEditableCCs = true"
             fxLayoutAlign="start center">
-            <a *ngFor="let cc of diff.cc; let last = last" class="cc-name">
-              {{ last ? cc : cc + ',' }}
-            </a>
-          </div>
-          <mat-form-field class="editableInput" *ngIf="showEditableCCs">
-            <input matInput placeholder="" 
-              [(ngModel)]="ccs"
-              (keyup.enter)="showEditableCCs = false; saveCCs()"
-              (blur)="showEditableCCs = false; getCCs()"
+            <span 
+              *ngFor="let s of diff.cc; let last = last" 
+              [ngClass]="{ 
+                'bold-text': 
+                  diff.needAttentionOf.includes(s),
+                'cc-name': true
+                }"
               >
-          </mat-form-field>
+              <button mat-raised-button 
+                class="add-to-list"
+                (click)="onAddToList(s);
+                $event.stopPropagation()"
+                >
+                {{ getButtonText(s) }}
+              </button>
+              {{ last ? s : s + ',' }}
+            </span>
+            <button mat-icon-button><mat-icon>edit</mat-icon></button> 
+          </div>
+          <div class="editableInput" *ngIf="showEditableCCs">
+            <div>
+              <mat-form-field>
+                <input matInput placeholder="" 
+                  [(ngModel)]="ccs"
+                  (keyup.enter)="showEditableCCs = false; saveCCs()"
+                  >
+              </mat-form-field>
+            </div>
+            <div>
+              <div
+                class="actions"
+                fxFlex
+                fxLayoutAlign="end end"
+                fxLayoutGap="10px"
+                >
+                <span class="input save">
+                  <button 
+                    mat-raised-button 
+                    color="primary"
+                    (click)="showEditableCCs = false; 
+                    saveCCs()"
+                    >
+                    Save
+                  </button>
+                </span>
+                <span class="input cancel">
+                  <button 
+                    mat-raised-button 
+                    (click)="showEditableCCs = false; getCCs()"
+                    >
+                    Cancel
+                  </button>
+                </span>
+              </div>
+            </div>
+          </div>
         </ng-container>
         <ng-container *ngIf="diff.cc.length === 0">
           <span>
