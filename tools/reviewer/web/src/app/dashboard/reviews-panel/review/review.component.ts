@@ -95,7 +95,16 @@ export class ReviewComponent implements OnInit {
     this.updateDiff(this.diff, 'CCs Saved');
   }
 
-  onAddToList(): void {}
+  updateAttentionList(name: string): void {
+    if (this.diff.needAttentionOf.includes(name)) {
+      this.diff.needAttentionOf = this.diff.needAttentionOf.filter(
+        e => e !== name
+      );
+    } else {
+      this.diff.needAttentionOf.push(name);
+    }
+    this.updateDiff(this.diff, 'Need Attention List Updated');
+  }
 
   updateDiff(diff: Diff, message: string): void {
     this.firebaseService

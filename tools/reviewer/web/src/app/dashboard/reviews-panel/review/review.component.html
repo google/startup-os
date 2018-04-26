@@ -64,7 +64,6 @@
           <div
             class="reviewer-detail"
             *ngIf="!showEditableReviewers"
-            (click)="showEditableReviewers = true"
             fxLayoutAlign="start center">
             <span
               *ngFor="let reviewer of diff.reviewers; let last = last"
@@ -76,14 +75,19 @@
               >
               <button mat-raised-button 
                 class="add-to-list"
-                (click)="onAddToList(reviewer);
+                (click)="updateAttentionList(reviewer);
                 $event.stopPropagation()"
                 >
                 {{ getButtonText(reviewer) }}
               </button>
-              {{ last ? reviewer : reviewer + ',' }}
+              {{ last ? reviewer : reviewer + ',&nbsp;' }}
             </span>
-            <button mat-icon-button><mat-icon>edit</mat-icon></button> 
+            <button 
+              mat-icon-button
+              (click)="showEditableReviewers = true"
+              >
+              <mat-icon>edit</mat-icon>
+            </button>
           </div>
           <div class="editableInput" *ngIf="showEditableReviewers">
             <div>
@@ -151,7 +155,6 @@
         <ng-container>
           <div
             *ngIf="!showEditableCCs"
-            (click)="showEditableCCs = true"
             fxLayoutAlign="start center">
             <span 
               *ngFor="let s of diff.cc; let last = last" 
@@ -163,14 +166,19 @@
               >
               <button mat-raised-button 
                 class="add-to-list"
-                (click)="onAddToList(s);
+                (click)="updateAttentionList(s);
                 $event.stopPropagation()"
                 >
                 {{ getButtonText(s) }}
               </button>
-              {{ last ? s : s + ',' }}
+              {{ last ? s : s + ',&nbsp;' }}
             </span>
-            <button mat-icon-button><mat-icon>edit</mat-icon></button> 
+            <button 
+              mat-icon-button
+              (click)="showEditableCCs = true"
+              >
+              <mat-icon>edit</mat-icon>
+            </button> 
           </div>
           <div class="editableInput" *ngIf="showEditableCCs">
             <div>
