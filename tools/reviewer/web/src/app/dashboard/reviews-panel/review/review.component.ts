@@ -17,7 +17,7 @@ export class ReviewComponent implements OnInit {
   diff: Diff;
   reviewers: string = '';
   ccs: string = '';
-  // diffReviewers: Array<string> = [];
+  notSubmitted: boolean = false;
   showEditableReviewers = false;
   showEditableCCs = false;
 
@@ -45,6 +45,7 @@ export class ReviewComponent implements OnInit {
         this.diff.number = parseInt(this.diffId, 10);
         this.getReviewers();
         this.getCCs();
+        this.notSubmitted = !(this.diff.status === 4);
       });
     });
   }

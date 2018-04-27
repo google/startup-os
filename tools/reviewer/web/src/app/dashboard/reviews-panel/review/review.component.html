@@ -75,6 +75,7 @@
               >
               <button mat-raised-button 
                 class="add-to-list"
+                *ngIf="notSubmitted"
                 (click)="updateAttentionList(reviewer);
                 $event.stopPropagation()"
                 >
@@ -85,6 +86,7 @@
             <button 
               mat-icon-button
               (click)="showEditableReviewers = true"
+              *ngIf="notSubmitted"
               >
               <mat-icon>edit</mat-icon>
             </button>
@@ -166,6 +168,7 @@
               >
               <button mat-raised-button 
                 class="add-to-list"
+                *ngIf="notSubmitted"
                 (click)="updateAttentionList(s);
                 $event.stopPropagation()"
                 >
@@ -175,6 +178,7 @@
             </span>
             <button 
               mat-icon-button
+              *ngIf="notSubmitted"
               (click)="showEditableCCs = true"
               >
               <mat-icon>edit</mat-icon>
@@ -225,7 +229,6 @@
         </ng-container>
       </div>
     </div>
-
 
     <!-- Created At timestamp -->
     <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
