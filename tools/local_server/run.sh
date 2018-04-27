@@ -15,7 +15,12 @@ fi
 # Kill previous:
 pkill -f 'tools/local_server/local_http_gateway'
 pkill -f 'tools/local_server/local_server'
-sleep 0.5  # Wait for processes to terminate
+fuser -k 8000/tcp # For Angular
+
+cd tools/local_server/web_login
+npm install
+ng serve &
+cd -
 
 # Run:
 bazel-bin/tools/local_server/local_http_gateway &
