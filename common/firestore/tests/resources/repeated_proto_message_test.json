@@ -1,0 +1,28 @@
+{
+	"fields": {
+		"item": {
+			"arrayValue": {
+				"values": [
+					{
+						"mapValue": {
+							"fields": {
+								"doubleField1": {
+									"doubleValue": 12.34
+								}
+							}
+						}
+					},
+					{
+						"mapValue": {
+							"fields": {
+								"doubleField1": {
+									"doubleValue": 56.78
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	}
+}

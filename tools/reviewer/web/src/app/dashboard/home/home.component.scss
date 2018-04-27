@@ -1,0 +1,16 @@
+/* Separated styles folder works better on bigger projects */
+/* fxLayout project would be used on a bigger project it'll help in UI */
+.inputArea {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  textarea {
+    height: 800px;
+    width: 800px;
+  }
+  button {
+    display: block;
+    margin-top: 30px;
+  }
+}

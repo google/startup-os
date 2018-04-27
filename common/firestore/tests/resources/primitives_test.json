@@ -1,0 +1,25 @@
+{
+	"fields": {
+		"doubleField1": {
+			"doubleValue": 12.34
+		},
+		"floatField1": {
+			"doubleValue": 56.78
+		},
+		"intField1": {
+			"integerValue": 123
+		},
+		"longField1": {
+			"integerValue": 456
+		},
+		"booleanField1": {
+			"booleanValue": true
+		},
+		"stringField1": {
+			"stringValue": "Some string"
+		},
+		"bytesField1": {
+			"stringValue": "YWJjZA=="
+		}
+	}
+}

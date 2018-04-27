@@ -16,14 +16,17 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.startupos.tools.aa.Aa;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
 import java.io.IOException;
 
 public class InitCommand implements AaCommand {
+  @FlagDesc(name = "config_path", description = "Path to config file", required = true)
+  public static Flag<String> configPath = Flag.create("");
+
   @FlagDesc(name = "base_path", description = "Base path", required = true)
   public static Flag<String> basePath = Flag.create("");
 
@@ -31,17 +34,23 @@ public class InitCommand implements AaCommand {
   public static Flag<String> remoteRepoUrl = Flag.create("");
 
   @Override
-  public void run() {
+  public void run(String[] args) {
+    Flags.parse(args, InitCommand.class.getPackage());
+
     try {
       Config config =
           Config.newBuilder()
               .setBasePath(basePath.get())
               .setRemoteRepoUrl(remoteRepoUrl.get())
               .build();
-      FileUtils.writePrototxt(config, Aa.CONFIG_FILE);
-
-    } catch (IOException ex) {
-      ex.printStackTrace();
+      FileUtils.writePrototxt(config, configPath.get());
+      
+    } catch (IllegalArgumentException e) {
+      System.out.println(e.getMessage());
+      System.out.println("Input flags:");
+      Flags.printUsage();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -50,4 +59,3 @@ public class InitCommand implements AaCommand {
     return "init";
   }
 }
-

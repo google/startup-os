@@ -1,0 +1,16 @@
+{
+	"fields": {
+		"intValue": {
+			"arrayValue": {
+				"values": [
+					{
+						"integerValue": 123
+					},
+					{
+						"integerValue": 456
+					}
+				]
+			}
+		}
+	}
+}

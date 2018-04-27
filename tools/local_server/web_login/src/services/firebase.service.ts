@@ -1,19 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import 'rxjs/add/operator/map';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
-
-import { port } from '@/bootstrap/environments/port';
-import { config } from '@/bootstrap/environments/firebase';
 
 @Injectable()
 export class FirebaseService {
   isLoading: boolean = false;
-
+  
   constructor(
     public access: AngularFireAuth,
-    public http: Http
   ) {
 
     this.access.authState.subscribe(() => {
@@ -21,20 +15,19 @@ export class FirebaseService {
     });
   }
 
-  login(): void {
+  login(callback?: (result: any) => void): void {
     this.isLoading = true;
 
     var provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/datastore');
     provider.addScope('https://www.googleapis.com/auth/cloud-platform');
-    this.access.auth.signInWithPopup(provider)
-      .then(result => {
-        // Send token and projectId
-        this.http.post(`http://localhost:${port}/token`, {
-          token: result.credential.accessToken,
-          projectId: config.projectId,
-        }).subscribe(() => { });
+    const signInPromise = this.access.auth.signInWithPopup(provider);
+
+    if (callback) {
+      signInPromise.then(result => {
+        callback(result);
       });
+    }
   }
 
   logout(): void {

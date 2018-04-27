@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.google.startupos.tools.reviewer.service";
+option java_outer_classname = "Protos";
+
+package com.google.startupos.tools.reviewer.service;
+
+service CodeReviewService { 
+  // Get a text file's contents
+  rpc getFile(FileRequest) returns (FileResponse);
+}
+
+message FileRequest { string filename = 1; }
+
+message FileResponse { string content = 1; }

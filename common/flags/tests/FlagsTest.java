@@ -43,7 +43,7 @@ public class FlagsTest {
   @Test
   public void defaultsTest() throws Exception {
     List<String> leftOverArgs =
-        Arrays.asList(Flags.parse(new String[0], Arrays.asList(TESTFLAGS_PACKAGE)));
+        Arrays.asList(Flags.parse(new String[0], TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, "default value", FlagDescTestClass.getStringFlagValue());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, true, FlagDescTestClass.booleanFlag.get());
@@ -58,7 +58,7 @@ public class FlagsTest {
     List<String> leftOverArgs =
         Arrays.asList(
             Flags.parse(
-                new String[] {"--string_flag", "some value"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+                new String[] {"--string_flag", "some value"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, "some value", FlagDescTestClass.getStringFlagValue());
     assertEquals(leftOverArgs.size(), 0);
@@ -67,7 +67,7 @@ public class FlagsTest {
   @Test
   public void onlyArgsTest() throws Exception {
     List<String> nonFlags =
-        Arrays.asList(Flags.parse(new String[] {"just", "args"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+        Arrays.asList(Flags.parse(new String[] {"just", "args"}, TESTFLAGS_PACKAGE));
 
     assertEquals(
         "Should inject flag value", "default value", FlagDescTestClass.getStringFlagValue());
@@ -83,7 +83,7 @@ public class FlagsTest {
         Arrays.asList(
             Flags.parse(
                 new String[] {"--string_flag", "some value", "just", "args"},
-                Arrays.asList(TESTFLAGS_PACKAGE)));
+                TESTFLAGS_PACKAGE));
 
     assertEquals("Should inject flag value", "some value", FlagDescTestClass.getStringFlagValue());
     assertArrayEquals(
@@ -98,7 +98,7 @@ public class FlagsTest {
         Arrays.asList(
             Flags.parse(
                 new String[] {"just", "args", "--string_flag", "some value"},
-                Arrays.asList(TESTFLAGS_PACKAGE)));
+                TESTFLAGS_PACKAGE));
 
     assertEquals("Should inject flag value", "some value", FlagDescTestClass.getStringFlagValue());
     assertArrayEquals(
@@ -113,7 +113,7 @@ public class FlagsTest {
     ByteArrayOutputStream catchStream = new ByteArrayOutputStream();
     System.setOut(new PrintStream(catchStream));
 
-    Flags.parse(new String[0], Arrays.asList(TESTFLAGS_PACKAGE));
+    Flags.parse(new String[0], TESTFLAGS_PACKAGE);
     Flags.printUsage();
     String result = new String(catchStream.toByteArray());
 
@@ -129,7 +129,7 @@ public class FlagsTest {
     List<String> leftOverArgs =
         Arrays.asList(
             Flags.parse(
-                new String[] {"--boolean_flag", "false"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+                new String[] {"--boolean_flag", "false"}, TESTFLAGS_PACKAGE));
 
     assertEquals("Flag should have false value", false, FlagDescTestClass.booleanFlag.get());
     assertEquals(leftOverArgs.size(), 0);
@@ -139,7 +139,7 @@ public class FlagsTest {
   public void testBooleanFlagSetToTrue() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--boolean_flag", "true"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--boolean_flag", "true"}, TESTFLAGS_PACKAGE));
 
     assertEquals("Flag should have true value", true, FlagDescTestClass.booleanFlag.get());
     assertEquals(leftOverArgs.size(), 0);
@@ -149,7 +149,7 @@ public class FlagsTest {
   public void testBooleanFlagSetToFalseUsingNoX() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--noboolean_flag"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--noboolean_flag"}, TESTFLAGS_PACKAGE));
     assertEquals("Flag should have false value", false, FlagDescTestClass.booleanFlag.get());
     assertEquals(leftOverArgs.size(), 0);
   }
@@ -158,7 +158,7 @@ public class FlagsTest {
   public void testBooleanFlagSetToFalseUsingX() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--boolean_flag"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--boolean_flag"}, TESTFLAGS_PACKAGE));
     assertEquals("Flag should have true value", true, FlagDescTestClass.booleanFlag.get());
     assertEquals(leftOverArgs.size(), 0);
   }
@@ -167,7 +167,7 @@ public class FlagsTest {
   public void testStringFlag() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--string_flag", "abcd"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--string_flag", "abcd"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, "abcd", FlagDescTestClass.getStringFlagValue());
     assertEquals(leftOverArgs.size(), 0);
@@ -177,7 +177,7 @@ public class FlagsTest {
   public void testIntegerFlag() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--integer_flag", "1234"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--integer_flag", "1234"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(1234), FlagDescTestClass.integerFlag.get());
     assertEquals(leftOverArgs.size(), 0);
@@ -188,7 +188,7 @@ public class FlagsTest {
     List<String> leftOverArgs =
         Arrays.asList(
             Flags.parse(
-                new String[] {"--long_flag", "987654321"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+                new String[] {"--long_flag", "987654321"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, new Long(987654321L), FlagDescTestClass.longFlag.get());
     assertEquals(leftOverArgs.size(), 0);
@@ -198,7 +198,7 @@ public class FlagsTest {
   public void testDoubleFlag() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--double_flag", "9.87"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--double_flag", "9.87"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, new Double(9.87), FlagDescTestClass.doubleFlag.get());
     assertEquals(leftOverArgs.size(), 0);
@@ -207,7 +207,7 @@ public class FlagsTest {
   @Test(expected = IllegalArgumentException.class)
   public void testRequiredStringFlagNotSupplied() throws Exception {
     List<String> leftOverArgs =
-        Arrays.asList(Flags.parse(new String[] {}, Arrays.asList(TESTFLAGS_PACKAGE)));
+        Arrays.asList(Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
 
     FlagDescTestClass.requiredFlag.get();
   }
@@ -216,7 +216,7 @@ public class FlagsTest {
   public void testRequiredStringFlagNoValue() throws Exception {
     List<String> leftOverArgs =
         Arrays.asList(
-            Flags.parse(new String[] {"--required_flag"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+            Flags.parse(new String[] {"--required_flag"}, TESTFLAGS_PACKAGE));
 
     FlagDescTestClass.requiredFlag.get();
   }
@@ -226,7 +226,7 @@ public class FlagsTest {
     List<String> leftOverArgs =
         Arrays.asList(
             Flags.parse(
-                new String[] {"--required_flag", "required"}, Arrays.asList(TESTFLAGS_PACKAGE)));
+                new String[] {"--required_flag", "required"}, TESTFLAGS_PACKAGE));
 
     assertEquals(0, leftOverArgs.size());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, "required", FlagDescTestClass.requiredFlag.get());

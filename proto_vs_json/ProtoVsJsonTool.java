@@ -7,7 +7,6 @@ import com.google.startupos.proto_vs_json.Protos.Book;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.util.JsonFormat;
 import java.io.IOException;
 
@@ -33,9 +32,7 @@ public class ProtoVsJsonTool {
             Flag.create("example.json");
 
     public static void main(String[] args) throws IOException {
-        Iterable<String> packages
-                = ImmutableList.of(ProtoVsJsonTool.class.getPackage().getName());
-        Flags.parse(args, packages);
+        Flags.parse(args, ProtoVsJsonTool.class.getPackage());
 
         Person person = Person.newBuilder()
             .setName("John Smith")

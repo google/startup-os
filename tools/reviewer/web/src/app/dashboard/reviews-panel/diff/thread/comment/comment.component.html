@@ -1,0 +1,33 @@
+<!-- Show Comment's creator's username  -->
+<div *ngIf="readonly == true"><i>{{ comment.createdBy }}</i> wrote </div>
+<mat-form-field>
+  <textarea 
+    matInput 
+    [readonly]="readonly" 
+    matTextareaAutosize
+    matAutosizeMinRows="2"
+    [placeholder]="placeholder" 
+    [(ngModel)]="commentContent">
+  </textarea>
+</mat-form-field>
+<div 
+  *ngIf="readonly != true" 
+  class="comment-actions" 
+  fxLayout="row" 
+  fxLayoutAlign="end end" 
+  fxLayoutGap="20px">
+  <div>
+    <button 
+      mat-raised-button 
+      (click)="onAddClicked()">
+      Add
+    </button>
+  </div>
+  <div>
+    <button 
+      mat-raised-button
+      (click)="removeComment()">
+      Cancel
+    </button>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<div class="comment-thread">
+  <div class="comment-wrapper"
+    *ngFor="let comment of thread.comments"
+    fxLayout="column">
+    <div class="comment">
+      <cr-comment 
+        [comment]="comment" 
+        [readonly]="true"
+        [user]="user"
+        >
+      </cr-comment>
+    </div>
+  </div>
+  <div class="comment-wrapper" fxLayout="column">
+    <div class="comment">
+      <cr-comment 
+        [readonly]="false"
+        (onAddComment)="onAddComment($event)"
+        [placeholder]="'Add a comment'"
+        [user]="user"
+        (removeParentThread)="removeThread()"
+        >
+      </cr-comment>
+    </div>
+  </div>
+</div>

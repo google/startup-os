@@ -1,0 +1,51 @@
+@import 'variables';
+
+.single-review {
+  mat-card-title div:first-child {
+    width: 350px;
+  }
+  .crw-header {
+    font-size: 24px;
+  }
+  .review-details {
+    padding: 30px;
+    > div {
+      // display: flex;
+      margin-bottom: 20px;
+      // border-bottom: 1px solid #d1d1d1;
+      .property {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .detail {
+        font-size: 16px;
+      }
+      .filePosition {
+        cursor: pointer;
+        color: #0000ee;
+        text-decoration: underline;
+      }
+    }
+    .thread {
+      border: 1px solid $borderColor;
+      border-radius: 3px;
+      .thread-header {
+        padding: 5px 20px;
+        border-bottom: 1px solid $borderColor;
+        background: azure;
+        .line-number-label {
+          font-size: 14px;
+        }
+      }
+      .thread-contents {
+        margin: 10px;
+      }
+      .comment {
+        margin-bottom: 20px;
+      }
+    }
+  }
+  .bold-text {
+    font-weight: bold;
+  }
+}

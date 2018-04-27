@@ -1,0 +1,27 @@
+.cr-snack-success {
+  background-color: #37d437;
+  .mat-simple-snackbar {
+    color: black;
+  }
+}
+
+.cr-snack-info {
+  background-color: #9da1f1;
+  .mat-simple-snackbar {
+    color: black;
+  }
+}
+
+.cr-snack-warning {
+  background-color: #f95656;
+  .mat-simple-snackbar {
+    color: black;
+  }
+}
+
+.cr-snack-error {
+  background-color: #e83636;
+  .mat-simple-snackbar {
+    color: black;
+  }
+}
