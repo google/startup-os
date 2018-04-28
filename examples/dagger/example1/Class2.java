@@ -1,6 +1,5 @@
 package examples.dagger.example1;
 
-import dagger.Lazy;
 import javax.inject.Inject;
 
 class Class2 {

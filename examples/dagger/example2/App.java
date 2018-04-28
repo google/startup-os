@@ -1,7 +1,6 @@
 package examples.dagger.example2;
 
 import dagger.Component;
-import javax.inject.Singleton;
 
 public class App {
   public static void main(String[] args) {
