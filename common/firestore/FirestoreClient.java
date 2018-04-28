@@ -34,14 +34,16 @@ public class FirestoreClient {
   private static final String BASE_PATH =
           "https://firestore.googleapis.com/v1beta1" + "/projects/%s/databases/(default)/documents%s";
 
-  private final String firestoreProject;
+  private final String project;
+  private final String token;
 
-  public FirestoreClient(String firestoreProject){
-    this.firestoreProject = firestoreProject;
+  public FirestoreClient(String project, String token){
+    this.project = project;
+    this.token = token;
   }
 
   private String getGetUrl(String path) {
-    return String.format(BASE_PATH, firestoreProject, path);
+    return String.format(BASE_PATH, project, path);
   }
 
   private String getCreateDocumentUrl(String user) {
@@ -83,6 +85,7 @@ public class FirestoreClient {
       connection.setRequestMethod("POST");
       connection.setRequestProperty("Content-Type", "application/json");
       connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+      connection.setRequestProperty("Authorization", "Bearer " + token);
       connection.setDoOutput(true);
       connection.getOutputStream().write(postDataBytes);
 
