@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * Access to the internal slf4j logger is through getInternalLogger.
  */
 // TODO: Use getForClass where appropriate.
+// TODO: Use Flogger instead of slf4j: https://github.com/google/flogger
 public class Logger {
   private org.slf4j.Logger logger;
 

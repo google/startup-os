@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package com.google.startup.common;
+package com.google.startupos.common;
 
-option java_package = "com.google.startup.common";
+option java_package = "com.google.startupos.common";
 option java_multiple_files = true;
 
 // Holds information about a character difference.
