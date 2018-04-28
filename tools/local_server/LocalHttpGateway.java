@@ -92,7 +92,7 @@ public class LocalHttpGateway {
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.info("Handling token post request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
-        client.postAuthData(json.getString("projectId"), json.getString("token"));
+        client.postAuthData(json.getString("projectId"), json.getString("accessToken"));
       }
       httpExchange.sendResponseHeaders(200, -1);
     }

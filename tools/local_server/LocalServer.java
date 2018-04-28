@@ -49,7 +49,7 @@ public class LocalServer {
     AuthService authService = new AuthService();
     server =
         ServerBuilder.forPort(localServerPort.get())
-            .addService(new AuthService())
+            .addService(authService)
             .addService(new CodeReviewService(authService, rootPath.get()))
             .build()
             .start();
@@ -85,7 +85,7 @@ public class LocalServer {
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
-    Flags.parse(args, LocalServer.class.getPackage());
+    Flags.parse(args, LocalServer.class.getPackage(), CodeReviewService.class.getPackage());
     checkFlags();
 
     final LocalServer server = new LocalServer();

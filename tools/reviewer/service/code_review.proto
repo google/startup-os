@@ -8,8 +8,93 @@ package com.google.startupos.tools.reviewer.service;
 service CodeReviewService { 
   // Get a text file's contents
   rpc getFile(FileRequest) returns (FileResponse);
+  rpc createDiff(CreateDiffRequest) returns (CreateDiffResponse);
 }
 
 message FileRequest { string filename = 1; }
 
 message FileResponse { string content = 1; }
+
+message CreateDiffRequest {
+  Diff diff = 1;
+}
+
+message CreateDiffResponse {
+  string diffId = 1;
+}
+
+// TODO: Separate non-request/response messages into a separate file. This resulted in issues
+//   when attempted (couldn't import another proto) but maybe they've since been fixed.
+message Diff {
+  enum Status {
+    REVIEW_NOT_STARTED = 0;
+    NEEDS_MORE_WORK = 1;
+    UNDER_REVIEW = 2;
+    ACCEPTED = 3;
+    SUBMITTING = 4;
+    SUBMITTED = 5;
+    REVERTING = 6;
+    REVERTED = 7;
+  }
+
+  int64 firestore_id = 1;
+  int64 number = 2;
+  // Authors list is auto-generated based on snapshot authors.
+  repeated string author = 3;
+  repeated string reviewer = 4;
+  string description = 5;
+  string bug = 6;
+  Status status = 7;
+
+  string workspace = 8;
+  int64 created_timestamp = 9;
+  int64 modified_timestamp = 10;
+  repeated File file = 11;
+  repeated Snapshot snapshot = 12;
+  repeated Thread thread = 13;
+  string pull_request_id = 14;
+}
+
+message File {
+  enum Action {
+    ADD = 0;
+    DELETE = 1;
+    RENAME = 2;
+    MODIFY = 3;
+  }
+  string filename = 1;
+  string repo_id = 2;
+  // Empty if referring to a local file
+  string git_commit = 3;
+  // Empty if referring to a local file
+  Action action = 4;
+}
+
+message SingleRepoSnapshot {
+  int64 timestamp = 1;
+  string repo_id = 2;
+  // Commit ID, e.g Git SHA
+  string commit_id = 3;
+  string author = 4;
+  bool for_review = 5;
+  repeated File file = 6;
+}
+
+// A snapshot over multiple repos
+message Snapshot {
+  repeated SingleRepoSnapshot snapshot = 1;
+}
+
+message Thread {
+  int32 snapshot = 1;
+  File file = 2;
+  int32 line_number = 3;
+  bool is_done = 4;
+  repeated Comment comment = 5;
+}
+
+message Comment {
+  string content = 1;
+  int64 timestamp = 2;
+  string created_by = 3;
+}
