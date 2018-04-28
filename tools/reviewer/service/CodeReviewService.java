@@ -24,7 +24,12 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
+import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.CreateDiffResponse;
+import com.google.startupos.common.firestore.FirestoreClient;
 import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -32,12 +37,15 @@ import com.google.startupos.tools.localserver.service.AuthService;
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
  
-  private AuthService authService;
-  private String rootPath;
+  @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
+  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
 
-  public CodeReviewService(AuthService authService, String rootPath) {
+  private AuthService authService;
+  private String filesystemRootPath;
+
+  public CodeReviewService(AuthService authService, String filesystemRootPath) {
     this.authService = authService;
-    this.rootPath = rootPath;
+    this.filesystemRootPath = filesystemRootPath;
   }
 
   private static String readTextFile(String path) throws IOException {
@@ -46,9 +54,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   private String getAbsolutePath(String relativePath) throws SecurityException {
     // normalize() resolves "../", to help prevent returning files outside rootPath
-    String absolutePath = Paths.get(this.rootPath, relativePath).normalize().toString();
+    String absolutePath = Paths.get(filesystemRootPath, relativePath).normalize().toString();
 
-    if (!absolutePath.startsWith(rootPath)) {
+    if (!absolutePath.startsWith(filesystemRootPath)) {
       throw new SecurityException("Resulting path is not under root");
     }
 
@@ -68,5 +76,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               .withDescription(String.format("No such file %s", req.getFilename()))
               .asException());
     }
+  }
+
+  @Override
+  public void createDiff(CreateDiffRequest req, StreamObserver<CreateDiffResponse> responseObserver) {
+    FirestoreClient client = new FirestoreClient(authService.getProjectId(), authService.getToken());
+    client.createDocument(firestoreReviewRoot.get(), req.getDiff());
+    responseObserver.onCompleted();
   }
 }
