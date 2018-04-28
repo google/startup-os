@@ -53,3 +53,16 @@ java_proto_library(
     name = "char_difference_java_proto",
     deps = [":char_difference_proto"],
 )
+
+java_plugin(
+    name = "dagger_compiler_plugin",
+    generates_api = True,
+    processor_class = "dagger.internal.codegen.ComponentProcessor",
+    deps = ["//third_party/maven/com/google/dagger:dagger_compiler"],
+)
+
+java_library(
+    name = "dagger_with_annotation_processor",
+    exported_plugins = [":dagger_compiler_plugin"],
+    exports = ["//third_party/maven/com/google/dagger"],
+)

@@ -163,7 +163,7 @@ public class TextDifferencer {
         differences.add(
             CharDifference.newBuilder()
                 .setFirstStringIndex(first.getBeginIndex() + Math.max(0, i - 1))
-                .setSecondStringIndex(second.getBeginIndex() + j - 1)
+                .setSecondStringIndex(s
                 .setDifference(Character.toString(second.charAt(j - 1)))
                 .setType(DifferenceType.ADDITION)
                 .build());
