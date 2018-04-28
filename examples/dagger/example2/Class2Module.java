@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package examples.dagger.example2;
+package com.google.startupos.examples.dagger.example2;
 
 import dagger.Module;
 import dagger.Provides;
+import dagger.Binds;
 
 @Module(includes = Class1Module.class)
-class Class2Module {
-  @Provides Class2Interface provideClass2Impl(Class2Impl class2Object) {
-    return class2Object;
-  }
+abstract class Class2Module {
+  @Binds
+  abstract Class2Interface provideClass2Interface(Class2Impl class2Object);
 }

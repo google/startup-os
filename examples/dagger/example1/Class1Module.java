@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package examples.dagger.example1;
+package com.google.startupos.examples.dagger.example1;
 
 import dagger.Module;
 import dagger.Provides;

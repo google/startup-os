@@ -11,7 +11,7 @@ java_library(
 
 java_binary(
     name = "example1",
-    main_class = "examples.dagger.example1.App",
+    main_class = "com.google.startupos.examples.dagger.example1.App",
     runtime_deps = [":example1_lib"],
     jvm_flags = [
         "-Xms32m",

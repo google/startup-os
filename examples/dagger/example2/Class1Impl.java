@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package examples.dagger.example2;
+package com.google.startupos.examples.dagger.example2;
 
 class Class1Impl implements Class1Interface {
   boolean booleanValue;
