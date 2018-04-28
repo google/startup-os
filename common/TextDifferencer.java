@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import javax.swing.text.Segment;
 
 /**
  * An implementation of text difference based on the Longest Common Subsequence problem (A.K.A LCS).
@@ -27,19 +30,75 @@ import java.util.stream.Collectors;
 public class TextDifferencer {
 
   /**
-   * Returns all the text differences between two given strings.
+   * Return all the text differences between two given strings.
    *
-   * @param first The first string.
-   * @param second The second string.
+   * @param firstString The first string.
+   * @param secondString The second string.
    * @return A list which holds all the text differences.
    */
-  public static List<CharDifference> getAllTextDifferences(String first, String second) {
-    return getDifferencesFromLCSMatrix(
-            computeLCSMatrix(first.toCharArray(), second.toCharArray()),
-            first.toCharArray(),
-            second.toCharArray())
-        .stream()
-        .map((builder) -> builder.build())
+  public static List<CharDifference> getAllTextDifferences(
+      String firstString, String secondString) {
+    final char[] first = firstString.toCharArray();
+    final char[] second = secondString.toCharArray();
+    int headerLength = getHeaderMatchingCharactersLength(first, second);
+    int footerLength = getFooterMatchingCharactersLength(headerLength, first, second);
+    Segment firstView =
+        new Segment(first, headerLength, first.length - footerLength - headerLength);
+    Segment secondView =
+        new Segment(second, headerLength, second.length - footerLength - headerLength);
+
+    List<CharDifference> allDifferences = new ArrayList<>();
+    allDifferences.addAll(getMatchingCharDifferences(first, 0, headerLength));
+    allDifferences.addAll(
+        getDifferencesFromLCSMatrix(
+            computeLCSMatrix(firstView, secondView), firstView, secondView));
+    allDifferences.addAll(
+        getMatchingCharDifferences(first, first.length - footerLength, footerLength));
+    return allDifferences;
+  }
+
+  /** Count the number of equal characters from the beginning of the given two strings. */
+  private static int getHeaderMatchingCharactersLength(final char[] first, final char[] second) {
+    int count = 0;
+    for (; count < first.length && count < second.length; count++) {
+      if (first[count] != second[count]) {
+        return count;
+      }
+    }
+    return count;
+  }
+
+  /** Count the number of equal characters from the end of the given two strings. */
+  private static int getFooterMatchingCharactersLength(
+      int offset, final char[] first, final char[] second) {
+    int count = 0;
+    for (; count < first.length - offset && count < second.length - offset; count++) {
+      if (first[first.length - count - 1] != second[second.length - count - 1]) {
+        return count;
+      }
+    }
+    return count;
+  }
+
+  /**
+   * Generate matching char differences for the given range. The implementation assumes that all the
+   * characters within the given range are equal.
+   *
+   * @param content The contents of the first string.
+   * @param begin The beginning index of the matching character range.
+   * @param length the length of the matching character range.
+   * @return A {@link Stream} which holds all the text differences.
+   */
+  private static List<CharDifference> getMatchingCharDifferences(
+      char[] content, int begin, int length) {
+    return IntStream.range(begin, begin + length)
+        .mapToObj(
+            (i) ->
+                CharDifference.newBuilder()
+                    .setIndex(i)
+                    .setDifference(Character.toString(content[i]))
+                    .setType(DifferenceType.NO_CHANGE)
+                    .build())
         .collect(Collectors.toList());
   }
 
@@ -60,11 +119,11 @@ public class TextDifferencer {
    * @param second The second string out of two strings for precomputing a common subsequence.
    * @return A length of the common subsequence for the two strings.
    */
-  private static int[][] computeLCSMatrix(char[] first, char[] second) {
-    final int[][] lcsMatrix = createEmptyLCSMatrix(first.length + 1, second.length + 1);
-    for (int i = 1; i < first.length + 1; i++) {
-      for (int j = 1; j < second.length + 1; j++) {
-        if (first[i - 1] == second[j - 1]) {
+  private static int[][] computeLCSMatrix(final Segment first, final Segment second) {
+    final int[][] lcsMatrix = createEmptyLCSMatrix(first.length() + 1, second.length() + 1);
+    for (int i = 1; i < first.length() + 1; i++) {
+      for (int j = 1; j < second.length() + 1; j++) {
+        if (first.charAt(i - 1) == second.charAt(j - 1)) {
           lcsMatrix[i][j] = lcsMatrix[i - 1][j - 1] + 1;
         } else {
           lcsMatrix[i][j] = Math.max(lcsMatrix[i][j - 1], lcsMatrix[i - 1][j]);
@@ -83,33 +142,36 @@ public class TextDifferencer {
    * @param second The second string of two strings to be compared with.
    * @return A list of all the character differences
    */
-  private static List<CharDifference.Builder> getDifferencesFromLCSMatrix(
-      int[][] lcsMatrix, char[] first, char[] second) {
-    List<CharDifference.Builder> differences = new ArrayList<>();
-    int i = lcsMatrix.length - 1;
-    int j = lcsMatrix[0].length - 1;
+  private static List<CharDifference> getDifferencesFromLCSMatrix(
+      final int[][] lcsMatrix, final Segment first, final Segment second) {
+    List<CharDifference> differences = new ArrayList<>();
+    int i = first.length();
+    int j = second.length();
     while (i >= 0 || j >= 0) {
-      if (i > 0 && j > 0 && first[i - 1] == second[j - 1]) {
+      if (i > 0 && j > 0 && first.charAt(i - 1) == second.charAt(j - 1)) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(i - 1)
-                .setDifference(Character.toString(first[i - 1]))
-                .setType(DifferenceType.NO_CHANGE));
+                .setIndex(first.getBeginIndex() + i - 1)
+                .setDifference(Character.toString(first.charAt(i - 1)))
+                .setType(DifferenceType.NO_CHANGE)
+                .build());
         i--;
         j--;
       } else if (j > 0 && (i == 0 || lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j])) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(j - 1)
-                .setDifference(Character.toString(second[j - 1]))
-                .setType(DifferenceType.ADDITION));
+                .setIndex(second.getBeginIndex() + j - 1)
+                .setDifference(Character.toString(second.charAt(j - 1)))
+                .setType(DifferenceType.ADDITION)
+                .build());
         j--;
       } else if (i > 0 && (j == 0 || lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j])) {
         differences.add(
             CharDifference.newBuilder()
-                .setIndex(i - 1)
-                .setDifference(Character.toString(first[i - 1]))
-                .setType(DifferenceType.DELETION));
+                .setIndex(first.getBeginIndex() + i - 1)
+                .setDifference(Character.toString(first.charAt(i - 1)))
+                .setType(DifferenceType.DELETION)
+                .build());
         i--;
       } else {
         break;
