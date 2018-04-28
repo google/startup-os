@@ -1,0 +1,20 @@
+syntax = "proto3";
+package com.google.startupos.tools.aa;
+
+option java_package = "com.google.startupos.tools.aa";
+option java_outer_classname = "Protos";
+
+message RemoteRepo {
+  // ID must be unique over all repos and consistent across the team's local configs.
+  string id = 1;
+  // Repo url. We currently support git repos.
+  string url = 2;
+}
+
+/* Config protos. */
+message Config {
+  // Base folder
+  string base_path = 1;
+  // Remote git repo url
+  repeated RemoteRepo remote_repo = 2;
+}
