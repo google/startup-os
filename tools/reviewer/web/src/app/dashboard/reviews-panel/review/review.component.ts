@@ -20,6 +20,7 @@ export class ReviewComponent implements OnInit {
   notSubmitted: boolean = false;
   showEditableReviewers = false;
   showEditableCCs = false;
+  showEditableBug = false;
 
   constructor(
     private route: ActivatedRoute,

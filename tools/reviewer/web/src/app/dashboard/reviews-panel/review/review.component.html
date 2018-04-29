@@ -230,6 +230,77 @@
       </div>
     </div>
 
+    <!-- Issue -->
+    <div 
+    fxLayout="row"
+    fxLayoutAlign="start center"
+    fxLayout.xs="column"
+    fxLayoutGap.xs="10px"
+    class="bug">
+    <div fxFlex="150px" fxFlex.xs="" 
+      fxLayoutAlign="start center" 
+      class="property">
+      Issue:
+    </div>
+    <div fxFlex class="detail">
+      <ng-container>
+        <div
+          class="issue-detail"
+          *ngIf="!showEditableBug"
+          fxLayoutAlign="start center">
+          <span>
+            {{ this.diff.bug }}
+          </span>
+          <button 
+            mat-icon-button
+            (click)="showEditableBug = true"
+            *ngIf="notSubmitted"
+            >
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+        <div class="editableInput" *ngIf="showEditableBug">
+          <div>
+            <mat-form-field>
+              <input matInput placeholder="" 
+                [(ngModel)]="this.diff.bug"
+                (keyup.enter)="showEditableBug = false; saveBug()"
+                >
+            </mat-form-field>
+          </div>
+          <div>
+            <div
+              class="actions"
+              fxFlex
+              fxLayoutAlign="end end"
+              fxLayoutGap="10px"
+              >
+              <span class="input save">
+                <button 
+                  mat-raised-button 
+                  color="primary"
+                  (click)="showEditableBug = false; 
+                  saveBug()"
+                  >
+                  Save
+                </button>
+              </span>
+              <span class="input cancel">
+                <button 
+                  mat-raised-button 
+                  (click)="showEditableBug = false; 
+                  getBug()"
+                  >
+                  Cancel
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
     <!-- Created At timestamp -->
     <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
       <div fxFlex="150px" fxFlex.xs="" class="property">Created:</div>
