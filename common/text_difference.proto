@@ -1,12 +1,30 @@
 syntax = "proto3";
 
-package com.google.startup.common;
+package com.google.startupos.common;
 
-option java_package = "com.google.startup.common";
+option java_package = "com.google.startupos.common";
 option java_multiple_files = true;
 
-// Holds information about a character difference.
-message CharDifference {
+// Holds information about a text change.
+message TextChange {
+  /** Describes the type of the difference. */
+  enum Type {
+    // Unused.
+    TYPE_UNUSED = 0;
+
+    // No change has occurred. The source is equal to the
+    // destination.
+    NO_CHANGE = 1;
+
+    // An addition of a new character has occurred. Additional character was
+    // added to the source.
+    ADD = 2;
+
+    // A deletion of a character has occurred. The source is missing a
+    // character.
+    DELETE = 3;
+  }
+
   // The index in which the difference has occurred in the first string. For
   // example, if we have the two strings, "Exampl" and "Example", the index
   // would be 5.
@@ -23,22 +41,6 @@ message CharDifference {
   string difference = 3;
 
   // The type of the difference, i.e. what change has occurred. In the example
-  // of the two strings "Exampl" and "Example" it would be ADDITION.
-  DifferenceType type = 4;
-}
-
-/** Describes the type of the difference. */
-enum DifferenceType {
-  TYPE_UNUSED = 0;
-
-  // No change has occurred. The source is equal to the
-  // destination.
-  NO_CHANGE = 1;
-
-  // An addition of a new character has occurred. Additional character was
-  // added to the source.
-  ADDITION = 2;
-
-  // A deletion of a character has occurred. The source is missing a character.
-  DELETION = 3;
+  // of the two strings "Exampl" and "Example" it would be {@link Type.ADD}.
+  Type type = 4;
 }
