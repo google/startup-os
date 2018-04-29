@@ -248,9 +248,9 @@
           class="issue-detail"
           *ngIf="!showEditableBug"
           fxLayoutAlign="start center">
-          <span>
-            {{ this.diff.bug }}
-          </span>
+          <a class="link" href="{{bug}}">
+            {{ bug }}
+          </a>
           <button 
             mat-icon-button
             (click)="showEditableBug = true"
@@ -263,7 +263,7 @@
           <div>
             <mat-form-field>
               <input matInput placeholder="" 
-                [(ngModel)]="this.diff.bug"
+                [(ngModel)]="bug"
                 (keyup.enter)="showEditableBug = false; saveBug()"
                 >
             </mat-form-field>
@@ -329,7 +329,7 @@
             <ng-container *ngSwitchCase="3">Modified</ng-container>
           </ng-container>
         </div>
-        <a class="filePosition" (click)="openFile(file.filePosition)"> {{ file.filePosition }} </a>
+        <a class="link" (click)="openFile(file.filePosition)"> {{ file.filePosition }} </a>
       </div>
     </div>
 
