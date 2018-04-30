@@ -9,6 +9,8 @@ java_library(
         "StringBuilder.java",
         "Strings.java",
         "Time.java",
+        "CommonModule.java",
+        "CommonComponent.java",
     ],
     deps = [
         "//third_party/maven/com/google/auto/value:auto_value",
@@ -17,6 +19,8 @@ java_library(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/slf4j:slf4j_api",
+        "//common:dagger_with_annotation_processor",
+        "//third_party/maven/javax/inject:javax_inject"
     ],
 )
 

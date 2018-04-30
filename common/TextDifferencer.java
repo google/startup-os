@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startup.common;
+package com.google.startupos.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
