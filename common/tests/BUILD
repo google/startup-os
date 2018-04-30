@@ -24,7 +24,7 @@ java_test(
     srcs = ["TextDifferencerTest.java"],
     test_class = "com.google.startupos.common.TextDifferencerTest",
     deps = [
-        "//common:char_difference_java_proto",
+        "//common:text_differencer_java_proto",
         "//common:text_differencer",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/junit",
