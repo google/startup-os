@@ -29,24 +29,7 @@ java_library(
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/auto/value:auto_value_plugin",
-        #"//third_party/maven/com/google/auto/factory:auto_factory",
-        ":auto_factory",
-        ":auto_factory_plugin",
+        "//common:auto_factory",
+        "//common:auto_factory_plugin",
     ]
-)
-
-java_library(
-    name = "auto_factory",
-    exported_plugins = [":auto_factory_plugin"],
-    exports = ["//third_party/maven/com/google/auto/factory:auto_factory"],
-)
-
-java_plugin(
-    name = "auto_factory_plugin",
-    generates_api = True,
-    deps = [
-        "//third_party/maven/com/google/auto/factory:auto_factory",
-        "//third_party/maven/com/google/auto:auto_common"
-    ],
-    processor_class = "com.google.auto.factory.processor.AutoFactoryProcessor",
 )

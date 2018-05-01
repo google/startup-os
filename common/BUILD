@@ -70,3 +70,19 @@ java_library(
     exported_plugins = [":dagger_compiler_plugin"],
     exports = ["//third_party/maven/com/google/dagger"],
 )
+
+java_library(
+    name = "auto_factory",
+    exported_plugins = [":auto_factory_plugin"],
+    exports = ["//third_party/maven/com/google/auto/factory:auto_factory"],
+)
+
+java_plugin(
+    name = "auto_factory_plugin",
+    generates_api = True,
+    deps = [
+        "//third_party/maven/com/google/auto/factory:auto_factory",
+        "//third_party/maven/com/google/auto:auto_common"
+    ],
+    processor_class = "com.google.auto.factory.processor.AutoFactoryProcessor",
+)
