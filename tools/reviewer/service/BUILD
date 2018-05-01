@@ -1,6 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_library")
 
+proto_library(
+    name = "code_review_proto",
+    srcs = ["code_review.proto"],
+)
+
 java_proto_library(
     name = "service_lib",
     protos = ["code_review.proto"],
