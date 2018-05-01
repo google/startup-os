@@ -126,9 +126,9 @@ public class TextDifferencer {
     for (int i = 1; i < first.length() + 1; i++) {
       for (int j = 1; j < second.length() + 1; j++) {
         if (first.charAt(i - 1) == second.charAt(j - 1)) {
-          lcsMatrix[i][j] = lcsMatrix[i - 1][j - 1] + 1;
+          lcsMatrix[i][j] = lcsMatrix[i - 1][j - 1] + 2;
         } else {
-          lcsMatrix[i][j] = Math.max(lcsMatrix[i][j - 1], lcsMatrix[i - 1][j]);
+          lcsMatrix[i][j] = Math.max(lcsMatrix[i][j - 1], lcsMatrix[i - 1][j], lcsMatrix[i - 1][j - 1] + 1);
         }
       }
     }
