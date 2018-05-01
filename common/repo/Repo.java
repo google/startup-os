@@ -19,7 +19,7 @@ public interface Repo {
   /** Gets commits on branch since it diverged from master. */
   ImmutableList<Commit> getCommits(String branch);
   /** Gets all uncommited files. This includes new, modified and deleted files. */
-  ImmutableList<File> getUncomittedFiles();
+  ImmutableList<File> getUncommittedFiles();
   /** Commits files to current branch and returns commit */
   Commit commit(ImmutableList<File> files, String message);
   /** Pushes all branches to remote repo */

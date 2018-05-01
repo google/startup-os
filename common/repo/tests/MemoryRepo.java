@@ -69,7 +69,7 @@ public class MemoryRepo implements Repo {
     return result.build();
   }
 
-  public ImmutableList<File> getUncomittedFiles() {
+  public ImmutableList<File> getUncommittedFiles() {
     // TODO: Implement using FileSystem injection
     throw new UnsupportedOperationException("Not implemented");
   }

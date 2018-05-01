@@ -45,7 +45,7 @@ public class GitRepo implements Repo {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public ImmutableList<File> getUncomittedFiles() {
+  public ImmutableList<File> getUncommittedFiles() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
