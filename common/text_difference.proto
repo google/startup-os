@@ -16,12 +16,10 @@ message TextChange {
     // destination.
     NO_CHANGE = 1;
 
-    // An addition of a new character has occurred. Additional character was
-    // added to the source.
+    // A new character was added to the source.
     ADD = 2;
 
-    // A deletion of a character has occurred. The source is missing a
-    // character.
+    // A character was deleted from the source.
     DELETE = 3;
   }
 
@@ -40,7 +38,8 @@ message TextChange {
   // last "e".
   string difference = 3;
 
-  // The type of the difference, i.e. what change has occurred. In the example
-  // of the two strings "Exampl" and "Example" it would be {@link Type.ADD}.
+  // The {@link Type} of the difference, i.e. what change has occurred. In the
+  // example of the two strings "Exampl" and "Example" it would be {@link
+  // Type.ADD}.
   Type type = 4;
 }
