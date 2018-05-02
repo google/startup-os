@@ -73,6 +73,11 @@ dependencies:
       lang: java
       version: "0.1.54"
   
+  commons-io:
+    commons-io:
+      lang: java
+      version: "2.6"
+
   commons-logging:
     commons-logging:
       lang: java

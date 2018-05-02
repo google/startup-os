@@ -5,24 +5,25 @@ load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_library")
 java_library(
     name = "common",
     srcs = [
+        "CommonComponent.java",
+        "CommonModule.java",
         "FileUtils.java",
         "Logger.java",
         "MessageDifferencer.java",
         "StringBuilder.java",
         "Strings.java",
         "Time.java",
-        "CommonModule.java",
-        "CommonComponent.java",
     ],
     deps = [
+        "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/commons_io",
+        "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/slf4j:slf4j_api",
-        "//common:dagger_with_annotation_processor",
-        "//third_party/maven/javax/inject:javax_inject"
     ],
 )
 
@@ -82,9 +83,9 @@ java_library(
 java_plugin(
     name = "auto_factory_plugin",
     generates_api = True,
-    deps = [
-        "//third_party/maven/com/google/auto/factory:auto_factory",
-        "//third_party/maven/com/google/auto:auto_common"
-    ],
     processor_class = "com.google.auto.factory.processor.AutoFactoryProcessor",
+    deps = [
+        "//third_party/maven/com/google/auto:auto_common",
+        "//third_party/maven/com/google/auto/factory:auto_factory",
+    ],
 )

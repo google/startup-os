@@ -182,4 +182,8 @@ public class FileUtils {
       throw new RuntimeException(e);
     }
   }
+
+  public void copyDirectoryToDirectory(String source, String destination) throws IOException {
+    org.apache.commons.io.FileUtils.copyDirectory(new File(source), new File(destination));
+  }
 }

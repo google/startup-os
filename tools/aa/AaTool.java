@@ -19,6 +19,7 @@ package com.google.startupos.tools.aa;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
+import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
 import java.util.HashMap;
 import javax.inject.Inject;
@@ -42,8 +43,9 @@ public class AaTool {
   }
 
   @Inject
-  AaTool(InitCommand initCommand) {
+  AaTool(InitCommand initCommand, WorkspaceCommand workspaceCommand) {
     commands.put(initCommand.getName(), initCommand);
+    commands.put(workspaceCommand.getName(), workspaceCommand);
   }
 
   private void run(String[] args) {
