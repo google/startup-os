@@ -20,87 +20,20 @@ import com.google.startupos.common.TextChange.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.swing.text.Segment;
 
 /** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */
-public class LCSTextDifferencer implements TextDifferencer {
+public class LCSTextDifferencer extends AbstractTextDifferencer {
 
-  public LCSTextDifferencer() {}
-
-  /**
-   * Return all the text differences between two strings.
-   *
-   * @param firstString The first string.
-   * @param secondString The second string.
-   * @return A list of text changes.
-   */
-  public List<TextChange> getAllTextChanges(String firstString, String secondString) {
-    final char[] first = firstString.toCharArray();
-    final char[] second = secondString.toCharArray();
-    int headerLength = getHeaderMatchingCharactersLength(first, second);
-    int footerLength = getFooterMatchingCharactersLength(headerLength, first, second);
-    Segment firstView =
-        new Segment(first, headerLength, first.length - footerLength - headerLength);
-    Segment secondView =
-        new Segment(second, headerLength, second.length - footerLength - headerLength);
-
-    List<TextChange> allChanges = new ArrayList<>();
-    allChanges.addAll(getMatchingTextChanges(first, 0, 0, headerLength));
-    allChanges.addAll(
-        getChangesFromLCSMatrix(computeLCSMatrix(firstView, secondView), firstView, secondView));
-    allChanges.addAll(
-        getMatchingTextChanges(
-            first, first.length - footerLength, second.length - footerLength, footerLength));
-    return allChanges;
+  public LCSTextDifferencer() {
+    super();
   }
 
-  /** Count the number of equal characters from the beginning of the given two strings. */
-  private static int getHeaderMatchingCharactersLength(final char[] first, final char[] second) {
-    int count = 0;
-    for (; count < first.length && count < second.length; count++) {
-      if (first[count] != second[count]) {
-        return count;
-      }
-    }
-    return count;
-  }
-
-  /** Count the number of equal characters from the end of the given two strings. */
-  private static int getFooterMatchingCharactersLength(
-      int offset, final char[] first, final char[] second) {
-    int count = 0;
-    for (; count < first.length - offset && count < second.length - offset; count++) {
-      if (first[first.length - count - 1] != second[second.length - count - 1]) {
-        return count;
-      }
-    }
-    return count;
-  }
-
-  /**
-   * Generate matching text changes for the given range. The implementation assumes that all the
-   * characters within the given range are equal.
-   *
-   * @param contentFirst The contents of the first string.
-   * @param beginFirst The beginning index of the matching character range of the first string.
-   * @param beginSecond The beginning index of the matching character range of the second string.
-   * @param length the length of the matching character range.
-   * @return A {@link List} which holds all the text differences.
-   */
-  private static List<TextChange> getMatchingTextChanges(
-      char[] content, int beginFirst, int beginSecond, int length) {
-    return IntStream.range(0, length)
-        .mapToObj(
-            (i) ->
-                TextChange.newBuilder()
-                    .setFirstStringIndex(i + beginFirst)
-                    .setSecondStringIndex(i + beginSecond)
-                    .setDifference(Character.toString(content[i + beginFirst]))
-                    .setType(Type.NO_CHANGE)
-                    .build())
-        .collect(Collectors.toList());
+  @Override
+  protected List<TextChange> getNonMatchingTextChanges(
+      Segment firstSegment, Segment secondSegment) {
+    return getChangesFromLCSMatrix(
+        computeLCSMatrix(firstSegment, secondSegment), firstSegment, secondSegment);
   }
 
   /** Create an empty matrix based on the given dimensions. */
