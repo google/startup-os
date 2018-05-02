@@ -17,5 +17,6 @@ java_library(
         ":auth_service_lib",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+        "//third_party/maven/javax/inject:javax_inject",
     ],
 )

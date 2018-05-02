@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
+import com.google.auto.factory.AutoFactory;
+import com.google.auto.factory.Provided;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
@@ -34,6 +36,7 @@ import com.google.startupos.common.flags.FlagDesc;
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
  */
+@AutoFactory
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
  
@@ -43,7 +46,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private AuthService authService;
   private String filesystemRootPath;
 
-  public CodeReviewService(AuthService authService, String filesystemRootPath) {
+  public CodeReviewService(@Provided AuthService authService, String filesystemRootPath) {
     this.authService = authService;
     this.filesystemRootPath = filesystemRootPath;
   }

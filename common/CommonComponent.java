@@ -22,5 +22,5 @@ import javax.inject.Singleton;
 @Singleton
 @Component(modules = { CommonModule.class })
 public interface CommonComponent {
-  FileUtils geFileUtils();
+  FileUtils getFileUtils();
 }

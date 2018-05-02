@@ -20,11 +20,13 @@ java_library(
     ],
     deps = [
         ":service_lib",
+        "//common:auto_factory",
         "//common/firestore",
+        "//common/flags",
         "//tools/local_server/service:auth_service",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
+        "//third_party/maven/javax/inject:javax_inject",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
-        "//common/flags",
     ],
 )
 

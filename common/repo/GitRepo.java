@@ -10,8 +10,6 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import java.nio.file.Paths;
 import java.io.IOException;
 import org.eclipse.jgit.revwalk.RevCommit;
-import javax.inject.Singleton;
-import javax.inject.Inject;
 import com.google.auto.factory.AutoFactory;
 import com.google.auto.factory.Provided;
 import java.nio.file.FileSystem;

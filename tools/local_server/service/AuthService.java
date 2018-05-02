@@ -21,6 +21,7 @@ import io.grpc.stub.StreamObserver;
 import java.util.logging.Logger;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
+import javax.inject.Inject;
 
 /*
  * AuthService is a gRPC service to receive Firestore auth data from WebLogin.
@@ -30,6 +31,9 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
  
   private String firestoreToken;
   private String firestoreProjectId;
+
+  @Inject
+  AuthService() {}
 
   @Override
   public void postAuthData(AuthDataRequest req, StreamObserver<AuthDataResponse> responseObserver) {
