@@ -9,20 +9,20 @@ java_test(
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/junit:junit",
-        "//third_party/maven/org/mockito:mockito_core",
-        "//third_party/maven/com/google/guava:guava",
+        "//third_party/maven/com/google/dagger",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/jimfs",
-        "//third_party/maven/org/objenesis:objenesis",
-        "//third_party/maven/com/google/dagger:dagger",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/junit",
+        "//third_party/maven/org/mockito:mockito_core",
+        "//third_party/maven/org/objenesis",
     ],
 )
 
 java_test(
-    name = "TextDifferencerTest",
-    srcs = ["TextDifferencerTest.java"],
-    test_class = "com.google.startupos.common.TextDifferencerTest",
+    name = "LCSTextDifferencerTest",
+    srcs = ["LCSTextDifferencerTest.java"],
+    test_class = "com.google.startupos.common.LCSTextDifferencerTest",
     deps = [
         "//common:text_difference_java_proto",
         "//common:text_differencer",
