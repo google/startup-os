@@ -16,28 +16,37 @@
 
 package com.google.startupos.tools.aa;
 
+import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
-import com.google.startupos.tools.aa.commands.CommandsComponent;
-import com.google.startupos.tools.aa.commands.DaggerCommandsComponent;
+import com.google.startupos.tools.aa.commands.InitCommand;
+import dagger.Component;
 import java.util.HashMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** aa tool. */
+@Singleton
 public class AaTool {
-  private static HashMap<String, AaCommand> commands = new HashMap<>();
-  private static CommandsComponent commandsComponent = DaggerCommandsComponent.create();
+  private HashMap<String, AaCommand> commands = new HashMap<>();
 
-  static {
-    AaCommand init = commandsComponent.provideInitCommand();
-    commands.put(init.getName(), init);
-  }
-
-  public static void printUsage() {
+  private void printUsage() {
     System.out.println(
         String.format(
             "Invalid usage. Available commands are: %s", String.join(", ", commands.keySet())));
   }
 
-  public static void main(String[] args) {
+  @Singleton
+  @Component(modules = {CommonModule.class})
+  public interface AaToolComponent {
+    AaTool getAaTool();
+  }
+
+  @Inject
+  AaTool(InitCommand initCommand) {
+    commands.put(initCommand.getName(), initCommand);
+  }
+
+  private void run(String[] args) {
     if (args.length > 0) {
       String command = args[0];
       if (commands.containsKey(command)) {
@@ -49,5 +58,9 @@ public class AaTool {
     } else {
       printUsage();
     }
+  }
+
+  public static void main(String[] args) {
+    DaggerAaTool_AaToolComponent.create().getAaTool().run(args);
   }
 }

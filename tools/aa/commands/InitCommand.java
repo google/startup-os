@@ -53,14 +53,12 @@ public class InitCommand implements AaCommand {
     Flags.parse(args, InitCommand.class.getPackage());
 
     try {
-      String remoteRepoPath = remoteRepoUrl.get();
+      String remoteRepoId = getNameFromRemoteUrl(remoteRepoUrl.get());
       Config config =
           Config.newBuilder()
               .setBasePath(basePath.get())
               .addRemoteRepo(
-                  RemoteRepo.newBuilder()
-                      .setId(getNameFromRemoteUrl(remoteRepoPath))
-                      .setUrl(remoteRepoPath))
+                  RemoteRepo.newBuilder().setId(remoteRepoId).setUrl(remoteRepoUrl.get()))
               .build();
       fileUtils.writePrototxt(config, configPath.get());
 
