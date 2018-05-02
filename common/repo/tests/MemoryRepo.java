@@ -131,7 +131,7 @@ public class MemoryRepo implements Repo {
     nextMerge = ActionOverride.FAIL;
   }
 
-  public String getFileContents(File file) {
+  public String getFileContents(String commitId, String path) {
     return "File contents";
   }  
 }
