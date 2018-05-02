@@ -31,6 +31,9 @@ import javax.inject.Singleton;
 @Singleton
 public class TestTool {
   private static String REPO_ROOT_PATH = "";
+  private static String COMMIT_ID = "";
+  private static String FILE_PATH = "WORKSPACE";
+
   private GitRepoFactory repoFactory;
 
   @Inject
@@ -50,15 +53,15 @@ public class TestTool {
   }
 
   public static void main(String[] args) {
-    if (REPO_ROOT_PATH.isEmpty()) {
-      System.out.println("Please set REPO_ROOT_PATH");
+    if (REPO_ROOT_PATH.isEmpty() || COMMIT_ID.isEmpty()) {
+      System.out.println("Please set REPO_ROOT_PATH and COMMIT_ID");
       System.exit(1);
     }
-    TestTool tool = DaggerTestTool_TestToolComponent.builder().build().getTestTool();
+    TestTool tool = DaggerTestTool_TestToolComponent.create().getTestTool();
     String content = tool.getFile(
         REPO_ROOT_PATH,
-        "d0cc9a5fa1f12741e4d5c9da6d614766f1c01ce5",
-        "WORKSPACE");
+        COMMIT_ID,
+        FILE_PATH);
     System.out.println(content);
   }
 }
