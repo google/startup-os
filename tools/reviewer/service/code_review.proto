@@ -11,7 +11,7 @@ service CodeReviewService {
   // Get a text file's contents
   rpc getFile(FileRequest) returns (FileResponse);
   rpc createDiff(CreateDiffRequest) returns (CreateDiffResponse);
-  rpc getFileChanges(FileChangeRequest) returns (FileChangeResponse);
+  rpc getTextDiff(TextDiffRequest) returns (TextDiffResponse);
 }
 
 message FileRequest {
@@ -30,12 +30,12 @@ message CreateDiffResponse {
   string diffId = 1;
 }
 
-message FileChangeRequest {
+message TextDiffRequest {
   string first_filepath = 1;
   string second_filepath = 2;
 }
 
-message FileChangeResponse {
+message TextDiffResponse {
   // The changes of the second file.
   repeated com.google.startupos.common.TextChange changes = 1;
 }

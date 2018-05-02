@@ -23,10 +23,10 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffResponse;
-import com.google.startupos.tools.reviewer.service.Protos.FileChangeRequest;
-import com.google.startupos.tools.reviewer.service.Protos.FileChangeResponse;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -90,13 +90,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
-  public void getFileChanges(
-      FileChangeRequest req, StreamObserver<FileChangeResponse> responseObserver) {
+  public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
     try {
       String firstFileContents = readTextFile(req.getFirstFilepath());
       String secondFileContents = readTextFile(req.getSecondFilepath());
       responseObserver.onNext(
-          FileChangeResponse.newBuilder()
+          TextDiffResponse.newBuilder()
               .addAllChanges(
                   TextDifferencer.getAllTextChanges(firstFileContents, secondFileContents))
               .build());
