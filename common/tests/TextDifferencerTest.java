@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.TextChange.Type;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -27,6 +28,8 @@ import org.junit.runners.JUnit4;
 /** Tests for {@link com.google.startupos.common.TextDifferencer}. */
 @RunWith(JUnit4.class)
 public class TextDifferencerTest {
+
+  private ITextDifferencer differencer;
 
   /** package */
   TextChange.Builder newTextChange(int leftIndex, int rightIndex, char difference, Type type) {
@@ -37,9 +40,15 @@ public class TextDifferencerTest {
         .setType(type);
   }
 
+  @Before
+  public void setUp() {
+    differencer = new TextDifferencer();
+  }
+
   @Test
   public void testEmptyDiff() {
-    assertEquals(TextDifferencer.getAllTextChanges("", ""), ImmutableList.of());
+
+    assertEquals(differencer.getAllTextChanges("", ""), ImmutableList.of());
   }
 
   @Test
@@ -55,7 +64,7 @@ public class TextDifferencerTest {
             newTextChange(0, 6, 'o', Type.ADD).build(),
             newTextChange(0, 7, 'n', Type.ADD).build(),
             newTextChange(0, 8, '.', Type.ADD).build()),
-        TextDifferencer.getAllTextChanges("", "Addition."));
+        differencer.getAllTextChanges("", "Addition."));
   }
 
   @Test
@@ -71,7 +80,7 @@ public class TextDifferencerTest {
             newTextChange(6, 0, 'o', Type.DELETE).build(),
             newTextChange(7, 0, 'n', Type.DELETE).build(),
             newTextChange(8, 0, '.', Type.DELETE).build()),
-        TextDifferencer.getAllTextChanges("Deletion.", ""));
+        differencer.getAllTextChanges("Deletion.", ""));
   }
 
   @Test
@@ -88,7 +97,7 @@ public class TextDifferencerTest {
             newTextChange(7, 7, 'g', Type.NO_CHANGE).build(),
             newTextChange(8, 8, 'e', Type.NO_CHANGE).build(),
             newTextChange(9, 9, '.', Type.NO_CHANGE).build()),
-        TextDifferencer.getAllTextChanges("No Change.", "No Change."));
+        differencer.getAllTextChanges("No Change.", "No Change."));
   }
 
   @Test
@@ -109,7 +118,7 @@ public class TextDifferencerTest {
             newTextChange(7, 9, 'g', Type.NO_CHANGE).build(),
             newTextChange(8, 10, 'e', Type.NO_CHANGE).build(),
             newTextChange(9, 11, '.', Type.NO_CHANGE).build()),
-        TextDifferencer.getAllTextChanges("No Change.", "With Change."));
+        differencer.getAllTextChanges("No Change.", "With Change."));
   }
 
   @Test
@@ -130,7 +139,7 @@ public class TextDifferencerTest {
             newTextChange(9, 11, 'g', Type.NO_CHANGE).build(),
             newTextChange(10, 12, 'e', Type.NO_CHANGE).build(),
             newTextChange(11, 13, '.', Type.NO_CHANGE).build()),
-        TextDifferencer.getAllTextChanges("With Change.", "With a Change."));
+        differencer.getAllTextChanges("With Change.", "With a Change."));
   }
 
   @Test
@@ -148,6 +157,6 @@ public class TextDifferencerTest {
             newTextChange(8, 8, 'e', Type.NO_CHANGE).build(),
             newTextChange(9, 9, '.', Type.DELETE).build(),
             newTextChange(9, 9, '!', Type.ADD).build()),
-        TextDifferencer.getAllTextChanges("No Change.", "No Change!"));
+        differencer.getAllTextChanges("No Change.", "No Change!"));
   }
 }

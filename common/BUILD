@@ -42,6 +42,7 @@ java_library(
 java_library(
     name = "text_differencer",
     srcs = [
+        "ITextDifferencer.java",
         "TextDifferencer.java",
     ],
     deps = [

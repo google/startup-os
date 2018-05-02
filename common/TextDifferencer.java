@@ -25,7 +25,9 @@ import java.util.stream.IntStream;
 import javax.swing.text.Segment;
 
 /** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */
-public class TextDifferencer {
+public class TextDifferencer implements ITextDifferencer {
+
+  public TextDifferencer() {}
 
   /**
    * Return all the text differences between two strings.
@@ -34,7 +36,7 @@ public class TextDifferencer {
    * @param secondString The second string.
    * @return A list of text changes.
    */
-  public static List<TextChange> getAllTextChanges(String firstString, String secondString) {
+  public List<TextChange> getAllTextChanges(String firstString, String secondString) {
     final char[] first = firstString.toCharArray();
     final char[] second = secondString.toCharArray();
     int headerLength = getHeaderMatchingCharactersLength(first, second);
@@ -182,6 +184,4 @@ public class TextDifferencer {
     Collections.reverse(changes);
     return changes;
   }
-
-  private TextDifferencer() {}
 }
