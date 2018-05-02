@@ -7,13 +7,16 @@ java_binary(
     ],
     main_class = "com.google.startupos.tools.localserver.LocalServer",
     deps = [
+        "//common",
+        "//common/flags",
+        "//common:dagger_with_annotation_processor",
+        "//tools/local_server/service:auth_service",
         "//tools/reviewer/service",
         "//tools/reviewer/service:service_lib",
-        "//tools/local_server/service:auth_service",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
-        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
-        "//common/flags",
+        "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/slf4j:slf4j_simple",
+        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
     ],
 )
 

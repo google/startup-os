@@ -11,6 +11,8 @@ java_library(
         "StringBuilder.java",
         "Strings.java",
         "Time.java",
+        "CommonModule.java",
+        "CommonComponent.java",
     ],
     deps = [
         "//third_party/maven/com/google/auto/value:auto_value",
@@ -19,6 +21,8 @@ java_library(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/slf4j:slf4j_api",
+        "//common:dagger_with_annotation_processor",
+        "//third_party/maven/javax/inject:javax_inject"
     ],
 )
 
@@ -67,4 +71,20 @@ java_library(
     name = "dagger_with_annotation_processor",
     exported_plugins = [":dagger_compiler_plugin"],
     exports = ["//third_party/maven/com/google/dagger"],
+)
+
+java_library(
+    name = "auto_factory",
+    exported_plugins = [":auto_factory_plugin"],
+    exports = ["//third_party/maven/com/google/auto/factory:auto_factory"],
+)
+
+java_plugin(
+    name = "auto_factory_plugin",
+    generates_api = True,
+    deps = [
+        "//third_party/maven/com/google/auto/factory:auto_factory",
+        "//third_party/maven/com/google/auto:auto_common"
+    ],
+    processor_class = "com.google.auto.factory.processor.AutoFactoryProcessor",
 )

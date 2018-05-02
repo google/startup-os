@@ -2,6 +2,11 @@ package(default_visibility = ["//visibility:public"])
 
 load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_library")
 
+proto_library(
+    name = "code_review_proto",
+    srcs = ["code_review.proto"],
+)
+
 java_proto_library(
     name = "service_lib",
     proto_deps = ["//common:text_difference_java_proto"],
@@ -17,10 +22,12 @@ java_library(
     ],
     deps = [
         ":service_lib",
-        "//common:text_differencer",
         "//common/firestore",
         "//common/flags",
+        "//common:auto_factory",
+        "//common:text_differencer",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
+        "//third_party/maven/javax/inject:javax_inject",
         "//tools/local_server/service:auth_service",
         "@org_pubref_rules_protobuf//java:netty_runtime_deps",
     ],

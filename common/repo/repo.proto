@@ -1,0 +1,12 @@
+syntax = "proto3";
+package com.google.startupos.common.repo;
+
+import "tools/reviewer/service/code_review.proto";
+
+option java_package = "com.google.startupos.common.repo";
+option java_outer_classname = "Protos";
+
+message Commit {
+  string id = 1;
+  repeated com.google.startupos.tools.reviewer.service.File file = 2;
+}

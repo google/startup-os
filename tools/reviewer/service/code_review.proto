@@ -81,6 +81,7 @@ message File {
     RENAME = 2;
     MODIFY = 3;
   }
+  // Includes the path + filename
   string filename = 1;
   string repo_id = 2;
   // Empty if referring to a local file
