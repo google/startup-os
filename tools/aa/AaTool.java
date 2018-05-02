@@ -17,20 +17,17 @@
 package com.google.startupos.tools.aa;
 
 import com.google.startupos.tools.aa.commands.AaCommand;
-import com.google.startupos.tools.aa.commands.InitCommand;
-import com.google.startupos.tools.aa.Protos.Config;
-import com.google.startupos.common.FileUtils;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Arrays;
+import com.google.startupos.tools.aa.commands.CommandsComponent;
+import com.google.startupos.tools.aa.commands.DaggerCommandsComponent;
 import java.util.HashMap;
 
 /** aa tool. */
 public class AaTool {
   private static HashMap<String, AaCommand> commands = new HashMap<>();
+  private static CommandsComponent commandsComponent = DaggerCommandsComponent.create();
 
   static {
-    AaCommand init = new InitCommand();
+    AaCommand init = commandsComponent.provideInitCommand();
     commands.put(init.getName(), init);
   }
 
