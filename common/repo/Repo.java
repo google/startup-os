@@ -30,5 +30,5 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
-  String getFileContents(File file);
+  String getFileContents(String commitId, String path);
 }
