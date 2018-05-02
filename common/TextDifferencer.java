@@ -16,19 +16,15 @@
 
 package com.google.startupos.common;
 
+import com.google.startupos.common.TextChange.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import javax.swing.text.Segment;
-import com.google.startupos.common.Protos.TextChange;
-import com.google.startupos.common.Protos.TextChange.Type;
 
-/**
- * An implementation of text difference based on the Longest Common Subsequence (LCS) problem.
- */
+/** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */
 public class TextDifferencer {
 
   /**
@@ -38,8 +34,7 @@ public class TextDifferencer {
    * @param secondString The second string.
    * @return A list of text changes.
    */
-  public static List<TextChange> getAllTextChanges(
-      String firstString, String secondString) {
+  public static List<TextChange> getAllTextChanges(String firstString, String secondString) {
     final char[] first = firstString.toCharArray();
     final char[] second = secondString.toCharArray();
     int headerLength = getHeaderMatchingCharactersLength(first, second);
@@ -50,12 +45,12 @@ public class TextDifferencer {
         new Segment(second, headerLength, second.length - footerLength - headerLength);
 
     List<TextChange> allChanges = new ArrayList<>();
-    allChanges.addAll(getMatchingTextChanges(first, 0, headerLength));
+    allChanges.addAll(getMatchingTextChanges(first, 0, 0, headerLength));
     allChanges.addAll(
-        getChangesFromLCSMatrix(
-            computeLCSMatrix(firstView, secondView), firstView, secondView));
+        getChangesFromLCSMatrix(computeLCSMatrix(firstView, secondView), firstView, secondView));
     allChanges.addAll(
-        getMatchingTextChanges(first, first.length - footerLength, footerLength));
+        getMatchingTextChanges(
+            first, first.length - footerLength, second.length - footerLength, footerLength));
     return allChanges;
   }
 
@@ -86,19 +81,21 @@ public class TextDifferencer {
    * Generate matching text changes for the given range. The implementation assumes that all the
    * characters within the given range are equal.
    *
-   * @param content The contents of the first string.
-   * @param begin The beginning index of the matching character range.
+   * @param contentFirst The contents of the first string.
+   * @param beginFirst The beginning index of the matching character range of the first string.
+   * @param beginSecond The beginning index of the matching character range of the second string.
    * @param length the length of the matching character range.
-   * @return A {@link Stream} which holds all the text differences.
+   * @return A {@link List} which holds all the text differences.
    */
   private static List<TextChange> getMatchingTextChanges(
-      char[] content, int begin, int length) {
-    return IntStream.range(begin, begin + length)
+      char[] content, int beginFirst, int beginSecond, int length) {
+    return IntStream.range(0, length)
         .mapToObj(
             (i) ->
                 TextChange.newBuilder()
-                    .setIndex(i)
-                    .setDifference(Character.toString(content[i]))
+                    .setFirstStringIndex(i + beginFirst)
+                    .setSecondStringIndex(i + beginSecond)
+                    .setDifference(Character.toString(content[i + beginFirst]))
                     .setType(Type.NO_CHANGE)
                     .build())
         .collect(Collectors.toList());
@@ -153,7 +150,8 @@ public class TextDifferencer {
       if (i > 0 && j > 0 && first.charAt(i - 1) == second.charAt(j - 1)) {
         changes.add(
             TextChange.newBuilder()
-                .setIndex(first.getBeginIndex() + i - 1)
+                .setFirstStringIndex(first.getBeginIndex() + i - 1)
+                .setSecondStringIndex(second.getBeginIndex() + j - 1)
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(Type.NO_CHANGE)
                 .build());
@@ -162,7 +160,8 @@ public class TextDifferencer {
       } else if (j > 0 && (i == 0 || lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j])) {
         changes.add(
             TextChange.newBuilder()
-                .setIndex(second.getBeginIndex() + j - 1)
+                .setFirstStringIndex(first.getBeginIndex() + Math.max(0, i - 1))
+                .setSecondStringIndex(second.getBeginIndex() + j - 1)
                 .setDifference(Character.toString(second.charAt(j - 1)))
                 .setType(Type.ADD)
                 .build());
@@ -170,7 +169,8 @@ public class TextDifferencer {
       } else if (i > 0 && (j == 0 || lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j])) {
         changes.add(
             TextChange.newBuilder()
-                .setIndex(first.getBeginIndex() + i - 1)
+                .setFirstStringIndex(first.getBeginIndex() + i - 1)
+                .setSecondStringIndex(second.getBeginIndex() + Math.max(0, j - 1))
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(Type.DELETE)
                 .build());

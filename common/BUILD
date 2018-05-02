@@ -43,19 +43,19 @@ java_library(
         "TextDifferencer.java",
     ],
     deps = [
-        ":text_differencer_java_proto",
+        ":text_difference_java_proto",
         "//third_party/maven/com/google/guava",
     ],
 )
 
 proto_library(
-    name = "text_differencer_proto",
-    srcs = ["text_differencer.proto"],
+    name = "text_difference_proto",
+    srcs = ["text_difference.proto"],
 )
 
 java_proto_library(
-    name = "text_differencer_java_proto",
-    deps = [":text_differencer_proto"],
+    name = "text_difference_java_proto",
+    deps = [":text_difference_proto"],
 )
 
 java_plugin(
