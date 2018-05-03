@@ -21,6 +21,7 @@ import com.google.startupos.tools.aa.commands.AaCommand;
 import com.google.startupos.tools.aa.commands.ConfigProvider;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
+import dagger.BindsInstance;
 import dagger.Component;
 import java.util.HashMap;
 import javax.inject.Inject;
@@ -30,6 +31,8 @@ import javax.inject.Singleton;
 @Singleton
 public class AaTool {
   private HashMap<String, AaCommand> commands = new HashMap<>();
+  // TODO: maybe make a flag to set it dynamically
+  public static final String CONFIG_FILENAME = "~/aaconfig.prototxt";
 
   private void printUsage() {
     System.out.println(
@@ -41,6 +44,12 @@ public class AaTool {
   @Component(modules = {CommonModule.class, ConfigProvider.class})
   public interface AaToolComponent {
     AaTool getAaTool();
+
+    @Component.Builder
+    interface Builder {
+      @BindsInstance Builder configFileName (String configFileName);
+      AaToolComponent build();
+    }
   }
 
   @Inject
@@ -64,6 +73,10 @@ public class AaTool {
   }
 
   public static void main(String[] args) {
-    DaggerAaTool_AaToolComponent.create().getAaTool().run(args);
+    DaggerAaTool_AaToolComponent
+            .builder()
+            .configFileName(CONFIG_FILENAME)
+            .build()
+            .getAaTool().run(args);
   }
 }

@@ -7,19 +7,16 @@ import dagger.Module;
 import dagger.Provides;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Module(includes = CommonModule.class)
 public class ConfigProvider {
-    private static String CONFIG_FILENAME = "~/aaconfig.prototxt";
-
     @Inject
     public ConfigProvider() {
     }
 
-    @Provides public static Config getConfig(FileUtils fileUtils) {
+    @Provides public static Config getConfig(FileUtils fileUtils, String configFileName) {
         return (Config) fileUtils.readPrototxtUnchecked(
-                fileUtils.expandHomeDirectory(CONFIG_FILENAME),
+                fileUtils.expandHomeDirectory(configFileName),
                 Config.newBuilder());
 
     }
