@@ -13,11 +13,11 @@ import javax.inject.Inject;
 public class WorkspaceCommand implements AaCommand {
   @FlagDesc(
     name = "force",
-    description = "Force workspace switching creating workspace if non-existent"
+    description = "Create workspace if it doesn't exist"
   )
   public static Flag<Boolean> force = Flag.create(false);
 
-  @FlagDesc(name = "ws", description = "Workspace name to switch to", required = true)
+  @FlagDesc(name = "ws", description = "Name of workspace to switch to", required = true)
   public static Flag<String> ws = Flag.create("");
 
   private FileUtils fileUtils;
