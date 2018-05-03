@@ -27,6 +27,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.FileVisitResult;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.FileSystem;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -184,6 +188,23 @@ public class FileUtils {
   }
 
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
-    org.apache.commons.io.FileUtils.copyDirectory(new File(source), new File(destination));
+    final Path sourcePath = Paths.get(source);
+    final Path targetPath = Paths.get(destination);
+    java.nio.file.Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult preVisitDirectory(final Path dir,
+                                               final BasicFileAttributes attrs) throws IOException {
+        java.nio.file.Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFile(final Path file,
+                                       final BasicFileAttributes attrs) throws IOException {
+        java.nio.file.Files.copy(file,
+                targetPath.resolve(sourcePath.relativize(file)));
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 }
