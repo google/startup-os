@@ -18,6 +18,7 @@ package com.google.startupos.tools.aa;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
+import com.google.startupos.tools.aa.commands.ConfigProvider;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
@@ -37,7 +38,7 @@ public class AaTool {
   }
 
   @Singleton
-  @Component(modules = {CommonModule.class})
+  @Component(modules = {CommonModule.class, ConfigProvider.class})
   public interface AaToolComponent {
     AaTool getAaTool();
   }

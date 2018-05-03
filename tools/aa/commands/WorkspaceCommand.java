@@ -4,6 +4,8 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.tools.aa.Protos.Config;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import javax.inject.Inject;
@@ -19,18 +21,18 @@ public class WorkspaceCommand implements AaCommand {
   public static Flag<String> ws = Flag.create("");
 
   private FileUtils fileUtils;
-  private ConfigProvider config;
+  private Config config;
 
   @Inject
-  public WorkspaceCommand(FileUtils utils, ConfigProvider configProvider) {
+  public WorkspaceCommand(FileUtils utils, Config config) {
     this.fileUtils = utils;
-    this.config = configProvider;
+    this.config = config;
   }
 
   @Override
   public void run(String[] args) {
     Flags.parse(args, WorkspaceCommand.class.getPackage());
-    String basePath = config.getConfig().getBasePath();
+    String basePath = config.getBasePath();
 
     String user = System.getenv("USER");
     String headPath = Paths.get(basePath, "head").toAbsolutePath().toString();
