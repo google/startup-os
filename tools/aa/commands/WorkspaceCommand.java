@@ -8,6 +8,7 @@ import com.google.startupos.tools.aa.Protos.Config;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import javax.inject.Inject;
 
 public class WorkspaceCommand implements AaCommand {
@@ -16,9 +17,6 @@ public class WorkspaceCommand implements AaCommand {
     description = "Create workspace if it doesn't exist"
   )
   public static Flag<Boolean> force = Flag.create(false);
-
-  @FlagDesc(name = "ws", description = "Name of workspace to switch to", required = true)
-  public static Flag<String> ws = Flag.create("");
 
   private FileUtils fileUtils;
   private Config config;
@@ -36,11 +34,20 @@ public class WorkspaceCommand implements AaCommand {
         args[i] = "--force";
       }
     }
+
+    String workspaceName = args[args.length - 1];
+
+    if (workspaceName.equals(getName()) || workspaceName.startsWith("-")) {
+      throw new IllegalArgumentException("Supply workspace name");
+    }
+
+    args = Arrays.copyOfRange(args, 0, args.length - 1);
+
     Flags.parse(args, WorkspaceCommand.class.getPackage());
     String basePath = config.getBasePath();
 
     String headPath = Paths.get(basePath, "head").toAbsolutePath().toString();
-    String newWsPath = Paths.get(basePath, config.getUser(), "ws", ws.get()).toAbsolutePath().toString();
+    String newWsPath = Paths.get(basePath, config.getUser(), "ws", workspaceName).toAbsolutePath().toString();
 
     if (force.get()) {
       fileUtils.mkdirs(newWsPath);
