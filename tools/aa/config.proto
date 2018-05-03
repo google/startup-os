@@ -17,4 +17,6 @@ message Config {
   string base_path = 1;
   // Remote git repo url
   repeated RemoteRepo remote_repo = 2;
+  // user
+  string user = 3;
 }

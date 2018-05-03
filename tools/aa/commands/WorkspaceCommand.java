@@ -39,9 +39,8 @@ public class WorkspaceCommand implements AaCommand {
     Flags.parse(args, WorkspaceCommand.class.getPackage());
     String basePath = config.getBasePath();
 
-    String user = System.getenv("USER");
     String headPath = Paths.get(basePath, "head").toAbsolutePath().toString();
-    String newWsPath = Paths.get(basePath, user, "ws", ws.get()).toAbsolutePath().toString();
+    String newWsPath = Paths.get(basePath, config.getUser(), "ws", ws.get()).toAbsolutePath().toString();
 
     if (force.get()) {
       fileUtils.mkdirs(newWsPath);
