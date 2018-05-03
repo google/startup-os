@@ -47,7 +47,9 @@ public class AaTool {
 
     @Component.Builder
     interface Builder {
-      @BindsInstance Builder configFileName (String configFileName);
+      @BindsInstance
+      Builder configFileName(String configFileName);
+
       AaToolComponent build();
     }
   }
@@ -73,10 +75,10 @@ public class AaTool {
   }
 
   public static void main(String[] args) {
-    DaggerAaTool_AaToolComponent
-            .builder()
-            .configFileName(CONFIG_FILENAME)
-            .build()
-            .getAaTool().run(args);
+    DaggerAaTool_AaToolComponent.builder()
+        .configFileName(CONFIG_FILENAME)
+        .build()
+        .getAaTool()
+        .run(args);
   }
 }

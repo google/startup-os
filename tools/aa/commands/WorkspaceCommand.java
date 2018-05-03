@@ -21,17 +21,13 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.aa.Protos.Config;
-
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 
 public class WorkspaceCommand implements AaCommand {
-  @FlagDesc(
-    name = "force",
-    description = "Create workspace if it doesn't exist"
-  )
+  @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
   public static Flag<Boolean> force = Flag.create(false);
 
   private FileUtils fileUtils;
@@ -63,7 +59,8 @@ public class WorkspaceCommand implements AaCommand {
     String basePath = config.getBasePath();
 
     String headPath = Paths.get(basePath, "head").toAbsolutePath().toString();
-    String newWsPath = Paths.get(basePath, config.getUser(), "ws", workspaceName).toAbsolutePath().toString();
+    String newWsPath =
+        Paths.get(basePath, config.getUser(), "ws", workspaceName).toAbsolutePath().toString();
 
     if (force.get()) {
       fileUtils.mkdirs(newWsPath);

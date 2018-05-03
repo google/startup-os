@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package com.google.startupos.common;
+package com.google.startupos.common;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -23,22 +23,20 @@ import com.google.common.io.Files;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.FileVisitResult;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import com.google.protobuf.TextFormat;
-import javax.inject.Singleton;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** File utils */
 @Singleton
@@ -190,21 +188,22 @@ public class FileUtils {
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
     final Path sourcePath = Paths.get(source);
     final Path targetPath = Paths.get(destination);
-    java.nio.file.Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
-      @Override
-      public FileVisitResult preVisitDirectory(final Path dir,
-                                               final BasicFileAttributes attrs) throws IOException {
-        java.nio.file.Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
-        return FileVisitResult.CONTINUE;
-      }
+    java.nio.file.Files.walkFileTree(
+        sourcePath,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+              throws IOException {
+            java.nio.file.Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+            return FileVisitResult.CONTINUE;
+          }
 
-      @Override
-      public FileVisitResult visitFile(final Path file,
-                                       final BasicFileAttributes attrs) throws IOException {
-        java.nio.file.Files.copy(file,
-                targetPath.resolve(sourcePath.relativize(file)));
-        return FileVisitResult.CONTINUE;
-      }
-    });
+          @Override
+          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+              throws IOException {
+            java.nio.file.Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+            return FileVisitResult.CONTINUE;
+          }
+        });
   }
 }
