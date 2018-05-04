@@ -19,9 +19,22 @@
       }
       .detail {
         font-size: 16px;
+        line-height: 32px;
         .mat-icon-button {
-          margin-left: 20px;
+          display: none;
+          margin-left: 100px;
           background-color: #f9f6f6;
+          width: 30px;
+          height: 30px;
+          line-height: 28px;
+          .material-icons {
+            font-size: 20px;
+          }
+        }
+        &:hover {
+          .mat-icon-button {
+            display: block;
+          }
         }
       }
       .editableInput,

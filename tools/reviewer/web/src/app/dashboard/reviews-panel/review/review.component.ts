@@ -18,7 +18,8 @@ export class ReviewComponent implements OnInit {
   reviewers: string = '';
   ccs: string = '';
   bug: string = '';
-  notSubmitted: boolean = false;
+  notEditable: boolean = false;
+  notEditableStatus: Array<number> = [4, 5];
   showEditableReviewers = false;
   showEditableCCs = false;
   showEditableBug = false;
@@ -48,7 +49,7 @@ export class ReviewComponent implements OnInit {
         this.getReviewers();
         this.getCCs();
         this.getBug();
-        this.notSubmitted = !(this.diff.status === 4);
+        this.notEditable = !this.notEditableStatus.includes(this.diff.status);
       });
     });
   }

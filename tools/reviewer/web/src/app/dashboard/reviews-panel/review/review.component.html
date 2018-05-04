@@ -75,7 +75,7 @@
               >
               <button mat-raised-button 
                 class="add-to-list"
-                *ngIf="notSubmitted"
+                *ngIf="notEditable"
                 (click)="updateAttentionList(reviewer);
                 $event.stopPropagation()"
                 >
@@ -86,7 +86,7 @@
             <button 
               mat-icon-button
               (click)="showEditableReviewers = true"
-              *ngIf="notSubmitted"
+              *ngIf="notEditable"
               >
               <mat-icon>edit</mat-icon>
             </button>
@@ -107,6 +107,14 @@
                 fxLayoutAlign="end end"
                 fxLayoutGap="10px"
                 >
+                <span class="input cancel">
+                  <button 
+                    mat-raised-button 
+                    (click)="showEditableReviewers = false; getReviewers()"
+                    >
+                    Cancel
+                  </button>
+                </span>
                 <span class="input save">
                   <button 
                     mat-raised-button 
@@ -115,14 +123,6 @@
                     saveReviewers()"
                     >
                     Save
-                  </button>
-                </span>
-                <span class="input cancel">
-                  <button 
-                    mat-raised-button 
-                    (click)="showEditableReviewers = false; getReviewers()"
-                    >
-                    Cancel
                   </button>
                 </span>
               </div>
@@ -168,7 +168,7 @@
               >
               <button mat-raised-button 
                 class="add-to-list"
-                *ngIf="notSubmitted"
+                *ngIf="notEditable"
                 (click)="updateAttentionList(s);
                 $event.stopPropagation()"
                 >
@@ -178,7 +178,7 @@
             </span>
             <button 
               mat-icon-button
-              *ngIf="notSubmitted"
+              *ngIf="notEditable"
               (click)="showEditableCCs = true"
               >
               <mat-icon>edit</mat-icon>
@@ -200,6 +200,14 @@
                 fxLayoutAlign="end end"
                 fxLayoutGap="10px"
                 >
+                <span class="input cancel">
+                  <button 
+                    mat-raised-button 
+                    (click)="showEditableCCs = false; getCCs()"
+                    >
+                    Cancel
+                  </button>
+                </span>
                 <span class="input save">
                   <button 
                     mat-raised-button 
@@ -208,14 +216,6 @@
                     saveCCs()"
                     >
                     Save
-                  </button>
-                </span>
-                <span class="input cancel">
-                  <button 
-                    mat-raised-button 
-                    (click)="showEditableCCs = false; getCCs()"
-                    >
-                    Cancel
                   </button>
                 </span>
               </div>
@@ -254,7 +254,7 @@
           <button 
             mat-icon-button
             (click)="showEditableBug = true"
-            *ngIf="notSubmitted"
+            *ngIf="notEditable"
             >
             <mat-icon>edit</mat-icon>
           </button>
@@ -275,6 +275,15 @@
               fxLayoutAlign="end end"
               fxLayoutGap="10px"
               >
+              <span class="input cancel">
+                <button 
+                  mat-raised-button 
+                  (click)="showEditableBug = false; 
+                  getBug()"
+                  >
+                  Cancel
+                </button>
+              </span>
               <span class="input save">
                 <button 
                   mat-raised-button 
@@ -283,15 +292,6 @@
                   saveBug()"
                   >
                   Save
-                </button>
-              </span>
-              <span class="input cancel">
-                <button 
-                  mat-raised-button 
-                  (click)="showEditableBug = false; 
-                  getBug()"
-                  >
-                  Cancel
                 </button>
               </span>
             </div>
