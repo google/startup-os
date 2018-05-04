@@ -16,23 +16,19 @@
 
  package com.google.startupos.common;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Files;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
-import java.nio.file.Paths;
 import java.nio.file.FileSystem;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import com.google.protobuf.TextFormat;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
@@ -55,9 +51,8 @@ public class FileUtils {
   }
 
   /** Reads a prototxt file into a proto. */
-  public Message readPrototxt(String path, Message.Builder builder)
-      throws IOException, ParseException {
-    String protoText = Files.toString(new File(expandHomeDirectory(path)), UTF_8);
+  public Message readPrototxt(String path, Message.Builder builder) throws IOException {
+    String protoText = readFile(path);
     TextFormat.merge(protoText, builder);
     return builder.build();
   }
@@ -87,8 +82,9 @@ public class FileUtils {
 
   /** Writes a string to file. */
   public void writeString(String text, String path) throws IOException {
-    mkdirs(path);
-    java.nio.file.Files.write(Paths.get(expandHomeDirectory(path)), text.getBytes());
+    File file = new File(path);
+    mkdirs(file.getParent());
+    Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes());
   }
 
   /** Writes a string to file, rethrows exceptions as unchecked. */
@@ -102,46 +98,48 @@ public class FileUtils {
 
   /** Checks if file exists. Returns false for folders. */
   public boolean fileExists(String path) {
-    File file = new File(expandHomeDirectory(path));
-    return file.exists() && file.isFile();
+    return Files.isRegularFile(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Checks if folder exists. Returns false for files. */
   public boolean folderExists(String path) {
-    return java.nio.file.Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
+    return Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Checks if folder or folder exists. */
   public boolean fileOrFolderExists(String path) {
-    File file = new File(expandHomeDirectory(path));
-    return file.exists();
+    return Files.isRegularFile(fileSystem.getPath(expandHomeDirectory(path)))
+            || Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Creates directories in path if none exist. */
   public void mkdirs(String path) {
     try {
-      Files.createParentDirs(new File(path));
+      Files.createDirectories(fileSystem.getPath(expandHomeDirectory(path)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   /** Gets filenames in path. */
-  public ImmutableList<String> getFiles(String path) {
-    String[] files = Paths.get(path).toFile().list();
-    if (files.length == 0) {
-      return ImmutableList.of();
+  public ImmutableList<String> getFiles(String path) throws IOException {
+    List<String> files = new ArrayList<>();
+    try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {
+      paths
+              .filter(Files::isRegularFile)
+              .sorted()
+              .forEach(absolutePath -> files.add(absolutePath.getFileName().toString()));
     }
-    return ImmutableList.sortedCopyOf(Arrays.asList(files));
+    return ImmutableList.copyOf(files);
   }
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    try {
-      return Files.toString(new File(expandHomeDirectory(path)), UTF_8);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    ImmutableList<String> lines =
+            ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
+    final StringBuilder builder = new StringBuilder();
+    lines.forEach(line -> builder.append(line + "\n"));
+    return builder.toString();
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */
@@ -155,8 +153,9 @@ public class FileUtils {
 
   /** Writes a proto to binary file. */
   public void writeProtoBinary(Message proto, String path) throws IOException {
-    mkdirs(path);
-    proto.writeTo(new FileOutputStream(path));
+    File file = new File(path);
+    mkdirs(file.getParent());
+    proto.writeTo(Files.newOutputStream(fileSystem.getPath(expandHomeDirectory(path))));
   }
 
   /** Writes a proto to binary file, rethrows exceptions as unchecked. */
@@ -170,7 +169,7 @@ public class FileUtils {
 
   /** Reads a proto binary file into a proto. */
   public Message readProtoBinary(String path, Message.Builder builder) throws IOException {
-    InputStream input = new FileInputStream(path);
+    InputStream input = Files.newInputStream(fileSystem.getPath(expandHomeDirectory(path)));
     return builder.build().getParserForType().parseFrom(input);
   }
 
