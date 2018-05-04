@@ -15,11 +15,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class ReviewComponent implements OnInit {
   diffId: string;
   diff: Diff;
+
+  // Following variables are used in editing
+  // the fields
   reviewers: string = '';
   ccs: string = '';
   bug: string = '';
+
+  // Fields can not be edited if status is
+  // 'SUBMITTED' or 'REVERTED'
   notEditable: boolean = false;
   notEditableStatus: Array<number> = [4, 5];
+
+  // Following variables are used to show editable fields
   showEditableReviewers = false;
   showEditableCCs = false;
   showEditableBug = false;
@@ -49,11 +57,16 @@ export class ReviewComponent implements OnInit {
         this.getReviewers();
         this.getCCs();
         this.getBug();
+        // Render the fields un-editable if the current diff status
+        // is in the list of notEditableStatus
         this.notEditable = !this.notEditableStatus.includes(this.diff.status);
       });
     });
   }
 
+  // Upon click on a file open a
+  // single file reivew page showing
+  // code difference and comments
   openFile(filePosition): void {
     this.zone.run(() => {
       // Build a route path on the following format
@@ -65,6 +78,7 @@ export class ReviewComponent implements OnInit {
     });
   }
 
+  // Get reviewers from the Diff
   getReviewers(): void {
     const diffReviewers = this.diff.reviewers;
     this.reviewers = '';
@@ -77,22 +91,22 @@ export class ReviewComponent implements OnInit {
     }
   }
 
+  // Get CCs from the Diff
   getCCs(): void {
     const diffCCs = this.diff.cc;
-    this.ccs = '';
+    let cc = '';
     for (let i = 0; i < diffCCs.length; i++) {
-      this.ccs =
-        this.ccs + (i === diffCCs.length - 1 ? diffCCs[i] : diffCCs[i] + ', ');
+      cc = cc + (i === diffCCs.length - 1 ? diffCCs[i] : diffCCs[i] + ', ');
     }
+    this.ccs = cc;
   }
 
-  saveReviewers(): void {
-    let reviewers = this.reviewers.split(',');
-    reviewers = reviewers.map(v => v.trim());
-    this.diff.reviewers = reviewers;
-    this.updateDiff(this.diff, 'Reviewers Saved');
+  // Get bug property from Diff
+  getBug(): void {
+    this.bug = this.diff.bug;
   }
 
+  // Save the edited CCs to the Diff and update the Diff
   saveCCs(): void {
     let ccs = this.ccs.split(',');
     ccs = ccs.map(v => v.trim());
@@ -100,16 +114,22 @@ export class ReviewComponent implements OnInit {
     this.updateDiff(this.diff, 'CCs Saved');
   }
 
-  getBug(): void {
-    this.bug = this.diff.bug;
+  // Save the new reviewers and update Diff
+  saveReviewers(): void {
+    let reviewers = this.reviewers.split(',');
+    reviewers = reviewers.map(v => v.trim());
+    this.diff.reviewers = reviewers;
+    this.updateDiff(this.diff, 'Reviewers Saved');
   }
 
+  // Save bug property from edited field and update the Diff
   saveBug(): void {
     this.diff.bug = this.bug;
     this.updateDiff(this.diff, 'Bug Updated');
   }
 
-  updateAttentionList(name: string): void {
+  // Save NeetAttentionOf list and update the Diff
+  saveAttentionList(name: string): void {
     if (this.diff.needAttentionOf.includes(name)) {
       this.diff.needAttentionOf = this.diff.needAttentionOf.filter(
         e => e !== name
@@ -120,6 +140,7 @@ export class ReviewComponent implements OnInit {
     this.updateDiff(this.diff, 'Need Attention List Updated');
   }
 
+  // Update the Diff in the DB
   updateDiff(diff: Diff, message: string): void {
     this.firebaseService
       .updateDiff(diff)
@@ -132,6 +153,8 @@ export class ReviewComponent implements OnInit {
       });
   }
 
+  // Get text for 'Add to Attention List'
+  // and 'Remove from Attention List'
   getButtonText(reviewer: string): string {
     return this.diff.needAttentionOf.indexOf(reviewer) > -1
       ? 'Remove From Needs Attention'

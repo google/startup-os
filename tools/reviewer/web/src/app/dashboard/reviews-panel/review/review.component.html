@@ -66,7 +66,8 @@
             *ngIf="!showEditableReviewers"
             fxLayoutAlign="start center">
             <span
-              *ngFor="let reviewer of diff.reviewers; let last = last"
+              *ngFor="let reviewer of diff.reviewers; 
+              let last = last"
               [ngClass]="{ 
                 'bold-text': 
                   diff.needAttentionOf.includes(reviewer),
@@ -76,7 +77,7 @@
               <button mat-raised-button 
                 class="add-to-list"
                 *ngIf="notEditable"
-                (click)="updateAttentionList(reviewer);
+                (click)="saveAttentionList(reviewer);
                 $event.stopPropagation()"
                 >
                 {{ getButtonText(reviewer) }}
@@ -91,12 +92,15 @@
               <mat-icon>edit</mat-icon>
             </button>
           </div>
-          <div class="editableInput" *ngIf="showEditableReviewers">
+          <div 
+            class="editableInput"
+            *ngIf="showEditableReviewers">
             <div>
               <mat-form-field>
                 <input matInput placeholder="" 
                   [(ngModel)]="reviewers"
-                  (keyup.enter)="showEditableReviewers = false; saveReviewers()"
+                  (keyup.enter)=
+                  "showEditableReviewers = false; saveReviewers()"
                   >
               </mat-form-field>
             </div>
@@ -110,7 +114,8 @@
                 <span class="input cancel">
                   <button 
                     mat-raised-button 
-                    (click)="showEditableReviewers = false; getReviewers()"
+                    (click)=
+                    "showEditableReviewers = false; getReviewers()"
                     >
                     Cancel
                   </button>
@@ -169,7 +174,7 @@
               <button mat-raised-button 
                 class="add-to-list"
                 *ngIf="notEditable"
-                (click)="updateAttentionList(s);
+                (click)="saveAttentionList(s);
                 $event.stopPropagation()"
                 >
                 {{ getButtonText(s) }}
@@ -189,7 +194,8 @@
               <mat-form-field>
                 <input matInput placeholder="" 
                   [(ngModel)]="ccs"
-                  (keyup.enter)="showEditableCCs = false; saveCCs()"
+                  (keyup.enter)=
+                  "showEditableCCs = false; saveCCs()"
                   >
               </mat-form-field>
             </div>
@@ -264,7 +270,8 @@
             <mat-form-field>
               <input matInput placeholder="" 
                 [(ngModel)]="bug"
-                (keyup.enter)="showEditableBug = false; saveBug()"
+                (keyup.enter)=
+                "showEditableBug = false; saveBug()"
                 >
             </mat-form-field>
           </div>
@@ -302,26 +309,45 @@
   </div>
 
     <!-- Created At timestamp -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Created:</div>
-      <div fxFlex class="detail">{{ diff.createdTimestamp | date:'medium' }}</div>
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px">
+      <div fxFlex="150px" fxFlex.xs="" 
+        class="property">
+        Created:
+      </div>
+      <div fxFlex class="detail">
+        {{ diff.createdTimestamp | date:'medium' }}
+      </div>
     </div>
 
     <!-- Modified timestamp -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Modified:</div>
-      <div fxFlex class="detail">{{ diff.modifiedTimestamp | date:'medium' }}</div>
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px">
+      <div fxFlex="150px" fxFlex.xs="" 
+        class="property">
+        Modified:
+      </div>
+      <div fxFlex 
+        class="detail">
+        {{ diff.modifiedTimestamp | date:'medium' }}
+      </div>
     </div>
     
     <!-- Review files -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px"
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px"
       *ngFor="let file of diff.files; let i = index">
-      <div fxFlex="150px" fxFlex.xs="" class="property">
-        <ng-container *ngIf="i === 0">Files: </ng-container>
-        <ng-container> </ng-container>
+      <div fxFlex="150px" 
+        fxFlex.xs="" class="property">
+        <ng-container *ngIf="i === 0">
+          Files: 
+        </ng-container>
       </div>
       <div fxFlex fxLayout="row" class="detail">
-        <div  fxFlex="120px" fxFlex.xs="">
+        <div fxFlex="120px" fxFlex.xs="">
           <ng-container [ngSwitch]="file.fileAction">
             <ng-container *ngSwitchCase="0">Added</ng-container>
             <ng-container *ngSwitchCase="1">Deleted</ng-container>
@@ -329,31 +355,53 @@
             <ng-container *ngSwitchCase="3">Modified</ng-container>
           </ng-container>
         </div>
-        <a class="link" (click)="openFile(file.filePosition)"> {{ file.filePosition }} </a>
+        <a class="link" 
+          (click)="openFile(file.filePosition)"> 
+          {{ file.filePosition }}
+        </a>
       </div>
     </div>
 
     <!-- Review Comments -->
-    <div class="thread" fxLayout="column" fxLayout.xs="column" fxLayoutGap.xs="10px" 
+    <div class="thread" 
+      fxLayout="column" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px" 
       *ngFor="let thread of diff.threads; let i = index">
       <div fxLayout="row" class="thread-header">
-        <div fxFlex="50%" class="detail"> {{ thread.filename }}</div>
-        <div fxFlex="10%" class="line-number-label"> Snapshot: </div>
-        <div fxFlex="10%" class=""> {{ thread.snapshot }}</div>
-        <div fxFlex="20%" class="line-number-label"> Line number: </div>
-        <div fxFlex="10%" class=""> {{ thread.lineNumber }}</div>
+        <div fxFlex="50%" class="detail"> 
+          {{ thread.filename }}
+        </div>
+        <div fxFlex="10%" class="line-number-label">
+          Snapshot:
+        </div>
+        <div fxFlex="10%" class=""> 
+          {{ thread.snapshot }}
+        </div>
+        <div fxFlex="20%" class="line-number-label">
+          Line number:
+        </div>
+        <div fxFlex="10%" class=""> 
+          {{ thread.lineNumber }}
+        </div>
       </div>
-      <div *ngFor="let comment of thread.comments" class="thread-contents">
+      <div *ngFor="let comment of thread.comments" 
+        class="thread-contents">
         <div class="comment">
-          <div class="content"> {{ comment.content }} </div> 
-          <div fxLayout="row" fxLayoutGap="5px" class="details">
+          <div class="content"> 
+            {{ comment.content }} 
+          </div> 
+          <div fxLayout="row" 
+            fxLayoutGap="5px" 
+            class="details">
             <div> 
               <span> by </span>
               {{ comment.createdBy }} 
             </div>
             <div> 
               <span> on </span> 
-              {{ comment.timestamp |  date:'MMM dd, yyyy HH:mm a' : timezone }}
+              {{ comment.timestamp |  
+                date:'MMM dd, yyyy HH:mm a' : timezone }}
             </div>
           </div>
         </div>
