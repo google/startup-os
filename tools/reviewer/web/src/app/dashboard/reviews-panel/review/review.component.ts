@@ -2,7 +2,8 @@ import {
   Diff,
   FirebaseService,
   NotificationService,
-  ProtoService
+  ProtoService,
+  Status
 } from '@/shared';
 import { Component, NgZone, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,7 +26,7 @@ export class ReviewComponent implements OnInit {
   // Fields can not be edited if status is
   // 'SUBMITTED' or 'REVERTED'
   notEditable: boolean = false;
-  notEditableStatus: Array<number> = [4, 5];
+  notEditableStatus: Array<number> = [Status.SUBMITTED, Status.REVERTED];
 
   // Following variables are used to show editable fields
   showEditableReviewers = false;
