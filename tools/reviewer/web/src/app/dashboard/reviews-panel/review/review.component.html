@@ -100,7 +100,8 @@
                 <input matInput placeholder="" 
                   [(ngModel)]="reviewers"
                   (keyup.enter)=
-                  "showEditableReviewers = false; saveReviewers()"
+                  "showEditableReviewers = false; 
+                  savePropertyValue('reviewers')"
                   >
               </mat-form-field>
             </div>
@@ -115,7 +116,8 @@
                   <button 
                     mat-raised-button 
                     (click)=
-                    "showEditableReviewers = false; getReviewers()"
+                    "showEditableReviewers = false; 
+                    getPropertyValue('reviewers')"
                     >
                     Cancel
                   </button>
@@ -125,7 +127,7 @@
                     mat-raised-button 
                     color="primary"
                     (click)="showEditableReviewers = false; 
-                    saveReviewers()"
+                    savePropertyValue('reviewers')"
                     >
                     Save
                   </button>
@@ -193,9 +195,10 @@
             <div>
               <mat-form-field>
                 <input matInput placeholder="" 
-                  [(ngModel)]="ccs"
+                  [(ngModel)]="cc"
                   (keyup.enter)=
-                  "showEditableCCs = false; saveCCs()"
+                  "showEditableCCs = false; 
+                  savePropertyValue('cc')"
                   >
               </mat-form-field>
             </div>
@@ -209,7 +212,7 @@
                 <span class="input cancel">
                   <button 
                     mat-raised-button 
-                    (click)="showEditableCCs = false; getCCs()"
+                    (click)="showEditableCCs = false; getPropertyValue('cc');"
                     >
                     Cancel
                   </button>
@@ -219,7 +222,7 @@
                     mat-raised-button 
                     color="primary"
                     (click)="showEditableCCs = false; 
-                    saveCCs()"
+                    savePropertyValue('cc')"
                     >
                     Save
                   </button>

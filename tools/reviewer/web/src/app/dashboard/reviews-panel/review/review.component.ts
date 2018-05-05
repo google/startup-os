@@ -20,7 +20,7 @@ export class ReviewComponent implements OnInit {
   // Following variables are used in editing
   // the fields
   reviewers: string = '';
-  ccs: string = '';
+  cc: string = '';
   bug: string = '';
 
   // Fields can not be edited if status is
@@ -54,8 +54,8 @@ export class ReviewComponent implements OnInit {
         const review = res;
         this.diff = this.protoService.createDiff(review);
         this.diff.number = parseInt(this.diffId, 10);
-        this.getReviewers();
-        this.getCCs();
+        this.getPropertyValue('reviewers');
+        this.getPropertyValue('cc');
         this.getBug();
         // Render the fields un-editable if the current diff status
         // is in the list of notEditableStatus
@@ -76,27 +76,9 @@ export class ReviewComponent implements OnInit {
     });
   }
 
-  // Get reviewers from the Diff
-  getReviewers(): void {
-    const diffReviewers = this.diff.reviewers;
-    this.reviewers = '';
-    for (let i = 0; i < diffReviewers.length; i++) {
-      this.reviewers =
-        this.reviewers +
-        (i === diffReviewers.length - 1
-          ? diffReviewers[i]
-          : diffReviewers[i] + ', ');
-    }
-  }
-
-  // Get CCs from the Diff
-  getCCs(): void {
-    const diffCCs = this.diff.cc;
-    let cc = '';
-    for (let i = 0; i < diffCCs.length; i++) {
-      cc = cc + (i === diffCCs.length - 1 ? diffCCs[i] : diffCCs[i] + ', ');
-    }
-    this.ccs = cc;
+  // Get property value from the Diff
+  getPropertyValue(property: string): void {
+    this[property] = this.diff[property].join(', ');
   }
 
   // Get bug property from Diff
@@ -104,20 +86,11 @@ export class ReviewComponent implements OnInit {
     this.bug = this.diff.bug;
   }
 
-  // Save the edited CCs to the Diff and update the Diff
-  saveCCs(): void {
-    let ccs = this.ccs.split(',');
-    ccs = ccs.map(v => v.trim());
-    this.diff.cc = ccs;
-    this.updateDiff(this.diff, 'CCs Saved');
-  }
-
-  // Save the new reviewers and update Diff
-  saveReviewers(): void {
-    let reviewers = this.reviewers.split(',');
-    reviewers = reviewers.map(v => v.trim());
-    this.diff.reviewers = reviewers;
-    this.updateDiff(this.diff, 'Reviewers Saved');
+  // Save the new value of property and update Diff
+  savePropertyValue(property: string): void {
+    const value = this[property].split(', ');
+    this.diff[property] = value.map(v => v.trim());
+    this.updateDiff(this.diff, property + ' saved');
   }
 
   // Save bug property from edited field and update the Diff
