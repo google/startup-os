@@ -5,7 +5,7 @@ import {
   ProtoService,
   Status
 } from '@/shared';
-import { Component, NgZone, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -37,7 +37,6 @@ export class ReviewComponent implements OnInit {
     private route: ActivatedRoute,
     private protoService: ProtoService,
     private firebaseService: FirebaseService,
-    private zone: NgZone,
     private router: Router,
     private notify: NotificationService
   ) {}
@@ -69,13 +68,11 @@ export class ReviewComponent implements OnInit {
   // single file reivew page showing
   // code difference and comments
   openFile(filePosition): void {
-    this.zone.run(() => {
-      // Build a route path on the following format
-      // /diff/<diff number>/<path>?
-      // ls=<left snapshot number>&rs=<right snapshot number>
-      this.router.navigate(['diff/' + this.diffId + '/' + filePosition], {
-        queryParams: { ls: '1', rs: '3' }
-      });
+    // Build a route path on the following format
+    // /diff/<diff number>/<path>?
+    // ls=<left snapshot number>&rs=<right snapshot number>
+    this.router.navigate(['diff/' + this.diffId + '/' + filePosition], {
+      queryParams: { ls: '1', rs: '3' }
     });
   }
 
