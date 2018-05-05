@@ -10,9 +10,7 @@
   .review-details {
     padding: 30px;
     > div {
-      // display: flex;
       margin-bottom: 20px;
-      // border-bottom: 1px solid #d1d1d1;
       .property {
         font-size: 18px;
         font-weight: bold;
@@ -52,10 +50,6 @@
         text-decoration: underline;
       }
     }
-    // .reviewers,
-    // .CCs {
-    //   margin-bottom: 0px;
-    // }
     .reviewer-name,
     .cc-name {
       .add-to-list {
@@ -64,15 +58,11 @@
         margin-top: -35px;
       }
       &:hover {
-        // background-color: #ebf74c;
         .add-to-list {
           display: block;
         }
       }
     }
-    // .add-to-list {
-    //   display: none;
-    // }
     .thread {
       border: 1px solid $borderColor;
       border-radius: 3px;
