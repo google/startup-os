@@ -20,7 +20,6 @@ java_library(
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
-        "//third_party/maven/commons_io",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/slf4j:slf4j_api",
