@@ -47,84 +47,29 @@
     </div>
 
     <div>
-      <app-person-list [diff]="diff" [property]="'reviewers'" [addToAttention]="true"></app-person-list>
+      <app-person-list 
+        [diff]="diff"
+        [property]="'reviewers'"
+        [addToAttention]="true"
+        (onUpdateDiff)="updateDiff($event, 'Reviewers Updated')"
+        ></app-person-list>
     </div>
 
     <div>
-      <app-person-list [diff]="diff" [property]="'cc'" [addToAttention]="false"></app-person-list>
+      <app-person-list 
+        [diff]="diff"
+        [property]="'cc'"
+        [addToAttention]="false"
+        (onUpdateDiff)="updateDiff($event, 'CC Updated')"
+        ></app-person-list>
     </div>
 
-    <!-- Issue -->
-    <div 
-    fxLayout="row"
-    fxLayoutAlign="start center"
-    fxLayout.xs="column"
-    fxLayoutGap.xs="10px"
-    class="bug">
-    <div fxFlex="150px" fxFlex.xs="" 
-      fxLayoutAlign="start center" 
-      class="property">
-      Issue:
+    <div>
+      <app-bug 
+        [diff]="diff"
+        (onUpdateDiff)="updateDiff($event, 'Bug Updated')"
+        ></app-bug>
     </div>
-    <div fxFlex class="detail">
-      <ng-container>
-        <div
-          class="issue-detail"
-          *ngIf="!showEditableBug"
-          fxLayoutAlign="start center">
-          <a class="link" href="{{bug}}">
-            {{ bug }}
-          </a>
-          <button 
-            mat-icon-button
-            (click)="showEditableBug = true"
-            *ngIf="notEditable"
-            >
-            <mat-icon>edit</mat-icon>
-          </button>
-        </div>
-        <div class="editableInput" *ngIf="showEditableBug">
-          <div>
-            <mat-form-field>
-              <input matInput placeholder="" 
-                [(ngModel)]="bug"
-                (keyup.enter)=
-                "showEditableBug = false; saveBug()"
-                >
-            </mat-form-field>
-          </div>
-          <div>
-            <div
-              class="actions"
-              fxFlex
-              fxLayoutAlign="end end"
-              fxLayoutGap="10px"
-              >
-              <span class="input cancel">
-                <button 
-                  mat-raised-button 
-                  (click)="showEditableBug = false; 
-                  getBug()"
-                  >
-                  Cancel
-                </button>
-              </span>
-              <span class="input save">
-                <button 
-                  mat-raised-button 
-                  color="primary"
-                  (click)="showEditableBug = false; 
-                  saveBug()"
-                  >
-                  Save
-                </button>
-              </span>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-  </div>
 
     <!-- Created At timestamp -->
     <div fxLayout="row" 

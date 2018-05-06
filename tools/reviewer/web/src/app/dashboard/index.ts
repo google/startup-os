@@ -3,6 +3,7 @@ export * from './reviews-panel/';
 
 import { HomeComponent } from './home/home.component';
 import {
+  BugComponent,
   CommentComponent,
   DiffComponent,
   PersonListComponent,
@@ -12,6 +13,7 @@ import {
 } from './reviews-panel/';
 
 export const DashboardComponents = [
+  BugComponent,
   CommentComponent,
   DiffComponent,
   HomeComponent,

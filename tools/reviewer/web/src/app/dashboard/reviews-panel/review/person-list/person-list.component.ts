@@ -5,17 +5,18 @@ import {
   ProtoService,
   Status
 } from '@/shared';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-person-list',
   templateUrl: './person-list.component.html',
   styleUrls: ['./person-list.component.scss']
 })
-export class PersonListComponent implements OnInit {
+export class PersonListComponent {
   @Input() diff: Diff;
   @Input() property: string;
   @Input() addToAttention: boolean = true;
+  @Output() onUpdateDiff = new EventEmitter<Diff>();
 
   // Fields can not be edited if status is
   // 'SUBMITTED' or 'REVERTED'
@@ -36,8 +37,6 @@ export class PersonListComponent implements OnInit {
     private notify: NotificationService
   ) {}
 
-  ngOnInit() {}
-
   ngOnChanges() {
     this.getPropertyValue(this.property);
     // Render the fields un-editable if the current diff status
@@ -54,7 +53,7 @@ export class PersonListComponent implements OnInit {
   savePropertyValue(property: string): void {
     const value = this[property].split(', ');
     this.diff[property] = value.map(v => v.trim());
-    this.updateDiff(this.diff, property + ' saved');
+    this.onUpdateDiff.emit(this.diff);
   }
 
   // Save NeetAttentionOf list and update the Diff
@@ -66,20 +65,7 @@ export class PersonListComponent implements OnInit {
     } else {
       this.diff.needAttentionOf.push(name);
     }
-    this.updateDiff(this.diff, 'Need Attention List Updated');
-  }
-
-  // Update the Diff in the DB
-  updateDiff(diff: Diff, message: string): void {
-    this.firebaseService
-      .updateDiff(diff)
-      .then(res => {
-        // TODO make separate service for notifications
-        this.notify.success(message);
-      })
-      .catch(err => {
-        this.notify.error('Some Error Occured');
-      });
+    this.onUpdateDiff.emit(this.diff);
   }
 
   // Get text for 'Add to Attention List'
