@@ -5,6 +5,7 @@ import { HomeComponent } from './home/home.component';
 import {
   CommentComponent,
   DiffComponent,
+  PersonListComponent,
   ReviewComponent,
   ReviewsPanelComponent,
   ThreadComponent
@@ -16,7 +17,8 @@ export const DashboardComponents = [
   HomeComponent,
   ReviewComponent,
   ReviewsPanelComponent,
-  ThreadComponent
+  ThreadComponent,
+  PersonListComponent
 ];
 
 export const DashboardEntryComponents = [];

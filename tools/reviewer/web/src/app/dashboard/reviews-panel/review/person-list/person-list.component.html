@@ -1,0 +1,96 @@
+<div 
+  fxLayout="row"
+  fxLayoutAlign="start center"
+  fxLayout.xs="column"
+  fxLayoutGap.xs="10px"
+  class="reviewers">
+  <div fxFlex="150px" fxFlex.xs="" 
+    fxLayoutAlign="start center" 
+    class="property">
+    {{ property | titlecase }}
+  </div>
+  <div fxFlex class="detail">
+    
+    <ng-container>
+      <div
+        class="reviewer-detail"
+        *ngIf="!showEditableProperty"
+        fxLayoutAlign="start center">
+        <!-- Print out list if length is more than zero -->
+        <span
+          *ngFor="let person of diff[property]; 
+          let last = last"
+          [ngClass]="{ 
+            'bold-text': 
+              diff.needAttentionOf.includes(person),
+            'reviewer-name': true
+            }"
+          >
+          <button mat-raised-button 
+            class="add-to-list"
+            *ngIf="editable && addToAttention"
+            (click)="saveAttentionList(person);
+            $event.stopPropagation()"
+            >
+            {{ getButtonText(person) }}
+          </button>
+          {{ last ? person : person + ',&nbsp;' }}
+        </span>
+        <!-- If no persons are present -->
+        <span *ngIf="diff[property].length === 0">
+          Not available
+        </span>
+        <button 
+          mat-icon-button
+          (click)="showEditableProperty = true"
+          *ngIf="editable"
+          >
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <div 
+        class="editableInput"
+        *ngIf="showEditableProperty">
+        <div>
+          <mat-form-field>
+            <input matInput placeholder="" 
+              [(ngModel)]="this[property]"
+              (keyup.enter)=
+              "showEditableProperty = false; 
+              savePropertyValue(property)"
+              >
+          </mat-form-field>
+        </div>
+        <div>
+          <div
+            class="actions"
+            fxFlex
+            fxLayoutAlign="end end"
+            fxLayoutGap="10px"
+            >
+            <span class="input cancel">
+              <button 
+                mat-raised-button 
+                (click)=
+                "showEditableProperty = false; 
+                getPropertyValue(property)"
+                >
+                Cancel
+              </button>
+            </span>
+            <span class="input save">
+              <button 
+                mat-raised-button 
+                color="primary"
+                (click)="showEditableProperty = false; 
+                savePropertyValue(property)"
+                >
+                Save
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>
