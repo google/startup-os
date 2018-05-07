@@ -36,6 +36,9 @@ public class InitCommand implements AaCommand {
   @FlagDesc(name = "remote_repo_url", description = "Remote git repo", required = true)
   public static Flag<String> remoteRepoUrl = Flag.create("");
 
+  @FlagDesc(name = "user", description = "User")
+  public static Flag<String> user = Flag.create(System.getenv("USER"));
+
   private FileUtils fileUtils;
 
   @Inject
@@ -57,6 +60,7 @@ public class InitCommand implements AaCommand {
       Config config =
           Config.newBuilder()
               .setBasePath(basePath.get())
+              .setUser(user.get())
               .addRemoteRepo(
                   RemoteRepo.newBuilder().setId(remoteRepoId).setUrl(remoteRepoUrl.get()))
               .build();
