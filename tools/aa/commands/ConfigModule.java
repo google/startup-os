@@ -24,9 +24,9 @@ import dagger.Provides;
 import javax.inject.Inject;
 
 @Module(includes = CommonModule.class)
-public class ConfigProvider {
+public class ConfigModule {
   @Inject
-  public ConfigProvider() {}
+  public ConfigModule() {}
 
   @Provides
   public static Config getConfig(FileUtils fileUtils, String configFileName) {
