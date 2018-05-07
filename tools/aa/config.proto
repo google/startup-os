@@ -19,5 +19,6 @@ message Config {
   // Remote git repo url
   repeated RemoteRepo remote_repo = 2;
   // user
+  // TODO: get this value from LocalServer
   string user = 3;
 }
