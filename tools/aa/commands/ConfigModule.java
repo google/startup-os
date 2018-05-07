@@ -26,7 +26,7 @@ import javax.inject.Inject;
 @Module(includes = CommonModule.class)
 public class ConfigModule {
   @Inject
-  public ConfigModule() {}
+  ConfigModule() {}
 
   @Provides
   public static Config getConfig(FileUtils fileUtils, String configFileName) {
