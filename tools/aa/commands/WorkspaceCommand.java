@@ -26,6 +26,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 
+/**
+ * This command is used to switch between workspace and create new ones Its output gets executed in
+ * aa function of aa_tool.sh to perform the switching
+ */
 public class WorkspaceCommand implements AaCommand {
   @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
   public static Flag<Boolean> force = Flag.create(false);
@@ -77,6 +81,7 @@ public class WorkspaceCommand implements AaCommand {
       }
     }
 
+    // output change-directory command to be executed by aa (shell func)
     System.out.println(String.format("cd %s", newWsPath));
   }
 
