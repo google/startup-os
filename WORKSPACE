@@ -49,6 +49,17 @@ git_repository(
   tag = "v0.8.2",
 )
 
+http_archive(
+    name = "io_grpc_grpc_java",
+    urls = ["https://github.com/grpc/grpc-java/archive/46079fff8aa50b5a9222b79f9ea01472fcd5b44f.zip"],
+    strip_prefix = "grpc-java-46079fff8aa50b5a9222b79f9ea01472fcd5b44f",
+)
+
+maven_jar(
+  name = "javax_annotation_api",
+  artifact = "javax.annotation:javax.annotation-api:1.2"
+)
+
 load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_repositories")
 java_proto_repositories(excludes = [
     "com_google_protobuf",
