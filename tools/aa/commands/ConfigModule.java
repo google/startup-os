@@ -30,8 +30,6 @@ public class ConfigModule {
 
   @Provides
   public static Config getConfig(FileUtils fileUtils, String configFileName) {
-    return (Config)
-        fileUtils.readPrototxtUnchecked(
-            fileUtils.expandHomeDirectory(configFileName), Config.newBuilder());
+    return (Config) fileUtils.readPrototxtUnchecked(configFileName, Config.newBuilder());
   }
 }
