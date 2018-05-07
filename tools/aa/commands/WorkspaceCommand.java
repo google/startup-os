@@ -47,8 +47,8 @@ public class WorkspaceCommand implements AaCommand {
   public void run(String[] args) {
     /*
      * //common/flags library intentionally does not support short flags
-     * as this would introduce ambiguity between multiple packages
-     * before parsing flags, we replace "-f" with "--force" so we are
+     * as this would introduce ambiguity between multiple packages.
+     * Before parsing flags, we replace "-f" with "--force" so we are
      * able to call the tool as `aa workspace -f <wsname>`
      */
     for (int i = 0; i < args.length; i++) {
@@ -81,7 +81,7 @@ public class WorkspaceCommand implements AaCommand {
       }
     }
 
-    // output change-directory command to be executed by aa (shell func)
+    // output change-directory command to be executed by aa (shell function)
     System.out.println(String.format("cd %s", newWsPath));
   }
 

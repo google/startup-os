@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# To use `aa` tool, you need to execute (from cloned repo)
+# To setup `aa` tool, you need to execute (from cloned repo)
 #
 # bazel build //tools/aa:aa_tool_deploy.jar
 # echo "export AA_BASE=$(pwd)" >> ~/.bashrc
