@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# To use `aa` tool, you need to execute (from cloned repo)
+#
+# bazel build //tools/aa:aa_tool_deploy.jar
+# echo "export AA_BASE=$(pwd)" >> ~/.bashrc
+# echo "source $(pwd)/tools/aa/aa_tool.sh" >> ~/.bashrc
+# source ~/.bashrc
+#
+# If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
+
+
 AA_BINARY="java -jar $AA_BASE/bazel-bin/tools/aa/aa_tool_deploy.jar"
 
 
