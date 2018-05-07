@@ -60,6 +60,17 @@ maven_jar(
   artifact = "javax.annotation:javax.annotation-api:1.2"
 )
 
+bind(
+    name = "gson",
+    actual = "//third_party/maven/com/google/code/gson",
+)
+
+
+bind(
+    name = "guava",
+    actual = "//third_party/maven/com/google/guava",
+)
+
 load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_repositories")
 java_proto_repositories(excludes = [
     "com_google_protobuf",
