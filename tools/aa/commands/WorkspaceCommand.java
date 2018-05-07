@@ -41,6 +41,12 @@ public class WorkspaceCommand implements AaCommand {
 
   @Override
   public void run(String[] args) {
+    /*
+     * //common/flags library intentionally does not support short flags
+     * as this would introduce ambiguity between multiple packages
+     * before parsing flags, we replace "-f" with "--force" so we are
+     * able to call the tool as `aa workspace -f <wsname>`
+     */
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("-f")) {
         args[i] = "--force";
