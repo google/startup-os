@@ -26,11 +26,16 @@ import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Singleton;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** File utils */
 @Singleton
@@ -174,5 +179,27 @@ public class FileUtils {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+  
+  public void copyDirectoryToDirectory(String source, String destination) throws IOException {
+    final Path sourcePath = Paths.get(source);
+    final Path targetPath = Paths.get(destination);
+    java.nio.file.Files.walkFileTree(
+        sourcePath,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+              throws IOException {
+            java.nio.file.Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+              throws IOException {
+            java.nio.file.Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+            return FileVisitResult.CONTINUE;
+          }
+        });
   }
 }

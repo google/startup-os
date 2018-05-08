@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.startupos.common;
+package com.google.startupos.tools.aa.commands;
 
-import dagger.Component;
-import javax.inject.Singleton;
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.FileUtils;
+import com.google.startupos.tools.aa.Protos.Config;
+import dagger.Module;
+import dagger.Provides;
+import javax.inject.Inject;
 
-@Singleton
-@Component(modules = { CommonModule.class })
-public interface CommonComponent {
-  FileUtils getFileUtils();
+@Module(includes = CommonModule.class)
+public class ConfigModule {
+  @Inject
+  ConfigModule() {}
+
+  @Provides
+  public static Config getConfig(FileUtils fileUtils, String configFileName) {
+    return (Config) fileUtils.readPrototxtUnchecked(configFileName, Config.newBuilder());
+  }
 }

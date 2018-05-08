@@ -16,15 +16,19 @@
 
 package com.google.startupos.tools.localserver;
 
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.service.CodeReviewServiceFactory;
+import dagger.Component;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
 import java.util.logging.Logger;
-import com.google.startupos.tools.localserver.service.AuthService;
-import com.google.startupos.tools.reviewer.service.CodeReviewService;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.Flags;
-import com.google.startupos.common.flags.FlagDesc;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
@@ -34,6 +38,7 @@ import com.google.startupos.common.flags.FlagDesc;
  * bazel-bin/tools/local_server/local_server -- {absolute_path}
  * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
  */
+@Singleton
 public class LocalServer {
   private static final Logger logger = Logger.getLogger(LocalServer.class.getName());
 
@@ -45,14 +50,17 @@ public class LocalServer {
 
   private Server server;
 
-  private void start() throws IOException {
-    AuthService authService = new AuthService();
+  @Inject
+  LocalServer(AuthService authService, CodeReviewServiceFactory codeReviewServiceFactory) {
     server =
         ServerBuilder.forPort(localServerPort.get())
             .addService(authService)
-            .addService(new CodeReviewService(authService, rootPath.get()))
-            .build()
-            .start();
+            .addService(codeReviewServiceFactory.create(rootPath.get()))
+            .build();
+  }
+
+  private void start() throws IOException {
+    server.start();
     logger.info("Server started, listening on " + localServerPort.get());
     Runtime.getRuntime()
         .addShutdownHook(
@@ -84,11 +92,16 @@ public class LocalServer {
     }
   }
 
-  public static void main(String[] args) throws IOException, InterruptedException {
-    Flags.parse(args, LocalServer.class.getPackage(), CodeReviewService.class.getPackage());
-    checkFlags();
+  @Singleton
+  @Component(modules = { CommonModule.class })
+  public interface LocalServerComponent {
+    LocalServer getLocalServer();
+  }
 
-    final LocalServer server = new LocalServer();
+  public static void main(String[] args) throws IOException, InterruptedException {
+    Flags.parse(args, LocalServer.class.getPackage(), CodeReviewServiceFactory.class.getPackage());
+    checkFlags();
+    LocalServer server = DaggerLocalServer_LocalServerComponent.builder().build().getLocalServer();
     server.start();
     server.blockUntilShutdown();
   }

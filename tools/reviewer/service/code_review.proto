@@ -1,19 +1,26 @@
 syntax = "proto3";
 
+package com.google.startupos.tools.reviewer.service;
+
 option java_package = "com.google.startupos.tools.reviewer.service";
 option java_outer_classname = "Protos";
 
-package com.google.startupos.tools.reviewer.service;
+import "common/text_difference.proto";
 
-service CodeReviewService { 
+service CodeReviewService {
   // Get a text file's contents
   rpc getFile(FileRequest) returns (FileResponse);
   rpc createDiff(CreateDiffRequest) returns (CreateDiffResponse);
+  rpc getTextDiff(TextDiffRequest) returns (TextDiffResponse);
 }
 
-message FileRequest { string filename = 1; }
+message FileRequest {
+  string filename = 1;
+}
 
-message FileResponse { string content = 1; }
+message FileResponse {
+  string content = 1;
+}
 
 message CreateDiffRequest {
   Diff diff = 1;
@@ -23,8 +30,20 @@ message CreateDiffResponse {
   string diffId = 1;
 }
 
-// TODO: Separate non-request/response messages into a separate file. This resulted in issues
-//   when attempted (couldn't import another proto) but maybe they've since been fixed.
+message TextDiffRequest {
+  string first_filepath = 1;
+  string second_filepath = 2;
+}
+
+message TextDiffResponse {
+  // The changes of the second file.
+  repeated com.google.startupos.common.TextChange changes = 1;
+}
+
+// TODO: Separate non-request/response messages into a separate file. This
+// resulted in issues
+//   when attempted (couldn't import another proto) but maybe they've since been
+//   fixed.
 message Diff {
   enum Status {
     REVIEW_NOT_STARTED = 0;
@@ -62,6 +81,7 @@ message File {
     RENAME = 2;
     MODIFY = 3;
   }
+  // Includes the path + filename
   string filename = 1;
   string repo_id = 2;
   // Empty if referring to a local file

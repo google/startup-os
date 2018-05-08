@@ -8,8 +8,8 @@ StartupOS is a setup that helps startups and enterprise teams with setting up th
 * Ready-to-run examples of Android and iOS native apps and Angular web apps.
 
 ##### Milestones
-* The first milestone will include [Bazel](bazel.build), [Protocol Buffers](https://developers.google.com/protocol-buffers), [ABC](http://g.co/ng/abc) (Angular Bazel Closure), and [Firebase](firebase.google.com) integration.
-* Later milestones will add more goodies such as [j2objc](https://developers.google.com/j2objc), [Dagger](https://github.com/google/dagger) and [Kubernetes](kubernetes.io).
+* The first milestone will include [Bazel](https://bazel.build), [Protocol Buffers](https://developers.google.com/protocol-buffers), [ABC](http://g.co/ng/abc) (Angular Bazel Closure), and [Firebase](https://firebase.google.com) integration.
+* Later milestones will add more goodies such as [j2objc](https://developers.google.com/j2objc), [Dagger](https://github.com/google/dagger) and [Kubernetes](https://kubernetes.io).
 
 #### Requirements
 We develop on Ubuntu and Mac. For other OSs - YMMV

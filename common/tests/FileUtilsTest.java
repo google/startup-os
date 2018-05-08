@@ -74,7 +74,7 @@ public class FileUtilsTest {
         return fileSystem;
       }
     }).build();
-    fileUtils = commonComponent.geFileUtils();
+    fileUtils = commonComponent.getFileUtils();
   }
 
   @Test

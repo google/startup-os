@@ -19,19 +19,20 @@ package com.google.startupos.common;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.TextChange.Type;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.google.startupos.common.Protos.TextChange;
-import com.google.startupos.common.Protos.TextChange.Type;
 
 /** Tests for {@link com.google.startupos.common.TextDifferencer}. */
 @RunWith(JUnit4.class)
 public class TextDifferencerTest {
 
-  TextChange.Builder newTextChange(int index, char difference, Type type) {
+  /** package */
+  TextChange.Builder newTextChange(int leftIndex, int rightIndex, char difference, Type type) {
     return TextChange.newBuilder()
-        .setIndex(index)
+        .setFirstStringIndex(leftIndex)
+        .setSecondStringIndex(rightIndex)
         .setDifference(Character.toString(difference))
         .setType(type);
   }
@@ -45,15 +46,15 @@ public class TextDifferencerTest {
   public void testOnlyAdditions() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 'A', Type.ADD).build(),
-            newTextChange(1, 'd', Type.ADD).build(),
-            newTextChange(2, 'd', Type.ADD).build(),
-            newTextChange(3, 'i', Type.ADD).build(),
-            newTextChange(4, 't', Type.ADD).build(),
-            newTextChange(5, 'i', Type.ADD).build(),
-            newTextChange(6, 'o', Type.ADD).build(),
-            newTextChange(7, 'n', Type.ADD).build(),
-            newTextChange(8, '.', Type.ADD).build()),
+            newTextChange(0, 0, 'A', Type.ADD).build(),
+            newTextChange(0, 1, 'd', Type.ADD).build(),
+            newTextChange(0, 2, 'd', Type.ADD).build(),
+            newTextChange(0, 3, 'i', Type.ADD).build(),
+            newTextChange(0, 4, 't', Type.ADD).build(),
+            newTextChange(0, 5, 'i', Type.ADD).build(),
+            newTextChange(0, 6, 'o', Type.ADD).build(),
+            newTextChange(0, 7, 'n', Type.ADD).build(),
+            newTextChange(0, 8, '.', Type.ADD).build()),
         TextDifferencer.getAllTextChanges("", "Addition."));
   }
 
@@ -61,15 +62,15 @@ public class TextDifferencerTest {
   public void testOnlyDeletions() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 'D', Type.DELETE).build(),
-            newTextChange(1, 'e', Type.DELETE).build(),
-            newTextChange(2, 'l', Type.DELETE).build(),
-            newTextChange(3, 'e', Type.DELETE).build(),
-            newTextChange(4, 't', Type.DELETE).build(),
-            newTextChange(5, 'i', Type.DELETE).build(),
-            newTextChange(6, 'o', Type.DELETE).build(),
-            newTextChange(7, 'n', Type.DELETE).build(),
-            newTextChange(8, '.', Type.DELETE).build()),
+            newTextChange(0, 0, 'D', Type.DELETE).build(),
+            newTextChange(1, 0, 'e', Type.DELETE).build(),
+            newTextChange(2, 0, 'l', Type.DELETE).build(),
+            newTextChange(3, 0, 'e', Type.DELETE).build(),
+            newTextChange(4, 0, 't', Type.DELETE).build(),
+            newTextChange(5, 0, 'i', Type.DELETE).build(),
+            newTextChange(6, 0, 'o', Type.DELETE).build(),
+            newTextChange(7, 0, 'n', Type.DELETE).build(),
+            newTextChange(8, 0, '.', Type.DELETE).build()),
         TextDifferencer.getAllTextChanges("Deletion.", ""));
   }
 
@@ -77,16 +78,16 @@ public class TextDifferencerTest {
   public void testOnlyNoChanges() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 'N', Type.NO_CHANGE).build(),
-            newTextChange(1, 'o', Type.NO_CHANGE).build(),
-            newTextChange(2, ' ', Type.NO_CHANGE).build(),
-            newTextChange(3, 'C', Type.NO_CHANGE).build(),
-            newTextChange(4, 'h', Type.NO_CHANGE).build(),
-            newTextChange(5, 'a', Type.NO_CHANGE).build(),
-            newTextChange(6, 'n', Type.NO_CHANGE).build(),
-            newTextChange(7, 'g', Type.NO_CHANGE).build(),
-            newTextChange(8, 'e', Type.NO_CHANGE).build(),
-            newTextChange(9, '.', Type.NO_CHANGE).build()),
+            newTextChange(0, 0, 'N', Type.NO_CHANGE).build(),
+            newTextChange(1, 1, 'o', Type.NO_CHANGE).build(),
+            newTextChange(2, 2, ' ', Type.NO_CHANGE).build(),
+            newTextChange(3, 3, 'C', Type.NO_CHANGE).build(),
+            newTextChange(4, 4, 'h', Type.NO_CHANGE).build(),
+            newTextChange(5, 5, 'a', Type.NO_CHANGE).build(),
+            newTextChange(6, 6, 'n', Type.NO_CHANGE).build(),
+            newTextChange(7, 7, 'g', Type.NO_CHANGE).build(),
+            newTextChange(8, 8, 'e', Type.NO_CHANGE).build(),
+            newTextChange(9, 9, '.', Type.NO_CHANGE).build()),
         TextDifferencer.getAllTextChanges("No Change.", "No Change."));
   }
 
@@ -94,20 +95,20 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheBeginning() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 'N', Type.DELETE).build(),
-            newTextChange(1, 'o', Type.DELETE).build(),
-            newTextChange(0, 'W', Type.ADD).build(),
-            newTextChange(1, 'i', Type.ADD).build(),
-            newTextChange(2, 't', Type.ADD).build(),
-            newTextChange(3, 'h', Type.ADD).build(),
-            newTextChange(2, ' ', Type.NO_CHANGE).build(),
-            newTextChange(3, 'C', Type.NO_CHANGE).build(),
-            newTextChange(4, 'h', Type.NO_CHANGE).build(),
-            newTextChange(5, 'a', Type.NO_CHANGE).build(),
-            newTextChange(6, 'n', Type.NO_CHANGE).build(),
-            newTextChange(7, 'g', Type.NO_CHANGE).build(),
-            newTextChange(8, 'e', Type.NO_CHANGE).build(),
-            newTextChange(9, '.', Type.NO_CHANGE).build()),
+            newTextChange(0, 0, 'N', Type.DELETE).build(),
+            newTextChange(1, 0, 'o', Type.DELETE).build(),
+            newTextChange(1, 0, 'W', Type.ADD).build(),
+            newTextChange(1, 1, 'i', Type.ADD).build(),
+            newTextChange(1, 2, 't', Type.ADD).build(),
+            newTextChange(1, 3, 'h', Type.ADD).build(),
+            newTextChange(2, 4, ' ', Type.NO_CHANGE).build(),
+            newTextChange(3, 5, 'C', Type.NO_CHANGE).build(),
+            newTextChange(4, 6, 'h', Type.NO_CHANGE).build(),
+            newTextChange(5, 7, 'a', Type.NO_CHANGE).build(),
+            newTextChange(6, 8, 'n', Type.NO_CHANGE).build(),
+            newTextChange(7, 9, 'g', Type.NO_CHANGE).build(),
+            newTextChange(8, 10, 'e', Type.NO_CHANGE).build(),
+            newTextChange(9, 11, '.', Type.NO_CHANGE).build()),
         TextDifferencer.getAllTextChanges("No Change.", "With Change."));
   }
 
@@ -115,20 +116,20 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheMiddle() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 'W', Type.NO_CHANGE).build(),
-            newTextChange(1, 'i', Type.NO_CHANGE).build(),
-            newTextChange(2, 't', Type.NO_CHANGE).build(),
-            newTextChange(3, 'h', Type.NO_CHANGE).build(),
-            newTextChange(4, ' ', Type.NO_CHANGE).build(),
-            newTextChange(5, 'a', Type.ADD).build(),
-            newTextChange(6, ' ', Type.ADD).build(),
-            newTextChange(5, 'C', Type.NO_CHANGE).build(),
-            newTextChange(6, 'h', Type.NO_CHANGE).build(),
-            newTextChange(7, 'a', Type.NO_CHANGE).build(),
-            newTextChange(8, 'n', Type.NO_CHANGE).build(),
-            newTextChange(9, 'g', Type.NO_CHANGE).build(),
-            newTextChange(10, 'e', Type.NO_CHANGE).build(),
-            newTextChange(11, '.', Type.NO_CHANGE).build()),
+            newTextChange(0, 0, 'W', Type.NO_CHANGE).build(),
+            newTextChange(1, 1, 'i', Type.NO_CHANGE).build(),
+            newTextChange(2, 2, 't', Type.NO_CHANGE).build(),
+            newTextChange(3, 3, 'h', Type.NO_CHANGE).build(),
+            newTextChange(4, 4, ' ', Type.NO_CHANGE).build(),
+            newTextChange(5, 5, 'a', Type.ADD).build(),
+            newTextChange(5, 6, ' ', Type.ADD).build(),
+            newTextChange(5, 7, 'C', Type.NO_CHANGE).build(),
+            newTextChange(6, 8, 'h', Type.NO_CHANGE).build(),
+            newTextChange(7, 9, 'a', Type.NO_CHANGE).build(),
+            newTextChange(8, 10, 'n', Type.NO_CHANGE).build(),
+            newTextChange(9, 11, 'g', Type.NO_CHANGE).build(),
+            newTextChange(10, 12, 'e', Type.NO_CHANGE).build(),
+            newTextChange(11, 13, '.', Type.NO_CHANGE).build()),
         TextDifferencer.getAllTextChanges("With Change.", "With a Change."));
   }
 
@@ -136,17 +137,17 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheEnd() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 'N', Type.NO_CHANGE).build(),
-            newTextChange(1, 'o', Type.NO_CHANGE).build(),
-            newTextChange(2, ' ', Type.NO_CHANGE).build(),
-            newTextChange(3, 'C', Type.NO_CHANGE).build(),
-            newTextChange(4, 'h', Type.NO_CHANGE).build(),
-            newTextChange(5, 'a', Type.NO_CHANGE).build(),
-            newTextChange(6, 'n', Type.NO_CHANGE).build(),
-            newTextChange(7, 'g', Type.NO_CHANGE).build(),
-            newTextChange(8, 'e', Type.NO_CHANGE).build(),
-            newTextChange(9, '.', Type.DELETE).build(),
-            newTextChange(9, '!', Type.ADD).build()),
+            newTextChange(0, 0, 'N', Type.NO_CHANGE).build(),
+            newTextChange(1, 1, 'o', Type.NO_CHANGE).build(),
+            newTextChange(2, 2, ' ', Type.NO_CHANGE).build(),
+            newTextChange(3, 3, 'C', Type.NO_CHANGE).build(),
+            newTextChange(4, 4, 'h', Type.NO_CHANGE).build(),
+            newTextChange(5, 5, 'a', Type.NO_CHANGE).build(),
+            newTextChange(6, 6, 'n', Type.NO_CHANGE).build(),
+            newTextChange(7, 7, 'g', Type.NO_CHANGE).build(),
+            newTextChange(8, 8, 'e', Type.NO_CHANGE).build(),
+            newTextChange(9, 9, '.', Type.DELETE).build(),
+            newTextChange(9, 9, '!', Type.ADD).build()),
         TextDifferencer.getAllTextChanges("No Change.", "No Change!"));
   }
 }

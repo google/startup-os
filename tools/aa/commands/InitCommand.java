@@ -16,12 +16,15 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
-import java.io.IOException;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.tools.aa.Protos.Config;
+import com.google.startupos.tools.aa.Protos.RemoteRepo;
+import java.net.URI;
+import java.net.URISyntaxException;
+import javax.inject.Inject;
 
 public class InitCommand implements AaCommand {
   @FlagDesc(name = "config_path", description = "Path to config file", required = true)
@@ -33,23 +36,41 @@ public class InitCommand implements AaCommand {
   @FlagDesc(name = "remote_repo_url", description = "Remote git repo", required = true)
   public static Flag<String> remoteRepoUrl = Flag.create("");
 
+  @FlagDesc(name = "user", description = "User")
+  public static Flag<String> user = Flag.create(System.getenv("USER"));
+
+  private FileUtils fileUtils;
+
+  @Inject
+  public InitCommand(FileUtils utils) {
+    this.fileUtils = utils;
+  }
+
+  private String getNameFromRemoteUrl(String remoteUrl) throws URISyntaxException {
+    String path = new URI(remoteRepoUrl.get()).getPath();
+    return path.substring(path.lastIndexOf("/") + 1).replace(".git", "");
+  }
+
   @Override
   public void run(String[] args) {
     Flags.parse(args, InitCommand.class.getPackage());
 
     try {
+      String remoteRepoId = getNameFromRemoteUrl(remoteRepoUrl.get());
       Config config =
           Config.newBuilder()
               .setBasePath(basePath.get())
-              .setRemoteRepoUrl(remoteRepoUrl.get())
+              .setUser(user.get())
+              .addRemoteRepo(
+                  RemoteRepo.newBuilder().setId(remoteRepoId).setUrl(remoteRepoUrl.get()))
               .build();
-      FileUtils.writePrototxt(config, configPath.get());
-      
+      fileUtils.writePrototxt(config, configPath.get());
+
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());
       System.out.println("Input flags:");
       Flags.printUsage();
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }

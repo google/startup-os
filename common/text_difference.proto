@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package com.google.startupos.common;
+
+option java_package = "com.google.startupos.common";
+option java_multiple_files = true;
+
+// Holds information about a text change.
+message TextChange {
+  /** Describes the type of the difference. */
+  enum Type {
+    // Unused.
+    TYPE_UNUSED = 0;
+
+    // No change has occurred. The source is equal to the
+    // destination.
+    NO_CHANGE = 1;
+
+    // A new character was added to the source.
+    ADD = 2;
+
+    // A character was deleted from the source.
+    DELETE = 3;
+  }
+
+  // The index in which the difference has occurred in the first string. For
+  // example, if we have the two strings, "Exampl" and "Example", the index
+  // would be 5.
+  int64 first_string_index = 1;
+
+  // The index in which the difference has occurred in the second string. For
+  // example, if we have the two strings, "Exampl" and "Example", the index
+  // would be 6.
+  int64 second_string_index = 2;
+
+  // The string of the difference. Limited to hold only one character. In
+  // the example of the two strings "Exampl" and "Example" it would be the
+  // last "e".
+  string difference = 3;
+
+  // The {@link Type} of the difference, i.e. what change has occurred. In the
+  // example of the two strings "Exampl" and "Example" it would be {@link
+  // Type.ADD}.
+  Type type = 4;
+}

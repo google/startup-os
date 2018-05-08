@@ -16,31 +16,51 @@
 
 package com.google.startupos.tools.aa;
 
+import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
+import com.google.startupos.tools.aa.commands.ConfigModule;
 import com.google.startupos.tools.aa.commands.InitCommand;
-import com.google.startupos.tools.aa.Protos.Config;
-import com.google.startupos.common.FileUtils;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Arrays;
+import com.google.startupos.tools.aa.commands.WorkspaceCommand;
+import dagger.BindsInstance;
+import dagger.Component;
 import java.util.HashMap;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** aa tool. */
+@Singleton
 public class AaTool {
-  private static HashMap<String, AaCommand> commands = new HashMap<>();
+  private HashMap<String, AaCommand> commands = new HashMap<>();
+  // TODO: maybe make a flag to set it dynamically
+  public static final String CONFIG_FILENAME = "~/aaconfig.prototxt";
 
-  static {
-    AaCommand init = new InitCommand();
-    commands.put(init.getName(), init);
-  }
-
-  public static void printUsage() {
+  private void printUsage() {
     System.out.println(
         String.format(
             "Invalid usage. Available commands are: %s", String.join(", ", commands.keySet())));
   }
 
-  public static void main(String[] args) {
+  @Singleton
+  @Component(modules = {CommonModule.class, ConfigModule.class})
+  public interface AaToolComponent {
+    AaTool getAaTool();
+
+    @Component.Builder
+    interface Builder {
+      @BindsInstance
+      Builder configFileName(String configFileName);
+
+      AaToolComponent build();
+    }
+  }
+
+  @Inject
+  AaTool(InitCommand initCommand, WorkspaceCommand workspaceCommand) {
+    commands.put(initCommand.getName(), initCommand);
+    commands.put(workspaceCommand.getName(), workspaceCommand);
+  }
+
+  private void run(String[] args) {
     if (args.length > 0) {
       String command = args[0];
       if (commands.containsKey(command)) {
@@ -52,5 +72,13 @@ public class AaTool {
     } else {
       printUsage();
     }
+  }
+
+  public static void main(String[] args) {
+    DaggerAaTool_AaToolComponent.builder()
+        .configFileName(CONFIG_FILENAME)
+        .build()
+        .getAaTool()
+        .run(args);
   }
 }

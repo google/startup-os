@@ -16,34 +16,40 @@
 
 package com.google.startupos.tools.reviewer.service;
 
+import com.google.auto.factory.AutoFactory;
+import com.google.auto.factory.Provided;
+import com.google.startupos.common.TextDifferencer;
+import com.google.startupos.common.firestore.FirestoreClient;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.CreateDiffResponse;
+import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
-import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
-import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.CreateDiffResponse;
-import com.google.startupos.common.firestore.FirestoreClient;
-import com.google.startupos.tools.localserver.service.AuthService;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
  */
+@AutoFactory
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
- 
+
   @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
   private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
 
   private AuthService authService;
   private String filesystemRootPath;
 
-  public CodeReviewService(AuthService authService, String filesystemRootPath) {
+  public CodeReviewService(@Provided AuthService authService, String filesystemRootPath) {
     this.authService = authService;
     this.filesystemRootPath = filesystemRootPath;
   }
@@ -67,8 +73,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void getFile(FileRequest req, StreamObserver<FileResponse> responseObserver) {
     try {
       String filePath = getAbsolutePath(req.getFilename());
-      responseObserver.onNext(
-          FileResponse.newBuilder().setContent(readTextFile(filePath)).build());
+      responseObserver.onNext(FileResponse.newBuilder().setContent(readTextFile(filePath)).build());
       responseObserver.onCompleted();
     } catch (SecurityException | IOException e) {
       responseObserver.onError(
@@ -79,9 +84,30 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
-  public void createDiff(CreateDiffRequest req, StreamObserver<CreateDiffResponse> responseObserver) {
-    FirestoreClient client = new FirestoreClient(authService.getProjectId(), authService.getToken());
+  public void createDiff(
+      CreateDiffRequest req, StreamObserver<CreateDiffResponse> responseObserver) {
+    FirestoreClient client =
+        new FirestoreClient(authService.getProjectId(), authService.getToken());
     client.createDocument(firestoreReviewRoot.get(), req.getDiff());
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
+    try {
+      String firstFileContents = readTextFile(req.getFirstFilepath());
+      String secondFileContents = readTextFile(req.getSecondFilepath());
+      responseObserver.onNext(
+          TextDiffResponse.newBuilder()
+              .addAllChanges(
+                  TextDifferencer.getAllTextChanges(firstFileContents, secondFileContents))
+              .build());
+    } catch (IOException e) {
+      responseObserver.onError(
+          Status.NOT_FOUND
+              .withDescription(String.format("No such file %s", req.getFirstFilepath()))
+              .asException());
+    }
     responseObserver.onCompleted();
   }
 }
