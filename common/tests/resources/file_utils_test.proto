@@ -5,34 +5,14 @@ package com.google.startupos.common.tests;
 option java_package = "com.google.startupos.common.tests";
 option java_outer_classname = "Protos";
 
-message ScalarTypesMessage {
-    double double_field = 1;
-    float float_field = 2;
-    int32 int32_field = 3;
-    int64 int64_field = 4;
-    bool bool_field = 5;
-    string string_field = 6;
-    bytes bytes_field = 7;
-}
-
-message EnumMessage {
-    enum Color {
+message TestMessage {
+    enum BooleanEnum {
         UNKNOWN = 0;
-        RED = 1;
-        GREEN = 2;
-        BLUE = 3;
+        YES = 1;
+        NO = 2;
     }
-    Color favorite = 1;
-    repeated Color additional = 2;
-}
-
-message Parent {
-    message Child {
-        string name = 1;
-    }
-    Child child = 1;
-}
-
-message MapMessage {
-    map<string, int32> map_field = 1;
+    int32 int32_field = 1;
+    string string_field = 2;
+    map<string, int32> map_field = 3;
+    BooleanEnum enum_field = 4;
 }

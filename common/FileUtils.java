@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package com.google.startupos.common;
+package com.google.startupos.common;
 
 
 import com.google.common.collect.ImmutableList;
@@ -26,8 +26,8 @@ import java.io.InputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Singleton;
 import javax.inject.Inject;
@@ -43,8 +43,9 @@ public class FileUtils {
   }
 
   /** Replace the ~ in e.g ~/path with the home directory. */
+  // TODO  Inject System.getProperty("user.home")
   public String expandHomeDirectory(String path) {
-    if (path.startsWith("~" + File.separator)) {
+    if (path.startsWith("~" + fileSystem.getSeparator())) {
       path = System.getProperty("user.home") + path.substring(1);
     }
     return path;
@@ -121,25 +122,18 @@ public class FileUtils {
     }
   }
 
-  /** Gets filenames in path. */
-  public ImmutableList<String> getFiles(String path) throws IOException {
-    List<String> files = new ArrayList<>();
+  /** Gets file and folder names in path. */
+  public ImmutableList<String> listContents(String path) throws IOException {
+    List<String> fileNames;
     try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {
-      paths
-              .filter(Files::isRegularFile)
-              .sorted()
-              .forEach(absolutePath -> files.add(absolutePath.getFileName().toString()));
+      fileNames = paths.map(absolutePath -> absolutePath.getFileName().toString()).collect(Collectors.toList());
     }
-    return ImmutableList.copyOf(files);
+    return ImmutableList.sortedCopyOf(fileNames);
   }
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    ImmutableList<String> lines =
-            ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
-    final StringBuilder builder = new StringBuilder();
-    lines.forEach(line -> builder.append(line + "\n"));
-    return builder.toString();
+    return String.join("\n", Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */
