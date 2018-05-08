@@ -18,13 +18,19 @@ package com.google.startupos.common;
 
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import javax.inject.Singleton;
 
 @Module
 public class CommonModule {
   public @Provides @Singleton FileSystem provideDefaultFileSystem() {
     return FileSystems.getDefault();
+  }
+
+  @Provides
+  @Singleton
+  public TextDifferencer provideDefaultTextDifferencer() {
+    return new LCSTextDifferencer();
   }
 }
