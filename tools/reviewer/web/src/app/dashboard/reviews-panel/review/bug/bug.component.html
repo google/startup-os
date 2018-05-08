@@ -29,42 +29,38 @@ class="bug">
     </div>
     <div class="editableInput" 
       *ngIf="showEditableBug">
-      <div>
-        <mat-form-field>
-          <input matInput placeholder="" 
-            [(ngModel)]="bug"
-            (keyup.enter)=
-            "showEditableBug = false; saveBug()"
-            >
-        </mat-form-field>
-      </div>
-      <div>
-        <div
-          class="actions"
-          fxFlex
-          fxLayoutAlign="end end"
-          fxLayoutGap="10px"
+      <mat-form-field>
+        <input matInput placeholder="" 
+          [(ngModel)]="bug"
+          (keyup.enter)=
+          "showEditableBug = false; saveBug()"
           >
-          <span class="input cancel">
-            <button 
-              mat-raised-button 
-              (click)="showEditableBug = false; 
-              getBug()"
-              >
-              Cancel
-            </button>
-          </span>
-          <span class="input save">
-            <button 
-              mat-raised-button 
-              color="primary"
-              (click)="showEditableBug = false; 
-              saveBug()"
-              >
-              Save
-            </button>
-          </span>
-        </div>
+      </mat-form-field>
+      <div
+        class="actions"
+        fxFlex
+        fxLayoutAlign="end center"
+        fxLayoutGap="10px"
+        >
+        <span class="input cancel">
+          <button 
+            mat-raised-button 
+            (click)="showEditableBug = false; 
+            getBug()"
+            >
+            Cancel
+          </button>
+        </span>
+        <span class="input save">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="showEditableBug = false; 
+            saveBug()"
+            >
+            Save
+          </button>
+        </span>
       </div>
     </div>
   </ng-container>

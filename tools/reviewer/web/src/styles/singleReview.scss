@@ -37,11 +37,11 @@
       }
       .editableInput,
       .reviewer-detail {
-        width: 400px;
+        width: 600px;
       }
       .editableInput {
-        div mat-form-field {
-          width: 100%;
+        mat-form-field {
+          width: 400px;
         }
       }
       .link {

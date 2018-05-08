@@ -51,44 +51,40 @@
       <div 
         class="editableInput"
         *ngIf="showEditableProperty">
-        <div>
-          <mat-form-field>
-            <input matInput placeholder="" 
-              [(ngModel)]="this[property]"
-              (keyup.enter)=
+        <mat-form-field>
+          <input matInput placeholder="" 
+            [(ngModel)]="this[property]"
+            (keyup.enter)=
+            "showEditableProperty = false; 
+            savePropertyValue(property)"
+            >
+        </mat-form-field>
+        <div
+          class="actions"
+          fxFlex
+          fxLayoutAlign="end center"
+          fxLayoutGap="10px"
+          >
+          <span class="input cancel">
+            <button 
+              mat-raised-button 
+              (click)=
               "showEditableProperty = false; 
+              getPropertyValue(property)"
+              >
+              Cancel
+            </button>
+          </span>
+          <span class="input save">
+            <button 
+              mat-raised-button 
+              color="primary"
+              (click)="showEditableProperty = false; 
               savePropertyValue(property)"
               >
-          </mat-form-field>
-        </div>
-        <div>
-          <div
-            class="actions"
-            fxFlex
-            fxLayoutAlign="end end"
-            fxLayoutGap="10px"
-            >
-            <span class="input cancel">
-              <button 
-                mat-raised-button 
-                (click)=
-                "showEditableProperty = false; 
-                getPropertyValue(property)"
-                >
-                Cancel
-              </button>
-            </span>
-            <span class="input save">
-              <button 
-                mat-raised-button 
-                color="primary"
-                (click)="showEditableProperty = false; 
-                savePropertyValue(property)"
-                >
-                Save
-              </button>
-            </span>
-          </div>
+              Save
+            </button>
+          </span>
         </div>
       </div>
     </ng-container>
