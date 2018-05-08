@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.aa.commands;
+package com.google.startupos.tools.aa;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
@@ -24,9 +24,9 @@ import dagger.Provides;
 import javax.inject.Inject;
 
 @Module(includes = CommonModule.class)
-public class ConfigModule {
+public class AaModule {
   @Inject
-  ConfigModule() {}
+  AaModule() {}
 
   @Provides
   public static Config getConfig(FileUtils fileUtils, String configFileName) {
