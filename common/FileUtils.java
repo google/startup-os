@@ -118,7 +118,7 @@ public class FileUtils {
             || Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
-  /** Checks if folder exists. Returns false for files. */
+  /** Checks if folder is empty or doesn't exist. Returns false for files. */
   public boolean folderEmptyOrNotExists(String path) {
     if (fileExists(path)) {
       return false;
