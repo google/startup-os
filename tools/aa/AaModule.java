@@ -19,17 +19,37 @@ package com.google.startupos.tools.aa;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.aa.Protos.Config;
+import com.google.startupos.tools.aa.commands.InitCommand;
 import dagger.Module;
 import dagger.Provides;
+import java.io.File;
 import javax.inject.Inject;
+import javax.inject.Named;
+
 
 @Module(includes = CommonModule.class)
 public class AaModule {
   @Inject
   AaModule() {}
 
+  @Provides @Named("Base folder") static String provideBaseFolder(FileUtils fileUtils) {
+    String currentFolder = fileUtils.getCurrentWorkingDirectory();
+    while (currentFolder != null) {
+      if (fileUtils.fileExists(fileUtils.joinPaths(currentFolder, InitCommand.BASE_FILENAME))) {
+        return currentFolder;
+      }
+      File file = new File(currentFolder);
+      currentFolder = file.getAbsoluteFile().getParent();
+    }
+    throw new IllegalStateException("BASE file not found in path until root");
+  }
+
   @Provides
-  public static Config getConfig(FileUtils fileUtils, String configFileName) {
-    return (Config) fileUtils.readPrototxtUnchecked(configFileName, Config.newBuilder());
+  public static Config getConfig(FileUtils fileUtils, @Named("Base folder") String baseFolder) {
+    Config config = (Config) fileUtils.readPrototxtUnchecked(
+        fileUtils.joinPaths(baseFolder, InitCommand.BASE_FILENAME),
+        Config.newBuilder());
+    config = config.toBuilder().setBasePath(baseFolder).build();
+    return config;
   }
 }
