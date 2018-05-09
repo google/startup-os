@@ -46,27 +46,33 @@
       </div>
     </div>
 
+    <!-- Person List based on Reviewer in the Diff -->
     <div>
       <app-person-list 
         [diff]="diff"
         [property]="'reviewers'"
-        [addToAttention]="true"
+        [enableAddToAttention]="true"
+        [editable]="editable"
         (onUpdateDiff)="updateDiff($event, 'Reviewers Updated')"
         ></app-person-list>
     </div>
 
+    <!-- Person List based on CC in the Diff -->
     <div>
       <app-person-list 
         [diff]="diff"
         [property]="'cc'"
-        [addToAttention]="false"
+        [editable]="editable"
+        [enableAddToAttention]="false"
         (onUpdateDiff)="updateDiff($event, 'CC Updated')"
         ></app-person-list>
     </div>
 
+    <!-- Bug property of Diff that is a link to related Github Issue -->
     <div>
       <app-bug 
         [diff]="diff"
+        [editable]="editable"
         (onUpdateDiff)="updateDiff($event, 'Bug Updated')"
         ></app-bug>
     </div>

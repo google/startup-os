@@ -2,7 +2,8 @@ import {
   Diff,
   FirebaseService,
   NotificationService,
-  ProtoService
+  ProtoService,
+  Status
 } from '@/shared';
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,12 +17,17 @@ export class ReviewComponent implements OnInit {
   diffId: string;
   diff: Diff;
 
+  // Show editable button next to fields
+  editable: boolean = true;
+  // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
+  notEditableStatus: Array<number> = [Status.SUBMITTED, Status.REVERTED];
+
   constructor(
     private route: ActivatedRoute,
     private protoService: ProtoService,
     private firebaseService: FirebaseService,
     private router: Router,
-    private notify: NotificationService
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -37,16 +43,17 @@ export class ReviewComponent implements OnInit {
         const review = res;
         this.diff = this.protoService.createDiff(review);
         this.diff.number = parseInt(this.diffId, 10);
+        // Render the fields un-editable if the current diff status
+        // is in the list of notEditableStatus
+        this.editable = !this.notEditableStatus.includes(this.diff.status);
       });
     });
   }
 
-  // Upon click on a file open a
-  // single file reivew page showing
+  // Upon click on a file open a single file review page showing
   // code difference and comments
   openFile(filePosition): void {
-    // Build a route path on the following format
-    // /diff/<diff number>/<path>?
+    // Build a route path on the following format /diff/<diff number>/<path>?
     // ls=<left snapshot number>&rs=<right snapshot number>
     this.router.navigate(['diff/' + this.diffId + '/' + filePosition], {
       queryParams: { ls: '1', rs: '3' }
@@ -58,16 +65,14 @@ export class ReviewComponent implements OnInit {
     this.firebaseService
       .updateDiff(diff)
       .then(res => {
-        // TODO make separate service for notifications
-        this.notify.success(message);
+        this.notificationService.success(message);
       })
       .catch(err => {
-        this.notify.error('Some Error Occured');
+        this.notificationService.error('Some error occured');
       });
   }
 
-  // Get text for 'Add to Attention List'
-  // and 'Remove from Attention List'
+  // Get text for 'Add to Attention List' and 'Remove from Attention List'
   getButtonText(reviewer: string): string {
     return this.diff.needAttentionOf.indexOf(reviewer) > -1
       ? 'Remove From Needs Attention'

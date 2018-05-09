@@ -7,6 +7,9 @@ import {
 } from '@/shared';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
+// Bug component is used to display a link to github
+// issue related to this Diff
+
 @Component({
   selector: 'app-bug',
   templateUrl: './bug.component.html',
@@ -14,12 +17,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class BugComponent {
   @Input() diff: Diff;
+  @Input() editable: boolean = true;
   @Output() onUpdateDiff = new EventEmitter<Diff>();
 
   bug: string = '';
-
-  editable: boolean = true;
-  notEditableStatus: Array<number> = [Status.SUBMITTED, Status.REVERTED];
 
   constructor(
     private protoService: ProtoService,
@@ -29,7 +30,6 @@ export class BugComponent {
 
   ngOnChanges() {
     this.getBug();
-    this.editable = !this.notEditableStatus.includes(this.diff.status);
   }
 
   // Get bug property from Diff
