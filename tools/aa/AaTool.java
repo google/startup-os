@@ -55,7 +55,7 @@ public class AaTool {
       if (commands.containsKey(command)) {
         commands.get(command).get().run(args);
       } else {
-        System.out.println("");
+        System.out.println();
         printUsage();
       }
     } else {

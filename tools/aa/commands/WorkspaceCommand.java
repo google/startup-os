@@ -22,7 +22,6 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.aa.Protos.Config;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 
