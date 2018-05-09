@@ -37,10 +37,13 @@ java_library(
         "permissive"
     ],
     runtime_deps = [
+        "//third_party/maven/com/google/code/findbugs:jsr305",
+        "//third_party/maven/com/google/code/gson:gson",
         "//third_party/maven/com/google/errorprone:error_prone_annotations",
-        "//third_party/maven/com/google/instrumentation:instrumentation_api",
+        "//third_party/maven/com/google/guava:guava",
         "//third_party/maven/io/opencensus:opencensus_api",
-        "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics"
+        "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
+        ":grpc_context"
     ],
     visibility = [
         "//visibility:public"
@@ -78,6 +81,11 @@ java_library(
         "permissive"
     ],
     runtime_deps = [
+        "//third_party/maven/com/google/api/grpc:proto_google_common_protos",
+        "//third_party/maven/com/google/guava:guava",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/com/google/protobuf:protobuf_java_util",
+        ":grpc_core",
         ":grpc_protobuf_lite"
     ],
     visibility = [
@@ -109,6 +117,9 @@ java_library(
     ],
     licenses = [
         "permissive"
+    ],
+    runtime_deps = [
+        ":grpc_core"
     ],
     visibility = [
         "//visibility:public"

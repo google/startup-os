@@ -57,6 +57,10 @@ java_library(
     licenses = [
         "permissive"
     ],
+    runtime_deps = [
+        ":netty_codec_http",
+        ":netty_handler"
+    ],
     visibility = [
         "//visibility:public"
     ]
@@ -121,7 +125,8 @@ java_library(
         "permissive"
     ],
     runtime_deps = [
-        ":netty_codec_socks"
+        ":netty_codec_socks",
+        ":netty_transport"
     ],
     visibility = [
         "//visibility:public"

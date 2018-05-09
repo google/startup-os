@@ -78,6 +78,12 @@ dependencies:
       lang: java
       version: "1.2"
   
+  io.grpc:
+    grpc:
+      lang: java
+      modules: [ "netty", "protobuf", "stub" ]
+      version: "1.12.0"
+  
   javax.annotation:
     javax.annotation-api:
       lang: java
