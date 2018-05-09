@@ -28,8 +28,10 @@ java_library(
     deps = [
         ":code_review_java_grpc",
         ":code_review_java_proto",
+        "//common",
         "//common/firestore",
         "//common/flags",
+        "//common/repo",
         "//common:auto_factory",
         "//common:text_differencer",
         "//tools/local_server/service:auth_service",

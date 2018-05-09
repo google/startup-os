@@ -10,6 +10,7 @@ java_binary(
         "//common",
         "//common/flags",
         "//common:dagger_with_annotation_processor",
+        "//tools/aa:aa_module",
         "//tools/local_server/service:auth_service",
         "//tools/reviewer/service",
         "//third_party/maven/io/grpc:grpc_core",

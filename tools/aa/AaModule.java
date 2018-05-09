@@ -32,7 +32,7 @@ public class AaModule {
   @Inject
   AaModule() {}
 
-  @Provides @Named("Base folder") static String provideBaseFolder(FileUtils fileUtils) {
+  @Provides @Named("Base path") static String provideBasePath(FileUtils fileUtils) {
     String currentFolder = fileUtils.getCurrentWorkingDirectory();
     while (currentFolder != null) {
       if (fileUtils.fileExists(fileUtils.joinPaths(currentFolder, InitCommand.BASE_FILENAME))) {
@@ -45,11 +45,11 @@ public class AaModule {
   }
 
   @Provides
-  public static Config getConfig(FileUtils fileUtils, @Named("Base folder") String baseFolder) {
+  public static Config getConfig(FileUtils fileUtils, @Named("Base path") String basePath) {
     Config config = (Config) fileUtils.readPrototxtUnchecked(
-        fileUtils.joinPaths(baseFolder, InitCommand.BASE_FILENAME),
+        fileUtils.joinPaths(basePath, InitCommand.BASE_FILENAME),
         Config.newBuilder());
-    config = config.toBuilder().setBasePath(baseFolder).build();
+    config = config.toBuilder().setBasePath(basePath).build();
     return config;
   }
 }

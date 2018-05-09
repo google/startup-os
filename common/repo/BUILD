@@ -14,22 +14,22 @@ java_proto_library(
 java_library(
     name = "repo",
     srcs = [
-        "Repo.java", 
         "GitRepo.java",
+        "Repo.java", 
     ],
     deps = [
         ":repo_java_proto",
-        "//tools/reviewer/service:service_lib",
-        "//third_party/maven/org/slf4j:slf4j_api",
-        "//third_party/maven/javax/annotation:javax_annotation_api",
-        "//third_party/maven/com/google/guava:guava",
-        "//third_party/maven/com/jcraft:jsch",
-        "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
-        "//common:dagger_with_annotation_processor",
-        "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/com/google/auto/value:auto_value",
-        "//third_party/maven/com/google/auto/value:auto_value_plugin",
         "//common:auto_factory",
         "//common:auto_factory_plugin",
+        "//common:dagger_with_annotation_processor",
+        "//tools/reviewer/service:code_review_java_proto",
+        "//third_party/maven/com/google/auto/value:auto_value",
+        "//third_party/maven/com/google/auto/value:auto_value_plugin",
+        "//third_party/maven/com/google/guava:guava",
+        "//third_party/maven/com/jcraft:jsch",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
+        "//third_party/maven/org/slf4j:slf4j_api",
     ]
 )
