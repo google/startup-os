@@ -48,10 +48,15 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   private AuthService authService;
   private String filesystemRootPath;
+  private TextDifferencer textDifferencer;
 
-  public CodeReviewService(@Provided AuthService authService, String filesystemRootPath) {
+  public CodeReviewService(
+      @Provided AuthService authService,
+      String filesystemRootPath,
+      @Provided TextDifferencer textDifferencer) {
     this.authService = authService;
     this.filesystemRootPath = filesystemRootPath;
+    this.textDifferencer = textDifferencer;
   }
 
   private static String readTextFile(String path) throws IOException {
@@ -100,7 +105,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
               .addAllChanges(
-                  TextDifferencer.getAllTextChanges(firstFileContents, secondFileContents))
+                  textDifferencer.getAllTextChanges(firstFileContents, secondFileContents))
               .build());
     } catch (IOException e) {
       responseObserver.onError(

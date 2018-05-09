@@ -15,6 +15,7 @@ java_library(
         "Time.java",
     ],
     deps = [
+        ":text_differencer",
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/code/findbugs:jsr305",
@@ -42,6 +43,8 @@ java_library(
 java_library(
     name = "text_differencer",
     srcs = [
+        "AbstractTextDifferencer.java",
+        "LCSTextDifferencer.java",
         "TextDifferencer.java",
     ],
     deps = [
