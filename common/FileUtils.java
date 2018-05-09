@@ -205,20 +205,20 @@ public class FileUtils {
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
     final Path sourcePath = Paths.get(source);
     final Path targetPath = Paths.get(destination);
-    java.nio.file.Files.walkFileTree(
+    Files.walkFileTree(
         sourcePath,
         new SimpleFileVisitor<Path>() {
           @Override
           public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
               throws IOException {
-            java.nio.file.Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+            Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
             return FileVisitResult.CONTINUE;
           }
 
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
-            java.nio.file.Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+            Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
             return FileVisitResult.CONTINUE;
           }
         });

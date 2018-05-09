@@ -16,15 +16,17 @@
 
 package com.google.startupos.tools.reviewer.service;
 
-import com.google.auto.factory.AutoFactory;
-import com.google.auto.factory.Provided;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
 import com.google.startupos.common.firestore.FirestoreClient;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffResponse;
+import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
@@ -35,11 +37,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
+import javax.inject.Named;
+import javax.inject.Inject;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
  */
-@AutoFactory
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
 
@@ -47,22 +50,63 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
 
   private AuthService authService;
-  private String filesystemRootPath;
+  private FileUtils fileUtils;
+  private String basePath;
+  private GitRepoFactory repoFactory;
 
-  public CodeReviewService(@Provided AuthService authService, String filesystemRootPath) {
+  @Inject
+  public CodeReviewService(AuthService authService, FileUtils fileUtils,
+      @Named("Base path") String basePath, GitRepoFactory repoFactory) {
     this.authService = authService;
-    this.filesystemRootPath = filesystemRootPath;
+    this.fileUtils = fileUtils;
+    this.basePath = basePath;
+    this.repoFactory = repoFactory;
   }
 
-  private static String readTextFile(String path) throws IOException {
-    return String.join(System.lineSeparator(), Files.readAllLines(Paths.get(path)));
+  private String readTextFile(File file) throws IOException {
+    if (file.getWorkspace().isEmpty()) {
+      // It's a file in head
+      String repoPath = fileUtils.joinPaths(basePath, "head", file.getRepoId());
+      Repo repo = repoFactory.create(repoPath);
+      return repo.getFileContents(file.getCommitId(), file.getFilename());
+    } else {
+      // It's a file in a workspace
+      if (file.getUser().isEmpty()) {
+        // It's the current user
+        if (file.getCommitId().isEmpty()) {
+          // It's a file in the local filesystem (not in a repo)
+          String filePath = fileUtils.joinPaths(basePath, "ws", file.getWorkspace(),
+              file.getRepoId(), file.getFilename());
+          return fileUtils.readFile(filePath);
+        } else {
+          // It's a file in a repo
+          String repoPath = fileUtils.joinPaths(basePath, "ws", file.getWorkspace(),
+              file.getRepoId());
+          Repo repo = repoFactory.create(repoPath);
+          return repo.getFileContents(file.getCommitId(), file.getFilename());
+        }
+      } else {
+        // It's another user
+        if (file.getCommitId().isEmpty()) {
+          // It's a file in the local filesystem (not in a repo)
+          String filePath = fileUtils.joinPaths(basePath, "users", file.getUser(), "ws",
+              file.getWorkspace(), file.getRepoId(), file.getFilename());
+          return fileUtils.readFile(filePath);
+        } else {
+          // It's a file in a repo
+          String repoPath = fileUtils.joinPaths(basePath, "users", file.getUser(), "ws",
+              file.getWorkspace(), file.getRepoId());
+          Repo repo = repoFactory.create(repoPath);
+          return repo.getFileContents(file.getCommitId(), file.getFilename());
+        }
+      }
+    }
   }
 
   private String getAbsolutePath(String relativePath) throws SecurityException {
     // normalize() resolves "../", to help prevent returning files outside rootPath
-    String absolutePath = Paths.get(filesystemRootPath, relativePath).normalize().toString();
-
-    if (!absolutePath.startsWith(filesystemRootPath)) {
+    String absolutePath = Paths.get(basePath, relativePath).normalize().toString();
+    if (!absolutePath.startsWith(basePath)) {
       throw new SecurityException("Resulting path is not under root");
     }
 
@@ -72,8 +116,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getFile(FileRequest req, StreamObserver<FileResponse> responseObserver) {
     try {
-      String filePath = getAbsolutePath(req.getFilename());
-      responseObserver.onNext(FileResponse.newBuilder().setContent(readTextFile(filePath)).build());
+      String filePath = fileUtils.joinPaths(basePath, "head", "startup-os", req.getFilename());
+      responseObserver.onNext(
+          FileResponse.newBuilder().setContent(fileUtils.readFile(filePath)).build());
       responseObserver.onCompleted();
     } catch (SecurityException | IOException e) {
       responseObserver.onError(
@@ -95,8 +140,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
     try {
-      String firstFileContents = readTextFile(req.getFirstFilepath());
-      String secondFileContents = readTextFile(req.getSecondFilepath());
+      String firstFileContents = readTextFile(req.getLeftFile());
+      String secondFileContents = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
               .addAllChanges(
@@ -105,7 +150,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     } catch (IOException e) {
       responseObserver.onError(
           Status.NOT_FOUND
-              .withDescription(String.format("No such file %s", req.getFirstFilepath()))
+              .withDescription(String.format("TextDiffRequest: %s", req))
               .asException());
     }
     responseObserver.onCompleted();

@@ -31,10 +31,12 @@ message CreateDiffResponse {
 }
 
 message TextDiffRequest {
-  string first_filepath = 1;
-  string second_filepath = 2;
+  File left_file = 1;
+  File right_file = 2;
 }
 
+// TODO: Think whether this is the best format for response. Should probably return original
+// files, and just mark the changes. TextChanges should be a string, not a single char.
 message TextDiffResponse {
   // The changes of the second file.
   repeated com.google.startupos.common.TextChange changes = 1;
@@ -71,9 +73,25 @@ message Diff {
   repeated File file = 11;
   repeated Snapshot snapshot = 12;
   repeated Thread thread = 13;
-  string pull_request_id = 14;
 }
 
+/* A file can be:
+ * - A committed file, in head repo
+ *   <base>/head/<repo_id>/<commit_id>/<filename>
+ *
+ * - A local file for current user
+ *   <base>/ws/<workspace>/<repo_id>/<filename>
+ * - A committed file for current user
+ *   <base>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
+ *
+ * - A local file for other user
+ *   <base>/users/<user>/ws/<workspace>/<repo_id>/<filename>
+ * - A committed file for other user
+ *   <base>/users/<user>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
+ *
+ * Note that above paths are "conceptual" and not real filesystem paths.
+ * The distinction between the above, is based on the fields, e.g user being empty or not.
+ */
 message File {
   enum Action {
     ADD = 0;
@@ -81,13 +99,16 @@ message File {
     RENAME = 2;
     MODIFY = 3;
   }
-  // Includes the path + filename
+  // Includes the path + filename, relative to repo
   string filename = 1;
-  string repo_id = 2;
+  // Empty if referring to base/head or current user
+  string user = 2;
+  // Empty if referring to base/head
+  string workspace = 3;
+  string repo_id = 4;
   // Empty if referring to a local file
-  string git_commit = 3;
-  // Empty if referring to a local file
-  Action action = 4;
+  string commit_id = 5;
+  Action action = 6;
 }
 
 message SingleRepoSnapshot {
