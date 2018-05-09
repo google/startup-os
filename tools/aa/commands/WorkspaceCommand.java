@@ -27,8 +27,14 @@ import java.util.Arrays;
 import javax.inject.Inject;
 
 /**
- * This command is used to switch between workspace and create new ones Its output gets executed in
- * aa function of aa_tool.sh to perform the switching
+ * This command is used to switch between workspaces and create new ones.
+ *
+ * Usage:
+ * To switch to a workspace:
+ * aa workspace <workspace name>
+ *
+ * To create and then switch to a workspace:
+ * aa workspace -f <workspace name>
  */
 public class WorkspaceCommand implements AaCommand {
   @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
@@ -38,55 +44,59 @@ public class WorkspaceCommand implements AaCommand {
   private Config config;
 
   @Inject
-  public WorkspaceCommand(FileUtils utils, Config config) {
-    this.fileUtils = utils;
+  public WorkspaceCommand(FileUtils fileUtils, Config config) {
+    this.fileUtils = fileUtils;
     this.config = config;
   }
 
   @Override
   public void run(String[] args) {
-    /*
-     * //common/flags library intentionally does not support short flags
-     * as this would introduce ambiguity between multiple packages.
-     * Before parsing flags, we replace "-f" with "--force" so we are
-     * able to call the tool as `aa workspace -f <wsname>`
-     */
+    // Note: System.out gets executed by the calling aa_tool.sh to run commands such as cd.
+
+    // The Flags library does not support short flags by design, as this increases the chance of
+    // flag collisions between packages. To allow short flags here, we do a flag replacement.
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("-f")) {
         args[i] = "--force";
       }
     }
+    if (args.length < 2) {
+      System.err.println("Missing workspace name");
+      return;
+    }
 
     String workspaceName = args[args.length - 1];
-
-    if (workspaceName.equals(getName()) || workspaceName.startsWith("-")) {
-      throw new IllegalArgumentException("Supply workspace name");
+    if (workspaceName.startsWith("-")) {
+      System.err.println("Missing workspace name");
+      return;
     }
 
     args = Arrays.copyOfRange(args, 0, args.length - 1);
 
     Flags.parse(args, WorkspaceCommand.class.getPackage());
     String basePath = config.getBasePath();
-
-    String headPath = Paths.get(basePath, "head").toAbsolutePath().toString();
-    String newWsPath =
-        Paths.get(basePath, config.getUser(), "ws", workspaceName).toAbsolutePath().toString();
+    String workspacePath = fileUtils.joinPaths(basePath, "ws", workspaceName);
 
     if (force.get()) {
-      fileUtils.mkdirs(newWsPath);
-      try {
-        fileUtils.copyDirectoryToDirectory(headPath, newWsPath);
-      } catch (IOException e) {
-        e.printStackTrace();
+      if (fileUtils.folderExists(workspacePath)) {
+        System.err.println("Workspace already exists");
+      } else {
+        fileUtils.mkdirs(workspacePath);
+        try {
+          fileUtils.copyDirectoryToDirectory(
+            fileUtils.joinPaths(basePath, "head"),
+            workspacePath);
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    } else {
+      if (!fileUtils.folderExists(workspacePath)) {
+        System.err.println("Workspace does not exist");
+        return;
       }
     }
-
-    // output change-directory command to be executed by aa (shell function)
-    System.out.println(String.format("cd %s", newWsPath));
-  }
-
-  @Override
-  public String getName() {
-    return "workspace";
+    // System.out command will be run by calling script aa_tool.sh.
+    System.out.println(String.format("cd %s", workspacePath));
   }
 }
