@@ -21,14 +21,9 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import java.util.concurrent.TimeUnit;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashMap;
 
 /** Test tool for CodeReviewService. */
 public class TestTool {
