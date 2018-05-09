@@ -119,14 +119,14 @@ public class FileUtils {
   }
 
   /** Checks if folder is empty or doesn't exist. Returns false for files. */
-  public boolean folderEmptyOrNotExists(String path) {
+  public boolean folderEmptyOrNotExists(String path) throws IOException {
     if (fileExists(path)) {
       return false;
     }
     if (!folderExists(path)) {
       return true;
     }
-    return getFiles(path).isEmpty();
+    return listContents(path).isEmpty();
   }
 
   /** Creates directories in path if none exist. */
