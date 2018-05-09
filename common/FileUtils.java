@@ -118,6 +118,17 @@ public class FileUtils {
             || Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
+  /** Checks if folder is empty or doesn't exist. Returns false for files. */
+  public boolean folderEmptyOrNotExists(String path) throws IOException {
+    if (fileExists(path)) {
+      return false;
+    }
+    if (!folderExists(path)) {
+      return true;
+    }
+    return listContents(path).isEmpty();
+  }
+
   /** Creates directories in path if none exist. */
   public void mkdirs(String path) {
     try {
@@ -125,6 +136,16 @@ public class FileUtils {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /** Joins paths */
+  public String joinPaths(String first, String... more) {
+    return fileSystem.getPath(first, more).toAbsolutePath().toString();
+  }
+
+  /** Get the current working directory */
+  public String getCurrentWorkingDirectory() {
+    return fileSystem.getPath("").toAbsolutePath().toString();
   }
 
   /** Gets file and folder names in path. */
