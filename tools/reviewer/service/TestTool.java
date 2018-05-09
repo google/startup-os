@@ -64,8 +64,7 @@ public class TestTool {
   }
 
   public void run() {
-    Diff diff = Diff.newBuilder().setNumber(123).build();
-    createDiff(diff);
+    System.out.println(getFile("WORKSPACE"));
   }
 
   public static void main(String[] args) {
