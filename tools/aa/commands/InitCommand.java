@@ -35,6 +35,7 @@ import org.eclipse.jgit.api.Git;
  * or, if aa is already set up:
  * aa init --base_path </path/to/base/folder>
 */
+// TODO: Make aa init work without --base_path, i.e `aa init <base_path>`
 public class InitCommand implements AaCommand {
   public static final String BASE_FILENAME = "BASE";
 

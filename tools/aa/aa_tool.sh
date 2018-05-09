@@ -32,9 +32,9 @@ function aa {
   STARTUP_OS=$AA_BASE/head/startup-os
 
   # Uncomment to override StartupOS repo:
-  STARTUP_OS=<repo path>
+  #STARTUP_OS=<repo path>
   # Uncomment to force recompile:
-  AA_FORCE_COMPILE=1
+  #AA_FORCE_COMPILE=1
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/aa/aa_tool"
   if [ ! -f $AA_BINARY ] || [ "$AA_FORCE_COMPILE" = "1" ]; then
