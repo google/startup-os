@@ -28,11 +28,11 @@
           >
           <button mat-raised-button 
             class="add-to-list"
-            *ngIf="editable && addToAttention"
+            *ngIf="editable && enableAddToAttention"
             (click)="saveAttentionList(person);
             $event.stopPropagation()"
             >
-            {{ getButtonText(person) }}
+            {{ getAddToAttentionText(person) }}
           </button>
           {{ last ? person : person + ',&nbsp;' }}
         </span>

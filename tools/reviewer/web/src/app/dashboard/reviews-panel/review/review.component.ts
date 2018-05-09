@@ -60,6 +60,18 @@ export class ReviewComponent implements OnInit {
     });
   }
 
+  // Save needAttentionOf list and update the Diff
+  saveAttentionList(name: string): void {
+    if (this.diff.needAttentionOf.includes(name)) {
+      this.diff.needAttentionOf = this.diff.needAttentionOf.filter(
+        e => e !== name
+      );
+    } else {
+      this.diff.needAttentionOf.push(name);
+    }
+    this.updateDiff(this.diff, 'Update Need Attention List');
+  }
+
   // Update the Diff in the DB
   updateDiff(diff: Diff, message: string): void {
     this.firebaseService
@@ -70,12 +82,5 @@ export class ReviewComponent implements OnInit {
       .catch(err => {
         this.notificationService.error('Some error occured');
       });
-  }
-
-  // Get text for 'Add to Attention List' and 'Remove from Attention List'
-  getButtonText(reviewer: string): string {
-    return this.diff.needAttentionOf.indexOf(reviewer) > -1
-      ? 'Remove From Needs Attention'
-      : 'Add to Needs Attention';
   }
 }

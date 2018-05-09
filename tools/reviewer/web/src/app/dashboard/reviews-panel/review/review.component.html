@@ -3,12 +3,25 @@
     <mat-card-title class="crw-header">
       <div>
         Diff {{ diff.number }} by
-        <a [ngClass]="{ 
-        'bold-text': 
-          diff.needAttentionOf.includes(diff.author)
-        }">
-        {{ diff.author }}
-        </a>
+        <span [ngClass]="{ 
+          'bold-text': 
+            diff.needAttentionOf.includes(diff.author),
+            'author-name': true
+          }">
+          <button mat-raised-button 
+            class="add-to-list"
+            *ngIf="editable"
+            (click)="saveAttentionList(diff.author);
+            $event.stopPropagation()"
+            >
+            {{ 
+              diff.needAttentionOf.indexOf(diff.author) > -1
+              ? 'Remove from Needs Attention'
+              : 'Add to Needs Attention'
+            }}
+          </button>
+          {{ diff.author }}
+        </span>
       </div>
       <div fxFlex>
         <ng-container [ngSwitch]="diff.status">
@@ -54,6 +67,7 @@
         [enableAddToAttention]="true"
         [editable]="editable"
         (onUpdateDiff)="updateDiff($event, 'Reviewers Updated')"
+        (onAddToAttentionList)="saveAttentionList($event)"
         ></app-person-list>
     </div>
 

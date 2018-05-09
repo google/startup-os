@@ -21,6 +21,7 @@ export class PersonListComponent {
   @Input() enableAddToAttention: boolean = true;
   @Input() editable: boolean = true;
   @Output() onUpdateDiff = new EventEmitter<Diff>();
+  @Output() onAddToAttentionList = new EventEmitter<string>();
 
   // Following variables are used to show editable fields
   showEditableProperty = false;
@@ -50,20 +51,13 @@ export class PersonListComponent {
     this.onUpdateDiff.emit(this.diff);
   }
 
-  // Save needAttentionOf list and update the Diff
+  // Save needAttentionOf list
   saveAttentionList(name: string): void {
-    if (this.diff.needAttentionOf.includes(name)) {
-      this.diff.needAttentionOf = this.diff.needAttentionOf.filter(
-        e => e !== name
-      );
-    } else {
-      this.diff.needAttentionOf.push(name);
-    }
-    this.onUpdateDiff.emit(this.diff);
+    this.onAddToAttentionList.emit(name);
   }
 
   // Get text for 'Add to Attention List' and 'Remove from Attention List'
-  getButtonText(person: string): string {
+  getAddToAttentionText(person: string): string {
     return this.diff.needAttentionOf.indexOf(person) > -1
       ? 'Remove from Needs Attention'
       : 'Add to Needs Attention';
