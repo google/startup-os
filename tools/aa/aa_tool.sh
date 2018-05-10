@@ -24,7 +24,6 @@ function find_base_folder {
 function aa {
   CWD=`pwd`
   find_base_folder
-  echo "AA_BASE " $AA_BASE
   if [[ -z "$AA_BASE" ]]; then
     echo "BASE file not found in path until root"
     return 1
