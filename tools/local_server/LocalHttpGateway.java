@@ -120,19 +120,19 @@ public class LocalHttpGateway {
 
       if (fileContents == null) {
         httpExchange.sendResponseHeaders(404, 0);
-        OutputStream stream = httpExchange.getResponseBody();
-        stream.write(
+        try (OutputStream stream = httpExchange.getResponseBody()) {
+          stream.write(
             String.format("{\"error\": \"No file at path '%s'\"}", relativeFilePath).getBytes());
-        stream.close();
+        }        
         return;
       }
 
       byte[] response = fileContents.getBytes();
 
       httpExchange.sendResponseHeaders(200, response.length);
-      OutputStream stream = httpExchange.getResponseBody();
-      stream.write(response);
-      stream.close();
+      try (OutputStream stream = httpExchange.getResponseBody()) {
+        stream.write(response);
+      }
     }
   }
 
