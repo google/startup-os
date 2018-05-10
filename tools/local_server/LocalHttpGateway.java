@@ -79,7 +79,7 @@ public class LocalHttpGateway {
     httpServer.setExecutor(null); // Creates a default executor
   }
 
-  public void serve() throws Exception {
+  public void serve() {
     httpServer.start();
   }
 
@@ -172,16 +172,13 @@ public class LocalHttpGateway {
       byte[] response = Base64.getEncoder().encode(
           client.getCodeReviewStub().getTextDiff(request).toByteArray());
       httpExchange.sendResponseHeaders(200, response.length);
-      OutputStream stream = httpExchange.getResponseBody();
-      stream.write(response);
-      stream.close();
+      try (OutputStream stream = httpExchange.getResponseBody()) {
+        stream.write(response);
+      }
     }
   }
 
   static String getPostParamsString(HttpExchange httpExchange){
-    @SuppressWarnings("unchecked")
-    Map<String, Object> parameters =
-        (Map<String, Object>)httpExchange.getAttribute("parameters");
     BufferedReader reader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), UTF_8));
     return reader.lines().collect(Collectors.joining());
   }
