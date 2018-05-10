@@ -47,6 +47,7 @@ java_binary(
     deps = [
         ":local_http_gateway_grpc_client",
         "//common/flags",
+        "//tools/reviewer/service:code_review_java_proto",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/org/json:json",
         "//third_party/maven/org/slf4j:slf4j_simple",

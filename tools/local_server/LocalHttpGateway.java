@@ -18,22 +18,26 @@ package com.google.startupos.tools.localserver;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.logging.Logger;
+import java.util.Base64;
 import java.util.Map;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import com.google.common.collect.ImmutableMap;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.Flags;
-import com.google.startupos.common.flags.FlagDesc;
+
 
 /*
  * LocalHttpGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
@@ -50,8 +54,9 @@ public class LocalHttpGateway {
 
   private final HttpServer httpServer;
 
-  private static final String GET_FILE_PATH = "/get_file";
   private static final String TOKEN_PATH = "/token";
+  private static final String GET_FILE_PATH = "/get_file";
+  private static final String GET_TEXT_DIFF_PATH = "/get_text_diff";
 
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
   public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
@@ -70,6 +75,7 @@ public class LocalHttpGateway {
 
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
     httpServer.createContext(GET_FILE_PATH, new GetFileHandler(client));
+    httpServer.createContext(GET_TEXT_DIFF_PATH, new GetTextDiffHandler(client));
     httpServer.setExecutor(null); // Creates a default executor
   }
 
@@ -98,7 +104,7 @@ public class LocalHttpGateway {
     }
   }
 
-  /* Handler for serving /get_file/{fn} endpoint where {fn} is relative path */
+  /* Handler for serving /get_file/<file path>, <file path> is a relative path */
   static class GetFileHandler implements HttpHandler {
     private LocalHttpGatewayGrpcClient client;
 
@@ -123,6 +129,48 @@ public class LocalHttpGateway {
 
       byte[] response = fileContents.getBytes();
 
+      httpExchange.sendResponseHeaders(200, response.length);
+      OutputStream stream = httpExchange.getResponseBody();
+      stream.write(response);
+      stream.close();
+    }
+  }
+
+  /* Handler for serving /get_text_diff?request=<protobin> where <protobin> is a request proto.
+   * The response is a protobin of the response proto.
+   */
+  static class GetTextDiffHandler implements HttpHandler {
+    private LocalHttpGatewayGrpcClient client;
+
+    GetTextDiffHandler(LocalHttpGatewayGrpcClient client) {
+      this.client = client;
+    }
+
+    private void printExampleEncodedBytes() {
+      File file = File.newBuilder()
+          .setRepoId("startup-os")
+          .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+          .setFilename("README.md")
+          .build();
+      final TextDiffRequest request = TextDiffRequest.newBuilder()
+          .setLeftFile(file)
+          .setRightFile(file)
+          .build();
+      byte[] bytes = request.toByteArray();
+      String encodedBytes = Base64.getEncoder().encodeToString(bytes);
+      System.out.println("encodedBytes");
+      System.out.println(encodedBytes);
+    }
+
+    public void handle(HttpExchange httpExchange) throws IOException {
+      // TODO: Remove printExampleEncodedBytes() once integration is working
+      printExampleEncodedBytes();
+      ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
+      String requestString = params.get("request");
+      TextDiffRequest request = TextDiffRequest.parseFrom(Base64.getDecoder().decode(requestString));
+      logger.info("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
+      byte[] response = Base64.getEncoder().encode(
+          client.getCodeReviewStub().getTextDiff(request).toByteArray());
       httpExchange.sendResponseHeaders(200, response.length);
       OutputStream stream = httpExchange.getResponseBody();
       stream.write(response);

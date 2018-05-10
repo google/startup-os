@@ -71,4 +71,8 @@ public class LocalHttpGatewayGrpcClient {
       e.printStackTrace();
     }
   }
+
+  public CodeReviewServiceGrpc.CodeReviewServiceBlockingStub getCodeReviewStub() {
+    return codeReviewBlockingStub;
+  }
 }
