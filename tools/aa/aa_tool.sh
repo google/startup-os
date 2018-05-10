@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # To setup `aa` tool, you need to execute (from base/head repo)
-# echo "source tools/aa/aa_tool.sh" >> ~/.bashrc
+# echo "source `pwd`/startup-os/tools/aa/aa_tool.sh" >> ~/.bashrc
 # source ~/.bashrc
 #
 # If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
