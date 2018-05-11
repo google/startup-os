@@ -3,20 +3,24 @@ export * from './reviews-panel/';
 
 import { HomeComponent } from './home/home.component';
 import {
+  BugComponent,
   CommentComponent,
   DiffComponent,
+  PersonListComponent,
   ReviewComponent,
   ReviewsPanelComponent,
   ThreadComponent
 } from './reviews-panel/';
 
 export const DashboardComponents = [
+  BugComponent,
   CommentComponent,
   DiffComponent,
   HomeComponent,
   ReviewComponent,
   ReviewsPanelComponent,
-  ThreadComponent
+  ThreadComponent,
+  PersonListComponent
 ];
 
 export const DashboardEntryComponents = [];
