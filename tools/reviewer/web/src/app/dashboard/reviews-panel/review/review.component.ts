@@ -72,6 +72,18 @@ export class ReviewComponent implements OnInit {
     this.updateDiff(this.diff, 'Update Need Attention List');
   }
 
+  // Remove a property from Diff and update the Diff
+  removeProperty(property: string, message: string): void {
+    this.firebaseService
+      .removeProperty(this.diff, property)
+      .then(() => {
+        this.notificationService.success(message);
+      })
+      .catch(() => {
+        this.notificationService.error('Some error occured');
+      });
+  }
+
   // Update the Diff in the DB
   updateDiff(diff: Diff, message: string): void {
     this.firebaseService

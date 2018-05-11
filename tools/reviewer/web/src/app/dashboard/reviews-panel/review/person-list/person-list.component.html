@@ -32,14 +32,12 @@
             (click)="saveAttentionList(person);
             $event.stopPropagation()"
             >
-            {{ getAddToAttentionText(person) }}
+            {{ getNeedAttentionText(person) }}
           </button>
           {{ last ? person : person + ',&nbsp;' }}
         </span>
         <!-- If no persons are present -->
-        <span *ngIf="diff[property].length === 0">
-          Not available
-        </span>
+        <span *ngIf="diff[property].length === 0">&nbsp;</span>
         <button 
           mat-icon-button
           (click)="showEditableProperty = true"
@@ -53,10 +51,10 @@
         *ngIf="showEditableProperty">
         <mat-form-field>
           <input matInput placeholder="" 
-            [(ngModel)]="this[property]"
+            [(ngModel)]="propertyValue"
             (keyup.enter)=
             "showEditableProperty = false; 
-            savePropertyValue(property)"
+            savePropertyValue()"
             >
         </mat-form-field>
         <div
@@ -70,7 +68,7 @@
               mat-raised-button 
               (click)=
               "showEditableProperty = false; 
-              getPropertyValue(property)"
+              getPropertyValue()"
               >
               Cancel
             </button>
@@ -80,7 +78,7 @@
               mat-raised-button 
               color="primary"
               (click)="showEditableProperty = false; 
-              savePropertyValue(property)"
+              savePropertyValue()"
               >
               Save
             </button>

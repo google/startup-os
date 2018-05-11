@@ -17,7 +17,7 @@ class="bug">
       *ngIf="!showEditableBug"
       fxLayoutAlign="start center">
       <a class="link" href="{{bug}}">
-        {{ bug }}
+        {{ bug.length ? bug : '&nbsp;' }}
       </a>
       <button 
         mat-icon-button

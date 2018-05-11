@@ -67,6 +67,7 @@
         [enableAddToAttention]="true"
         [editable]="editable"
         (onUpdateDiff)="updateDiff($event, 'Reviewers Updated')"
+        (onRemove)="removeProperty($event, 'Reviewers Updated')"
         (onAddToAttentionList)="saveAttentionList($event)"
         ></app-person-list>
     </div>
@@ -79,6 +80,7 @@
         [editable]="editable"
         [enableAddToAttention]="false"
         (onUpdateDiff)="updateDiff($event, 'CC Updated')"
+        (onRemove)="removeProperty($event, 'CC Updated')"
         ></app-person-list>
     </div>
 

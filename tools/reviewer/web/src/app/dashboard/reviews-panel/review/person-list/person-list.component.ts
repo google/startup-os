@@ -1,10 +1,4 @@
-import {
-  Diff,
-  FirebaseService,
-  NotificationService,
-  ProtoService,
-  Status
-} from '@/shared';
+import { Diff, FirebaseService, NotificationService, Status } from '@/shared';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 // The PersonListComponent is used to display 'reviewers'
@@ -17,38 +11,44 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class PersonListComponent {
   @Input() diff: Diff;
+  // Property name in Diff, e.g 'reviewers' or 'cc'.
+  // The property value is stored in propertyValue
   @Input() property: string;
   @Input() enableAddToAttention: boolean = true;
   @Input() editable: boolean = true;
   @Output() onUpdateDiff = new EventEmitter<Diff>();
+  @Output() onRemoveProperty = new EventEmitter<string>();
   @Output() onAddToAttentionList = new EventEmitter<string>();
 
-  // Following variables are used to show editable fields
+  // To show editable fields
   showEditableProperty = false;
 
-  // Following variables are used in editing the fields
-  reviewers: string = '';
-  cc: string = '';
+  // Following variable is used in editing the fields
+  propertyValue: string = '';
 
-  constructor(
-    private protoService: ProtoService,
-    private firebaseService: FirebaseService
-  ) {}
+  constructor(private firebaseService: FirebaseService) {}
 
   ngOnChanges() {
-    this.getPropertyValue(this.property);
+    this.getPropertyValue();
   }
 
   // Get property value from the Diff
-  getPropertyValue(property: string): void {
-    this[property] = this.diff[property].join(', ');
+  getPropertyValue(): void {
+    this.propertyValue = this.diff[this.property].join(', ');
   }
 
   // Save the new value of property and update Diff
-  savePropertyValue(property: string): void {
-    const persons = this[property].split(', ');
-    this.diff[property] = persons.map(v => v.trim());
-    this.onUpdateDiff.emit(this.diff);
+  savePropertyValue(): void {
+    const persons = this.propertyValue.split(',');
+    // Trim white spaces
+    this.diff[this.property] = persons
+      .map(v => v.trim())
+      .filter(v => v.length);
+    if (this.diff[this.property].length === 0) {
+      this.onRemoveProperty.emit(this.property);
+    } else {
+      this.onUpdateDiff.emit(this.diff);
+    }
   }
 
   // Save needAttentionOf list
@@ -56,8 +56,8 @@ export class PersonListComponent {
     this.onAddToAttentionList.emit(name);
   }
 
-  // Get text for 'Add to Attention List' and 'Remove from Attention List'
-  getAddToAttentionText(person: string): string {
+  // Get text for modifying needAttentionOf field.
+  getNeedAttentionText(person: string): string {
     return this.diff.needAttentionOf.indexOf(person) > -1
       ? 'Remove from Needs Attention'
       : 'Add to Needs Attention';
