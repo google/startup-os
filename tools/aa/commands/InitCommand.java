@@ -40,7 +40,7 @@ public class InitCommand implements AaCommand {
   public static Flag<String> basePath = Flag.create("");
 
   @FlagDesc(name = "startupos_repo", description = "StartupOS git repo")
-  public static Flag<String> startuposRepo = Flag.create("git@github.com:google/startup-os.git");
+  public static Flag<String> startuposRepo = Flag.create("https://github.com/google/startup-os.git");
 
   @FlagDesc(name = "user", description = "User")
   public static Flag<String> user = Flag.create(System.getenv("USER"));
