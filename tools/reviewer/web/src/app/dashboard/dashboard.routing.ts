@@ -1,3 +1,4 @@
+import { AuthGuard } from '@/shared/services/auth.guard';
 import { RouterModule, Routes } from '@angular/router';
 import {
   DiffComponent,
@@ -8,6 +9,7 @@ import {
 
 const routes: Routes = [
   {
+    canActivate: [AuthGuard],
     path: '',
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },

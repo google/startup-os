@@ -6,21 +6,19 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class AuthService {
-  useremail: string;
-
-  constructor(public af: AngularFireAuth) {}
+  constructor(public angularFireAuth: AngularFireAuth) {}
 
   getUser(): Observable<User> {
-    return this.af.authState;
+    return this.angularFireAuth.authState;
   }
 
   loginWithGoogle() {
-    return this.af.auth.signInWithPopup(
+    return this.angularFireAuth.auth.signInWithPopup(
       new firebase.auth.GoogleAuthProvider()
     );
   }
 
   logout() {
-    return this.af.auth.signOut();
+    return this.angularFireAuth.auth.signOut();
   }
 }
