@@ -17,22 +17,23 @@
 package com.google.startupos.tools.aa.commands;
 
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.Protos.Config;
-import java.io.File;
 import java.io.IOException;
 import javax.inject.Inject;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class SyncCommand implements AaCommand {
 
   private FileUtils fileUtils;
   private Config config;
 
+  private GitRepoFactory repoFactory;
+
   @Inject
-  public SyncCommand(FileUtils utils, Config config) {
+  public SyncCommand(FileUtils utils, Config config, GitRepoFactory repoFactory) {
     this.fileUtils = utils;
     this.config = config;
+    this.repoFactory = repoFactory;
   }
 
   @Override
@@ -45,15 +46,10 @@ public class SyncCommand implements AaCommand {
           .stream()
           .map(path -> fileUtils.joinPaths(headPath, path))
           .filter(path -> fileUtils.folderExists(path))
-          .map(File::new)
           .forEach(
-              pathAsFile -> {
-                try {
-                  System.out.println("Performing sync: " + pathAsFile.toString());
-                  System.err.println(Git.open(pathAsFile).pull().call().toString());
-                } catch (GitAPIException | IOException e) {
-                  e.printStackTrace();
-                }
+              path -> {
+                System.out.println("Performing sync: " + path.toString());
+                repoFactory.create(path).pull();
               });
     } catch (IOException e) {
       e.printStackTrace();

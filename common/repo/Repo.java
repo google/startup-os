@@ -41,10 +41,11 @@ public interface Repo {
   /** Pushes all branches to remote repo */
   void pushAll();
   /** Pulls all branches from remote repo */
-  void pullAll();
+  void pull();
   /** Merges branch to master. Returns true on success. */
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
+
   String getFileContents(String commitId, String path);
 }

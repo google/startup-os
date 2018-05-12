@@ -93,8 +93,12 @@ public class GitRepo implements Repo {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public void pullAll() {
-    throw new UnsupportedOperationException("Not implemented");
+  public void pull() {
+    try {
+      jGit.pull().call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public boolean merge(String branch) {
