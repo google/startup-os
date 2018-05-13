@@ -16,6 +16,7 @@
 
 package com.google.startupos.common;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.TextChange.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,7 +35,7 @@ public class TextDifferencer {
    * @param secondString The second string.
    * @return A list of text changes.
    */
-  public static List<TextChange> getAllTextChanges(String firstString, String secondString) {
+  public static ImmutableList<TextChange> getAllTextChanges(String firstString, String secondString) {
     final char[] first = firstString.toCharArray();
     final char[] second = secondString.toCharArray();
     int headerLength = getHeaderMatchingCharactersLength(first, second);
@@ -51,7 +52,34 @@ public class TextDifferencer {
     allChanges.addAll(
         getMatchingTextChanges(
             first, first.length - footerLength, second.length - footerLength, footerLength));
-    return allChanges;
+    return unifyTextChanges(ImmutableList.copyOf(allChanges));
+  }
+
+  /** Unifies TextChanges from chars into strings  */
+  private static ImmutableList<TextChange> unifyTextChanges(ImmutableList<TextChange> changes) {
+    ImmutableList.Builder<TextChange> result = new ImmutableList.Builder<>();
+    TextChange unified = null;
+    TextChange previous = null;
+    for (TextChange current : changes) {
+      System.out.println(current);
+      if (previous == null) {
+        previous = current;
+        unified = current;
+        continue;
+      }
+      if (previous.getType() == current.getType()) {
+        unified = unified.toBuilder().setDifference(unified.getDifference() + current.getDifference()).build();
+      } else {
+        result.add(unified);
+        unified = current;
+      }
+      previous = current;
+    }
+    if (unified != null && (previous.getType() == unified.getType())) {
+      // Should add last part
+      result.add(unified);
+    }
+    return result.build();
   }
 
   /** Count the number of equal characters from the beginning of the given two strings. */
@@ -185,3 +213,4 @@ public class TextDifferencer {
 
   private TextDifferencer() {}
 }
+
