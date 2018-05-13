@@ -61,7 +61,6 @@ public class TextDifferencer {
     TextChange unified = null;
     TextChange previous = null;
     for (TextChange current : changes) {
-      System.out.println(current);
       if (previous == null) {
         previous = current;
         unified = current;
