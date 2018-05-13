@@ -52,32 +52,31 @@ public class TextDifferencer {
     allChanges.addAll(
         getMatchingTextChanges(
             first, first.length - footerLength, second.length - footerLength, footerLength));
-    return unifyTextChanges(ImmutableList.copyOf(allChanges));
+    return unifyTextChanges(allChanges);
   }
 
   /** Unifies TextChanges from chars into strings  */
-  private static ImmutableList<TextChange> unifyTextChanges(ImmutableList<TextChange> changes) {
+  private static ImmutableList<TextChange> unifyTextChanges(List<TextChange> changes) {
     ImmutableList.Builder<TextChange> result = new ImmutableList.Builder<>();
-    TextChange unified = null;
+    TextChange.Builder unified = null;
     TextChange previous = null;
     for (TextChange current : changes) {
-      System.out.println(current);
       if (previous == null) {
         previous = current;
-        unified = current;
+        unified = current.toBuilder();
         continue;
       }
       if (previous.getType() == current.getType()) {
-        unified = unified.toBuilder().setDifference(unified.getDifference() + current.getDifference()).build();
+        unified = unified.setDifference(unified.getDifference() + current.getDifference());
       } else {
-        result.add(unified);
-        unified = current;
+        result.add(unified.build());
+        unified = current.toBuilder();
       }
       previous = current;
     }
     if (unified != null && (previous.getType() == unified.getType())) {
       // Should add last part
-      result.add(unified);
+      result.add(unified.build());
     }
     return result.build();
   }
