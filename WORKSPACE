@@ -79,3 +79,32 @@ http_archive(
     urls = ["https://github.com/google/protobuf/archive/3.5.1.1.zip"],
     strip_prefix = "protobuf-3.5.1.1",
 )
+
+http_file(
+    name = "buildifier",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier"],
+    executable = True,
+    sha256 = "d7d41def74991a34dfd2ac8a73804ff11c514c024a901f64ab07f45a3cf0cfef"
+)
+
+http_file(
+    name = "buildifier_osx",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier.osx"],
+    executable = True,
+    sha256 = "3cbd708ff77f36413cfaef89cd5790a1137da5dfc3d9b3b3ca3fac669fbc298b"
+)
+
+
+http_file(
+    name = "unused_deps",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps"],
+    executable = True,
+    sha256 = "686f8943610e1a5e3d196e2209dcb35f463c3b583a056dd8ae355acdc2a089d8"
+)
+
+http_file(
+    name = "unused_deps_osx",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps.osx"],
+    executable = True,
+    sha256 = "dd8d58429a258b094b20a1435be3086ecee5d036b87c0e766309842766bc345b"
+)

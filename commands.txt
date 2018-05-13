@@ -24,3 +24,13 @@ bazel run @bazel_deps//:parse -- add-dep --deps `pwd`/dependencies.yaml --lang j
 # Usually there is already a folder 'third_party' but if there isn't, comment out loading of //third_party/maven:workspace.bzl in WORKSPACE
 bazel run @bazel_deps//:parse -- generate -r `pwd` -s third_party/maven/workspace.bzl -d dependencies.yaml
 
+# Buildtools (https://github.com/bazelbuild/buildtools)
+
+# Fix formatting of BUILD file with `buildifier`
+# (https://github.com/bazelbuild/buildtools/tree/master/buildifier)
+# Note that all paths should be absolute
+bazel run //tools:buildifier -- -mode=fix `pwd`/…
+
+# Find unused dependencies with `unused_deps`
+# (https://github.com/bazelbuild/buildtools/blob/master/unused_deps/)
+bazel run //tools:unused_deps -- <BUILD target, e.g //folder:target>
