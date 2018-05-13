@@ -12,6 +12,8 @@ export class AppComponent {
     this.authService.angularFireAuth.authState.subscribe(auth => {
       if (auth) {
         this.router.navigate(['dashboard']);
+      } else {
+        this.router.navigate(['/login']);
       }
     });
   }
