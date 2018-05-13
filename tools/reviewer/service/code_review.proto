@@ -35,11 +35,11 @@ message TextDiffRequest {
   File right_file = 2;
 }
 
-// TODO: Think whether this is the best format for response. Should probably return original
-// files, and just mark the changes. TextChanges should be a string, not a single char.
 message TextDiffResponse {
   // The changes of the second file.
   repeated com.google.startupos.common.TextChange changes = 1;
+  string left_file_contents = 2;
+  string right_file_contents = 3;
 }
 
 // TODO: Separate non-request/response messages into a separate file. This

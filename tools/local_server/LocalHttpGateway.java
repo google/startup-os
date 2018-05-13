@@ -147,6 +147,8 @@ public class LocalHttpGateway {
     }
 
     private void printExampleEncodedBytes() {
+      // Here's an example of a url that should work, based on the example below:
+      // http://localhost:7000/get_text_diff?request=CkEKCVJFQURNRS5tZCIKc3RhcnR1cC1vcyooMTEyZGEyN2IzMjFlZDZhYTJlYzFiYzkxZjM5MThlYjQxZDhhOTM4YxJBCglSRUFETUUubWQiCnN0YXJ0dXAtb3MqKDExMmRhMjdiMzIxZWQ2YWEyZWMxYmM5MWYzOTE4ZWI0MWQ4YTkzOGM=
       File file = File.newBuilder()
           .setRepoId("startup-os")
           .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")

@@ -140,12 +140,14 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
     try {
-      String firstFileContents = readTextFile(req.getLeftFile());
-      String secondFileContents = readTextFile(req.getRightFile());
+      String leftFileContents = readTextFile(req.getLeftFile());
+      String rightFileContents = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
               .addAllChanges(
-                  TextDifferencer.getAllTextChanges(firstFileContents, secondFileContents))
+                  TextDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
+              .setLeftFileContents(leftFileContents)
+              .setRightFileContents(rightFileContents)
               .build());
     } catch (IOException e) {
       responseObserver.onError(
