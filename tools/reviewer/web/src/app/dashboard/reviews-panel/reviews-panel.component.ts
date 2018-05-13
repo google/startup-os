@@ -20,7 +20,7 @@ export class ReviewsPanelComponent implements OnInit {
     private appRef: ApplicationRef,
     private router: Router,
     private zone: NgZone,
-    private auth: AuthService
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -29,9 +29,11 @@ export class ReviewsPanelComponent implements OnInit {
     this.username = this.router.parseUrl(this.router.url).queryParams['user'];
     if (!this.username) {
       // Get user from AuthService
-      this.auth.getUser().subscribe(user => {
-        const email = user.email;
-        this.username = email.split('@')[0];
+      this.authService.getUser().subscribe(user => {
+        if (user) {
+          const email = user.email;
+          this.username = email.split('@')[0];
+        }
       });
     }
     this.getReviews();
@@ -104,5 +106,9 @@ export class ReviewsPanelComponent implements OnInit {
     this.zone.run(() => {
       this.router.navigate(['diff/', diffId]);
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 }

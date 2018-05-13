@@ -1,16 +1,10 @@
 import { RouterModule, Routes } from '@angular/router';
-import {
-  HomeComponent,
-  LoginComponent,
-  PageNotFoundComponent,
-  ReviewComponent,
-  ReviewsPanelComponent
-} from './';
+import { LoginComponent, PageNotFoundComponent } from './';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'diffs', pathMatch: 'full' },
   {
-    path: 'dashboard',
+    path: 'diffs',
     loadChildren: 'app/dashboard/dashboard.module#DashboardModule'
   },
   { path: 'login', component: LoginComponent },

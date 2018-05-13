@@ -10,9 +10,7 @@ import { AuthService } from './shared';
 export class AppComponent {
   constructor(public authService: AuthService, private router: Router) {
     this.authService.angularFireAuth.authState.subscribe(auth => {
-      if (auth) {
-        this.router.navigate(['dashboard']);
-      } else {
+      if (!auth) {
         this.router.navigate(['/login']);
       }
     });
