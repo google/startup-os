@@ -9,7 +9,7 @@ if [ "$platform" == "Darwin" ]; then
 elif [ "$platform" == "Linux" ]; then
     UNUSED_DEPS_BINARY=$(pwd)/external/unused_deps/file/unused_deps
 else
-    echo "unused_deps does not have binary for $platform"
+    echo "unused_deps does not have a binary for $platform"
     exit 1
 fi
 

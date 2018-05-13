@@ -9,7 +9,7 @@ if [ "$platform" == "Darwin" ]; then
 elif [ "$platform" == "Linux" ]; then
     BUILDIFIER_BINARY=$(pwd)/external/buildifier/file/buildifier
 else
-    echo "Buildifier does not have binary for $platform"
+    echo "Buildifier does not have a binary for $platform"
     exit 1
 fi
 
