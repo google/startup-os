@@ -19,6 +19,7 @@ package com.google.startupos.tools.aa;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
+import com.google.startupos.tools.aa.commands.SyncCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
 import dagger.Lazy;
@@ -32,9 +33,13 @@ public class AaTool {
   private HashMap<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
 
   @Inject
-  AaTool(Lazy<InitCommand> initCommand, Lazy<WorkspaceCommand> workspaceCommand) {
+  AaTool(
+      Lazy<InitCommand> initCommand,
+      Lazy<WorkspaceCommand> workspaceCommand,
+      Lazy<SyncCommand> syncCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
+    commands.put("sync", syncCommand);
   }
 
   private void printUsage() {
