@@ -35,6 +35,9 @@ import javax.inject.Inject;
  * To create and then switch to a workspace:
  * aa workspace -f <workspace name>
  */
+// TODO: If there's only one repo in the workspace, cd should enter into it.
+// TODO: If there's multiple repos in the workspace, and I'm currently in a repo in a workspace,
+// cd should enter into that repo.
 public class WorkspaceCommand implements AaCommand {
   @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
   public static Flag<Boolean> force = Flag.create(false);

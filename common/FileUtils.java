@@ -151,12 +151,29 @@ public class FileUtils {
 
   /** Gets file and folder names in path. */
   public ImmutableList<String> listContents(String path) throws IOException {
-    List<String> fileNames;
     try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {
-      fileNames = paths.map(absolutePath -> absolutePath.getFileName().toString()).collect(Collectors.toList());
+      return ImmutableList.sortedCopyOf(
+          paths.map(
+              absolutePath -> absolutePath.getFileName().toString())
+              .collect(Collectors.toList()));
     }
-    return ImmutableList.sortedCopyOf(fileNames);
   }
+
+  /** 
+   * Gets file and folder absolute paths recursively.
+   * Throws NoSuchFileException if directory doesn't exist
+   */
+  public ImmutableList<String> listContentsRecursively(String path) throws IOException {
+    try (Stream<Path> paths = Files.find(
+        fileSystem.getPath(expandHomeDirectory(path)),
+        100000, // Folder depth
+        (unused, unused2) -> true)) {
+      return ImmutableList.sortedCopyOf(
+          paths.map(
+              absolutePath -> absolutePath.toString())
+              .collect(Collectors.toList()));
+    }
+} 
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
