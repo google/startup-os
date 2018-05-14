@@ -231,4 +231,9 @@ public class FlagsTest {
     assertEquals(0, leftOverArgs.size());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, "required", FlagDescTestClass.requiredFlag.get());
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testFlagThrowsWithoutParsing() throws Exception {
+    FlagDescTestClass.integerFlag.get();
+  }
 }
