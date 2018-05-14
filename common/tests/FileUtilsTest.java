@@ -16,28 +16,27 @@
 
 package com.google.startupos.common;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.Assert.*;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.google.startupos.common.tests.Protos.TestMessage;
 import dagger.Provides;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.*;
-
+import javax.inject.Singleton;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized.Parameters;
+import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class FileUtilsTest {
@@ -348,8 +347,8 @@ public class FileUtilsTest {
       return;
     }
     Files.createDirectories(fileSystem.getPath("/foo"));
-    Files.createFile(fileSystem.getPath("/foo" + "/first_file.txt"));
-    Files.createFile(fileSystem.getPath("/foo" + "/second_file.txt"));
+    Files.createFile(fileSystem.getPath("/foo/first_file.txt"));
+    Files.createFile(fileSystem.getPath("/foo/second_file.txt"));
     ImmutableList<String> names = fileUtils.listContents("/foo");
     assertEquals(ImmutableList.of("first_file.txt", "second_file.txt"), names);
   }
@@ -359,8 +358,8 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       return;
     }
-    Files.createDirectories(fileSystem.getPath("/foo" + "/first_folder"));
-    Files.createDirectories(fileSystem.getPath("/foo" + "/second_folder"));
+    Files.createDirectories(fileSystem.getPath("/foo/first_folder"));
+    Files.createDirectories(fileSystem.getPath("/foo/second_folder"));
     ImmutableList<String> names = fileUtils.listContents("/foo");
     assertEquals(ImmutableList.of("first_folder", "second_folder"), names);
   }
@@ -370,10 +369,10 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       return;
     }
-    Files.createDirectories(fileSystem.getPath("/foo" + "/first_folder"));
-    Files.createDirectories(fileSystem.getPath("/foo" + "/second_folder"));
-    Files.createFile(fileSystem.getPath("/foo" + "/first_file.txt"));
-    Files.createFile(fileSystem.getPath("/foo" + "/second_file.txt"));
+    Files.createDirectories(fileSystem.getPath("/foo/first_folder"));
+    Files.createDirectories(fileSystem.getPath("/foo/second_folder"));
+    Files.createFile(fileSystem.getPath("/foo/first_file.txt"));
+    Files.createFile(fileSystem.getPath("/foo/second_file.txt"));
     ImmutableList<String> names = fileUtils.listContents("/foo");
     assertEquals(ImmutableList.of("first_file.txt", "first_folder", "second_file.txt", "second_folder"), names);
   }
@@ -397,6 +396,53 @@ public class FileUtilsTest {
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/subdirectory" + "/foo.txt"));
     ImmutableList<String> names = fileUtils.listContents(TEST_DIR_PATH);
     assertEquals(ImmutableList.of("subdirectory"), names);
+  }
+
+  @Test
+  public void testListContentsRecursively() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath("/empty_folder"));
+    Files.createDirectories(fileSystem.getPath("/path/to/folder"));
+    Files.createFile(fileSystem.getPath("/first_file.txt"));
+    Files.createFile(fileSystem.getPath("/path/to/folder/second_file.txt"));
+    Files.createFile(fileSystem.getPath("/path/to/folder/third_file.txt"));
+    ImmutableList<String> paths = fileUtils.listContentsRecursively("/");
+    assertEquals(
+        ImmutableList.of(
+            "/",
+            "/empty_folder",
+            "/first_file.txt",
+            "/path",
+            "/path/to",
+            "/path/to/folder",
+            "/path/to/folder/second_file.txt",
+            "/path/to/folder/third_file.txt",
+            "/work"),
+        paths);
+  }
+
+  @Test
+  public void testListContentsRecursivelyWhenEmpty() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    ImmutableList<String> paths = fileUtils.listContentsRecursively("/");
+    assertEquals(
+        ImmutableList.of(
+            "/",
+            "/work"),
+        paths);
+  }
+
+  @Test(expected = NoSuchFileException.class)
+  public void testListContentsRecursivelyWhenDirectoryNotExists() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      throw new NoSuchFileException("");
+    }
+    ImmutableList<String> paths = fileUtils.listContentsRecursively(TEST_DIR_PATH);
+    assertEquals(ImmutableList.of(), paths);
   }
 
   @Test
