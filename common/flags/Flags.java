@@ -115,6 +115,10 @@ public class Flags {
     return instance;
   }
 
+  public static void resetForTesting() {
+    instance = new Flags(new ClassScanner(), new HashMap<String, FlagData>());
+  }
+
   private Flags(ClassScanner classScanner, Map<String, FlagData> flags) {
     this.classScanner = classScanner;
     this.flags = flags;
