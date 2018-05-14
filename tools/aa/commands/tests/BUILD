@@ -17,6 +17,26 @@ java_test(
         "//third_party/maven/junit:junit",
         "//third_party/maven/org/mockito:mockito_core",
         "//third_party/maven/org/objenesis:objenesis",
+    ],
+)
 
+java_test(
+    name = "WorkspaceCommandTest",
+    srcs = [
+        "WorkspaceCommandTest.java",
+    ],
+    test_class = "com.google.startupos.tools.aa.commands.tests.WorkspaceCommandTest",
+    deps = [
+        "//common:dagger_with_annotation_processor",
+        "//common",
+        "//common/flags",
+        "//tools/aa/commands",
+        "//tools/aa:aa_module",
+        "//third_party/maven/com/google/guava:guava",
+        "//third_party/maven/com/google/jimfs",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/junit:junit",
+        "//third_party/maven/org/mockito:mockito_core",
+        "//third_party/maven/org/objenesis:objenesis",
     ],
 )

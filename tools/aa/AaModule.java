@@ -29,10 +29,7 @@ import javax.inject.Named;
 
 @Module(includes = CommonModule.class)
 public class AaModule {
-  @Inject
-  AaModule() {}
-
-  @Provides @Named("Base path") static String provideBasePath(FileUtils fileUtils) {
+  public @Provides @Named("Base path") String provideBasePath(FileUtils fileUtils) {
     String currentFolder = fileUtils.getCurrentWorkingDirectory();
     while (currentFolder != null) {
       if (fileUtils.fileExists(fileUtils.joinPaths(currentFolder, InitCommand.BASE_FILENAME))) {
