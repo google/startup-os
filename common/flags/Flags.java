@@ -79,7 +79,13 @@ public class Flags {
 
   @VisibleForTesting
   static String getFlagValue(String name) {
-    if (!instance().getFlag(name).getHasValue()) {
+    FlagData flagData = instance().getFlag(name);
+    if (flagData == null) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Flag data '%s' is null; did you forget to call FlagData.parse()?", flagData));
+    }
+    if (!flagData.getHasValue()) {
       return null;
     }
     return instance().getFlag(name).getValue();
