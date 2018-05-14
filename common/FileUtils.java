@@ -31,6 +31,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Singleton;
@@ -201,8 +202,9 @@ public class FileUtils {
       throw new RuntimeException(e);
     }
   }
-  
-  public void copyDirectoryToDirectory(String source, String destination) throws IOException {
+
+  public void copyDirectoryToDirectory(String source, String destination, String ignored)
+      throws IOException {
     final Path sourcePath = Paths.get(source);
     final Path targetPath = Paths.get(destination);
     Files.walkFileTree(
@@ -211,6 +213,11 @@ public class FileUtils {
           @Override
           public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
               throws IOException {
+            if (ignored != null) {
+              if (Pattern.matches(ignored, dir.getFileName().toString())) {
+                return FileVisitResult.CONTINUE;
+              }
+            }
             Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
             return FileVisitResult.CONTINUE;
           }
@@ -218,9 +225,18 @@ public class FileUtils {
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
+            if (ignored != null) {
+              if (Pattern.matches(ignored, file.getFileName().toString())) {
+                return FileVisitResult.CONTINUE;
+              }
+            }
             Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
             return FileVisitResult.CONTINUE;
           }
         });
+  }
+
+  public void copyDirectoryToDirectory(String source, String destination) throws IOException {
+    copyDirectoryToDirectory(source, destination, null);
   }
 }

@@ -83,8 +83,7 @@ public class WorkspaceCommand implements AaCommand {
         fileUtils.mkdirs(workspacePath);
         try {
           fileUtils.copyDirectoryToDirectory(
-            fileUtils.joinPaths(basePath, "head"),
-            workspacePath);
+              fileUtils.joinPaths(basePath, "head"), workspacePath, "^bazel-.*$");
         } catch (IOException e) {
           e.printStackTrace();
         }
