@@ -108,7 +108,7 @@ public class MemoryRepo implements Repo {
     }
   }
 
-  public void pullAll() {
+  public void pull() {
     // Do nothing
   }
 

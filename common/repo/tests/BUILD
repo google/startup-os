@@ -8,7 +8,7 @@ java_library(
   deps = [
       "//common/repo",
       "//common/repo:repo_java_proto",
-      "//tools/reviewer/service:service_lib",
+      "//tools/reviewer/service:code_review_java_proto",
       "//third_party/maven/com/google/guava:guava",
       "//third_party/maven/javax/annotation:javax_annotation_api",
       "//third_party/maven/org/slf4j:slf4j_api",
