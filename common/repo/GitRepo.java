@@ -28,6 +28,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.Paths;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -72,7 +73,46 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<File> getUncommittedFiles() {
-    throw new UnsupportedOperationException("Not implemented");
+    ImmutableList.Builder<File> files = ImmutableList.builder();
+    try {
+      Status status = jGit.status().call();
+      status
+          .getAdded()
+          .forEach(
+              added ->
+                  files.add(
+                      File.newBuilder().setAction(File.Action.ADD).setFilename(added).build()));
+      status
+          .getChanged()
+          .forEach(
+              changed ->
+                  files.add(
+                      File.newBuilder()
+                          .setAction(File.Action.MODIFY)
+                          .setFilename(changed)
+                          .build()));
+      status
+          .getRemoved()
+          .forEach(
+              removed ->
+                  files.add(
+                      File.newBuilder()
+                          .setAction(File.Action.DELETE)
+                          .setFilename(removed)
+                          .build()));
+      status
+          .getUntracked()
+          .forEach(
+              untracked ->
+                  files.add(
+                      File.newBuilder()
+                          .setAction(File.Action.UNRECOGNIZED)
+                          .setFilename(untracked)
+                          .build()));
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+    return files.build();
   }
 
   public Commit commit(ImmutableList<File> files, String message) {
