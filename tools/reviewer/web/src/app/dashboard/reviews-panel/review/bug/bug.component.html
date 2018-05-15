@@ -1,0 +1,68 @@
+<!-- Issue -->
+<div 
+fxLayout="row"
+fxLayoutAlign="start center"
+fxLayout.xs="column"
+fxLayoutGap.xs="10px"
+class="bug">
+<div fxFlex="150px" fxFlex.xs="" 
+  fxLayoutAlign="start center" 
+  class="property">
+  Issue:
+</div>
+<div fxFlex class="detail">
+  <ng-container>
+    <div
+      class="issue-detail"
+      *ngIf="!showEditableBug"
+      fxLayoutAlign="start center">
+      <a class="link" href="{{bug}}">
+        {{ bug.length ? bug : '&nbsp;' }}
+      </a>
+      <button 
+        mat-icon-button
+        (click)="showEditableBug = true"
+        *ngIf="editable"
+        >
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+    <div class="editableInput" 
+      *ngIf="showEditableBug">
+      <mat-form-field>
+        <input matInput placeholder="" 
+          [(ngModel)]="bug"
+          (keyup.enter)=
+          "showEditableBug = false; saveBug()"
+          >
+      </mat-form-field>
+      <div
+        class="actions"
+        fxFlex
+        fxLayoutAlign="end center"
+        fxLayoutGap="10px"
+        >
+        <span class="input cancel">
+          <button 
+            mat-raised-button 
+            (click)="showEditableBug = false; 
+            getBug()"
+            >
+            Cancel
+          </button>
+        </span>
+        <span class="input save">
+          <button 
+            mat-raised-button 
+            color="primary"
+            (click)="showEditableBug = false; 
+            saveBug()"
+            >
+            Save
+          </button>
+        </span>
+      </div>
+    </div>
+  </ng-container>
+</div>
+</div>

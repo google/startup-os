@@ -1,4 +1,4 @@
-enum Status {
+export enum Status {
   REVIEW_NOT_STARTED = 0,
   NEEDS_MORE_WORK = 1,
   UNDER_REVIEW = 2,

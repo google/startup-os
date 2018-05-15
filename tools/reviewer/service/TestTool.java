@@ -20,15 +20,13 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import java.util.concurrent.TimeUnit;
-import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashMap;
 
 /** Test tool for CodeReviewService. */
 public class TestTool {
@@ -63,13 +61,39 @@ public class TestTool {
     }
   }
 
-  public void run() {
-    Diff diff = Diff.newBuilder().setNumber(123).build();
-    createDiff(diff);
+  private TextDiffResponse getTextDiff(File leftFile, File rightFile) {
+    final TextDiffRequest request = TextDiffRequest.newBuilder()
+        .setLeftFile(leftFile)
+        .setRightFile(rightFile)
+        .build();
+    try {
+      return blockingStub.getTextDiff(request);
+    } catch (StatusRuntimeException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public void runGetTextDiff() {
+    File leftFile = File.newBuilder()
+        .setRepoId("startup-os")
+        .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+        .setFilename("WORKSPACE")
+        .build();
+    File rightFile = File.newBuilder()
+        .setRepoId("startup-os")
+        .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+        .setFilename("WORKSPACE")
+        .build();
+    System.out.println(getTextDiff(leftFile, rightFile));
+  }
+
+  public void runGetFile() {
+    System.out.println(getFile("WORKSPACE"));
   }
 
   public static void main(String[] args) {
     TestTool tool = new TestTool();
-    tool.run();
+    tool.runGetTextDiff();
   }
 }

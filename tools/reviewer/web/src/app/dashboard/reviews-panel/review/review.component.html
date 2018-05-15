@@ -3,12 +3,25 @@
     <mat-card-title class="crw-header">
       <div>
         Diff {{ diff.number }} by
-        <a [ngClass]="{ 
-        'bold-text': 
-          diff.needAttentionOf.includes(diff.author)
-        }">
-        {{ diff.author }}
-        </a>
+        <span [ngClass]="{ 
+          'bold-text': 
+            diff.needAttentionOf.includes(diff.author),
+            'author-name': true
+          }">
+          <button mat-raised-button 
+            class="add-to-list"
+            *ngIf="editable"
+            (click)="saveAttentionList(diff.author);
+            $event.stopPropagation()"
+            >
+            {{ 
+              diff.needAttentionOf.indexOf(diff.author) > -1
+              ? 'Remove from Needs Attention'
+              : 'Add to Needs Attention'
+            }}
+          </button>
+          {{ diff.author }}
+        </span>
       </div>
       <div fxFlex>
         <ng-container [ngSwitch]="diff.status">
@@ -45,70 +58,81 @@
         </ng-container>
       </div>
     </div>
-    
-    <!-- Reviwers -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Reviewers:</div>
-      <div class="detail">
-        <!-- Print out reviewer's list if length is more than zero -->
-        <ng-container>
-          <a 
-            *ngFor="let reviewer of diff.reviewers; let last = last"
-            [ngClass]="{ 
-              'bold-text': 
-                diff.needAttentionOf.includes(reviewer)
-              }"
-            >
-            {{ last ? reviewer : reviewer + ',' }}
-          </a>
-        </ng-container>
-        <!-- If no reviewers are present -->
-        <ng-container *ngIf="diff.reviewers.length === 0">
-          <span>
-            Not available
-          </span>
-        </ng-container>
-      </div>
+
+    <!-- Person List based on Reviewer in the Diff -->
+    <div>
+      <app-person-list 
+        [diff]="diff"
+        [property]="'reviewers'"
+        [enableAddToAttention]="true"
+        [editable]="editable"
+        (onUpdateDiff)="updateDiff($event, 'Reviewers Updated')"
+        (onRemove)="removeProperty($event, 'Reviewers Updated')"
+        (onAddToAttentionList)="saveAttentionList($event)"
+        ></app-person-list>
     </div>
 
-    <!-- CC's -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">CC:</div>
-      <div fxFlex class="detail">
-        <ng-container *ngIf="diff.cc.length > 0">
-          <a *ngFor="let cc of diff.cc; let last = last ">
-            {{ last ? cc : cc + ',' }}
-          </a>
-        </ng-container>
-        <ng-container *ngIf="diff.cc.length === 0">
-          <span>
-            Not available
-          </span>
-        </ng-container>
-      </div>
+    <!-- Person List based on CC in the Diff -->
+    <div>
+      <app-person-list 
+        [diff]="diff"
+        [property]="'cc'"
+        [editable]="editable"
+        [enableAddToAttention]="false"
+        (onUpdateDiff)="updateDiff($event, 'CC Updated')"
+        (onRemove)="removeProperty($event, 'CC Updated')"
+        ></app-person-list>
+    </div>
+
+    <!-- Bug property of Diff that is a link to related Github Issue -->
+    <div>
+      <app-bug 
+        [diff]="diff"
+        [editable]="editable"
+        (onUpdateDiff)="updateDiff($event, 'Bug Updated')"
+        ></app-bug>
     </div>
 
     <!-- Created At timestamp -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Created:</div>
-      <div fxFlex class="detail">{{ diff.createdTimestamp | date:'medium' }}</div>
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px">
+      <div fxFlex="150px" fxFlex.xs="" 
+        class="property">
+        Created:
+      </div>
+      <div fxFlex class="detail">
+        {{ diff.createdTimestamp | date:'medium' }}
+      </div>
     </div>
 
     <!-- Modified timestamp -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Modified:</div>
-      <div fxFlex class="detail">{{ diff.modifiedTimestamp | date:'medium' }}</div>
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px">
+      <div fxFlex="150px" fxFlex.xs="" 
+        class="property">
+        Modified:
+      </div>
+      <div fxFlex 
+        class="detail">
+        {{ diff.modifiedTimestamp | date:'medium' }}
+      </div>
     </div>
     
     <!-- Review files -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px"
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px"
       *ngFor="let file of diff.files; let i = index">
-      <div fxFlex="150px" fxFlex.xs="" class="property">
-        <ng-container *ngIf="i === 0">Files: </ng-container>
-        <ng-container> </ng-container>
+      <div fxFlex="150px" 
+        fxFlex.xs="" class="property">
+        <ng-container *ngIf="i === 0">
+          Files: 
+        </ng-container>
       </div>
       <div fxFlex fxLayout="row" class="detail">
-        <div  fxFlex="120px" fxFlex.xs="">
+        <div fxFlex="120px" fxFlex.xs="">
           <ng-container [ngSwitch]="file.fileAction">
             <ng-container *ngSwitchCase="0">Added</ng-container>
             <ng-container *ngSwitchCase="1">Deleted</ng-container>
@@ -116,31 +140,53 @@
             <ng-container *ngSwitchCase="3">Modified</ng-container>
           </ng-container>
         </div>
-        <a class="filePosition" (click)="openFile(file.filePosition)"> {{ file.filePosition }} </a>
+        <a class="link" 
+          (click)="openFile(file.filePosition)"> 
+          {{ file.filePosition }}
+        </a>
       </div>
     </div>
 
     <!-- Review Comments -->
-    <div class="thread" fxLayout="column" fxLayout.xs="column" fxLayoutGap.xs="10px" 
+    <div class="thread" 
+      fxLayout="column" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px" 
       *ngFor="let thread of diff.threads; let i = index">
       <div fxLayout="row" class="thread-header">
-        <div fxFlex="50%" class="detail"> {{ thread.filename }}</div>
-        <div fxFlex="10%" class="line-number-label"> Snapshot: </div>
-        <div fxFlex="10%" class=""> {{ thread.snapshot }}</div>
-        <div fxFlex="20%" class="line-number-label"> Line number: </div>
-        <div fxFlex="10%" class=""> {{ thread.lineNumber }}</div>
+        <div fxFlex="50%" class="detail"> 
+          {{ thread.filename }}
+        </div>
+        <div fxFlex="10%" class="line-number-label">
+          Snapshot:
+        </div>
+        <div fxFlex="10%" class=""> 
+          {{ thread.snapshot }}
+        </div>
+        <div fxFlex="20%" class="line-number-label">
+          Line number:
+        </div>
+        <div fxFlex="10%" class=""> 
+          {{ thread.lineNumber }}
+        </div>
       </div>
-      <div *ngFor="let comment of thread.comments" class="thread-contents">
+      <div *ngFor="let comment of thread.comments" 
+        class="thread-contents">
         <div class="comment">
-          <div class="content"> {{ comment.content }} </div> 
-          <div fxLayout="row" fxLayoutGap="5px" class="details">
+          <div class="content"> 
+            {{ comment.content }} 
+          </div> 
+          <div fxLayout="row" 
+            fxLayoutGap="5px" 
+            class="details">
             <div> 
               <span> by </span>
               {{ comment.createdBy }} 
             </div>
             <div> 
               <span> on </span> 
-              {{ comment.timestamp |  date:'MMM dd, yyyy HH:mm a' : timezone }}
+              {{ comment.timestamp |  
+                date:'MMM dd, yyyy HH:mm a' : timezone }}
             </div>
           </div>
         </div>

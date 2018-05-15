@@ -1,26 +1,64 @@
 @import 'variables';
 
 .single-review {
+  margin-top: 30px;
   mat-card-title div:first-child {
-    width: 350px;
+    width: 500px;
   }
   .crw-header {
     font-size: 24px;
   }
+  .reviewer-name,
+  .author-name {
+    .add-to-list {
+      display: none;
+      position: absolute;
+      margin-top: -35px;
+    }
+    &:hover {
+      .add-to-list {
+        display: inline-block;
+      }
+    }
+  }
   .review-details {
     padding: 30px;
     > div {
-      // display: flex;
       margin-bottom: 20px;
-      // border-bottom: 1px solid #d1d1d1;
       .property {
         font-size: 18px;
         font-weight: bold;
       }
       .detail {
         font-size: 16px;
+        line-height: 32px;
+        .mat-icon-button {
+          display: none;
+          margin-left: 100px;
+          background-color: #f9f6f6;
+          width: 30px;
+          height: 30px;
+          line-height: 28px;
+          .material-icons {
+            font-size: 20px;
+          }
+        }
+        &:hover {
+          .mat-icon-button {
+            display: block;
+          }
+        }
       }
-      .filePosition {
+      .editableInput,
+      .reviewer-detail {
+        width: 600px;
+      }
+      .editableInput {
+        mat-form-field {
+          width: 400px;
+        }
+      }
+      .link {
         cursor: pointer;
         color: #0000ee;
         text-decoration: underline;

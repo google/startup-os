@@ -10,13 +10,14 @@ java_binary(
         "//common",
         "//common/flags",
         "//common:dagger_with_annotation_processor",
+        "//tools/aa:aa_module",
         "//tools/local_server/service:auth_service",
         "//tools/reviewer/service",
-        "//tools/reviewer/service:service_lib",
+        "//third_party/maven/io/grpc:grpc_core",
+        "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/slf4j:slf4j_simple",
-        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
     ],
 )
 
@@ -27,10 +28,13 @@ java_library(
         "LocalHttpGatewayGrpcClient.java",
     ],
     deps = [
-        "//tools/reviewer/service:service_lib",
-        "//tools/local_server/service:auth_service_lib",
+        "//tools/local_server/service:auth_service_java_grpc",
+        "//tools/local_server/service:auth_service_java_proto",
+        "//tools/reviewer/service:code_review_java_grpc",
+        "//tools/reviewer/service:code_review_java_proto",
+        "//third_party/maven/io/grpc:grpc_core",
+        "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
-        "@org_pubref_rules_protobuf//java:grpc_compiletime_deps",
     ],
 )
 
@@ -41,12 +45,11 @@ java_binary(
     ],
     main_class = "com.google.startupos.tools.localserver.LocalHttpGateway",
     deps = [
-        "//tools/reviewer/service:service_lib",
         ":local_http_gateway_grpc_client",
-        "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
-        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
-        "//third_party/maven/org/json:json",
         "//common/flags",
+        "//tools/reviewer/service:code_review_java_proto",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/org/json:json",
         "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )

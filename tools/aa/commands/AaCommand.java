@@ -18,6 +18,4 @@ package com.google.startupos.tools.aa.commands;
 
 public interface AaCommand {
   void run(String[] args);
-
-  String getName();
 }

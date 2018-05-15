@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
- package com.google.startupos.common;
+package com.google.startupos.common;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Files;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.FileInputStream;
-import java.nio.file.Paths;
 import java.nio.file.FileSystem;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import com.google.protobuf.TextFormat;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Singleton;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** File utils */
 @Singleton
@@ -47,17 +49,17 @@ public class FileUtils {
   }
 
   /** Replace the ~ in e.g ~/path with the home directory. */
+  // TODO  Inject System.getProperty("user.home")
   public String expandHomeDirectory(String path) {
-    if (path.startsWith("~" + File.separator)) {
+    if (path.startsWith("~" + fileSystem.getSeparator())) {
       path = System.getProperty("user.home") + path.substring(1);
     }
     return path;
   }
 
   /** Reads a prototxt file into a proto. */
-  public Message readPrototxt(String path, Message.Builder builder)
-      throws IOException, ParseException {
-    String protoText = Files.toString(new File(expandHomeDirectory(path)), UTF_8);
+  public Message readPrototxt(String path, Message.Builder builder) throws IOException {
+    String protoText = readFile(path);
     TextFormat.merge(protoText, builder);
     return builder.build();
   }
@@ -87,8 +89,9 @@ public class FileUtils {
 
   /** Writes a string to file. */
   public void writeString(String text, String path) throws IOException {
-    mkdirs(path);
-    java.nio.file.Files.write(Paths.get(expandHomeDirectory(path)), text.getBytes());
+    File file = new File(path);
+    mkdirs(file.getParent());
+    Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes());
   }
 
   /** Writes a string to file, rethrows exceptions as unchecked. */
@@ -102,46 +105,79 @@ public class FileUtils {
 
   /** Checks if file exists. Returns false for folders. */
   public boolean fileExists(String path) {
-    File file = new File(expandHomeDirectory(path));
-    return file.exists() && file.isFile();
+    return Files.isRegularFile(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Checks if folder exists. Returns false for files. */
   public boolean folderExists(String path) {
-    return java.nio.file.Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
+    return Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Checks if folder or folder exists. */
   public boolean fileOrFolderExists(String path) {
-    File file = new File(expandHomeDirectory(path));
-    return file.exists();
+    return Files.isRegularFile(fileSystem.getPath(expandHomeDirectory(path)))
+            || Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
+  }
+
+  /** Checks if folder is empty or doesn't exist. Returns false for files. */
+  public boolean folderEmptyOrNotExists(String path) throws IOException {
+    if (fileExists(path)) {
+      return false;
+    }
+    if (!folderExists(path)) {
+      return true;
+    }
+    return listContents(path).isEmpty();
   }
 
   /** Creates directories in path if none exist. */
   public void mkdirs(String path) {
     try {
-      Files.createParentDirs(new File(path));
+      Files.createDirectories(fileSystem.getPath(expandHomeDirectory(path)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  /** Gets filenames in path. */
-  public ImmutableList<String> getFiles(String path) {
-    String[] files = Paths.get(path).toFile().list();
-    if (files.length == 0) {
-      return ImmutableList.of();
-    }
-    return ImmutableList.sortedCopyOf(Arrays.asList(files));
+  /** Joins paths */
+  public String joinPaths(String first, String... more) {
+    return fileSystem.getPath(first, more).toAbsolutePath().toString();
   }
+
+  /** Get the current working directory */
+  public String getCurrentWorkingDirectory() {
+    return fileSystem.getPath("").toAbsolutePath().toString();
+  }
+
+  /** Gets file and folder names in path. */
+  public ImmutableList<String> listContents(String path) throws IOException {
+    try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {
+      return ImmutableList.sortedCopyOf(
+          paths.map(
+              absolutePath -> absolutePath.getFileName().toString())
+              .collect(Collectors.toList()));
+    }
+  }
+
+  /** 
+   * Gets file and folder absolute paths recursively.
+   * Throws NoSuchFileException if directory doesn't exist
+   */
+  public ImmutableList<String> listContentsRecursively(String path) throws IOException {
+    try (Stream<Path> paths = Files.find(
+        fileSystem.getPath(expandHomeDirectory(path)),
+        100000, // Folder depth
+        (unused, unused2) -> true)) {
+      return ImmutableList.sortedCopyOf(
+          paths.map(
+              absolutePath -> absolutePath.toString())
+              .collect(Collectors.toList()));
+    }
+} 
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    try {
-      return Files.toString(new File(expandHomeDirectory(path)), UTF_8);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    return String.join("\n", Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */
@@ -155,8 +191,9 @@ public class FileUtils {
 
   /** Writes a proto to binary file. */
   public void writeProtoBinary(Message proto, String path) throws IOException {
-    mkdirs(path);
-    proto.writeTo(new FileOutputStream(path));
+    File file = new File(path);
+    mkdirs(file.getParent());
+    proto.writeTo(Files.newOutputStream(fileSystem.getPath(expandHomeDirectory(path))));
   }
 
   /** Writes a proto to binary file, rethrows exceptions as unchecked. */
@@ -170,7 +207,7 @@ public class FileUtils {
 
   /** Reads a proto binary file into a proto. */
   public Message readProtoBinary(String path, Message.Builder builder) throws IOException {
-    InputStream input = new FileInputStream(path);
+    InputStream input = Files.newInputStream(fileSystem.getPath(expandHomeDirectory(path)));
     return builder.build().getParserForType().parseFrom(input);
   }
 
@@ -181,5 +218,42 @@ public class FileUtils {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void copyDirectoryToDirectory(String source, String destination, String ignored)
+      throws IOException {
+    final Path sourcePath = Paths.get(source);
+    final Path targetPath = Paths.get(destination);
+    Files.walkFileTree(
+        sourcePath,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+              throws IOException {
+            if (ignored != null) {
+              if (Pattern.matches(ignored, dir.getFileName().toString())) {
+                return FileVisitResult.CONTINUE;
+              }
+            }
+            Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+              throws IOException {
+            if (ignored != null) {
+              if (Pattern.matches(ignored, file.getFileName().toString())) {
+                return FileVisitResult.CONTINUE;
+              }
+            }
+            Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+            return FileVisitResult.CONTINUE;
+          }
+        });
+  }
+
+  public void copyDirectoryToDirectory(String source, String destination) throws IOException {
+    copyDirectoryToDirectory(source, destination, null);
   }
 }

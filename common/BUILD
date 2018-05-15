@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_library")
-
 java_library(
     name = "common",
     srcs = [
@@ -53,14 +51,14 @@ java_library(
     ],
 )
 
-filegroup(
+proto_library(
     name = "text_difference_proto",
     srcs = ["text_difference.proto"],
 )
 
 java_proto_library(
     name = "text_difference_java_proto",
-    protos = [":text_difference_proto"],
+    deps = [":text_difference_proto"],
 )
 
 java_plugin(

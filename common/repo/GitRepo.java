@@ -26,20 +26,19 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
-
 
 // TODO: Implement methods
 @AutoFactory
@@ -63,7 +62,16 @@ public class GitRepo implements Repo {
   }
 
   public void switchBranch(String branch) {
-    throw new UnsupportedOperationException("Not implemented");
+    boolean createBranch = true;
+    try {
+      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
+      if (ref != null) {
+        createBranch = false;
+      }
+      jGit.checkout().setCreateBranch(createBranch).setName(branch).call();
+    } catch (IOException | GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public ImmutableList<Commit> getCommits(String branch) {
@@ -71,7 +79,46 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<File> getUncommittedFiles() {
-    throw new UnsupportedOperationException("Not implemented");
+    ImmutableList.Builder<File> files = ImmutableList.builder();
+    try {
+      Status status = jGit.status().call();
+      status
+          .getAdded()
+          .forEach(
+              added ->
+                  files.add(
+                      File.newBuilder().setAction(File.Action.ADD).setFilename(added).build()));
+      status
+          .getChanged()
+          .forEach(
+              changed ->
+                  files.add(
+                      File.newBuilder()
+                          .setAction(File.Action.MODIFY)
+                          .setFilename(changed)
+                          .build()));
+      status
+          .getRemoved()
+          .forEach(
+              removed ->
+                  files.add(
+                      File.newBuilder()
+                          .setAction(File.Action.DELETE)
+                          .setFilename(removed)
+                          .build()));
+      status
+          .getUntracked()
+          .forEach(
+              untracked ->
+                  files.add(
+                      File.newBuilder()
+                          .setAction(File.Action.UNRECOGNIZED)
+                          .setFilename(untracked)
+                          .build()));
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+    return files.build();
   }
 
   public Commit commit(ImmutableList<File> files, String message) {
@@ -80,10 +127,7 @@ public class GitRepo implements Repo {
         jGit.add().addFilepattern(file.getFilename()).call();
       }
       RevCommit revCommit = jGit.commit().setMessage(message).call();
-      return Commit.newBuilder()
-          .setId(revCommit.getId().toString())
-          .addAllFile(files)
-          .build();
+      return Commit.newBuilder().setId(revCommit.getId().toString()).addAllFile(files).build();
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
@@ -93,16 +137,37 @@ public class GitRepo implements Repo {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public void pullAll() {
-    throw new UnsupportedOperationException("Not implemented");
+  public void pull() {
+    try {
+      jGit.pull().call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public boolean merge(String branch) {
-    throw new UnsupportedOperationException("Not implemented");
+    try {
+      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
+      return (jGit.merge().setSquash(true).setCommit(false).include(ref).call().getConflicts()
+          == null);
+    } catch (GitAPIException | IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public boolean isMerged(String branch) {
     throw new UnsupportedOperationException("Not implemented");
+  }
+
+  public void reset(String ref) {
+    try {
+      // MIXED type means that HEAD pointer would be
+      // reset to `ref` and all changes introduced after it
+      // would be marked as unstaged but saved in working tree
+      jGit.reset().setMode(ResetType.MIXED).setRef(ref).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String getFileContents(String commitId, String path) {

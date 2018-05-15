@@ -108,7 +108,7 @@ public class MemoryRepo implements Repo {
     }
   }
 
-  public void pullAll() {
+  public void pull() {
     // Do nothing
   }
 
@@ -121,6 +121,11 @@ public class MemoryRepo implements Repo {
 
   public boolean isMerged(String branch) {
     return branches.get(branch).isMerged;
+  }
+
+  @Override
+  public void reset(String ref) {
+    // TODO: implement if needed
   }
 
   public void succeedNextPull() {

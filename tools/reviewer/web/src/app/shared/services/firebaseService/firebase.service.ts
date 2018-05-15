@@ -33,4 +33,8 @@ export class FirebaseService {
         console.log(err);
       });
   }
+
+  removeProperty(diff: Diff, property: string): Promise<void> {
+    return this.db.object('diffs/' + diff.number + '/' + property).remove();
+  }
 }

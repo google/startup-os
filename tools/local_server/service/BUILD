@@ -1,11 +1,22 @@
 package(default_visibility = ["//visibility:public"])
-load("@org_pubref_rules_protobuf//java:rules.bzl", "java_proto_library")
+load("@io_grpc_grpc_java//:java_grpc_library.bzl", "java_grpc_library")
+
+proto_library(
+    name = "auth_service_proto",
+    srcs = ["auth_service.proto"],
+)
 
 java_proto_library(
-    name = "auth_service_lib",
-    protos = ["auth_service.proto"],
-    verbose = 1,
-    with_grpc = True,
+    name = "auth_service_java_proto",
+    deps = [":auth_service_proto"],
+)
+
+java_grpc_library(
+    name = "auth_service_java_grpc",
+    srcs = [":auth_service_proto"],
+    deps = [
+        ":auth_service_java_proto",
+    ],
 )
 
 java_library(
@@ -14,9 +25,10 @@ java_library(
         "AuthService.java",
     ],
     deps = [
-        ":auth_service_lib",
-        "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
-        "@org_pubref_rules_protobuf//java:netty_runtime_deps",
+        ":auth_service_java_grpc",
+        ":auth_service_java_proto",
+        "//third_party/maven/io/grpc:grpc_core",
+        "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/javax/inject:javax_inject",
     ],
 )
