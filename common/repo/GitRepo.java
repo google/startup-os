@@ -60,7 +60,11 @@ public class GitRepo implements Repo {
   }
 
   public void switchBranch(String branch) {
-    throw new UnsupportedOperationException("Not implemented");
+    try {
+      jGit.checkout().setCreateBranch(true).setName(branch).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public ImmutableList<Commit> getCommits(String branch) {
