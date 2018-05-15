@@ -123,6 +123,11 @@ public class MemoryRepo implements Repo {
     return branches.get(branch).isMerged;
   }
 
+  @Override
+  public void reset(String ref) {
+    // TODO: implement if needed
+  }
+
   public void succeedNextPull() {
     nextPull = ActionOverride.SUCCESS;
   }

@@ -26,20 +26,17 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
-
 
 // TODO: Implement methods
 @AutoFactory
@@ -80,10 +77,7 @@ public class GitRepo implements Repo {
         jGit.add().addFilepattern(file.getFilename()).call();
       }
       RevCommit revCommit = jGit.commit().setMessage(message).call();
-      return Commit.newBuilder()
-          .setId(revCommit.getId().toString())
-          .addAllFile(files)
-          .build();
+      return Commit.newBuilder().setId(revCommit.getId().toString()).addAllFile(files).build();
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
@@ -107,6 +101,17 @@ public class GitRepo implements Repo {
 
   public boolean isMerged(String branch) {
     throw new UnsupportedOperationException("Not implemented");
+  }
+
+  public void reset(String ref) {
+    try {
+      // MIXED type means that HEAD pointer would be
+      // reset to `ref` and all changes introduced after it
+      // would be marked as unstaged but saved in working tree
+      jGit.reset().setMode(ResetType.MIXED).setRef(ref).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public String getFileContents(String commitId, String path) {

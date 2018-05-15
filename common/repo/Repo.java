@@ -20,14 +20,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 
-
-/** An interface for a code repository that uses Trunk-based development.
- * In particular, this means all branches start from master and merge to master.
- * Underlying repo could be Git, Mercurial, or a MemoryRepo for testing.
- * 
- * Where possible, if an action fails or takes a long time (and can be cancelled by the user), the
- * implementation should do them in a way that has no side-effect (e.g doing operations on a temp
- * branch/folder and copying when done).
+/**
+ * An interface for a code repository that uses Trunk-based development. In particular, this means
+ * all branches start from master and merge to master. Underlying repo could be Git, Mercurial, or a
+ * MemoryRepo for testing.
+ *
+ * <p>Where possible, if an action fails or takes a long time (and can be cancelled by the user),
+ * the implementation should do them in a way that has no side-effect (e.g doing operations on a
+ * temp branch/folder and copying when done).
  */
 public interface Repo {
   /** Switches to branch. Creates branch if needed. */
@@ -46,6 +46,8 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
+  /** Reset current branch */
+  void reset(String ref);
 
   String getFileContents(String commitId, String path);
 }
