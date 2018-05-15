@@ -140,7 +140,17 @@ public class GitRepo implements Repo {
   }
 
   public boolean merge(String branch) {
-    throw new UnsupportedOperationException("Not implemented");
+    try {
+      return jGit.merge()
+          .setSquash(true)
+          .setCommit(false)
+          .include(jGitRepo.exactRef(branch))
+          .call()
+          .getConflicts()
+          .isEmpty();
+    } catch (GitAPIException | IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public boolean isMerged(String branch) {
