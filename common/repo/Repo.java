@@ -46,7 +46,11 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
-  /** Reset current branch */
+  /*
+   * Reset current branch.
+   * All changes introduced after it would be marked as unstaged
+   * but saved in working tree
+   */
   void reset(String ref);
 
   String getFileContents(String commitId, String path);
