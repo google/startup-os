@@ -32,6 +32,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
@@ -61,9 +62,14 @@ public class GitRepo implements Repo {
   }
 
   public void switchBranch(String branch) {
+    boolean createBranch = true;
     try {
-      jGit.checkout().setCreateBranch(true).setName(branch).call();
-    } catch (GitAPIException e) {
+      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
+      if (ref != null) {
+        createBranch = false;
+      }
+      jGit.checkout().setCreateBranch(createBranch).setName(branch).call();
+    } catch (IOException | GitAPIException e) {
       throw new RuntimeException(e);
     }
   }
@@ -141,13 +147,9 @@ public class GitRepo implements Repo {
 
   public boolean merge(String branch) {
     try {
-      return jGit.merge()
-          .setSquash(true)
-          .setCommit(false)
-          .include(jGitRepo.exactRef(branch))
-          .call()
-          .getConflicts()
-          .isEmpty();
+      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
+      return (jGit.merge().setSquash(true).setCommit(false).include(ref).call().getConflicts()
+          == null);
     } catch (GitAPIException | IOException e) {
       throw new RuntimeException(e);
     }
