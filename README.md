@@ -35,6 +35,6 @@ Working examples of:
 * [Dagger on Android](https://google.github.io/dagger/android.html)
 * More goodies...
 
-#### Feedback
+## Feedback
 If you're interested in StartupOS, please let us know!
 You can fill in this form: https://goo.gl/forms/jfAH0wLgedE8GoWg2
