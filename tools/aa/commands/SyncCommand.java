@@ -93,10 +93,13 @@ public class SyncCommand implements AaCommand {
                 repo.pull();
                 System.out.println(
                     String.format("[%s/%s]: merging changes", currentWorkspaceName, repoName));
-                repo.merge("temp_branch_for_sync");
-                System.out.println(
-                    String.format("[%s/%s]: resetting HEAD", currentWorkspaceName, repoName));
-                repo.reset("HEAD^");
+                boolean mergeResult = repo.merge("temp_branch_for_sync");
+                if (!mergeResult) {
+                    System.out.println(
+                            String.format(
+                                    "[%s/%s]: merge did NOT go clear, check files for conflicts",
+                                    currentWorkspaceName, repoName));
+                }
                 System.out.println(
                       String.format("[%s/%s]: removing temp branch", currentWorkspaceName, repoName));
                 repo.removeBranch("temp_branch_for_sync");

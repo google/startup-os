@@ -26,6 +26,8 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
+
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.Status;
@@ -89,7 +91,7 @@ public class GitRepo implements Repo {
                   files.add(
                       File.newBuilder().setAction(File.Action.ADD).setFilename(added).build()));
       status
-          .getChanged()
+          .getModified()
           .forEach(
               changed ->
                   files.add(
@@ -147,9 +149,21 @@ public class GitRepo implements Repo {
 
   public boolean merge(String branch) {
     try {
+      Ref current = jGitRepo.exactRef(jGitRepo.getFullBranch());
+      boolean successfulMerge = true;
       Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
-      return (jGit.merge().setSquash(true).setCommit(false).include(ref).call().getConflicts()
-          == null);
+      AddCommand addCommand = jGit.add();
+      jGit.merge().include(ref).call();
+      for (String conflictingFile: jGit.status().call().getConflicting()) {
+        successfulMerge = false;
+        addCommand = addCommand.addFilepattern(conflictingFile);
+      }
+      if (!successfulMerge) {
+        addCommand.call();
+        jGit.commit().call();
+      }
+      jGit.reset().setRef(current.getObjectId().toObjectId().name()).call();
+      return successfulMerge;
     } catch (GitAPIException | IOException e) {
       throw new RuntimeException(e);
     }
