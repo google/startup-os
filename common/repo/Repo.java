@@ -52,6 +52,8 @@ public interface Repo {
    * but saved in working tree
    */
   void reset(String ref);
+  /** Remove branch */
+  void removeBranch(String branch);
 
   String getFileContents(String commitId, String path);
 }

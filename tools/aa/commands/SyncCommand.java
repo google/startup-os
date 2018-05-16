@@ -97,6 +97,9 @@ public class SyncCommand implements AaCommand {
                 System.out.println(
                     String.format("[%s/%s]: resetting HEAD", currentWorkspaceName, repoName));
                 repo.reset("HEAD^");
+                System.out.println(
+                      String.format("[%s/%s]: removing temp branch", currentWorkspaceName, repoName));
+                repo.removeBranch("temp_branch_for_sync");
               });
     } catch (IOException e) {
       e.printStackTrace();

@@ -170,6 +170,15 @@ public class GitRepo implements Repo {
     }
   }
 
+  @Override
+  public void removeBranch(String branch) {
+    try {
+      jGit.branchDelete().setBranchNames(branch).setForce(true).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public String getFileContents(String commitId, String path) {
     ObjectReader objectReader = null;
     try {

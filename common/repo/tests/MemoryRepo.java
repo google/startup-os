@@ -128,6 +128,11 @@ public class MemoryRepo implements Repo {
     // TODO: implement if needed
   }
 
+  @Override
+  public void removeBranch(String branch) {
+    branches.remove(branch);
+  }
+
   public void succeedNextPull() {
     nextPull = ActionOverride.SUCCESS;
   }
