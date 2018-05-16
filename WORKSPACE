@@ -48,12 +48,15 @@ grpc_java_repositories(
     omit_org_apache_commons_lang3 = True,
 )
 
-git_repository(
-    name = 'gmaven_rules',
-    remote = 'https://github.com/aj-michael/gmaven_rules',
-    commit = '5e89b7cdc94d002c13576fad3b28b0ae30296e55',
+# Google Maven Repository
+GMAVEN_TAG = "20180513-1"
+http_archive(
+    name = "gmaven_rules",
+    strip_prefix = "gmaven_rules-%s" % GMAVEN_TAG,
+    url = "https://github.com/bazelbuild/gmaven_rules/archive/%s.tar.gz" % GMAVEN_TAG,
 )
-load('@gmaven_rules//:gmaven.bzl', 'gmaven_rules')
+
+load("@gmaven_rules//:gmaven.bzl", "gmaven_rules")
 gmaven_rules()
 
 # Android SDK configuration. For more details, see:
