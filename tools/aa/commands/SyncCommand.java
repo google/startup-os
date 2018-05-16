@@ -48,7 +48,7 @@ public class SyncCommand implements AaCommand {
   public void run(String[] args) {
     String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
 
-    // deal with head first
+    // Pull all repos in head
     try {
       fileUtils
           .listContents(headPath)
