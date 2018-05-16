@@ -26,7 +26,6 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
-
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
@@ -154,7 +153,7 @@ public class GitRepo implements Repo {
       Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
       AddCommand addCommand = jGit.add();
       jGit.merge().include(ref).call();
-      for (String conflictingFile: jGit.status().call().getConflicting()) {
+      for (String conflictingFile : jGit.status().call().getConflicting()) {
         successfulMerge = false;
         addCommand = addCommand.addFilepattern(conflictingFile);
       }
