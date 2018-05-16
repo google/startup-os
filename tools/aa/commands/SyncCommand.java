@@ -37,11 +37,11 @@ public class SyncCommand implements AaCommand {
       FileUtils utils,
       Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWs) {
+      @Named("Current workspace name") String currentWorkspaceName) {
     this.fileUtils = utils;
     this.config = config;
     this.repoFactory = repoFactory;
-    this.currentWorkspaceName = currentWs;
+    this.currentWorkspaceName = currentWorkspaceName;
   }
 
   @Override
