@@ -97,7 +97,7 @@ public class SyncCommand implements AaCommand {
                 if (!mergeResult) {
                   System.out.println(
                       String.format(
-                          "[%s/%s]: merge did NOT go clear, check files for conflicts",
+                          "[%s/%s]: manual merge required, check files for conflicts",
                           currentWorkspaceName, repoName));
                 }
                 System.out.println(
