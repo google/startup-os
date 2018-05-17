@@ -1,0 +1,14 @@
+<div class="add-comment-buttons">
+  <div class="add-comment-button
+    {{line.isOpen?'':'closed-comment'}}
+    {{codeBlockViewService.lineBackground(line, isUpdate)}}"
+    *ngFor="let line of lines; let i=index "
+    (mouseover)="diffService.mouseHover(i, isUpdate)"
+    (click)="diffService.openComments(i)"
+  >
+    <div class="icon">
+      <mat-icon *ngIf="diffService.hoverCheck(i, isUpdate) && !line.isOpen">add_box</mat-icon>
+    </div>
+    <div class="placeholder" [style.height.px]="line.height"></div>
+  </div>
+</div>

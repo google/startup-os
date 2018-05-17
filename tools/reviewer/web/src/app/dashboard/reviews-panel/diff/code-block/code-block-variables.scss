@@ -1,0 +1,17 @@
+$comments-background: #f1f8ff;
+$code-size: 16px;
+$line-height: 19px;
+
+.new-code {
+  background: #e6ffed;
+}
+.old-code {
+  background: #ffeef0;
+}
+
+pre {
+  margin: 0;
+  code {
+    font-size: $code-size;
+  }
+}

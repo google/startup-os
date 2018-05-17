@@ -1,0 +1,45 @@
+<div id="code-block">
+  <line-numbers
+    [lines]="lines"
+    [isUpdate]="isUpdate"
+  ></line-numbers>
+
+  <add-comment-buttons
+    [lines]="lines"
+    [isUpdate]="isUpdate"
+  ></add-comment-buttons>
+
+  <div class="code">
+    <!-- Changes highlighting -->
+    <changes-highlighting
+      [lines]="lines"
+      [isUpdate]="isUpdate"
+    ></changes-highlighting>
+    
+    <!-- Highlighted code -->
+    <div class="highlighted-code">
+      <pre><code [HTML]="highlightedLines.join('\n')"></code></pre>
+    </div>
+
+    <div class="hidden-lines">
+      <div class="line"
+        *ngFor="let line of lines; let i=index "
+        (mouseover)="diffService.mouseHover(i, isUpdate)"
+      >
+        <pre [HTML]="line.code"></pre>
+        
+        <!-- Comments -->
+        <line-comments
+          [lineNumber]="i"
+          [comments]="line.comments"
+          *ngIf="line.isOpen && line.isCommentsVisible"
+        ></line-comments>
+
+        <div class="placeholder"
+          *ngIf="line.isOpen && !line.isCommentsVisible"
+          [style.height.px]="line.height"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>
