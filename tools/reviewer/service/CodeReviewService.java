@@ -39,10 +39,12 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 import javax.inject.Named;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
  */
+@Singleton
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
 
