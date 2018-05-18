@@ -18,26 +18,26 @@ package com.google.startupos.common.firestore;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 // TODO: Fix open Firestore rules
 public class FirestoreClient {
   // Base path formatted by project name and path, that starts with a /.
   private static final String BASE_PATH =
-          "https://firestore.googleapis.com/v1beta1" + "/projects/%s/databases/(default)/documents%s";
+      "https://firestore.googleapis.com/v1beta1" + "/projects/%s/databases/(default)/documents%s";
 
   private final String project;
   private final String token;
 
-  public FirestoreClient(String project, String token){
+  public FirestoreClient(String project, String token) {
     this.project = project;
     this.token = token;
   }
@@ -46,9 +46,16 @@ public class FirestoreClient {
     return String.format(BASE_PATH, project, path);
   }
 
-  private String getCreateDocumentUrl(String user) {
+  private String getCreateDocumentUrl(String user, String documentId) {
     // GET and CreateDocument are the same if the server selects the ID.
-    return getGetUrl(user);
+    if (documentId == null) {
+      return getGetUrl(user);
+    }
+    return getGetUrl(user) + "/" + documentId;
+  }
+
+  private String getCreateDocumentUrl(String user) {
+    return getCreateDocumentUrl(user, null);
   }
 
   public Message getDocument(String path, Message.Builder proto) {
@@ -57,6 +64,7 @@ public class FirestoreClient {
       URL url = new URL(getGetUrl(path));
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
+      connection.setRequestProperty("Authorization", "Bearer " + token);
       BufferedReader reader =
           new BufferedReader(new InputStreamReader(connection.getInputStream()));
       String line;
@@ -75,14 +83,19 @@ public class FirestoreClient {
   }
 
   public void createDocument(String path, MessageOrBuilder proto) {
+    createDocument(path, null, proto);
+  }
+
+  public void createDocument(String path, String documentId, MessageOrBuilder proto) {
     try {
-      URL url = new URL(getCreateDocumentUrl(path));
+      URL url = new URL(getCreateDocumentUrl(path, documentId));
 
       String prototxt = JsonFormat.printer().print(proto);
       String json = FirestoreJsonFormat.printer().print(proto);
       byte[] postDataBytes = json.getBytes("UTF-8");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("POST");
+      connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
       connection.setRequestProperty("Content-Type", "application/json");
       connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
       connection.setRequestProperty("Authorization", "Bearer " + token);
