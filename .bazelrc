@@ -1,0 +1,4 @@
+# This will be the default in bazel.
+# https://blog.bazel.build/2018/01/19/config-parsing-order.html
+startup --expand_configs_in_place
+
