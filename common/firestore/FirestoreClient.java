@@ -94,6 +94,9 @@ public class FirestoreClient {
       String json = FirestoreJsonFormat.printer().print(proto);
       byte[] postDataBytes = json.getBytes("UTF-8");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+      // PATCH method updates the document if if exists and creates otherwise
+      // java.net.HttpURLConnection does not support PATCH natively
+      // SOURCE: https://stackoverflow.com/a/32503192/4617642
       connection.setRequestMethod("POST");
       connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
       connection.setRequestProperty("Content-Type", "application/json");
