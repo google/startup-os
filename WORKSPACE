@@ -111,3 +111,9 @@ http_file(
     executable = True,
     sha256 = "dd8d58429a258b094b20a1435be3086ecee5d036b87c0e766309842766bc345b"
 )
+
+http_archive(
+    name = "com_google_googletest",
+    strip_prefix = "googletest-master",
+    urls = ["https://github.com/google/googletest/archive/master.zip"],
+)
