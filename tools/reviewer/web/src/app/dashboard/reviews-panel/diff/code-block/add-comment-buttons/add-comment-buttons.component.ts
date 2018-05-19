@@ -4,6 +4,8 @@ import { DiffService } from '../../diff.service';
 import { CodeBlockViewService } from '../code-block-view.service';
 import { Line } from '../code-block.component';
 
+// The component implements buttons, which open comments block,
+// where a user can add a comment
 @Component({
   selector: 'add-comment-buttons',
   templateUrl: './add-comment-buttons.component.html',
@@ -12,7 +14,7 @@ import { Line } from '../code-block.component';
 })
 export class AddCommentButtonsComponent {
   @Input() lines: Line[];
-  @Input() isUpdate: boolean;
+  @Input() isNewCode: boolean;
 
   constructor(
     public diffService: DiffService,

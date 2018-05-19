@@ -1,4 +1,11 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
 
 import { Comment, Thread } from '@/shared';
 import { HighlightService } from '@/shared/services';
@@ -7,56 +14,69 @@ import { DiffService } from '../diff.service';
 export interface Line {
   code: string; // Original code of the line
   highlightedCode: string; // Code with html tags
-  isOpen: boolean;  // Does the line have a placeholder for comments?
+  hasPlaceholder: boolean;  // Does the line have a placeholder for comments?
   isCommentsVisible: boolean; // Should comments be displayed?
   isChanged: boolean; // Should the line be highligted as modified?
   height: number; // Height of placeholder
   comments: Comment[];
 }
 
+// The component implements a single block of a code
+// Usually, a diff contains two of them (left and right)
 @Component({
   selector: 'code-block',
   templateUrl: './code-block.component.html',
   styleUrls: ['./code-block.component.scss']
 })
-export class CodeBlockComponent implements OnInit {
+export class CodeBlockComponent implements OnInit, OnDestroy {
   isComponentInit: boolean = false;
   lines: Line[] = [];
   // Highlighted code with placeholders, in lines.
   highlightedLines: string[] = [];
 
   @Input() fileContent: string;
-  @Input() isUpdate: boolean;
+  @Input() isNewCode: boolean;
   @Input() changes: number[];
   // TODO: Do not use Threads
   @Input() threads: Thread[];
+
+  lineHeightChangesSubscription: Subscription;
+  closeCommentsChangesSubscription: Subscription;
+  openCommentsChangesSubscription: Subscription;
 
   constructor(
     private highlightService: HighlightService,
     private changeDetectorRef: ChangeDetectorRef,
     private diffService: DiffService,
   ) {
-    this.diffService.lineHeightChanges.subscribe(param => {
-      this.lines[param.lineNumber].isOpen = true;
-      this.lines[param.lineNumber].height = param.height;
-      this.addPlaceholder(param.lineNumber);
-    });
-    this.diffService.closeCommentsChanges.subscribe(lineNumber => {
-      this.closeCommentsBlock(lineNumber);
-    });
-    this.diffService.openCommentChanges.subscribe(lineNumber => {
-      // Open comment always on right side
-      if (!this.isUpdate) {
-        return;
-      }
-      this.openCommentsBlock(lineNumber);
-    });
+    // Subscriptions on events
+    this.lineHeightChangesSubscription = this.diffService
+      .lineHeightChanges.subscribe(param => {
+        // Height of a comment block is changed
+        this.lines[param.lineNumber].hasPlaceholder = true;
+        this.lines[param.lineNumber].height = param.height;
+        this.addPlaceholder(param.lineNumber);
+      });
+    this.closeCommentsChangesSubscription = this.diffService
+      .closeCommentsChanges.subscribe(lineNumber => {
+        // Request for closing a comment block
+        this.closeCommentsBlock(lineNumber);
+      });
+    this.openCommentsChangesSubscription = this.diffService
+      .openCommentsChanges.subscribe(lineNumber => {
+        // Request for opening a comment block
+        if (!this.isNewCode) {
+          // Open comments always on right side
+          return;
+        }
+        this.openCommentsBlock(lineNumber);
+      });
   }
 
   ngOnInit() {
     this.initLines(this.fileContent);
     this.initChanges(this.changes);
-    this.initComments(this.threads);
+    this.addComments(this.threads);
     this.isComponentInit = true;
   }
 
@@ -65,7 +85,13 @@ export class CodeBlockComponent implements OnInit {
     if (!this.isComponentInit) {
       return;
     }
-    this.initComments(this.threads);
+    this.addComments(this.threads);
+  }
+
+  ngOnDestroy() {
+    this.lineHeightChangesSubscription.unsubscribe();
+    this.closeCommentsChangesSubscription.unsubscribe();
+    this.openCommentsChangesSubscription.unsubscribe();
   }
 
   // Highlitght code, split it by lines.
@@ -83,7 +109,7 @@ export class CodeBlockComponent implements OnInit {
     FileLines.forEach((code, i) => {
       this.lines.push({
         code: code,
-        isOpen: false,
+        hasPlaceholder: false,
         height: 0,
         highlightedCode: this.highlightedLines[i],
         comments: [],
@@ -105,8 +131,7 @@ export class CodeBlockComponent implements OnInit {
   }
 
   // Add comments to lines
-  // Bootstrap method.
-  initComments(threads: Thread[]): void {
+  addComments(threads: Thread[]): void {
     if (!threads) {
       return;
     }
@@ -153,15 +178,15 @@ export class CodeBlockComponent implements OnInit {
   }
 
   openCommentsBlock(i: number): void {
-    if (this.lines[i].isOpen) {
+    if (this.lines[i].hasPlaceholder) {
       return;
     }
-    this.lines[i].isOpen = true;
+    this.lines[i].hasPlaceholder = true;
     this.lines[i].isCommentsVisible = true;
   }
 
   closeCommentsBlock(i: number): void {
-    this.lines[i].isOpen = false;
+    this.lines[i].hasPlaceholder = false;
     this.lines[i].isCommentsVisible = false;
     this.lines[i].height = 0;
     this.highlightedLines[i] = this.lines[i].highlightedCode;
@@ -170,7 +195,7 @@ export class CodeBlockComponent implements OnInit {
   // Choose a color of changes highlighting
   lineBackground(line: Line): string {
     if (line.isChanged) {
-      return this.isUpdate ? 'new-code' : 'old-code';
+      return this.isNewCode ? 'new-code' : 'old-code';
     } else {
       return 'default';
     }

@@ -18,12 +18,14 @@ interface AddCommentResponse {
 // diff component (and children) and send to another.
 @Injectable()
 export class DiffService {
-  hoveredLine: number;
-  isUpdatedHovered: boolean;
+  // A number of the line, where user cursor is hovering right now.
+  private hoveredLine: number;
+  // Is cursor hovering above new/old code?
+  private isHoveredNewCode: boolean;
 
   // Subjects, which send data:
   lineHeightChanges = new Subject<HeightResponse>();
-  openCommentChanges = new Subject<number>();
+  openCommentsChanges = new Subject<number>();
   closeCommentsChanges = new Subject<number>();
   newComment = new Subject<AddCommentResponse>();
 
@@ -32,7 +34,7 @@ export class DiffService {
     this.lineHeightChanges.next(param);
   }
   openComments(lineNumber: number): void {
-    this.openCommentChanges.next(lineNumber);
+    this.openCommentsChanges.next(lineNumber);
   }
   closeComments(lineNumber: number): void {
     this.closeCommentsChanges.next(lineNumber);
@@ -42,17 +44,17 @@ export class DiffService {
   }
 
   // Lines detect mouse hover by the method
-  mouseHover(i: number, isUpdate: boolean): void {
+  mouseHover(i: number, isNewCode: boolean): void {
     this.hoveredLine = i;
-    this.isUpdatedHovered = isUpdate;
+    this.isHoveredNewCode = isNewCode;
   }
 
   // Lines use it to know, should they display
   // 'add-comment-button` on the line or not
-  hoverCheck(i: number, isUpdate: boolean): boolean {
+  hoverCheck(i: number, isNewCode: boolean): boolean {
     return (
       this.hoveredLine === i &&
-      this.isUpdatedHovered === isUpdate
+      this.isHoveredNewCode === isNewCode
     );
   }
 }

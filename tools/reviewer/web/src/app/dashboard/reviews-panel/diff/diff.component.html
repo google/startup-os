@@ -1,5 +1,6 @@
 <div class="file-header">
-  <span>{{filePath}}</span>
+  <div><a routerLink="/diff/{{ diffId }}">Back</a></div>
+  <div><span>{{filePath}}</span></div>
 </div>
 
 <div class="loading" *ngIf="isLoading">
@@ -9,14 +10,14 @@
   <!-- Old code (left) -->
   <code-block
     [fileContent]="files[0]"
-    [isUpdate]="false"
+    [isNewCode]="false"
     [changes]="changes"
   ></code-block>
 
   <!-- New code (right) -->
   <code-block
     [fileContent]="files[1]"
-    [isUpdate]="true"
+    [isNewCode]="true"
     [changes]="changes"
     [threads]="threads"
   ></code-block>

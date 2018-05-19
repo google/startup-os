@@ -1,5 +1,12 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs/Subscription';
 
 import { Comment, Diff, Thread } from '@/shared';
 import {
@@ -12,12 +19,13 @@ import { DiffService } from './diff.service';
 // TODO: load files from server
 import { files } from './mock-files';
 
+// The component implements a diff
 @Component({
   selector: 'app-diff',
   templateUrl: './diff.component.html',
   styleUrls: ['./diff.component.scss']
 })
-export class DiffComponent implements OnInit {
+export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   filePath: string;
   files: string[] = files;
@@ -25,6 +33,8 @@ export class DiffComponent implements OnInit {
   threads: Thread[];
   snapshot: number;
   diff: Diff;
+  newCommentSubscription: Subscription;
+  diffId: string;
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -35,9 +45,11 @@ export class DiffComponent implements OnInit {
   ) {
     this.changes = this.differenceService.compare(files[0], files[1]);
 
-    this.diffService.newComment.subscribe(param => {
-      this.addComment(param.lineNumber, param.comments);
-    });
+    this.newCommentSubscription = this.diffService
+      .newComment.subscribe(param => {
+        // New comment is added
+        this.addComment(param.lineNumber, param.comments);
+      });
   }
 
   addComment(lineNumber: number, comments: Comment[]): void {
@@ -72,8 +84,8 @@ export class DiffComponent implements OnInit {
 
     this.snapshot = parseInt(urlSnapshot.queryParams['rs'], 10) || null;
 
-    const id: string = urlSnapshot.url[0].path;
-    this.firebaseService.getDiff(id).subscribe(diff => {
+    this.diffId = urlSnapshot.url[0].path;
+    this.firebaseService.getDiff(this.diffId).subscribe(diff => {
       this.diff = diff;
       this.filtherThreads(diff.threads);
       this.isLoading = false;
@@ -84,5 +96,9 @@ export class DiffComponent implements OnInit {
     this.threads = treads.filter(
       v => v.filename === this.filePath
     );
+  }
+
+  ngOnDestroy() {
+    this.newCommentSubscription.unsubscribe();
   }
 }

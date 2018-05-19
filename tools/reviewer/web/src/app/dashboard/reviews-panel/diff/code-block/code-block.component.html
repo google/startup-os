@@ -1,19 +1,19 @@
 <div id="code-block">
   <line-numbers
     [lines]="lines"
-    [isUpdate]="isUpdate"
+    [isNewCode]="isNewCode"
   ></line-numbers>
 
   <add-comment-buttons
     [lines]="lines"
-    [isUpdate]="isUpdate"
+    [isNewCode]="isNewCode"
   ></add-comment-buttons>
 
   <div class="code">
     <!-- Changes highlighting -->
     <changes-highlighting
       [lines]="lines"
-      [isUpdate]="isUpdate"
+      [isNewCode]="isNewCode"
     ></changes-highlighting>
     
     <!-- Highlighted code -->
@@ -24,7 +24,7 @@
     <div class="hidden-lines">
       <div class="line"
         *ngFor="let line of lines; let i=index "
-        (mouseover)="diffService.mouseHover(i, isUpdate)"
+        (mouseover)="diffService.mouseHover(i, isNewCode)"
       >
         <pre [HTML]="line.code"></pre>
         
@@ -32,11 +32,11 @@
         <line-comments
           [lineNumber]="i"
           [comments]="line.comments"
-          *ngIf="line.isOpen && line.isCommentsVisible"
+          *ngIf="line.hasPlaceholder && line.isCommentsVisible"
         ></line-comments>
 
         <div class="placeholder"
-          *ngIf="line.isOpen && !line.isCommentsVisible"
+          *ngIf="line.hasPlaceholder && !line.isCommentsVisible"
           [style.height.px]="line.height"
         ></div>
       </div>

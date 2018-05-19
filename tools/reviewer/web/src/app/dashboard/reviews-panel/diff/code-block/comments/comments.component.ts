@@ -14,6 +14,7 @@ import { Subject } from 'rxjs/Subject';
 import { AuthService, Comment } from '@/shared';
 import { DiffService } from '../../diff.service';
 
+// The component implements comments of code block
 @Component({
   selector: 'line-comments',
   templateUrl: './comments.component.html',

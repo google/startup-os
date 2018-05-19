@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 
 import { Line } from '../code-block.component';
 
+// The component implements highlighting of code changes
 @Component({
   selector: 'changes-highlighting',
   templateUrl: './changes-highlighting.component.html',
@@ -9,5 +10,5 @@ import { Line } from '../code-block.component';
 })
 export class ChangesHighlightingComponent {
   @Input() lines: Line[];
-  @Input() isUpdate: boolean;
+  @Input() isNewCode: boolean;
 }

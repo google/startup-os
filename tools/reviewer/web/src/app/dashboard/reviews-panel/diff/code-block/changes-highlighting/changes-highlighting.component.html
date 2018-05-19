@@ -4,7 +4,7 @@
   >
     <div class="line-changes">
       <pre
-        [class]="isUpdate?'new-code':'old-code'"
+        [class]=" isNewCode ? 'new-code' : 'old-code' "
         *ngIf="line.isChanged"
         [HTML]="line.code"
       ></pre>

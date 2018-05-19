@@ -3,6 +3,7 @@ import { Component, Input } from '@angular/core';
 import { CodeBlockViewService } from '../code-block-view.service';
 import { Line } from '../code-block.component';
 
+// The component implements line numbers of code block
 @Component({
   selector: 'line-numbers',
   templateUrl: './line-numbers.component.html',
@@ -11,7 +12,7 @@ import { Line } from '../code-block.component';
 })
 export class LineNumbersComponent {
   @Input() lines: Line[];
-  @Input() isUpdate: boolean;
+  @Input() isNewCode: boolean;
 
   constructor(
     public codeBlockViewService: CodeBlockViewService
