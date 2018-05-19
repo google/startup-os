@@ -48,9 +48,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
 
   @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
-  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
+  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer/data/diff/");
 
-  private static final String META_COLLECTION = "/reviewer-meta";
+  private static final String META_COLLECTION = "/reviewer";
   private static final String META_LAST_DIFF_NUMBER_DOCUMENT = "last_diff_id";
 
   private AuthService authService;
