@@ -149,7 +149,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
     client.createDocument(firestoreReviewRoot.get(), req.getDiff());
-    responseObserver.onNext(Empty.newBuilder().build());
+    responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
 
