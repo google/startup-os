@@ -54,7 +54,9 @@ public class FirestoreJsonFormat {
     public String print(MessageOrBuilder message) throws InvalidProtocolBufferException {
       JsonParser parser = new JsonParser();
 
-      String messageAsJson = JsonFormat.printer().print(message);
+      // we need .preservingProtoFieldNames() because
+      // by default JsonFormat.Printer converts field identifiers to lowerCamelCase
+      String messageAsJson = JsonFormat.printer().preservingProtoFieldNames().print(message);
       JsonObject firestoreJson = new JsonObject();
       firestoreJson.add(
           "fields",
@@ -233,4 +235,3 @@ public class FirestoreJsonFormat {
     }
   }
 }
-
