@@ -23,7 +23,7 @@ message FileResponse { string content = 1; }
 
 message CreateDiffRequest { Diff diff = 1; }
 
-message DiffNumberResponse { int64 diffNumber = 1; }
+message DiffNumberResponse { int64 last_diff_id = 1; }
 
 message TextDiffRequest {
   File left_file = 1;
@@ -85,7 +85,8 @@ message Diff {
  *   <base>/users/<user>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
  *
  * Note that above paths are "conceptual" and not real filesystem paths.
- * The distinction between the above, is based on the fields, e.g user being empty or not.
+ * The distinction between the above, is based on the fields, e.g user being
+ * empty or not.
  */
 message File {
   enum Action {
@@ -117,9 +118,7 @@ message SingleRepoSnapshot {
 }
 
 // A snapshot over multiple repos
-message Snapshot {
-  repeated SingleRepoSnapshot snapshot = 1;
-}
+message Snapshot { repeated SingleRepoSnapshot snapshot = 1; }
 
 message Thread {
   int32 snapshot = 1;

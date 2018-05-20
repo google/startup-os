@@ -11,9 +11,9 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.service.Protos;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -28,6 +28,8 @@ public class DiffCommand implements AaCommand {
   private Config config;
   private GitRepoFactory gitRepoFactory;
   private String currentWorkspaceName;
+
+  private static final Integer GRPC_PORT = 8001;
 
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
@@ -52,7 +54,7 @@ public class DiffCommand implements AaCommand {
     this.currentWorkspaceName = currentWorkspaceName;
 
     ManagedChannel channel =
-        ManagedChannelBuilder.forAddress("localhost", 8001).usePlaintext().build();
+        ManagedChannelBuilder.forAddress("localhost", GRPC_PORT).usePlaintext().build();
     codeReviewBlockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
@@ -60,9 +62,9 @@ public class DiffCommand implements AaCommand {
   public void run(String[] args) {
     Flags.parse(args, this.getClass().getPackage());
 
-    Protos.DiffNumberResponse response =
+    DiffNumberResponse response =
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
-    String branchName = String.format("D%s", response.getDiffNumber());
+    String branchName = String.format("D%s", response.getLastDiffId());
 
     Diff.Builder diffBuilder =
         Diff.newBuilder()
@@ -70,7 +72,7 @@ public class DiffCommand implements AaCommand {
             .setDescription(description.get())
             .setBug(buglink.get())
             .addAllReviewer(Arrays.asList(reviewers.get().split(",")))
-            .setNumber(response.getDiffNumber())
+            .setNumber(response.getLastDiffId())
             .addAuthor(config.getUser());
 
     String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);

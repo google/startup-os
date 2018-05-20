@@ -48,10 +48,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
 
   @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
-  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer/data/diff");
+  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
 
-  private static final String META_COLLECTION = "/reviewer";
-  private static final String META_LAST_DIFF_NUMBER_DOCUMENT = "last_diff_id";
+  private static final String DOCUMENT_FOR_LAST_DIFF_NUMBER = "data";
 
   private AuthService authService;
   private FileUtils fileUtils;
@@ -148,8 +147,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
-    client.createDocument(
-        firestoreReviewRoot.get(), String.valueOf(req.getDiff().getNumber()), req.getDiff());
+    String diffPath = firestoreReviewRoot.get() + "/data/diff";
+    client.createDocument(diffPath, String.valueOf(req.getDiff().getNumber()), req.getDiff());
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
@@ -182,12 +181,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     Protos.DiffNumberResponse diffNumberResponse =
         (Protos.DiffNumberResponse)
             client.getDocument(
-                META_COLLECTION + "/" + META_LAST_DIFF_NUMBER_DOCUMENT,
+                firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
                 Protos.DiffNumberResponse.newBuilder());
     client.createDocument(
-        META_COLLECTION,
-        META_LAST_DIFF_NUMBER_DOCUMENT,
-        diffNumberResponse.toBuilder().setDiffNumber(diffNumberResponse.getDiffNumber() + 1));
+        firestoreReviewRoot.get(),
+        DOCUMENT_FOR_LAST_DIFF_NUMBER,
+        diffNumberResponse.toBuilder().setLastDiffId(diffNumberResponse.getLastDiffId() + 1));
     responseObserver.onNext(diffNumberResponse);
     responseObserver.onCompleted();
   }
