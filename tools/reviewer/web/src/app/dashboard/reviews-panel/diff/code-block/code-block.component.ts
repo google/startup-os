@@ -191,13 +191,4 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     this.lines[i].height = 0;
     this.highlightedLines[i] = this.lines[i].highlightedCode;
   }
-
-  // Choose a color of changes highlighting
-  lineBackground(line: Line): string {
-    if (line.isChanged) {
-      return this.isNewCode ? 'new-code' : 'old-code';
-    } else {
-      return 'default';
-    }
-  }
 }
