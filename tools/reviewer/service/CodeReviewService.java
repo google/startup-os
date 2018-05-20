@@ -48,7 +48,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
 
   @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
-  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer/data/diff/");
+  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer/data/diff");
 
   private static final String META_COLLECTION = "/reviewer";
   private static final String META_LAST_DIFF_NUMBER_DOCUMENT = "last_diff_id";
@@ -148,7 +148,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
-    client.createDocument(firestoreReviewRoot.get(), req.getDiff());
+    client.createDocument(
+        firestoreReviewRoot.get(), String.valueOf(req.getDiff().getNumber()), req.getDiff());
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
