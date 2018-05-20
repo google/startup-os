@@ -27,7 +27,7 @@ import org.junit.runners.JUnit4;
 
 /** Tests for {@link com.google.startupos.common.TextDifferencer}. */
 @RunWith(JUnit4.class)
-public class LCSTextDifferencerTest {
+public class TextDifferencerTest {
 
   private TextDifferencer differencer;
 
@@ -42,7 +42,7 @@ public class LCSTextDifferencerTest {
 
   @Before
   public void setUp() {
-    differencer = new LCSTextDifferencer();
+    differencer = new TextDifferencer();
   }
 
   @Test

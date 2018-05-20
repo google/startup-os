@@ -27,10 +27,4 @@ public class CommonModule {
   public @Provides @Singleton FileSystem provideDefaultFileSystem() {
     return FileSystems.getDefault();
   }
-
-  @Provides
-  @Singleton
-  public TextDifferencer provideDefaultTextDifferencer() {
-    return new LCSTextDifferencer();
-  }
 }

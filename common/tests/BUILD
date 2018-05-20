@@ -33,9 +33,9 @@ java_test(
 )
 
 java_test(
-    name = "LCSTextDifferencerTest",
-    srcs = ["LCSTextDifferencerTest.java"],
-    test_class = "com.google.startupos.common.LCSTextDifferencerTest",
+    name = "TextDifferencerTest",
+    srcs = ["TextDifferencerTest.java"],
+    test_class = "com.google.startupos.common.TextDifferencerTest",
     deps = [
         "//common:text_difference_java_proto",
         "//common:text_differencer",

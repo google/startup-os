@@ -41,12 +41,12 @@ java_library(
 java_library(
     name = "text_differencer",
     srcs = [
-        "LCSTextDifferencer.java",
         "TextDifferencer.java",
     ],
     deps = [
         ":text_difference_java_proto",
         "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
     ],
 )
 
