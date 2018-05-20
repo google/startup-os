@@ -25,6 +25,7 @@
       <div class="line"
         *ngFor="let line of lines; let i=index "
         (mouseover)="diffService.mouseHover(i, isNewCode)"
+        (dblclick)="diffService.openComments(i)"
       >
         <pre [HTML]="line.code"></pre>
         
