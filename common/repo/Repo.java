@@ -42,8 +42,12 @@ public interface Repo {
   void pushAll();
   /** Pulls all branches from remote repo */
   void pull();
-  /** Merges branch to master. Returns true on success. */
+  /** Merges branch to master, keeping conflicting changes in tree. * Returns true on success. */
   boolean merge(String branch);
+  /** Merges branch to master, preferring the changes in other branch * Returns true on success. */
+  default boolean mergeTheirs(String branch) {
+    return merge(branch);
+  };
   /** Is branch merged to master */
   boolean isMerged(String branch);
   /*
@@ -54,6 +58,8 @@ public interface Repo {
   void reset(String ref);
   /** Remove branch */
   void removeBranch(String branch);
+  /** List branches */
+  ImmutableList<String> listBranches();
 
   String getFileContents(String commitId, String path);
 }
