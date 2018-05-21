@@ -23,6 +23,7 @@ import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
@@ -107,7 +108,15 @@ public class FirestoreClient {
       connection.setDoOutput(true);
       connection.getOutputStream().write(postDataBytes);
 
-      Reader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+      InputStream stream;
+
+      if (connection.getResponseCode() != HTTP_OK) {
+        stream = connection.getErrorStream();
+      } else {
+        stream = connection.getInputStream();
+      }
+
+      Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
 
       for (int c; (c = in.read()) >= 0; ) System.out.print((char) c);
     } catch (IOException e) {
