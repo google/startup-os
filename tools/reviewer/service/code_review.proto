@@ -13,6 +13,7 @@ service CodeReviewService {
   rpc getFile(FileRequest) returns (FileResponse);
   rpc createDiff(CreateDiffRequest) returns (.google.protobuf.Empty);
   rpc getTextDiff(TextDiffRequest) returns (TextDiffResponse);
+  // returns available diff number and increments stored value by one
   rpc getAvailableDiffNumber(.google.protobuf.Empty)
       returns (DiffNumberResponse);
 }

@@ -26,6 +26,7 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
@@ -147,7 +148,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
-    String diffPath = firestoreReviewRoot.get() + "/data/diff";
+    String diffPath = fileUtils.joinPaths(firestoreReviewRoot.get(), "data/diff");
     client.createDocument(diffPath, String.valueOf(req.getDiff().getNumber()), req.getDiff());
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
@@ -173,16 +174,18 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onCompleted();
   }
 
+  // TODO: fix concurrency issues (if two different call method at same time)
+  // could be done by wrapping in a transaction
   @Override
   public void getAvailableDiffNumber(
-      Empty request, StreamObserver<Protos.DiffNumberResponse> responseObserver) {
+      Empty request, StreamObserver<DiffNumberResponse> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
-    Protos.DiffNumberResponse diffNumberResponse =
-        (Protos.DiffNumberResponse)
+    DiffNumberResponse diffNumberResponse =
+        (DiffNumberResponse)
             client.getDocument(
                 firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
-                Protos.DiffNumberResponse.newBuilder());
+                DiffNumberResponse.newBuilder());
     client.createDocument(
         firestoreReviewRoot.get(),
         DOCUMENT_FOR_LAST_DIFF_NUMBER,
