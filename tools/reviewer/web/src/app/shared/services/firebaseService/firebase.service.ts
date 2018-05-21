@@ -1,4 +1,4 @@
-import { Diff } from '@/shared';
+import { Comment, Diff } from '@/shared';
 import { Injectable } from '@angular/core';
 import {
   AngularFireAction,
@@ -16,22 +16,25 @@ export class FirebaseService {
     return this.db.object('diffs').valueChanges();
   }
 
-  getDiff(id: string): Observable<Array<Diff>> {
-    const obj: AngularFireObject<Array<Diff>> = this.db.object('diffs/' + id);
+  getDiff(id: string): Observable<Diff> {
+    const obj: AngularFireObject<Diff> = this.db.object('diffs/' + id);
     return obj.valueChanges();
   }
 
-  updateDiff(diff: Diff): Promise<void> {
-    return this.db
-      .object('diffs/' + diff.number)
-      .update(diff)
-      .then(() => {
-        // TODO Notify of comment saved Success
-      })
-      .catch(err => {
-        // TODO Notify of error
-        console.log(err);
-      });
+  // TODO: add/delete/change separete elements,
+  // instead of updating whole diff
+  updateDiff(diff: Diff): Observable<void> {
+    return new Observable(observer => {
+      this.db
+        .object('diffs/' + diff.number)
+        .update(diff)
+        .then(() => {
+          observer.next();
+        })
+        .catch(err => {
+          observer.error();
+        });
+    });
   }
 
   removeProperty(diff: Diff, property: string): Promise<void> {
