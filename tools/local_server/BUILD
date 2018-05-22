@@ -8,19 +8,17 @@ java_binary(
     main_class = "com.google.startupos.tools.localserver.LocalServer",
     deps = [
         "//common",
-        "//common/flags",
         "//common:dagger_with_annotation_processor",
-        "//tools/aa:aa_module",
-        "//tools/local_server/service:auth_service",
-        "//tools/reviewer/service",
+        "//common/flags",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/slf4j:slf4j_simple",
+        "//tools/aa:aa_module",
+        "//tools/local_server/service:auth_service",
+        "//tools/reviewer/service",
     ],
 )
-
 
 java_library(
     name = "local_http_gateway_grpc_client",
@@ -28,13 +26,13 @@ java_library(
         "LocalHttpGatewayGrpcClient.java",
     ],
     deps = [
+        "//third_party/maven/io/grpc:grpc_core",
+        "//third_party/maven/io/grpc:grpc_netty",
+        "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//tools/local_server/service:auth_service_java_grpc",
         "//tools/local_server/service:auth_service_java_proto",
         "//tools/reviewer/service:code_review_java_grpc",
         "//tools/reviewer/service:code_review_java_proto",
-        "//third_party/maven/io/grpc:grpc_core",
-        "//third_party/maven/io/grpc:grpc_netty",
-        "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
     ],
 )
 
@@ -47,9 +45,8 @@ java_binary(
     deps = [
         ":local_http_gateway_grpc_client",
         "//common/flags",
-        "//tools/reviewer/service:code_review_java_proto",
         "//third_party/maven/com/google/guava",
-        "//third_party/maven/org/json:json",
-        "//third_party/maven/org/slf4j:slf4j_simple",
+        "//third_party/maven/org/json",
+        "//tools/reviewer/service:code_review_java_proto",
     ],
 )

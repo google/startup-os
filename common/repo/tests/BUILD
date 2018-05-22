@@ -11,7 +11,6 @@ java_library(
       "//tools/reviewer/service:code_review_java_proto",
       "//third_party/maven/com/google/guava:guava",
       "//third_party/maven/javax/annotation:javax_annotation_api",
-      "//third_party/maven/org/slf4j:slf4j_api",
   ]
 )
 
@@ -26,6 +25,5 @@ java_binary(
         "//common:dagger_with_annotation_processor",
         "//common/repo",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )

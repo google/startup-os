@@ -18,13 +18,10 @@ package com.google.startupos.common.flags;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-// TODO: Make logging only require 1 package instead of 2.
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.flogger.FluentLogger;
 
 /**
  * Parses command-line arguments.
@@ -35,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * doing something with them like maintaining the current state and writing flag data.
  */
 class GflagsParser {
-  private static final Logger log = LoggerFactory.getLogger(GflagsParser.class);
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
   private final List<String> arguments = new ArrayList<String>();
   private final Map<String, FlagData> flags;
   private State state = State.EXPECT_KEY;
@@ -148,11 +145,11 @@ class GflagsParser {
   }
 
   private void errorUnknownFlag(String flag) {
-    log.error("Unknown flag: {}", flag);
+    log.atSevere().log("Unknown flag: {%s}", flag);
   }
 
   private void errorFlagHasNoValue() {
-    log.error("Option {} has no value", lastFlag);
+    log.atSevere().log("Option {%s} has no value", lastFlag);
   }
 
   @VisibleForTesting
@@ -170,4 +167,3 @@ class GflagsParser {
     }
   }
 }
-

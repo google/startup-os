@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.localserver;
 
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
@@ -27,7 +28,6 @@ import dagger.Component;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import java.io.IOException;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -40,7 +40,7 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class LocalServer {
-  private static final Logger logger = Logger.getLogger(LocalServer.class.getName());
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
   private static final Flag<Integer> localServerPort = Flag.create(8001);
@@ -58,7 +58,7 @@ public class LocalServer {
 
   private void start() throws IOException {
     server.start();
-    logger.info("Server started, listening on " + localServerPort.get());
+    logger.atInfo().log("Server started, listening on " + localServerPort.get());
     Runtime.getRuntime()
         .addShutdownHook(
             new Thread(

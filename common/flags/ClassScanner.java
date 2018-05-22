@@ -23,13 +23,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
+import com.google.common.flogger.FluentLogger;
 import org.reflections.Reflections;
 import org.reflections.scanners.FieldAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Scans for {@code Flag} fields using reflection and saves their data.
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * variable names are camelCase. - Flag names are underscore_case.
  */
 public class ClassScanner {
-  private static final Logger log = LoggerFactory.getLogger(ClassScanner.class);
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
 
   public void scanPackage(String packagePrefix, Map<String, FlagData> flags) {
     // TODO - figure out configuration builder.
@@ -119,7 +118,7 @@ public class ClassScanner {
       ParameterizedType flagType = (ParameterizedType) field.getGenericType();
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
-        log.warn(
+        log.atWarning().log(
             "Cannot check if flag '"
                 + field
                 + "' is of boolean type. It"
@@ -130,7 +129,7 @@ public class ClassScanner {
         return true;
       }
     } else {
-      log.warn(
+      log.atWarning().log(
           "Cannot check if flag '"
               + field
               + "' is of boolean type. It's"

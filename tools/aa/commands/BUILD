@@ -19,7 +19,6 @@ java_library(
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
         "//third_party/maven/org/reflections",
-        "//third_party/maven/org/slf4j:slf4j_simple",
         "//tools/aa:config_java_proto",
         "//tools/local_server/service:auth_service_java_grpc",
         "//tools/local_server/service:auth_service_java_proto",

@@ -23,7 +23,6 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/reflections",
-        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
 
@@ -35,13 +34,12 @@ java_binary(
         ":aa_module",
         ":config_java_proto",
         "//common",
-        "//common/flags",
         "//common:dagger_with_annotation_processor",
+        "//common/flags",
         "//external:jar/com/google/protobuf/protobuf_java",
-        "//tools/aa/commands",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/reflections",
-        "//third_party/maven/org/slf4j:slf4j_simple",
+        "//tools/aa/commands",
     ],
 )

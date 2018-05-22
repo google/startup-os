@@ -14,10 +14,10 @@ java_library(
       ":flags_java_proto",
       "//third_party/maven/org/reflections:reflections",
       "//third_party/maven/org/javassist:javassist",
-      "//third_party/maven/org/slf4j:slf4j_api",
       "//third_party/maven/com/google/code/findbugs:jsr305",
       "//third_party/maven/javax/annotation:javax_annotation_api",
       "//third_party/maven/com/google/guava:guava",
+      "//third_party/maven/com/google/flogger:flogger",
   ]
 )
 

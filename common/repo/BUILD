@@ -15,7 +15,7 @@ java_library(
     name = "repo",
     srcs = [
         "GitRepo.java",
-        "Repo.java", 
+        "Repo.java",
     ],
     deps = [
         ":repo_java_proto",
@@ -30,6 +30,5 @@ java_library(
         "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
-        "//third_party/maven/org/slf4j:slf4j_api",
     ]
 )

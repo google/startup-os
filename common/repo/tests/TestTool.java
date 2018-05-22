@@ -19,10 +19,7 @@ package com.google.startupos.common.repo.tests;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.common.repo.Repo;
 import dagger.Component;
-import java.io.IOException;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 

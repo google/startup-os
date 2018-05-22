@@ -60,6 +60,5 @@ java_binary(
         "//common",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
-        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
