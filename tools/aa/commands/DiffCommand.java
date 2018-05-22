@@ -34,6 +34,7 @@ public class DiffCommand implements AaCommand {
   private String workspacePath;
 
   private static final Integer GRPC_PORT = 8001;
+  private static final Integer NOT_A_VALUE = -1024;
 
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
@@ -223,6 +224,14 @@ public class DiffCommand implements AaCommand {
     return diffBuilder.build();
   }
 
+  private static Integer safeParseInt(String s) {
+    try {
+      return Integer.parseInt(s);
+    } catch (NumberFormatException e) {
+      return NOT_A_VALUE;
+    }
+  }
+
   @Override
   public void run(String[] args) {
     Flags.parse(args, this.getClass().getPackage());
@@ -247,7 +256,8 @@ public class DiffCommand implements AaCommand {
           repo.listBranches()
               .stream()
               .filter(branchName -> branchName.startsWith("D"))
-              .mapToInt(branchName -> Integer.parseInt(branchName.replace("D", "")))
+              .mapToInt(branchName -> safeParseInt(branchName.replace("D", "")))
+              .filter(number -> number > 0)
               .findFirst()
               .orElse(-1);
 
