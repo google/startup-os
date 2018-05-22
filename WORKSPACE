@@ -114,18 +114,18 @@ http_file(
 
 http_archive(
     name = "com_google_googletest",
-    strip_prefix = "googletest-master",
-    urls = ["https://github.com/google/googletest/archive/master.zip"],
+    strip_prefix = "googletest-08d5b1f33af8c18785fb8ca02792b5fac81e248f",
+    urls = ["https://github.com/google/googletest/archive/08d5b1f33af8c18785fb8ca02792b5fac81e248f.zip"]
 )
 
 http_archive(
     name = "com_github_google_benchmark",
-    strip_prefix = "benchmark-master",
-    urls = ["https://github.com/google/benchmark/archive/master.zip"],
+    strip_prefix = "benchmark-6d74c0625b8e88c1afce72b4f383c91b9a99dbe6",
+    urls = ["https://github.com/google/benchmark/archive/6d74c0625b8e88c1afce72b4f383c91b9a99dbe6.zip"],
 )
 
 http_archive(
     name = "com_google_absl",
-    strip_prefix = "abseil-cpp-master",
-    urls = ["https://github.com/abseil/abseil-cpp/archive/master.zip"],
+    strip_prefix = "abseil-cpp-59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7.zip"],
 )
