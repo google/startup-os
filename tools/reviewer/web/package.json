@@ -28,6 +28,7 @@
     "core-js": "^2.4.1",
     "eslint": "^4.11.0",
     "firebase": "^4.6.0",
+    "highlight.js": "^9.10.0",
     "protobufjs": "^6.8.3",
     "rxjs": "^5.5.2",
     "zone.js": "^0.8.14"
