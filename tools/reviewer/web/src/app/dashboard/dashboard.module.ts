@@ -1,3 +1,4 @@
+import { Directives } from '@/shared';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -9,7 +10,8 @@ import {
   MatIconModule,
   MatInputModule,
   MatListModule,
-  MatSnackBarModule
+  MatProgressSpinnerModule,
+  MatSnackBarModule,
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -33,12 +35,16 @@ import {
     MatInputModule,
     MatListModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
     MatCardModule,
     MatFormFieldModule,
     BrowserAnimationsModule
   ],
   exports: [RouterModule],
-  declarations: DashboardComponents,
+  declarations: [
+    ...DashboardComponents,
+    Directives,
+  ],
   entryComponents: DashboardEntryComponents,
   providers: DashboardProviders
 })

@@ -1,0 +1,19 @@
+@import '../code-block-variables';
+
+.add-comment-buttons {
+  >.add-comment-button {
+    width: 25px;
+    >.icon {
+      height: $line-height;
+      mat-icon {
+        color: #036fe8;
+      }
+    }
+    >.placeholder {
+      background: $comments-background;
+    }
+  }
+  >.closed-comment {
+    cursor: pointer;
+  }
+}

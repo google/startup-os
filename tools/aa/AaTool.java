@@ -18,6 +18,7 @@ package com.google.startupos.tools.aa;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
+import com.google.startupos.tools.aa.commands.DiffCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.SyncCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
@@ -36,10 +37,12 @@ public class AaTool {
   AaTool(
       Lazy<InitCommand> initCommand,
       Lazy<WorkspaceCommand> workspaceCommand,
-      Lazy<SyncCommand> syncCommand) {
+      Lazy<SyncCommand> syncCommand,
+      Lazy<DiffCommand> diffCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
+    commands.put("diff", diffCommand);
   }
 
   private void printUsage() {

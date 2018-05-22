@@ -112,10 +112,7 @@ public class GitRepo implements Repo {
           .forEach(
               untracked ->
                   files.add(
-                      File.newBuilder()
-                          .setAction(File.Action.UNRECOGNIZED)
-                          .setFilename(untracked)
-                          .build()));
+                      File.newBuilder().setAction(File.Action.ADD).setFilename(untracked).build()));
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
@@ -123,12 +120,17 @@ public class GitRepo implements Repo {
   }
 
   public Commit commit(ImmutableList<File> files, String message) {
+    Commit.Builder commitBuilder = Commit.newBuilder();
     try {
       for (File file : files) {
         jGit.add().addFilepattern(file.getFilename()).call();
       }
       RevCommit revCommit = jGit.commit().setMessage(message).call();
-      return Commit.newBuilder().setId(revCommit.getId().toString()).addAllFile(files).build();
+      String commitId = revCommit.toObjectId().name();
+      for (File file : files) {
+        commitBuilder.addFile(file.toBuilder().setCommitId(commitId));
+      }
+      return commitBuilder.setId(commitId).build();
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }

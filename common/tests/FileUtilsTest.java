@@ -35,8 +35,8 @@ import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class FileUtilsTest {
@@ -48,11 +48,12 @@ public class FileUtilsTest {
 
   @Parameters(name = "{1}")
   public static Collection<Object[]> parameters() {
-    return Arrays.asList(new Object[][] {
-        {Configuration.unix(), "Unix"},
-        {Configuration.osX(), "OSX"},
-        {Configuration.windows(), "Windows"}
-    });
+    return Arrays.asList(
+        new Object[][] {
+          {Configuration.unix(), "Unix"},
+          {Configuration.osX(), "OSX"},
+          {Configuration.windows(), "Windows"}
+        });
   }
 
   private final Configuration fileSystemConfig;
@@ -68,11 +69,18 @@ public class FileUtilsTest {
   @Before
   public void setup() {
     fileSystem = Jimfs.newFileSystem(fileSystemConfig);
-    CommonComponent commonComponent = DaggerCommonComponent.builder().commonModule(new CommonModule() {
-      @Provides @Singleton @Override public FileSystem provideDefaultFileSystem() {
-        return fileSystem;
-      }
-    }).build();
+    CommonComponent commonComponent =
+        DaggerCommonComponent.builder()
+            .commonModule(
+                new CommonModule() {
+                  @Provides
+                  @Singleton
+                  @Override
+                  public FileSystem provideDefaultFileSystem() {
+                    return fileSystem;
+                  }
+                })
+            .build();
     fileUtils = commonComponent.getFileUtils();
   }
 
@@ -374,7 +382,9 @@ public class FileUtilsTest {
     Files.createFile(fileSystem.getPath("/foo/first_file.txt"));
     Files.createFile(fileSystem.getPath("/foo/second_file.txt"));
     ImmutableList<String> names = fileUtils.listContents("/foo");
-    assertEquals(ImmutableList.of("first_file.txt", "first_folder", "second_file.txt", "second_folder"), names);
+    assertEquals(
+        ImmutableList.of("first_file.txt", "first_folder", "second_file.txt", "second_folder"),
+        names);
   }
 
   @Test
@@ -429,11 +439,7 @@ public class FileUtilsTest {
       return;
     }
     ImmutableList<String> paths = fileUtils.listContentsRecursively("/");
-    assertEquals(
-        ImmutableList.of(
-            "/",
-            "/work"),
-        paths);
+    assertEquals(ImmutableList.of("/", "/work"), paths);
   }
 
   @Test(expected = NoSuchFileException.class)
@@ -452,22 +458,26 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_PROTOTXT_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(testPath, ImmutableList.of(
-        "int32_field: 123",
-        "string_field: \"foo\"",
-        "map_field {",
-        "key: \"foo\"",
-        "value: 123",
-        "}",
-        "enum_field: YES"),
+    Files.write(
+        testPath,
+        ImmutableList.of(
+            "int32_field: 123",
+            "string_field: \"foo\"",
+            "map_field {",
+            "key: \"foo\"",
+            "value: 123",
+            "}",
+            "enum_field: YES"),
         UTF_8);
-    TestMessage actual = (TestMessage) fileUtils.readPrototxt(TEST_PROTOTXT_FILE_PATH, TestMessage.newBuilder());
-    TestMessage expected = TestMessage.newBuilder()
-        .setInt32Field(123)
-        .setStringField("foo")
-        .putMapField("foo", 123)
-        .setEnumField(TestMessage.BooleanEnum.YES)
-        .build();
+    TestMessage actual =
+        (TestMessage) fileUtils.readPrototxt(TEST_PROTOTXT_FILE_PATH, TestMessage.newBuilder());
+    TestMessage expected =
+        TestMessage.newBuilder()
+            .setInt32Field(123)
+            .setStringField("foo")
+            .putMapField("foo", 123)
+            .setEnumField(TestMessage.BooleanEnum.YES)
+            .build();
     assertEquals(expected, actual);
   }
 
@@ -484,22 +494,25 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       return;
     }
-    TestMessage message = TestMessage.newBuilder()
-        .setInt32Field(123)
-        .setStringField("foo")
-        .putMapField("foo", 123)
-        .setEnumField(TestMessage.BooleanEnum.YES)
-        .build();
+    TestMessage message =
+        TestMessage.newBuilder()
+            .setInt32Field(123)
+            .setStringField("foo")
+            .putMapField("foo", 123)
+            .setEnumField(TestMessage.BooleanEnum.YES)
+            .build();
     fileUtils.writePrototxt(message, TEST_PROTOTXT_FILE_PATH);
-    ImmutableList<String> actual = ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(TEST_PROTOTXT_FILE_PATH)));
-    ImmutableList<String> expected = ImmutableList.of(
-        "int32_field: 123",
-        "string_field: \"foo\"",
-        "map_field {",
-        "  key: \"foo\"",
-        "  value: 123",
-        "}",
-        "enum_field: YES");
+    ImmutableList<String> actual =
+        ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(TEST_PROTOTXT_FILE_PATH)));
+    ImmutableList<String> expected =
+        ImmutableList.of(
+            "int32_field: 123",
+            "string_field: \"foo\"",
+            "map_field {",
+            "  key: \"foo\"",
+            "  value: 123",
+            "}",
+            "enum_field: YES");
     assertEquals(expected, actual);
   }
 
@@ -508,7 +521,7 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       throw new RuntimeException();
     }
-    fileUtils.writePrototxtUnchecked(TestMessage.newBuilder().build(), "");
+    fileUtils.writePrototxtUnchecked(TestMessage.getDefaultInstance(), "");
   }
 
   @Test
@@ -516,19 +529,21 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       return;
     }
-    TestMessage expected = TestMessage.newBuilder()
-        .setInt32Field(123)
-        .setStringField("foo")
-        .putMapField("foo", 123)
-        .setEnumField(TestMessage.BooleanEnum.YES)
-        .build();
+    TestMessage expected =
+        TestMessage.newBuilder()
+            .setInt32Field(123)
+            .setStringField("foo")
+            .putMapField("foo", 123)
+            .setEnumField(TestMessage.BooleanEnum.YES)
+            .build();
     Path testPath = fileSystem.getPath(TEST_PROTO_BINARY_FILE_PATH);
     Files.createDirectories(testPath.getParent());
     expected.writeTo(Files.newOutputStream(testPath));
-    TestMessage actual = (TestMessage) fileUtils.readProtoBinary(TEST_PROTO_BINARY_FILE_PATH, TestMessage.newBuilder());
+    TestMessage actual =
+        (TestMessage)
+            fileUtils.readProtoBinary(TEST_PROTO_BINARY_FILE_PATH, TestMessage.newBuilder());
     assertEquals(expected, actual);
   }
-
 
   @Test(expected = RuntimeException.class)
   public void testReadProtoBinaryUncheckedWithException() {
@@ -543,18 +558,20 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       return;
     }
-    TestMessage expected = TestMessage.newBuilder()
-        .setInt32Field(123)
-        .setStringField("foo")
-        .putMapField("foo", 123)
-        .setEnumField(TestMessage.BooleanEnum.YES)
-        .build();
+    TestMessage expected =
+        TestMessage.newBuilder()
+            .setInt32Field(123)
+            .setStringField("foo")
+            .putMapField("foo", 123)
+            .setEnumField(TestMessage.BooleanEnum.YES)
+            .build();
     fileUtils.writeProtoBinary(expected, TEST_PROTO_BINARY_FILE_PATH);
     Path testPath = fileSystem.getPath(TEST_PROTO_BINARY_FILE_PATH);
-    TestMessage actual = TestMessage.newBuilder()
-        .build()
-        .getParserForType()
-        .parseFrom(Files.newInputStream(testPath));
+    TestMessage actual =
+        TestMessage.newBuilder()
+            .build()
+            .getParserForType()
+            .parseFrom(Files.newInputStream(testPath));
     assertEquals(expected, actual);
   }
 
@@ -563,6 +580,6 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       throw new RuntimeException();
     }
-    fileUtils.writeProtoBinaryUnchecked(TestMessage.newBuilder().build(), "");
+    fileUtils.writeProtoBinaryUnchecked(TestMessage.getDefaultInstance(), "");
   }
 }
