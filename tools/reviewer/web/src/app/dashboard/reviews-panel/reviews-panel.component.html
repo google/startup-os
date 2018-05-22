@@ -1,7 +1,25 @@
-<!--  Temporary placement of logout button, 
-  It should be in a layout component-->
-<button mat-raised-button (click)="logout()">Logout</button>
-<hr>
+<mat-toolbar>
+  <mat-toolbar-row>
+    <div fxFlex="10%" fxLayoutAlign="center">
+      <img src="./assets/icon.png" height="44" width="44">
+    </div>
+    <div>
+      <span class="title">Reviewer</span>
+    </div>
+    <div fxFlex="1 1" class="search">
+      <input type="text">
+    </div>
+    <div>
+      <button mat-icon-button class="search-button">
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
+    <div class="action">
+      <button mat-raised-button (click)="logout()">Logout</button>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>
+
 <div fxLayout="column" fxLayoutGap="5%">
   <!-- Container for each list -->
   <ng-container *ngFor="let list of diffs;let listIndex = index;">

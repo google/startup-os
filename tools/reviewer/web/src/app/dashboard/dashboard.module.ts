@@ -9,7 +9,8 @@ import {
   MatIconModule,
   MatInputModule,
   MatListModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatToolbarModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -35,6 +36,7 @@ import {
     MatSnackBarModule,
     MatCardModule,
     MatFormFieldModule,
+    MatToolbarModule,
     BrowserAnimationsModule
   ],
   exports: [RouterModule],
