@@ -1,0 +1,9 @@
+<div class="line-numbers">
+  <div class="line-number
+    {{ codeBlockViewService.lineBackground(line, isNewCode) }}"
+    *ngFor="let line of lines; let i=index "
+  >
+    <pre>{{i+1}}</pre>
+    <div class="placeholder" [style.height.px]="line.height"></div>
+  </div>
+</div>

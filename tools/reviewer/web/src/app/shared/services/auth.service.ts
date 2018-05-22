@@ -6,7 +6,13 @@ import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class AuthService {
-  constructor(public angularFireAuth: AngularFireAuth) {}
+  user: string;
+
+  constructor(public angularFireAuth: AngularFireAuth) {
+    this.angularFireAuth.authState.subscribe(userData => {
+      this.user = userData ? userData.email.split('@')[0] : undefined;
+    });
+  }
 
   getUser(): Observable<User> {
     return this.angularFireAuth.authState;

@@ -1,25 +1,34 @@
 export * from './reviews-panel/';
 
 import {
+  AddCommentButtonsComponent,
   BugComponent,
-  CommentComponent,
+  ChangesHighlightingComponent,
+  CodeBlockComponent,
+  CommentsComponent,
   DiffComponent,
+  DiffService,
+  LineNumbersComponent,
   PersonListComponent,
   ReviewComponent,
   ReviewsPanelComponent,
-  ThreadComponent
 } from './reviews-panel/';
 
 export const DashboardComponents = [
   BugComponent,
-  CommentComponent,
   DiffComponent,
   ReviewComponent,
   ReviewsPanelComponent,
-  ThreadComponent,
-  PersonListComponent
+  PersonListComponent,
+  CodeBlockComponent,
+  CommentsComponent,
+  LineNumbersComponent,
+  AddCommentButtonsComponent,
+  ChangesHighlightingComponent,
 ];
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [];
+export const DashboardProviders = [
+  DiffService
+];

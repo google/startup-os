@@ -77,14 +77,18 @@ public class InitCommand implements AaCommand {
           config,
           fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
 
-      // Clone StartupOS repo into head:
-      String startupOsPath = fileUtils.joinPaths(basePath.get(), "head", "startup-os");
-      System.out.println("Cloning StartupOS into " + startupOsPath);
-      Git.cloneRepository()
-          .setURI(startuposRepo.get())
-          .setDirectory(Paths.get(startupOsPath).toFile())
-          .call();
-      System.out.println("Completed Cloning");
+      if (!startuposRepo.get().isEmpty()) {
+        // Clone StartupOS repo into head:
+        String startupOsPath = fileUtils.joinPaths(basePath.get(), "head", "startup-os");
+        System.out.println("Cloning StartupOS into " + startupOsPath);
+        Git.cloneRepository()
+            .setURI(startuposRepo.get())
+            .setDirectory(Paths.get(startupOsPath).toFile())
+            .call();
+        System.out.println("Completed Cloning");
+      } else {
+        System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");
+      }
 
     } catch (IllegalArgumentException e) {
       System.out.println(e.getMessage());

@@ -1,0 +1,14 @@
+<div class="changes-highlighting">
+  <div class="line"
+    *ngFor="let line of lines"
+  >
+    <div class="line-changes">
+      <pre
+        [class]=" isNewCode ? 'new-code' : 'old-code' "
+        *ngIf="line.isChanged"
+        [HTML]="line.code"
+      ></pre>
+    </div>
+    <div class="placeholder" [style.height.px]="line.height"></div>
+  </div>
+</div>

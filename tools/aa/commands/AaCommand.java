@@ -18,4 +18,6 @@ package com.google.startupos.tools.aa.commands;
 
 public interface AaCommand {
   void run(String[] args);
+  // TODO: implement ability to interrupt commands
+  // with leaving workspace in defined state
 }
