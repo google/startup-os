@@ -1,0 +1,34 @@
+@import 'code-block-variables';
+
+#code-block {
+  margin-right: 30px;
+  background: white;
+  border: #CCC solid 1px;
+  width: 837px; // ~100 chars on a code line
+  position: relative;
+  display: flex;
+  >.code {
+    position: relative;
+    width: 100%;
+    >.highlighted-code {
+      position: relative;
+      user-select: none;
+    }
+    >.hidden-lines {
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: rgba(0,0,0,0);
+      >.line {
+        pre {
+          height: $line-height;
+          font-size: $code-size;
+        }
+        >.placeholder {
+          background: $comments-background;
+        }
+      }
+    }
+  }
+}

@@ -17,29 +17,38 @@
 package com.google.startupos.tools.aa.commands;
 
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.Protos.Config;
 import java.io.IOException;
+import java.nio.file.Paths;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 public class SyncCommand implements AaCommand {
 
   private FileUtils fileUtils;
   private Config config;
-
   private GitRepoFactory repoFactory;
+  private String currentWorkspaceName;
 
   @Inject
-  public SyncCommand(FileUtils utils, Config config, GitRepoFactory repoFactory) {
+  public SyncCommand(
+      FileUtils utils,
+      Config config,
+      GitRepoFactory repoFactory,
+      @Named("Current workspace name") String currentWorkspaceName) {
     this.fileUtils = utils;
     this.config = config;
     this.repoFactory = repoFactory;
+    this.currentWorkspaceName = currentWorkspaceName;
   }
 
   @Override
   public void run(String[] args) {
     String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
 
+    // Pull all repos in head
     try {
       fileUtils
           .listContents(headPath)
@@ -48,8 +57,52 @@ public class SyncCommand implements AaCommand {
           .filter(path -> fileUtils.folderExists(path))
           .forEach(
               path -> {
-                System.out.println("Performing sync: " + path.toString());
+                System.out.println(String.format("[HEAD]: Performing sync: %s", path));
                 repoFactory.create(path).pull();
+              });
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    // then, do the sync for all workspaces
+    String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    try {
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
+          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .filter(path -> fileUtils.folderExists(path))
+          .forEach(
+              path -> {
+                String repoName = Paths.get(path).getFileName().toString();
+                System.out.println(
+                    String.format("[%s/%s]: Performing sync", currentWorkspaceName, repoName));
+                GitRepo repo = repoFactory.create(path);
+                System.out.println(
+                    String.format(
+                        "[%s/%s]: switching to temp branch", currentWorkspaceName, repoName));
+                repo.switchBranch("temp_branch_for_sync");
+                System.out.println(
+                    String.format(
+                        "[%s/%s]: committing all changes", currentWorkspaceName, repoName));
+                repo.commit(repo.getUncommittedFiles(), "Sync: temporary commit");
+                System.out.println(
+                    String.format("[%s/%s]: switching to master", currentWorkspaceName, repoName));
+                repo.switchBranch("master");
+                System.out.println(
+                    String.format("[%s/%s]: pulling", currentWorkspaceName, repoName));
+                repo.pull();
+                System.out.println(
+                    String.format("[%s/%s]: merging changes", currentWorkspaceName, repoName));
+                boolean mergeResult = repo.merge("temp_branch_for_sync");
+                if (!mergeResult) {
+                  System.out.println(
+                      String.format(
+                          "[%s/%s]: manual merge required, check files for conflicts",
+                          currentWorkspaceName, repoName));
+                }
+                System.out.println(
+                    String.format("[%s/%s]: removing temp branch", currentWorkspaceName, repoName));
+                repo.removeBranch("temp_branch_for_sync");
               });
     } catch (IOException e) {
       e.printStackTrace();

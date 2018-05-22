@@ -3,6 +3,8 @@ import { load, Message, Root, Type } from 'protobufjs';
 import { Observable } from 'rxjs/Observable';
 import { Diff } from './messages';
 
+// TODO: use protoc
+
 @Injectable()
 export class ProtoService {
   // Temporarily we're using a copy of proto file
@@ -25,7 +27,9 @@ export class ProtoService {
         observer.next(null);
       });
     });
+    this.open.subscribe(() => { });
   }
+
   verify(res: any): any {
     const verifyErrorMsg = this.Diff.verify(res);
     if (verifyErrorMsg) {
@@ -33,8 +37,9 @@ export class ProtoService {
     }
     return res;
   }
-  createDiff(res: any): Diff {
+
+  createDiff(diff: Diff): Diff {
     // tslint:disable-next-line
-    return <Diff>(<any>this.Diff.fromObject(res));
+    return <Diff>(<any>this.Diff.fromObject(diff));
   }
 }

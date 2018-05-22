@@ -16,6 +16,7 @@
 
 package com.google.startupos.common;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.TextChange.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +39,7 @@ public class TextDifferencer {
    * @param secondString The second string.
    * @return A list of text changes.
    */
-  public List<TextChange> getAllTextChanges(String firstString, String secondString) {
+  public ImmutableList<TextChange> getAllTextChanges(String firstString, String secondString) {
     final char[] first = firstString.toCharArray();
     final char[] second = secondString.toCharArray();
     int headerLength = getHeaderMatchingCharactersLength(first, second);
@@ -54,7 +55,33 @@ public class TextDifferencer {
     allChanges.addAll(
         getMatchingTextChanges(
             first, first.length - footerLength, second.length - footerLength, footerLength));
-    return allChanges;
+    return unifyTextChanges(allChanges);
+  }
+
+  /** Unifies TextChanges from chars into strings  */
+  private static ImmutableList<TextChange> unifyTextChanges(List<TextChange> changes) {
+    ImmutableList.Builder<TextChange> result = new ImmutableList.Builder<>();
+    TextChange.Builder unified = null;
+    TextChange previous = null;
+    for (TextChange current : changes) {
+      if (previous == null) {
+        previous = current;
+        unified = current.toBuilder();
+        continue;
+      }
+      if (previous.getType() == current.getType()) {
+        unified = unified.setDifference(unified.getDifference() + current.getDifference());
+      } else {
+        result.add(unified.build());
+        unified = current.toBuilder();
+      }
+      previous = current;
+    }
+    if (unified != null && (previous.getType() == unified.getType())) {
+      // Should add last part
+      result.add(unified.build());
+    }
+    return result.build();
   }
 
   /** Count the number of equal characters from the beginning of the given two strings. */
@@ -200,3 +227,4 @@ public class TextDifferencer {
     return changes;
   }
 }
+

@@ -16,39 +16,44 @@
 
 package com.google.startupos.common.repo.tests;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.repo.Protos;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.reviewer.service.Protos.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
  * A memory repo used for testing.
  */
 public class MemoryRepo implements Repo {
   public enum ActionOverride {
-    NONE, SUCCESS, FAIL
+    NONE,
+    SUCCESS,
+    FAIL
   }
+
   class Commit {
     Commit(String id, String message, List<File> files) {
       this.id = id;
       this.message = message;
       this.files = files;
     }
+
     String id;
     String message;
     boolean isPushed;
     List<File> files = new ArrayList<>();
   }
+
   class Branch {
     Branch(String name) {
       this.name = name;
     }
+
     String name;
     boolean isMerged;
     LinkedHashMap<String, Commit> commits = new LinkedHashMap<>();
@@ -76,11 +81,7 @@ public class MemoryRepo implements Repo {
   public ImmutableList<Protos.Commit> getCommits(String branch) {
     ImmutableList.Builder<Protos.Commit> result = new ImmutableList.Builder<Protos.Commit>();
     for (Commit commit : branches.get(branch).commits.values()) {
-      result.add(
-          Protos.Commit.newBuilder()
-              .setId(commit.id)
-              .addAllFile(commit.files)
-              .build());
+      result.add(Protos.Commit.newBuilder().setId(commit.id).addAllFile(commit.files).build());
     }
     return result.build();
   }
@@ -94,10 +95,7 @@ public class MemoryRepo implements Repo {
     String id = String.valueOf(nextId);
     branches.get(currentBranch).commits.put(id, new Commit(id, message, files));
     nextId++;
-    return Protos.Commit.newBuilder()
-        .setId(id)
-        .addAllFile(files)
-        .build();
+    return Protos.Commit.newBuilder().setId(id).addAllFile(files).build();
   }
 
   public void pushAll() {
@@ -128,6 +126,11 @@ public class MemoryRepo implements Repo {
     // TODO: implement if needed
   }
 
+  @Override
+  public void removeBranch(String branch) {
+    branches.remove(branch);
+  }
+
   public void succeedNextPull() {
     nextPull = ActionOverride.SUCCESS;
   }
@@ -154,5 +157,5 @@ public class MemoryRepo implements Repo {
 
   public String getFileContents(String commitId, String path) {
     return "File contents";
-  }  
+  }
 }

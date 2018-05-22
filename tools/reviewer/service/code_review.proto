@@ -6,29 +6,25 @@ option java_package = "com.google.startupos.tools.reviewer.service";
 option java_outer_classname = "Protos";
 
 import "common/text_difference.proto";
+import "google/protobuf/empty.proto";
 
 service CodeReviewService {
   // Get a text file's contents
   rpc getFile(FileRequest) returns (FileResponse);
-  rpc createDiff(CreateDiffRequest) returns (CreateDiffResponse);
+  rpc createDiff(CreateDiffRequest) returns (.google.protobuf.Empty);
   rpc getTextDiff(TextDiffRequest) returns (TextDiffResponse);
+  // returns available diff number and increments stored value by one
+  rpc getAvailableDiffNumber(.google.protobuf.Empty)
+      returns (DiffNumberResponse);
 }
 
-message FileRequest {
-  string filename = 1;
-}
+message FileRequest { string filename = 1; }
 
-message FileResponse {
-  string content = 1;
-}
+message FileResponse { string content = 1; }
 
-message CreateDiffRequest {
-  Diff diff = 1;
-}
+message CreateDiffRequest { Diff diff = 1; }
 
-message CreateDiffResponse {
-  string diffId = 1;
-}
+message DiffNumberResponse { int64 last_diff_id = 1; }
 
 message TextDiffRequest {
   File left_file = 1;
@@ -90,7 +86,8 @@ message Diff {
  *   <base>/users/<user>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
  *
  * Note that above paths are "conceptual" and not real filesystem paths.
- * The distinction between the above, is based on the fields, e.g user being empty or not.
+ * The distinction between the above, is based on the fields, e.g user being
+ * empty or not.
  */
 message File {
   enum Action {
@@ -122,9 +119,7 @@ message SingleRepoSnapshot {
 }
 
 // A snapshot over multiple repos
-message Snapshot {
-  repeated SingleRepoSnapshot snapshot = 1;
-}
+message Snapshot { repeated SingleRepoSnapshot snapshot = 1; }
 
 message Thread {
   int32 snapshot = 1;

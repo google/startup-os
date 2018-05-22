@@ -6,7 +6,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { AppRoutes } from './app.routing';
 
 import { AngularFireDatabase } from 'angularfire2/database';
-import { environment } from '../environments/environment';
+import { config } from '../environments/firebase';
 import { AppComponent } from './app.component';
 import { DashboardModule } from './dashboard/dashboard.module';
 
@@ -15,8 +15,7 @@ import { AppComponents, Services } from './';
 @NgModule({
   declarations: [AppComponent, ...AppComponents],
   imports: [
-    // AngularFireModule.initializeApp(environment.firebase),
-    AngularFireModule.initializeApp(environment.aaStorageconfig),
+    AngularFireModule.initializeApp(config),
     BrowserModule,
     AppRoutes,
     DashboardModule

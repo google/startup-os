@@ -22,10 +22,12 @@ import java.util.logging.Logger;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /*
  * AuthService is a gRPC service to receive Firestore auth data from WebLogin.
  */
+@Singleton
 public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final Logger logger = Logger.getLogger(AuthService.class.getName());
  

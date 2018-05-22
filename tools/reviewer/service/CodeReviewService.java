@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.service;
 
+import com.google.protobuf.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
 import com.google.startupos.common.firestore.FirestoreClient;
@@ -25,7 +26,7 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.CreateDiffResponse;
+import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
@@ -38,15 +39,19 @@ import java.nio.file.Paths;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
  */
+@Singleton
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
 
   @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
   private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
+
+  private static final String DOCUMENT_FOR_LAST_DIFF_NUMBER = "data";
 
   private AuthService authService;
   private FileUtils fileUtils;
@@ -143,11 +148,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
-  public void createDiff(
-      CreateDiffRequest req, StreamObserver<CreateDiffResponse> responseObserver) {
+  public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
-    client.createDocument(firestoreReviewRoot.get(), req.getDiff());
+    String diffPath = fileUtils.joinPaths(firestoreReviewRoot.get(), "data/diff");
+    client.createDocument(diffPath, String.valueOf(req.getDiff().getNumber()), req.getDiff());
+    responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
 
@@ -168,6 +174,26 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               .withDescription(String.format("TextDiffRequest: %s", req))
               .asException());
     }
+    responseObserver.onCompleted();
+  }
+
+  // TODO: fix concurrency issues (if two different call method at same time)
+  // could be done by wrapping in a transaction
+  @Override
+  public void getAvailableDiffNumber(
+      Empty request, StreamObserver<DiffNumberResponse> responseObserver) {
+    FirestoreClient client =
+        new FirestoreClient(authService.getProjectId(), authService.getToken());
+    DiffNumberResponse diffNumberResponse =
+        (DiffNumberResponse)
+            client.getDocument(
+                firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
+                DiffNumberResponse.newBuilder());
+    client.createDocument(
+        firestoreReviewRoot.get(),
+        DOCUMENT_FOR_LAST_DIFF_NUMBER,
+        diffNumberResponse.toBuilder().setLastDiffId(diffNumberResponse.getLastDiffId() + 1));
+    responseObserver.onNext(diffNumberResponse);
     responseObserver.onCompleted();
   }
 }

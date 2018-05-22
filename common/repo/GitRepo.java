@@ -26,6 +26,7 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
+import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.Status;
@@ -89,7 +90,7 @@ public class GitRepo implements Repo {
                   files.add(
                       File.newBuilder().setAction(File.Action.ADD).setFilename(added).build()));
       status
-          .getChanged()
+          .getModified()
           .forEach(
               changed ->
                   files.add(
@@ -111,10 +112,7 @@ public class GitRepo implements Repo {
           .forEach(
               untracked ->
                   files.add(
-                      File.newBuilder()
-                          .setAction(File.Action.UNRECOGNIZED)
-                          .setFilename(untracked)
-                          .build()));
+                      File.newBuilder().setAction(File.Action.ADD).setFilename(untracked).build()));
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
@@ -122,12 +120,17 @@ public class GitRepo implements Repo {
   }
 
   public Commit commit(ImmutableList<File> files, String message) {
+    Commit.Builder commitBuilder = Commit.newBuilder();
     try {
       for (File file : files) {
         jGit.add().addFilepattern(file.getFilename()).call();
       }
       RevCommit revCommit = jGit.commit().setMessage(message).call();
-      return Commit.newBuilder().setId(revCommit.getId().toString()).addAllFile(files).build();
+      String commitId = revCommit.toObjectId().name();
+      for (File file : files) {
+        commitBuilder.addFile(file.toBuilder().setCommitId(commitId));
+      }
+      return commitBuilder.setId(commitId).build();
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
@@ -147,9 +150,21 @@ public class GitRepo implements Repo {
 
   public boolean merge(String branch) {
     try {
+      Ref current = jGitRepo.exactRef(jGitRepo.getFullBranch());
+      boolean successfulMerge = true;
       Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
-      return (jGit.merge().setSquash(true).setCommit(false).include(ref).call().getConflicts()
-          == null);
+      AddCommand addCommand = jGit.add();
+      jGit.merge().include(ref).call();
+      for (String conflictingFile : jGit.status().call().getConflicting()) {
+        successfulMerge = false;
+        addCommand = addCommand.addFilepattern(conflictingFile);
+      }
+      if (!successfulMerge) {
+        addCommand.call();
+        jGit.commit().call();
+      }
+      jGit.reset().setRef(current.getObjectId().toObjectId().name()).call();
+      return successfulMerge;
     } catch (GitAPIException | IOException e) {
       throw new RuntimeException(e);
     }
@@ -165,6 +180,15 @@ public class GitRepo implements Repo {
       // reset to `ref` and all changes introduced after it
       // would be marked as unstaged but saved in working tree
       jGit.reset().setMode(ResetType.MIXED).setRef(ref).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void removeBranch(String branch) {
+    try {
+      jGit.branchDelete().setBranchNames(branch).setForce(true).call();
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }

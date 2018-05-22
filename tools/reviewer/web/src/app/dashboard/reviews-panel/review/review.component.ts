@@ -88,11 +88,10 @@ export class ReviewComponent implements OnInit {
   updateDiff(diff: Diff, message: string): void {
     this.firebaseService
       .updateDiff(diff)
-      .then(res => {
-        this.notificationService.success(message);
-      })
-      .catch(err => {
-        this.notificationService.error('Some error occured');
-      });
+      .subscribe(() => {
+          this.notificationService.success(message);
+        }, () => {
+          this.notificationService.error('Some error occured');
+        });
   }
 }
