@@ -18,11 +18,14 @@ package com.google.startupos.tools.aa;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import dagger.Module;
 import dagger.Provides;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import javax.inject.Named;
@@ -66,6 +69,52 @@ public class AaModule {
       return wsName;
     } catch (IllegalArgumentException ex) {
       throw new RuntimeException("You're not in a workspace");
+    }
+  }
+
+  private static final Integer NOT_A_VALUE = -1024;
+
+  private static Integer safeParseInt(String s) {
+    try {
+      return Integer.parseInt(s);
+    } catch (NumberFormatException e) {
+      return NOT_A_VALUE;
+    }
+  }
+
+  @Provides
+  @Named("Current diff number")
+  public static Integer currentDiffNumber(
+      FileUtils fileUtils,
+      @Named("Current workspace name") String currentWorkspaceName,
+      GitRepoFactory gitRepoFactory,
+      Config config) {
+    String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    try {
+      String firstWorkspacePath =
+          fileUtils
+              .listContents(workspacePath)
+              .stream()
+              .map(path -> fileUtils.joinPaths(workspacePath, path))
+              .filter(fileUtils::folderExists)
+              .findFirst()
+              .orElse(null);
+
+      if (firstWorkspacePath == null) {
+        throw new RuntimeException(
+            String.format("There are no repositories in workspace %s", workspacePath));
+      }
+
+      GitRepo repo = gitRepoFactory.create(firstWorkspacePath);
+      return repo.listBranches()
+          .stream()
+          .filter(branchName -> branchName.startsWith("D"))
+          .mapToInt(branchName -> safeParseInt(branchName.replace("D", "")))
+          .filter(number -> number > 0)
+          .findFirst()
+          .orElse(-1);
+    } catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
   }
 }

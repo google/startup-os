@@ -32,9 +32,9 @@ public class DiffCommand implements AaCommand {
   private GitRepoFactory gitRepoFactory;
   private String currentWorkspaceName;
   private String workspacePath;
+  private Integer currentDiffNumber;
 
   private static final Integer GRPC_PORT = 8001;
-  private static final Integer NOT_A_VALUE = -1024;
 
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
@@ -52,12 +52,14 @@ public class DiffCommand implements AaCommand {
       FileUtils utils,
       Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName) {
+      @Named("Current workspace name") String currentWorkspaceName,
+      @Named("Current diff number") Integer currentDiffNumber) {
     this.fileUtils = utils;
     this.config = config;
     this.gitRepoFactory = repoFactory;
     this.currentWorkspaceName = currentWorkspaceName;
     this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    this.currentDiffNumber = currentDiffNumber;
 
     ManagedChannel channel =
         ManagedChannelBuilder.forAddress("localhost", GRPC_PORT).usePlaintext().build();
@@ -224,48 +226,12 @@ public class DiffCommand implements AaCommand {
     return diffBuilder.build();
   }
 
-  private static Integer safeParseInt(String s) {
-    try {
-      return Integer.parseInt(s);
-    } catch (NumberFormatException e) {
-      return NOT_A_VALUE;
-    }
-  }
-
   @Override
   public void run(String[] args) {
     Flags.parse(args, this.getClass().getPackage());
 
-    try {
-      String firstWorkspacePath =
-          fileUtils
-              .listContents(workspacePath)
-              .stream()
-              .map(path -> fileUtils.joinPaths(workspacePath, path))
-              .filter(path -> fileUtils.folderExists(path))
-              .findFirst()
-              .orElse(null);
-
-      if (firstWorkspacePath == null) {
-        throw new RuntimeException(
-            String.format("There are no repositories in workspace %s", workspacePath));
-      }
-
-      GitRepo repo = this.gitRepoFactory.create(firstWorkspacePath);
-      int diffNumber =
-          repo.listBranches()
-              .stream()
-              .filter(branchName -> branchName.startsWith("D"))
-              .mapToInt(branchName -> safeParseInt(branchName.replace("D", "")))
-              .filter(number -> number > 0)
-              .findFirst()
-              .orElse(-1);
-
-      Diff diff = (diffNumber == -1) ? createDiff() : updateDiff(diffNumber);
-      CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
-      codeReviewBlockingStub.createDiff(request);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    Diff diff = (currentDiffNumber == -1) ? createDiff() : updateDiff(currentDiffNumber);
+    CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
+    codeReviewBlockingStub.createDiff(request);
   }
 }
