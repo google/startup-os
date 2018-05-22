@@ -16,6 +16,8 @@ import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.SingleRepoSnapshot;
+import com.google.startupos.tools.reviewer.service.Protos.Snapshot;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
@@ -67,6 +69,8 @@ public class DiffCommand implements AaCommand {
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
     String branchName = String.format("D%s", response.getLastDiffId());
 
+    Snapshot.Builder snapshotBuilder = Snapshot.newBuilder();
+
     Diff.Builder diffBuilder =
         Diff.newBuilder()
             .setWorkspace(currentWorkspaceName)
@@ -95,6 +99,17 @@ public class DiffCommand implements AaCommand {
                     String.format("[%s/%s]: committing changes", currentWorkspaceName, repoName));
                 Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
                 diffBuilder.addAllFile(commit.getFileList());
+
+                snapshotBuilder.addSnapshot(
+                    SingleRepoSnapshot.newBuilder()
+                        .setTimestamp(System.currentTimeMillis())
+                        .setRepoId(repoName)
+                        .setCommitId(commit.getId())
+                        .setAuthor(config.getUser())
+                        .setForReview(false)
+                        .addAllFile(commit.getFileList())
+                        .build());
+
                 System.out.println(
                     String.format("[%s/%s]: switching to master", currentWorkspaceName, repoName));
                 repo.switchBranch("master");
@@ -105,6 +120,7 @@ public class DiffCommand implements AaCommand {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    diffBuilder.addSnapshot(snapshotBuilder);
     return diffBuilder.build();
   }
 
@@ -132,6 +148,8 @@ public class DiffCommand implements AaCommand {
       diffBuilder.setBug(buglink.get());
     }
 
+    Snapshot.Builder snapshotBuilder = Snapshot.newBuilder();
+
     try {
       fileUtils
           .listContents(workspacePath)
@@ -154,6 +172,16 @@ public class DiffCommand implements AaCommand {
 
                 Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
                 diffBuilder.addAllFile(commit.getFileList());
+
+                snapshotBuilder.addSnapshot(
+                    SingleRepoSnapshot.newBuilder()
+                        .setTimestamp(System.currentTimeMillis())
+                        .setRepoId(repoName)
+                        .setCommitId(commit.getId())
+                        .setAuthor(config.getUser())
+                        .setForReview(false)
+                        .addAllFile(commit.getFileList())
+                        .build());
 
                 System.out.println(
                     String.format(
@@ -181,6 +209,7 @@ public class DiffCommand implements AaCommand {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    diffBuilder.addSnapshot(snapshotBuilder);
     return diffBuilder.build();
   }
 
