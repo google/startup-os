@@ -1,0 +1,21 @@
+<mat-toolbar *ngIf="authService.user">
+  <mat-toolbar-row>
+    <div fxFlex="10%" fxLayoutAlign="center">
+      <img src="./assets/icon.png" height="44" width="44">
+    </div>
+    <div>
+      <span class="title">Reviewer</span>
+    </div>
+    <div fxFlex="1 1" class="search">
+      <input type="text">
+    </div>
+    <div>
+      <button mat-icon-button class="search-button">
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
+    <div class="action">
+      <button mat-raised-button (click)="logout()">Logout</button>
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>

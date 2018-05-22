@@ -87,7 +87,6 @@ export class ReviewsPanelComponent implements OnInit {
       },
       () => {
         // Permission Denied
-        console.log('Permission Denied');
       }
     );
   }
@@ -106,9 +105,5 @@ export class ReviewsPanelComponent implements OnInit {
     this.zone.run(() => {
       this.router.navigate(['diff/', diffId]);
     });
-  }
-
-  logout(): void {
-    this.authService.logout();
   }
 }

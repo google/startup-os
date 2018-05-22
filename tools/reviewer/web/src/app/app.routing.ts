@@ -5,7 +5,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'diffs', pathMatch: 'full' },
   {
     path: 'diffs',
-    loadChildren: 'app/dashboard/dashboard.module#DashboardModule'
+    loadChildren: 'app/layout/layout.module#LayoutModule'
   },
   { path: 'login', component: LoginComponent },
   { path: '**', component: PageNotFoundComponent }

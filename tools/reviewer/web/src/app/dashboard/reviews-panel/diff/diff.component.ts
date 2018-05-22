@@ -41,15 +41,16 @@ export class DiffComponent implements OnInit, OnDestroy {
     private differenceService: DifferenceService,
     private firebaseService: FirebaseService,
     private diffService: DiffService,
-    private protoService: ProtoService,
+    private protoService: ProtoService
   ) {
     this.changes = this.differenceService.compare(files[0], files[1]);
 
-    this.newCommentSubscription = this.diffService
-      .newComment.subscribe(param => {
+    this.newCommentSubscription = this.diffService.newComment.subscribe(
+      param => {
         // New comment is added
         this.addComment(param.lineNumber, param.comments);
-      });
+      }
+    );
   }
 
   addComment(lineNumber: number, comments: Comment[]): void {
@@ -66,11 +67,14 @@ export class DiffComponent implements OnInit, OnDestroy {
 
     this.protoService.open.subscribe(() => {
       const protoDiff = this.protoService.createDiff(this.diff);
-      this.firebaseService.updateDiff(protoDiff).subscribe(() => {
-        // Success
-      }, () => {
-        // Access denied
-      });
+      this.firebaseService.updateDiff(protoDiff).subscribe(
+        () => {
+          // Success
+        },
+        () => {
+          // Access denied
+        }
+      );
     });
   }
 
@@ -85,17 +89,20 @@ export class DiffComponent implements OnInit, OnDestroy {
     this.snapshot = parseInt(urlSnapshot.queryParams['rs'], 10) || null;
 
     this.diffId = urlSnapshot.url[0].path;
-    this.firebaseService.getDiff(this.diffId).subscribe(diff => {
-      this.diff = diff;
-      this.filtherThreads(diff.threads);
-      this.isLoading = false;
-    });
+    this.firebaseService.getDiff(this.diffId).subscribe(
+      diff => {
+        this.diff = diff;
+        this.filtherThreads(diff.threads);
+        this.isLoading = false;
+      },
+      () => {
+        // Access denied
+      }
+    );
   }
 
   filtherThreads(treads: Thread[]): void {
-    this.threads = treads.filter(
-      v => v.filename === this.filePath
-    );
+    this.threads = treads.filter(v => v.filename === this.filePath);
   }
 
   ngOnDestroy() {

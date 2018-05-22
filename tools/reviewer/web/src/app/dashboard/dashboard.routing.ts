@@ -4,7 +4,6 @@ import { DiffComponent, ReviewComponent, ReviewsPanelComponent } from './';
 
 const routes: Routes = [
   {
-    canActivate: [AuthGuard],
     path: '',
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'diffs' },
