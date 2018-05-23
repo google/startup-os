@@ -97,6 +97,19 @@ http_file(
     sha256 = "3cbd708ff77f36413cfaef89cd5790a1137da5dfc3d9b3b3ca3fac669fbc298b"
 )
 
+http_file(
+    name = "buildozer",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer"],
+    executable = True,
+    sha256 = "3226cfd3ac706b48fe69fc4581c6c163ba5dfa71a752a44d3efca4ae489f1105"
+)
+
+http_file(
+    name = "buildozer_osx",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer.osx"],
+    executable = True,
+    sha256 = "48109a542da2ad4bf10e7df962514a58ac19a32033e2dae8e682938ed11f4775"
+)
 
 http_file(
     name = "unused_deps",
