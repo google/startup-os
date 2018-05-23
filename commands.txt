@@ -34,3 +34,9 @@ bazel run //tools:buildifier -- -mode=fix `pwd`/…
 # Find unused dependencies with `unused_deps`
 # (https://github.com/bazelbuild/buildtools/blob/master/unused_deps/)
 bazel run //tools:unused_deps -- <BUILD target, e.g //folder:target>
+
+
+# Bash completion
+# This assumes you've installed `bazel` via APT or Homebrew
+# To enable bundled-in autocomplete for `bazel`, run:
+source completion.sh
