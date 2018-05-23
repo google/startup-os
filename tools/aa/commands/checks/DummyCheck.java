@@ -1,7 +1,5 @@
 package com.google.startupos.tools.aa.commands.checks;
 
-import com.google.startupos.tools.aa.commands.FixCommandCheck;
-
 public class DummyCheck implements FixCommandCheck {
   @Override
   public boolean perform() {

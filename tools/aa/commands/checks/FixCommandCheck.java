@@ -1,4 +1,4 @@
-package com.google.startupos.tools.aa.commands;
+package com.google.startupos.tools.aa.commands.checks;
 
 public interface FixCommandCheck {
   // returns whether the check identified
