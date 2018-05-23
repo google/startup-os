@@ -6,7 +6,6 @@ java_library(
         "CommonComponent.java",
         "CommonModule.java",
         "FileUtils.java",
-        "Logger.java",
         "MessageDifferencer.java",
         "StringBuilder.java",
         "Strings.java",
@@ -21,7 +20,6 @@ java_library(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/apache/commons:commons_lang3",
-        "//third_party/maven/org/slf4j:slf4j_api",
     ],
 )
 

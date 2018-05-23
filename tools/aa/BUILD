@@ -23,7 +23,6 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/reflections",
-        "//third_party/maven/org/slf4j:slf4j_simple",
         "//tools/aa/commands",
     ],
 )
@@ -42,7 +41,6 @@ java_binary(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/reflections",
-        "//third_party/maven/org/slf4j:slf4j_simple",
         "//tools/aa/commands",
     ],
 )

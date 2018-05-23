@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.service;
 
+import com.google.common.flogger.FluentLogger;
 import com.google.protobuf.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
@@ -38,7 +39,6 @@ import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -48,7 +48,7 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
-  private static final Logger logger = Logger.getLogger(CodeReviewService.class.getName());
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
   private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");

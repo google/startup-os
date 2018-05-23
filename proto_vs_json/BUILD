@@ -22,7 +22,5 @@ java_binary(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/slf4j:slf4j_api",
-        "//third_party/maven/org/slf4j:slf4j_simple",    
     ],
 )

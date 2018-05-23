@@ -19,6 +19,7 @@ package com.google.startupos.tools.localserver;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
@@ -33,8 +34,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.Base64;
-import java.util.Map;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 
@@ -50,7 +49,7 @@ import org.json.JSONObject;
  */
 // TODO: Find an automated way to do this, e.g github.com/improbable-eng/grpc-web
 public class LocalHttpGateway {
-  private static final Logger logger = Logger.getLogger(LocalHttpGateway.class.getName());
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   private final HttpServer httpServer;
 
@@ -65,7 +64,7 @@ public class LocalHttpGateway {
   public static final Flag<Integer> localServerPort = Flag.create(8001);
 
   private LocalHttpGateway(int httpGatewayPort, int localServerPort) throws Exception {
-    logger.info(String.format(
+    logger.atInfo().log(String.format(
         "Starting gateway at port %d (local server at port %d)",
         httpGatewayPort,
         localServerPort));
@@ -96,7 +95,7 @@ public class LocalHttpGateway {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
           "Origin, X-Requested-With, Content-Type, Accept");
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
-        logger.info("Handling token post request");
+        logger.atInfo().log("Handling token post request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
         client.postAuthData(json.getString("projectId"), json.getString("accessToken"));
       }
@@ -115,7 +114,7 @@ public class LocalHttpGateway {
     public void handle(HttpExchange httpExchange) throws IOException {
       String requestPath = httpExchange.getRequestURI().getPath();
       String relativeFilePath = requestPath.substring(GET_FILE_PATH.length());
-      logger.info("Handling get_file request for " + relativeFilePath);
+      logger.atInfo().log("Handling get_file request for " + relativeFilePath);
       String fileContents = client.getFile(relativeFilePath);
 
       if (fileContents == null) {
@@ -170,7 +169,7 @@ public class LocalHttpGateway {
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
       String requestString = params.get("request");
       TextDiffRequest request = TextDiffRequest.parseFrom(Base64.getDecoder().decode(requestString));
-      logger.info("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
+      logger.atInfo().log("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
       byte[] response = Base64.getEncoder().encode(
           client.getCodeReviewStub().getTextDiff(request).toByteArray());
       httpExchange.sendResponseHeaders(200, response.length);

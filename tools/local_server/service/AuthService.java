@@ -16,9 +16,9 @@
 
 package com.google.startupos.tools.localserver.service;
 
+import com.google.common.flogger.FluentLogger;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import java.util.logging.Logger;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
 import javax.inject.Inject;
@@ -29,8 +29,8 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
-  private static final Logger logger = Logger.getLogger(AuthService.class.getName());
- 
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+
   private String firestoreToken;
   private String firestoreProjectId;
 
@@ -44,13 +44,13 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       firestoreToken = req.getToken();
       responseObserver.onNext(AuthDataResponse.getDefaultInstance());
       responseObserver.onCompleted();
-      logger.info("Received token for project " + firestoreProjectId);
+      logger.atInfo().log("Received token for project " + firestoreProjectId);
     } catch (SecurityException e) {
       responseObserver.onError(
           Status.UNKNOWN
               .withDescription("Cannot get token from request")
               .asException());
-      logger.info("Cannot get token from request");
+      logger.atInfo().log("Cannot get token from request");
     }
   }
 

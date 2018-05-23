@@ -17,13 +17,12 @@
 package com.google.startupos.common.flags;
 
 import javax.annotation.Nonnull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.flogger.FluentLogger;
 
 /** Flag class, with implementations for various flag types. */
 // TODO: Add support for lists
 public abstract class Flag<T> {
-  private static final Logger log = LoggerFactory.getLogger(GflagsParser.class);
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
 
   public static Flag<String> create(String defaultValue) {
     return new Flag.StringFlag(defaultValue);
@@ -134,11 +133,10 @@ public abstract class Flag<T> {
     }
     Flags.setFlagValue(name, value.toString());
     if (prevValue != null && !prevValue.equals(value)) {
-      log.error(
-          String.format(
-              "Flag value has changed between get() calls. "
+      log.atSevere()
+              .log("Flag value has changed between get() calls. "
                   + "Previous value is %s and current is %s",
-              prevValue, value));
+              prevValue, value);
     }
     if (required && value.equals(Flags.getDefaultFlagValue(name))) {
       throw new IllegalArgumentException(

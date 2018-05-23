@@ -1,5 +1,7 @@
 .idea
 bazel-*
+*.iml
+.project
 
 # template app does not need this,
 # though it is safe to commit 
