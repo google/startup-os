@@ -23,10 +23,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.inject.Inject;
 import javax.swing.text.Segment;
 
 /** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */
 public class TextDifferencer {
+
+  @Inject
+  public TextDifferencer() {}
 
   /**
    * Return all the text differences between two strings.
@@ -35,20 +39,19 @@ public class TextDifferencer {
    * @param secondString The second string.
    * @return A list of text changes.
    */
-  public static ImmutableList<TextChange> getAllTextChanges(String firstString, String secondString) {
+  public ImmutableList<TextChange> getAllTextChanges(String firstString, String secondString) {
     final char[] first = firstString.toCharArray();
     final char[] second = secondString.toCharArray();
     int headerLength = getHeaderMatchingCharactersLength(first, second);
     int footerLength = getFooterMatchingCharactersLength(headerLength, first, second);
-    Segment firstView =
+    Segment firstSegment =
         new Segment(first, headerLength, first.length - footerLength - headerLength);
-    Segment secondView =
+    Segment secondSegment =
         new Segment(second, headerLength, second.length - footerLength - headerLength);
 
     List<TextChange> allChanges = new ArrayList<>();
     allChanges.addAll(getMatchingTextChanges(first, 0, 0, headerLength));
-    allChanges.addAll(
-        getChangesFromLCSMatrix(computeLCSMatrix(firstView, secondView), firstView, secondView));
+    allChanges.addAll(getNonMatchingTextChanges(firstSegment, secondSegment));
     allChanges.addAll(
         getMatchingTextChanges(
             first, first.length - footerLength, second.length - footerLength, footerLength));
@@ -126,6 +129,20 @@ public class TextDifferencer {
                     .setType(Type.NO_CHANGE)
                     .build())
         .collect(Collectors.toList());
+  }
+  /**
+   * Generate non matching text changes for the given range. Non matching text changes are changes
+   * which contains at least one change between the given strings.
+   *
+   * @param contentFirst The contents of the first string.
+   * @param beginFirst The beginning index of the matching character range of the first string.
+   * @param beginSecond The beginning index of the matching character range of the second string.
+   * @param length the length of the matching character range.
+   * @return A {@link List} which holds all the text differences.
+   */
+  private List<TextChange> getNonMatchingTextChanges(Segment firstSegment, Segment secondSegment) {
+    return getChangesFromLCSMatrix(
+        computeLCSMatrix(firstSegment, secondSegment), firstSegment, secondSegment);
   }
 
   /** Create an empty matrix based on the given dimensions. */
@@ -209,7 +226,5 @@ public class TextDifferencer {
     Collections.reverse(changes);
     return changes;
   }
-
-  private TextDifferencer() {}
 }
 

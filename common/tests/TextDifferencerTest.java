@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.TextChange.Type;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,6 +29,9 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class TextDifferencerTest {
 
+  private TextDifferencer differencer;
+
+  /** package */
   TextChange.Builder newTextChange(int leftIndex, int rightIndex, String difference, Type type) {
     return TextChange.newBuilder()
         .setFirstStringIndex(leftIndex)
@@ -36,9 +40,15 @@ public class TextDifferencerTest {
         .setType(type);
   }
 
+  @Before
+  public void setUp() {
+    differencer = new TextDifferencer();
+  }
+
   @Test
   public void testEmptyDiff() {
-    assertEquals(TextDifferencer.getAllTextChanges("", ""), ImmutableList.of());
+
+    assertEquals(differencer.getAllTextChanges("", ""), ImmutableList.of());
   }
 
   @Test
@@ -86,7 +96,6 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheEnd() throws Exception {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 0, "No Change", Type.NO_CHANGE).build(),
             newTextChange(9, 9, ".", Type.DELETE).build(),
             newTextChange(9, 9, "!", Type.ADD).build()),
         TextDifferencer.getAllTextChanges("No Change.", "No Change!"));

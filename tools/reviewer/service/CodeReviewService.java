@@ -55,19 +55,22 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   private AuthService authService;
   private FileUtils fileUtils;
-  private String basePath;
   private GitRepoFactory repoFactory;
+  private String basePath;
+  private TextDifferencer textDifferencer;
 
   @Inject
   public CodeReviewService(
       AuthService authService,
       FileUtils fileUtils,
       @Named("Base path") String basePath,
-      GitRepoFactory repoFactory) {
+      GitRepoFactory repoFactory,
+      TextDifferencer textDifferencer) {
     this.authService = authService;
     this.fileUtils = fileUtils;
     this.basePath = basePath;
     this.repoFactory = repoFactory;
+    this.textDifferencer = textDifferencer;
   }
 
   private String readTextFile(File file) throws IOException {
@@ -161,7 +164,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       String rightFileContents = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .addAllChanges(TextDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
+              .addAllChanges(textDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
               .setLeftFileContents(leftFileContents)
               .setRightFileContents(rightFileContents)
               .build());
