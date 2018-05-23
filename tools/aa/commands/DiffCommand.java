@@ -130,7 +130,7 @@ public class DiffCommand implements AaCommand {
   /*
    * From underlying repo perspective we do the following
    * - commit all changes to a temporary branch
-   * - merge temporary branch to diff branch, preferring changes in the latter
+   * - merge temporary branch to diff branch, preferring changes in the former
    * - merge diff branch to master (without commit)
    * - update diff entry in Firestore
    * After this, there would be one extra commit on top of diff branch,

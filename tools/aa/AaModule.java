@@ -72,13 +72,17 @@ public class AaModule {
     }
   }
 
-  private static final Integer NOT_A_VALUE = -1024;
-
-  private static Integer safeParseInt(String s) {
+  /**
+   * Parse string representing a positive integer or minus one
+   *
+   * @param s string to parse
+   * @return parsed value or -1
+   */
+  private static Integer safeParsePositiveInt(String s) {
     try {
       return Integer.parseInt(s);
     } catch (NumberFormatException e) {
-      return NOT_A_VALUE;
+      return -1;
     }
   }
 
@@ -109,7 +113,7 @@ public class AaModule {
       return repo.listBranches()
           .stream()
           .filter(branchName -> branchName.startsWith("D"))
-          .mapToInt(branchName -> safeParseInt(branchName.replace("D", "")))
+          .mapToInt(branchName -> safeParsePositiveInt(branchName.replace("D", "")))
           .filter(number -> number > 0)
           .findFirst()
           .orElse(-1);
