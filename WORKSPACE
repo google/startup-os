@@ -2,18 +2,19 @@
 # we cannot use it via http_archive directly for the moment
 # relevant issue: https://github.com/johnynek/bazel-deps/issues/126
 git_repository(
-    name = 'bazel_deps',
-    remote = 'https://github.com/vmax/bazel-deps-deploy',
-    commit = 'a15c2f64e099e78871ee78ff1f4e6bec5ec7ed4c'
+    name = "bazel_deps",
+    commit = "a15c2f64e099e78871ee78ff1f4e6bec5ec7ed4c",
+    remote = "https://github.com/vmax/bazel-deps-deploy",
 )
 
 load("//third_party/maven:workspace.bzl", "maven_dependencies")
+
 maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
-    urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
     strip_prefix = "grpc-java-1.12.0",
+    urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
 )
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
@@ -50,6 +51,7 @@ grpc_java_repositories(
 
 # Google Maven Repository
 GMAVEN_TAG = "20180513-1"
+
 http_archive(
     name = "gmaven_rules",
     strip_prefix = "gmaven_rules-%s" % GMAVEN_TAG,
@@ -57,6 +59,7 @@ http_archive(
 )
 
 load("@gmaven_rules//:gmaven.bzl", "gmaven_rules")
+
 gmaven_rules()
 
 # Android SDK configuration. For more details, see:
@@ -68,67 +71,67 @@ android_sdk_repository(
 )
 
 maven_jar(
-  name = "com_squareup_okhttp_okhttp_2_7_2",
-  artifact = "com.squareup.okhttp:okhttp:jar:2.7.2",
+    name = "com_squareup_okhttp_okhttp_2_7_2",
+    artifact = "com.squareup.okhttp:okhttp:jar:2.7.2",
 )
 
 maven_jar(
-  name = "com_squareup_okio_okio_1_6_0",
-  artifact = "com.squareup.okio:okio:jar:1.6.0"
+    name = "com_squareup_okio_okio_1_6_0",
+    artifact = "com.squareup.okio:okio:jar:1.6.0",
 )
 
 http_archive(
     name = "com_google_protobuf",
-    urls = ["https://github.com/google/protobuf/archive/3.5.1.1.zip"],
     strip_prefix = "protobuf-3.5.1.1",
+    urls = ["https://github.com/google/protobuf/archive/3.5.1.1.zip"],
 )
 
 http_file(
     name = "buildifier",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier"],
     executable = True,
-    sha256 = "d7d41def74991a34dfd2ac8a73804ff11c514c024a901f64ab07f45a3cf0cfef"
+    sha256 = "d7d41def74991a34dfd2ac8a73804ff11c514c024a901f64ab07f45a3cf0cfef",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier"],
 )
 
 http_file(
     name = "buildifier_osx",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier.osx"],
     executable = True,
-    sha256 = "3cbd708ff77f36413cfaef89cd5790a1137da5dfc3d9b3b3ca3fac669fbc298b"
+    sha256 = "3cbd708ff77f36413cfaef89cd5790a1137da5dfc3d9b3b3ca3fac669fbc298b",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier.osx"],
 )
 
 http_file(
     name = "buildozer",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer"],
     executable = True,
-    sha256 = "3226cfd3ac706b48fe69fc4581c6c163ba5dfa71a752a44d3efca4ae489f1105"
+    sha256 = "3226cfd3ac706b48fe69fc4581c6c163ba5dfa71a752a44d3efca4ae489f1105",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer"],
 )
 
 http_file(
     name = "buildozer_osx",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer.osx"],
     executable = True,
-    sha256 = "48109a542da2ad4bf10e7df962514a58ac19a32033e2dae8e682938ed11f4775"
+    sha256 = "48109a542da2ad4bf10e7df962514a58ac19a32033e2dae8e682938ed11f4775",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer.osx"],
 )
 
 http_file(
     name = "unused_deps",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps"],
     executable = True,
-    sha256 = "686f8943610e1a5e3d196e2209dcb35f463c3b583a056dd8ae355acdc2a089d8"
+    sha256 = "686f8943610e1a5e3d196e2209dcb35f463c3b583a056dd8ae355acdc2a089d8",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps"],
 )
 
 http_file(
     name = "unused_deps_osx",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps.osx"],
     executable = True,
-    sha256 = "dd8d58429a258b094b20a1435be3086ecee5d036b87c0e766309842766bc345b"
+    sha256 = "dd8d58429a258b094b20a1435be3086ecee5d036b87c0e766309842766bc345b",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps.osx"],
 )
 
 http_archive(
     name = "com_google_googletest",
     strip_prefix = "googletest-08d5b1f33af8c18785fb8ca02792b5fac81e248f",
-    urls = ["https://github.com/google/googletest/archive/08d5b1f33af8c18785fb8ca02792b5fac81e248f.zip"]
+    urls = ["https://github.com/google/googletest/archive/08d5b1f33af8c18785fb8ca02792b5fac81e248f.zip"],
 )
 
 http_archive(

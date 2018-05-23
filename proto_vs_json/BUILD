@@ -17,8 +17,8 @@ java_binary(
     deps = [
         ":data_java_proto",
         "//common",
-        "//common/flags",
         "//common:dagger_with_annotation_processor",
+        "//common/flags",
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/inject:javax_inject",

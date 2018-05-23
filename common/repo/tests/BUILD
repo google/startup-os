@@ -1,17 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
 java_library(
-  name = "memory_repo",
-  srcs = [
-      "MemoryRepo.java",
-  ],
-  deps = [
-      "//common/repo",
-      "//common/repo:repo_java_proto",
-      "//tools/reviewer/service:code_review_java_proto",
-      "//third_party/maven/com/google/guava:guava",
-      "//third_party/maven/javax/annotation:javax_annotation_api",
-  ]
+    name = "memory_repo",
+    srcs = [
+        "MemoryRepo.java",
+    ],
+    deps = [
+        "//common/repo",
+        "//common/repo:repo_java_proto",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
+        "//tools/reviewer/service:code_review_java_proto",
+    ],
 )
 
 java_binary(

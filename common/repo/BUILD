@@ -22,13 +22,13 @@ java_library(
         "//common:auto_factory",
         "//common:auto_factory_plugin",
         "//common:dagger_with_annotation_processor",
-        "//tools/reviewer/service:code_review_java_proto",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/auto/value:auto_value_plugin",
-        "//third_party/maven/com/google/guava:guava",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/com/jcraft:jsch",
         "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
-    ]
+        "//tools/reviewer/service:code_review_java_proto",
+    ],
 )
