@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-//TODO check package
-package com.google.startupos.common.flags;
 
+package com.google.startupos.common.flags.testpackage1;
+
+import com.google.startupos.common.flags.Flags;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import com.google.startupos.common.flags.testpackage1.FlagDescTestClass;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;

@@ -38,6 +38,7 @@ java_library(
         "//common/firestore",
         "//common/flags",
         "//common/repo",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",

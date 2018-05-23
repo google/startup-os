@@ -145,11 +145,11 @@ class GflagsParser {
   }
 
   private void errorUnknownFlag(String flag) {
-    log.atSevere().log("Unknown flag: {%s}", flag);
+    log.atSevere().log("Unknown flag: %s", flag);
   }
 
   private void errorFlagHasNoValue() {
-    log.atSevere().log("Option {%s} has no value", lastFlag);
+    log.atSevere().log("Option %s has no value", lastFlag);
   }
 
   @VisibleForTesting

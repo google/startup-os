@@ -10,6 +10,7 @@ java_binary(
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common/flags",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
@@ -45,6 +46,7 @@ java_binary(
     deps = [
         ":local_http_gateway_grpc_client",
         "//common/flags",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/org/json",
         "//tools/reviewer/service:code_review_java_proto",
