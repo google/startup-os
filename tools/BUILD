@@ -10,6 +10,15 @@ sh_binary(
 )
 
 sh_binary(
+    name = "buildozer",
+    srcs = ["buildtools_wrappers/buildozer.sh"],
+    data = [
+        "@buildozer//file",
+        "@buildozer_osx//file",
+    ],
+)
+
+sh_binary(
     name = "unused_deps",
     srcs = ["buildtools_wrappers/unused_deps.sh"],
     data = [
