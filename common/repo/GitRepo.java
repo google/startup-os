@@ -35,6 +35,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -170,6 +171,25 @@ public class GitRepo implements Repo {
     }
   }
 
+  @Override
+  public boolean mergeTheirs(String branch) {
+    try {
+      Ref current = jGitRepo.exactRef(jGitRepo.getFullBranch());
+      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
+      jGit.merge().setStrategy(MergeStrategy.THEIRS).include(ref).call();
+      jGit.reset().setRef(current.getObjectId().toObjectId().name()).call();
+      AddCommand add = jGit.add();
+      for (String file : jGit.status().call().getUntracked()) {
+        add.addFilepattern(file);
+      }
+      add.call();
+      jGit.commit().setAll(true).setMessage("Updated changes").call();
+      return true;
+    } catch (GitAPIException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public boolean isMerged(String branch) {
     throw new UnsupportedOperationException("Not implemented");
   }
@@ -192,6 +212,19 @@ public class GitRepo implements Repo {
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public ImmutableList<String> listBranches() {
+    ImmutableList.Builder<String> branches = new ImmutableList.Builder<>();
+    try {
+      jGit.branchList()
+          .call()
+          .forEach(ref -> branches.add(ref.getName().replace("refs/heads/", "")));
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+    return branches.build();
   }
 
   public String getFileContents(String commitId, String path) {

@@ -12,6 +12,7 @@ java_library(
         "Time.java",
     ],
     deps = [
+        ":text_differencer",
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/code/findbugs:jsr305",
@@ -43,6 +44,7 @@ java_library(
     deps = [
         ":text_difference_java_proto",
         "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
     ],
 )
 

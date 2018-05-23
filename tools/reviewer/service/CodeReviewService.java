@@ -27,10 +27,12 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
+import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
 import io.grpc.Status;
@@ -55,19 +57,22 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   private AuthService authService;
   private FileUtils fileUtils;
-  private String basePath;
   private GitRepoFactory repoFactory;
+  private String basePath;
+  private TextDifferencer textDifferencer;
 
   @Inject
   public CodeReviewService(
       AuthService authService,
       FileUtils fileUtils,
       @Named("Base path") String basePath,
-      GitRepoFactory repoFactory) {
+      GitRepoFactory repoFactory,
+      TextDifferencer textDifferencer) {
     this.authService = authService;
     this.fileUtils = fileUtils;
     this.basePath = basePath;
     this.repoFactory = repoFactory;
+    this.textDifferencer = textDifferencer;
   }
 
   private String readTextFile(File file) throws IOException {
@@ -161,7 +166,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       String rightFileContents = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .addAllChanges(TextDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
+              .addAllChanges(textDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
               .setLeftFileContents(leftFileContents)
               .setRightFileContents(rightFileContents)
               .build());
@@ -191,6 +196,20 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
         DOCUMENT_FOR_LAST_DIFF_NUMBER,
         diffNumberResponse.toBuilder().setLastDiffId(diffNumberResponse.getLastDiffId() + 1));
     responseObserver.onNext(diffNumberResponse);
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void getDiff(GetDiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
+    FirestoreClient client =
+        new FirestoreClient(authService.getProjectId(), authService.getToken());
+
+    String diffPath =
+        fileUtils.joinPaths(
+            firestoreReviewRoot.get(), "data/diff", String.valueOf(request.getDiffId()));
+    Diff diff = (Diff) client.getDocument(diffPath, Diff.newBuilder());
+
+    responseObserver.onNext(diff);
     responseObserver.onCompleted();
   }
 }

@@ -2,7 +2,10 @@ package(default_visibility = ["//visibility:public"])
 
 java_library(
     name = "commands",
-    srcs = glob(["*.java"]),
+    srcs = glob([
+        "*.java",
+        "checks/*.java",
+    ]),
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

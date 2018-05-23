@@ -16,13 +16,14 @@ java_library(
     deps = [
         ":config_java_proto",
         "//common",
-        "//common/flags",
         "//common:dagger_with_annotation_processor",
-        "//tools/aa/commands",
+        "//common/flags",
+        "//common/repo",
         "//external:jar/com/google/protobuf/protobuf_java",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/reflections",
+        "//tools/aa/commands",
     ],
 )
 

@@ -18,9 +18,9 @@ package com.google.startupos.common;
 
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import javax.inject.Singleton;
 
 @Module
 public class CommonModule {
