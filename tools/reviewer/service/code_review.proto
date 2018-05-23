@@ -16,6 +16,7 @@ service CodeReviewService {
   // returns available diff number and increments stored value by one
   rpc getAvailableDiffNumber(.google.protobuf.Empty)
       returns (DiffNumberResponse);
+  rpc getDiff(GetDiffRequest) returns (Diff);
 }
 
 message FileRequest { string filename = 1; }
@@ -37,6 +38,8 @@ message TextDiffResponse {
   string left_file_contents = 2;
   string right_file_contents = 3;
 }
+
+message GetDiffRequest { int64 diff_id = 1; }
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues

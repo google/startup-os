@@ -131,6 +131,11 @@ public class MemoryRepo implements Repo {
     branches.remove(branch);
   }
 
+  @Override
+  public ImmutableList<String> listBranches() {
+    return ImmutableList.copyOf(branches.keySet());
+  }
+
   public void succeedNextPull() {
     nextPull = ActionOverride.SUCCESS;
   }
