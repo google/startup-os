@@ -138,7 +138,7 @@ public class DiffCommand implements AaCommand {
    * because tree is not clean and branch cannot be switched with dirty tree
    */
   private Diff updateDiff(Integer diffNumber) {
-    System.out.println(String.format("mode: updating diff %d", diffNumber));
+    System.out.println(String.format("Updating D%d", diffNumber));
 
     String branchName = String.format("D%d", diffNumber);
 
@@ -173,16 +173,25 @@ public class DiffCommand implements AaCommand {
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 GitRepo repo = this.gitRepoFactory.create(path);
-                System.out.println(
-                    String.format(
-                        "[%s/%s]: switching to temporary branch", currentWorkspaceName, repoName));
-
-                repo.switchBranch("_temporary");
-
+                // Always start from master
+                repo.switchBranch("master");
                 ImmutableList<File> files = repo.getUncommittedFiles();
+                if (files.isEmpty()) {
+                    System.out.println(
+                        String.format("[%s]: No files to update", repoName));
+                    return; // Only skips this iteration
+                }
+                if (repo.listBranches().contains("_temporary")) {
+                  System.out.println(
+                      String.format("[%s]: Removing temporary branch leftover", repoName));
+  
+                  repo.removeBranch("_temporary");
+                }
                 System.out.println(
-                    String.format("[%s/%s]: committing changes", currentWorkspaceName, repoName));
-
+                    String.format("[%s]: Switching to temporary branch", repoName));
+                repo.switchBranch("_temporary");
+                
+                System.out.println(String.format("[%s]: Committing changes", repoName));
                 Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
                 diffBuilder.addAllFile(commit.getFileList());
 
@@ -197,32 +206,29 @@ public class DiffCommand implements AaCommand {
                         .build());
 
                 System.out.println(
-                    String.format(
-                        "[%s/%s]: switching to diff branch", currentWorkspaceName, repoName));
+                    String.format("[%s]: Switching to diff branch", repoName));
                 repo.switchBranch(branchName);
 
                 System.out.println(
-                    String.format(
-                        "[%s/%s]: merging temporary branch", currentWorkspaceName, repoName));
+                    String.format("[%s]: Merging temporary branch", repoName));
                 repo.mergeTheirs("_temporary");
 
                 System.out.println(
-                    String.format(
-                        "[%s/%s]: removing temporary branch", currentWorkspaceName, repoName));
+                    String.format("[%s]: Removing temporary branch", repoName));
                 repo.removeBranch("_temporary");
 
-                System.out.println(
-                    String.format("[%s/%s]: switching to master", currentWorkspaceName, repoName));
+                System.out.println(String.format("[%s]: Switching to master", repoName));
                 repo.switchBranch("master");
 
-                System.out.println(
-                    String.format("[%s/%s]: merging changes", currentWorkspaceName, repoName));
+                System.out.println(String.format("[%s]: Merging changes", repoName));
                 repo.merge(branchName);
               });
     } catch (IOException e) {
       e.printStackTrace();
     }
-    diffBuilder.addSnapshot(snapshotBuilder);
+    if (snapshotBuilder.getSnapshotCount() > 0) {
+      diffBuilder.addSnapshot(snapshotBuilder);
+    }
     return diffBuilder.build();
   }
 

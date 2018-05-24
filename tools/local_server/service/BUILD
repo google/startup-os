@@ -26,6 +26,8 @@ java_library(
         "AuthService.java",
     ],
     deps = [
+        "//common",
+        "//common/flags",
         ":auth_service_java_grpc",
         ":auth_service_java_proto",
         "//third_party/maven/com/google/flogger",
