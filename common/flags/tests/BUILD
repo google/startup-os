@@ -4,14 +4,14 @@ java_test(
     name = "FlagsTest",
     srcs = [
         "FlagDescTestClass.java",
-        "FlagsTest.java", 
+        "FlagsTest.java",
     ],
     test_class = "com.google.startupos.common.flags.FlagsTest",
     deps = [
         "//common/flags",
-        "//third_party/maven/junit:junit",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/junit",
         "//third_party/maven/org/mockito:mockito_core",
-        "//third_party/maven/com/google/guava:guava",
-        "//third_party/maven/org/objenesis:objenesis",
+        "//third_party/maven/org/objenesis",
     ],
 )

@@ -1,24 +1,24 @@
 package(default_visibility = ["//visibility:public"])
 
 java_library(
-  name = "flags",
-  srcs = [
-      "ClassScanner.java", 
-      "Flags.java",
-      "GflagsParser.java",
-      "UsagePrinter.java",
-      "Flag.java",
-      "FlagDesc.java", 
-  ],
-  deps = [
-      ":flags_java_proto",
-      "//third_party/maven/org/reflections:reflections",
-      "//third_party/maven/org/javassist:javassist",
-      "//third_party/maven/com/google/code/findbugs:jsr305",
-      "//third_party/maven/javax/annotation:javax_annotation_api",
-      "//third_party/maven/com/google/guava:guava",
-      "//third_party/maven/com/google/flogger:flogger",
-  ]
+    name = "flags",
+    srcs = [
+        "ClassScanner.java",
+        "Flag.java",
+        "FlagDesc.java",
+        "Flags.java",
+        "GflagsParser.java",
+        "UsagePrinter.java",
+    ],
+    deps = [
+        ":flags_java_proto",
+        "//third_party/maven/com/google/code/findbugs:jsr305",
+        "//third_party/maven/com/google/flogger",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
+        "//third_party/maven/org/javassist",
+        "//third_party/maven/org/reflections",
+    ],
 )
 
 proto_library(
