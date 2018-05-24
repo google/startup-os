@@ -17,16 +17,24 @@
 package com.google.startupos.common.repo.tests;
 
 import com.google.startupos.common.CommonModule;
-import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.Repo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import dagger.Component;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.repo.Protos.Commit;
+import com.google.startupos.tools.reviewer.service.Protos.File;
 
 
 /** Test tool for GitRepo. */
 @Singleton
 public class TestTool {
+  @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
+  public static Flag<Boolean> force = Flag.create(false);
+  
   private static String REPO_ROOT_PATH = "";
   private static String COMMIT_ID = "";
   private static String FILE_PATH = "WORKSPACE";
@@ -38,9 +46,45 @@ public class TestTool {
     this.repoFactory = repoFactory;
   }
 
-  public String getFile(String repoPath, String commitId, String path) {
-    GitRepo repo = repoFactory.create(repoPath);
-    return repo.getFileContents(commitId, path);
+  public void run(String[] args) {
+    if (args.length > 0) {
+      String command = args[0];
+      Repo repo = repoFactory.create(System.getenv("BUILD_WORKSPACE_DIRECTORY"));
+      if (command.equals("switchBranch")) {
+        String branch = args[1];
+        repo.switchBranch(branch);
+      } if (command.equals("getCommits")) {
+        String branch = args[1];
+        for (Commit commit : repo.getCommits(branch)) {
+          System.out.println();
+          System.out.println(commit);
+        }
+      } else if (command.equals("getUncommittedFiles")) {
+        for (File file : repo.getUncommittedFiles()) {
+          System.out.println(file);
+        }
+      } else if (command.equals("merge")) {
+        String branch = args[1];
+        repo.merge(branch);
+      } else if (command.equals("mergeTheirs")) {
+        String branch = args[1];
+        repo.mergeTheirs(branch);
+      } else if (command.equals("isMerged")) {
+        String branch = args[1];
+        repo.isMerged(branch);
+      } else if (command.equals("removeBranch")) {
+        String branch = args[1];
+        repo.removeBranch(branch);
+      } else if (command.equals("listBranches")) {
+        for (String branch : repo.listBranches()) {
+          System.out.println(branch);
+        }
+      } else {
+        System.out.println("Unknown command");
+      }
+    } else {
+      System.out.println("Please specify command");
+    }
   }
 
   @Singleton
@@ -50,15 +94,7 @@ public class TestTool {
   }
 
   public static void main(String[] args) {
-    if (REPO_ROOT_PATH.isEmpty() || COMMIT_ID.isEmpty()) {
-      System.out.println("Please set REPO_ROOT_PATH and COMMIT_ID");
-      System.exit(1);
-    }
-    TestTool tool = DaggerTestTool_TestToolComponent.create().getTestTool();
-    String content = tool.getFile(
-        REPO_ROOT_PATH,
-        COMMIT_ID,
-        FILE_PATH);
-    System.out.println(content);
+    String[] leftOverArgs = Flags.parse(args, TestTool.class.getPackage());
+    DaggerTestTool_TestToolComponent.create().getTestTool().run(args);
   }
 }
