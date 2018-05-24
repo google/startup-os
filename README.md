@@ -25,6 +25,7 @@ Working examples of:
 * [Protocol Buffers](https://developers.google.com/protocol-buffers)
 * [gRPC](https://grpc.io)
 * [Dagger](https://github.com/google/dagger)
+* [Flogger](https://github.com/google/flogger)
 * [Firebase](https://firebase.google.com) integration with Protocol Buffers.
 
 #### Milestone II
