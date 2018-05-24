@@ -22,9 +22,6 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import dagger.Component;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
-import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 
@@ -32,13 +29,6 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 /** Test tool for GitRepo. */
 @Singleton
 public class TestTool {
-  @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
-  public static Flag<Boolean> force = Flag.create(false);
-  
-  private static String REPO_ROOT_PATH = "";
-  private static String COMMIT_ID = "";
-  private static String FILE_PATH = "WORKSPACE";
-
   private GitRepoFactory repoFactory;
 
   @Inject
@@ -94,7 +84,6 @@ public class TestTool {
   }
 
   public static void main(String[] args) {
-    String[] leftOverArgs = Flags.parse(args, TestTool.class.getPackage());
     DaggerTestTool_TestToolComponent.create().getTestTool().run(args);
   }
 }

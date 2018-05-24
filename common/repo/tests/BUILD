@@ -23,7 +23,6 @@ java_binary(
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//common/flags",
         "//common/repo",
         "//common/repo:repo_java_proto",
         "//tools/reviewer/service:code_review_java_proto",
