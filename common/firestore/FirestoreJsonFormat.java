@@ -200,19 +200,22 @@ public class FirestoreJsonFormat {
 
       JsonObject result = new JsonObject();
       JsonPrimitive primitive;
-
       for (Map.Entry<String, JsonElement> item : json.entrySet()) {
-
         String key = item.getKey();
         JsonObject value = item.getValue().getAsJsonObject();
-
         if ((primitive = pluckPrimitive(value)) != null) {
           result.add(key, primitive);
         } else if (value.has(MAP_KEY)) {
-          result.add(
+          if (value.getAsJsonObject(MAP_KEY).entrySet().isEmpty()) {
+            result.add(
               key,
-              firestoreJsonToRegularJson(
-                  value.getAsJsonObject(MAP_KEY).getAsJsonObject(MAP_FIELDS_KEY)));
+              value.getAsJsonObject(MAP_KEY));
+          } else {
+            result.add(
+                key,
+                firestoreJsonToRegularJson(
+                    value.getAsJsonObject(MAP_KEY).getAsJsonObject(MAP_FIELDS_KEY)));
+          }
         } else if (value.has(ARRAY_KEY)) {
           JsonArray array = value.getAsJsonObject(ARRAY_KEY).getAsJsonArray(ARRAY_VALUES_KEY);
           JsonArray newArray = new JsonArray();
@@ -222,9 +225,13 @@ public class FirestoreJsonFormat {
             } else {
               JsonObject object = element.getAsJsonObject();
               if (object.has(MAP_KEY)) {
-                newArray.add(
-                    firestoreJsonToRegularJson(
-                        object.getAsJsonObject(MAP_KEY).getAsJsonObject(MAP_FIELDS_KEY)));
+                if (object.getAsJsonObject(MAP_KEY).entrySet().isEmpty()) {
+                  newArray.add(object.getAsJsonObject(MAP_KEY));
+                } else {
+                  newArray.add(
+                      firestoreJsonToRegularJson(
+                          object.getAsJsonObject(MAP_KEY).getAsJsonObject(MAP_FIELDS_KEY)));
+                }
               }
             }
           }

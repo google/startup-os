@@ -23,6 +23,9 @@ import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.FileUtils;
 
 /*
  * AuthService is a gRPC service to receive Firestore auth data from WebLogin.
@@ -31,11 +34,27 @@ import javax.inject.Singleton;
 public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
+  @FlagDesc(
+      name = "debug_token_mode",
+      description = "Make it easy to debug by storing and reading the token from disk")
+  private static final Flag<Boolean> debugTokenMode = Flag.create(false);
+  private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
+
   private String firestoreToken;
   private String firestoreProjectId;
+  private FileUtils fileUtils;
 
   @Inject
-  AuthService() {}
+  AuthService(FileUtils fileUtils) {
+    this.fileUtils = fileUtils;
+    if (debugTokenMode.get() && fileUtils.fileExists(DEBUGGING_TOKEN_PATH)) {
+      AuthDataRequest req = (AuthDataRequest)fileUtils.readProtoBinaryUnchecked(
+          DEBUGGING_TOKEN_PATH, AuthDataRequest.newBuilder());
+      firestoreProjectId = req.getProjectId();
+      firestoreToken = req.getToken();
+      logger.atInfo().log("Loaded token from filesystem");
+    }
+  }
 
   @Override
   public void postAuthData(AuthDataRequest req, StreamObserver<AuthDataResponse> responseObserver) {
@@ -45,6 +64,9 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       responseObserver.onNext(AuthDataResponse.getDefaultInstance());
       responseObserver.onCompleted();
       logger.atInfo().log("Received token for project " + firestoreProjectId);
+      if (debugTokenMode.get()) {
+        fileUtils.writeProtoBinaryUnchecked(req, DEBUGGING_TOKEN_PATH);
+      }
     } catch (SecurityException e) {
       responseObserver.onError(
           Status.UNKNOWN
