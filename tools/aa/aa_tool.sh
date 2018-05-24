@@ -6,6 +6,45 @@
 #
 # If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
 
+
+function _aa_completions()
+{
+    local cur_word prev_word type_list
+
+    # COMP_WORDS is an array of words in the current command line.
+    # COMP_CWORD is the index of the current word (the one the cursor is
+    # in). So COMP_WORDS[COMP_CWORD] is the current word; we also record
+    # the previous word here
+    cur_word="${COMP_WORDS[COMP_CWORD]}"
+    prev_word="${COMP_WORDS[COMP_CWORD-1]}"
+
+    commands="init workspace diff fix sync"
+    init_options="--base_path --startupos_repo --user"
+
+    if [ "$prev_word" = "aa" ] ; then
+        # completing command name
+        unset command
+        COMPREPLY=( $(compgen -W "${commands}" -- ${cur_word}) )
+    elif [ "$prev_word" = "workspace" ]; then
+        # completing names of workspaces
+        find_base_folder
+        workspaces=$(ls -1 $AA_BASE/ws/)
+        COMPREPLY=( $(compgen -W "${workspaces}" -- "${cur_word}") )
+    elif [ "$prev_word" = "init" ]; then
+        # user entered "aa init" already
+        command="init"
+    else
+        COMPREPLY=()
+    fi
+
+    if [[ $command = "init" && ${cur_word} == -* ]] ; then
+        # completing params for `init`
+        COMPREPLY=( $(compgen -W "${init_options}" -- ${cur_word}) )
+    fi
+
+    return 0
+}
+
 # Find base folder based on existence of BASE file, and put it in AA_BASE
 function find_base_folder {
   while [[ `pwd` != / ]]; do
@@ -63,3 +102,4 @@ function aa {
 
 # make aa available as command
 export -f aa
+complete -F _aa_completions aa
