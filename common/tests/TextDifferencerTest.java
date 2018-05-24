@@ -55,21 +55,21 @@ public class TextDifferencerTest {
   public void testOnlyAdditions() throws Exception {
     assertEquals(
         ImmutableList.of(newTextChange(0, 0, "Addition.", Type.ADD).build()),
-        TextDifferencer.getAllTextChanges("", "Addition."));
+        differencer.getAllTextChanges("", "Addition."));
   }
 
   @Test
   public void testOnlyDeletions() throws Exception {
     assertEquals(
         ImmutableList.of(newTextChange(0, 0, "Deletion.", Type.DELETE).build()),
-        TextDifferencer.getAllTextChanges("Deletion.", ""));
+        differencer.getAllTextChanges("Deletion.", ""));
   }
 
   @Test
   public void testOnlyNoChanges() throws Exception {
     assertEquals(
         ImmutableList.of(newTextChange(0, 0, "No Change.", Type.NO_CHANGE).build()),
-        TextDifferencer.getAllTextChanges("No Change.", "No Change."));
+        differencer.getAllTextChanges("No Change.", "No Change."));
   }
 
   @Test
@@ -79,7 +79,7 @@ public class TextDifferencerTest {
             newTextChange(0, 0, "No", Type.DELETE).build(),
             newTextChange(1, 0, "With", Type.ADD).build(),
             newTextChange(2, 4, " Change.", Type.NO_CHANGE).build()),
-        TextDifferencer.getAllTextChanges("No Change.", "With Change."));
+            differencer.getAllTextChanges("No Change.", "With Change."));
   }
 
   @Test
@@ -89,7 +89,7 @@ public class TextDifferencerTest {
             newTextChange(0, 0, "With ", Type.NO_CHANGE).build(),
             newTextChange(5, 5, "a ", Type.ADD).build(),
             newTextChange(5, 7, "Change.", Type.NO_CHANGE).build()),
-        TextDifferencer.getAllTextChanges("With Change.", "With a Change."));
+            differencer.getAllTextChanges("With Change.", "With a Change."));
   }
 
   @Test
@@ -98,6 +98,6 @@ public class TextDifferencerTest {
         ImmutableList.of(
             newTextChange(9, 9, ".", Type.DELETE).build(),
             newTextChange(9, 9, "!", Type.ADD).build()),
-        TextDifferencer.getAllTextChanges("No Change.", "No Change!"));
+            differencer.getAllTextChanges("No Change.", "No Change!"));
   }
 }
