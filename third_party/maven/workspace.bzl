@@ -43,6 +43,7 @@ def list_dependencies():
     {"artifact": "com.google.cloud:google-cloud-storage:1.15.0", "lang": "java", "sha1": "b2c6b1361eef9b084f9a5bfabf350b4997fb087b", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_cloud_google_cloud_storage", "actual": "@com_google_cloud_google_cloud_storage//jar", "bind": "jar/com/google/cloud/google_cloud_storage"},
 # duplicates in com.google.code.findbugs:jsr305 promoted to 3.0.1
 # - com.google.api:api-common:1.1.0 wanted version 3.0.0
+# - com.google.flogger:flogger-system-backend:0.1 wanted version 3.0.1
 # - com.google.flogger:flogger:0.1 wanted version 3.0.1
 # - com.google.guava:guava:24.0-android wanted version 1.3.9
 # - com.google.http-client:google-http-client:1.23.0 wanted version 1.3.9
@@ -63,6 +64,7 @@ def list_dependencies():
     {"artifact": "com.google.errorprone:error_prone_annotations:2.1.3", "lang": "java", "sha1": "39b109f2cd352b2d71b52a3b5a1a9850e1dc304b", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_errorprone_error_prone_annotations", "actual": "@com_google_errorprone_error_prone_annotations//jar", "bind": "jar/com/google/errorprone/error_prone_annotations"},
     {"artifact": "com.google.errorprone:javac-shaded:9-dev-r4023-3", "lang": "java", "sha1": "72b688efd290280a0afde5f9892b0fde6f362d1d", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_errorprone_javac_shaded", "actual": "@com_google_errorprone_javac_shaded//jar", "bind": "jar/com/google/errorprone/javac_shaded"},
     {"artifact": "com.google.firebase:firebase-admin:5.9.0", "lang": "java", "sha1": "c8e8c4a191158b3fb711c757cb48ed2f9ba239f9", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_firebase_firebase_admin", "actual": "@com_google_firebase_firebase_admin//jar", "bind": "jar/com/google/firebase/firebase_admin"},
+    {"artifact": "com.google.flogger:flogger-system-backend:0.1", "lang": "java", "sha1": "051278e0c81e2eaf5e275e4275a8fb9ca5967695", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_flogger_flogger_system_backend", "actual": "@com_google_flogger_flogger_system_backend//jar", "bind": "jar/com/google/flogger/flogger_system_backend"},
     {"artifact": "com.google.flogger:flogger:0.1", "lang": "java", "sha1": "e02b7e9c66921e31b506416ef690c72774e1ed65", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_flogger_flogger", "actual": "@com_google_flogger_flogger//jar", "bind": "jar/com/google/flogger/flogger"},
 # duplicates in com.google.googlejavaformat:google-java-format fixed to 1.5
 # - com.google.auto.factory:auto-factory:1.0-beta5 wanted version 1.1
@@ -166,7 +168,9 @@ def list_dependencies():
 # duplicates in org.slf4j:slf4j-api promoted to 1.7.25
 # - com.google.firebase:firebase-admin:5.9.0 wanted version 1.7.25
 # - org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r wanted version 1.7.2
+# - org.slf4j:slf4j-simple:1.7.25 wanted version 1.7.25
     {"artifact": "org.slf4j:slf4j-api:1.7.25", "lang": "java", "sha1": "da76ca59f6a57ee3102f8f9bd9cee742973efa8a", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_slf4j_slf4j_api", "actual": "@org_slf4j_slf4j_api//jar", "bind": "jar/org/slf4j/slf4j_api"},
+    {"artifact": "org.slf4j:slf4j-simple:1.7.25", "lang": "java", "sha1": "8dacf9514f0c707cbbcdd6fd699e8940d42fb54e", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_slf4j_slf4j_simple", "actual": "@org_slf4j_slf4j_simple//jar", "bind": "jar/org/slf4j/slf4j_simple"},
     {"artifact": "org.threeten:threetenbp:1.3.3", "lang": "java", "sha1": "3ea31c96676ff12ab56be0b1af6fff61d1a4f1f2", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_threeten_threetenbp", "actual": "@org_threeten_threetenbp//jar", "bind": "jar/org/threeten/threetenbp"},
     ]
 

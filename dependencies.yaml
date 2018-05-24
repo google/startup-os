@@ -46,12 +46,15 @@ dependencies:
     firebase-admin:
       lang: java
       version: "5.9.0"
-  
+
   com.google.flogger:
     flogger:
       lang: java
       version: "0.1"
-  
+    flogger-system-backend:
+      lang: java
+      version: "0.1"
+
   com.google.googlejavaformat:
     google-java-format:
       lang: java
@@ -154,3 +157,8 @@ dependencies:
     reflections:
       lang: java
       version: "0.9.11"
+
+  org.slf4j:
+    slf4j-simple:
+      lang: java
+      version: "1.7.25"

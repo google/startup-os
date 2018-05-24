@@ -42,5 +42,7 @@ java_binary(
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/reflections",
         "//tools/aa/commands",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
