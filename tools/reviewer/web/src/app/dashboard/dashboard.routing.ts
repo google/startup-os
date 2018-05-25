@@ -1,4 +1,3 @@
-import { AuthGuard } from '@/shared/services/auth.guard';
 import { RouterModule, Routes } from '@angular/router';
 import { DiffComponent, ReviewComponent, ReviewsPanelComponent } from './';
 

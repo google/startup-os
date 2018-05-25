@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
-import { Comment, Thread } from '@/shared';
+import { Comment } from '@/shared';
 import { SelectionService } from '@/shared/services';
 
 interface HeightResponse {
@@ -45,9 +44,7 @@ export class DiffService {
     this.newComment.next(param);
   }
 
-  constructor(
-    private selectionService: SelectionService
-  ) { }
+  constructor(private selectionService: SelectionService) {}
 
   // Lines detect mouse hover by the method
   mouseHover(i: number, isNewCode: boolean): void {
@@ -58,9 +55,6 @@ export class DiffService {
   // Lines use it to know, should they display
   // 'add-comment-button` on the line or not
   hoverCheck(i: number, isNewCode: boolean): boolean {
-    return (
-      this.hoveredLine === i &&
-      this.isHoveredNewCode === isNewCode
-    );
+    return this.hoveredLine === i && this.isHoveredNewCode === isNewCode;
   }
 }

@@ -1,12 +1,11 @@
 import {
-  AuthService,
   Diff,
   FirebaseService,
   NotificationService,
   ProtoService,
   Status
 } from '@/shared';
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -28,8 +27,7 @@ export class ReviewComponent implements OnInit {
     private protoService: ProtoService,
     private firebaseService: FirebaseService,
     private router: Router,
-    private notificationService: NotificationService,
-    private authService: AuthService
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {

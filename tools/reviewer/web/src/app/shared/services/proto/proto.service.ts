@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { load, Message, Root, Type } from 'protobufjs';
+import { load, Root, Type } from 'protobufjs';
 import { Observable } from 'rxjs/Observable';
 import { Diff } from './messages';
 
@@ -27,7 +27,7 @@ export class ProtoService {
         observer.next(null);
       });
     });
-    this.open.subscribe(() => { });
+    this.open.subscribe(() => {});
   }
 
   verify(res: any): any {

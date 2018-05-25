@@ -1,10 +1,4 @@
-import {
-  Diff,
-  FirebaseService,
-  NotificationService,
-  ProtoService,
-  Status
-} from '@/shared';
+import { Diff } from '@/shared';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 // Bug component is used to display a link to github
@@ -21,12 +15,6 @@ export class BugComponent {
   @Output() onUpdateDiff = new EventEmitter<Diff>();
 
   bug: string = '';
-
-  constructor(
-    private protoService: ProtoService,
-    private firebaseService: FirebaseService,
-    private notify: NotificationService
-  ) {}
 
   ngOnChanges() {
     this.getBug();

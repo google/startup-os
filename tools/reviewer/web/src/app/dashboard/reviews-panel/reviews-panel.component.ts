@@ -1,9 +1,7 @@
 import { AuthService, FirebaseService, Lists, ProtoService } from '@/shared';
 import { Diff } from '@/shared/services/proto/messages';
 import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-reviews-panel',
