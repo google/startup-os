@@ -4,7 +4,7 @@
     "encoding": true,
     "comment-format": [true, "check-space"],
     "one-line": [true, "check-open-brace", "check-whitespace"],
-    "no-unused-variable": false,
+    "no-unused-variable": true,
     "no-var-keyword": true,
     "quotemark": [true, "single", "avoid-escape"],
     "semicolon": [true, "always", "ignore-bound-class-methods"],

@@ -8,23 +8,23 @@ import { Observable } from 'rxjs/Observable';
 export class AuthService {
   user: string;
 
-  constructor(public af: AngularFireAuth) {
-    this.af.authState.subscribe(userData => {
+  constructor(public angularFireAuth: AngularFireAuth) {
+    this.angularFireAuth.authState.subscribe(userData => {
       this.user = userData ? userData.email.split('@')[0] : undefined;
     });
   }
 
   getUser(): Observable<User> {
-    return this.af.authState;
+    return this.angularFireAuth.authState;
   }
 
   loginWithGoogle() {
-    return this.af.auth.signInWithPopup(
+    return this.angularFireAuth.auth.signInWithPopup(
       new firebase.auth.GoogleAuthProvider()
     );
   }
 
   logout() {
-    return this.af.auth.signOut();
+    return this.angularFireAuth.auth.signOut();
   }
 }

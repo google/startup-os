@@ -1,11 +1,6 @@
-import { Comment, Diff } from '@/shared';
+import { Diff } from '@/shared';
 import { Injectable } from '@angular/core';
-import {
-  AngularFireAction,
-  AngularFireDatabase,
-  AngularFireObject,
-  DatabaseSnapshot
-} from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()

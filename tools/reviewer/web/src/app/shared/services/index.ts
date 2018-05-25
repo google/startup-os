@@ -7,6 +7,7 @@ export * from './notification.service';
 export * from './highlight.service';
 export * from './selection.service';
 
+import { AuthGuard } from '@/shared/services/auth.guard';
 import { AuthService } from './auth.service';
 import { DifferenceService } from './differenceService/difference.service';
 import { FirebaseService } from './firebaseService/firebase.service';
@@ -16,6 +17,7 @@ import { ProtoService } from './proto/proto.service';
 import { SelectionService } from './selection.service';
 
 export const Services = [
+  AuthGuard,
   AuthService,
   DifferenceService,
   FirebaseService,

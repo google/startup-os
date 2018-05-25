@@ -5,7 +5,7 @@ import {
   ProtoService,
   Status
 } from '@/shared';
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -34,20 +34,25 @@ export class ReviewComponent implements OnInit {
     this.diffId = this.route.snapshot.params['id'];
 
     // Get a single review
-    this.firebaseService.getDiff(this.diffId).subscribe(res => {
-      // Create Diff from proto
-      this.protoService.open.subscribe(error => {
-        if (error) {
-          throw error;
-        }
-        const review = res;
-        this.diff = this.protoService.createDiff(review);
-        this.diff.number = parseInt(this.diffId, 10);
-        // Render the fields un-editable if the current diff status
-        // is in the list of notEditableStatus
-        this.editable = !this.notEditableStatus.includes(this.diff.status);
-      });
-    });
+    this.firebaseService.getDiff(this.diffId).subscribe(
+      res => {
+        // Create Diff from proto
+        this.protoService.open.subscribe(error => {
+          if (error) {
+            throw error;
+          }
+          const review = res;
+          this.diff = this.protoService.createDiff(review);
+          this.diff.number = parseInt(this.diffId, 10);
+          // Render the fields un-editable if the current diff status
+          // is in the list of notEditableStatus
+          this.editable = !this.notEditableStatus.includes(this.diff.status);
+        });
+      },
+      () => {
+        // Permission Denied
+      }
+    );
   }
 
   // Upon click on a file open a single file review page showing
@@ -86,12 +91,13 @@ export class ReviewComponent implements OnInit {
 
   // Update the Diff in the DB
   updateDiff(diff: Diff, message: string): void {
-    this.firebaseService
-      .updateDiff(diff)
-      .subscribe(() => {
-          this.notificationService.success(message);
-        }, () => {
-          this.notificationService.error('Some error occured');
-        });
+    this.firebaseService.updateDiff(diff).subscribe(
+      () => {
+        this.notificationService.success(message);
+      },
+      () => {
+        this.notificationService.error('Some error occured');
+      }
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { Diff, FirebaseService, NotificationService, Status } from '@/shared';
+import { Diff } from '@/shared';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 // The PersonListComponent is used to display 'reviewers'
@@ -25,8 +25,6 @@ export class PersonListComponent {
 
   // Following variable is used in editing the fields
   propertyValue: string = '';
-
-  constructor(private firebaseService: FirebaseService) {}
 
   ngOnChanges() {
     this.getPropertyValue();

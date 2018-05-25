@@ -1,10 +1,8 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnInit,
-  Output,
   ViewChild
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
@@ -32,20 +30,16 @@ export class CommentsComponent implements OnInit {
 
   constructor(
     private diffService: DiffService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {
     // Detect view changes and send height of the component
-    this.componentHeightChanges
-      .pipe(distinctUntilChanged())
-      .subscribe(() => {
-        this.sendHeight();
-      });
+    this.componentHeightChanges.pipe(distinctUntilChanged()).subscribe(() => {
+      this.sendHeight();
+    });
 
-    this.onChanges
-      .pipe(debounceTime(10))
-      .subscribe(() => {
-        this.sendHeight();
-      });
+    this.onChanges.pipe(debounceTime(10)).subscribe(() => {
+      this.sendHeight();
+    });
 
     this.textareaControl.valueChanges.subscribe(() => {
       this.autosize();
@@ -86,7 +80,7 @@ export class CommentsComponent implements OnInit {
   sendHeight(): void {
     this.diffService.setLineHeight({
       height: this.getHeight(),
-      lineNumber: this.lineNumber,
+      lineNumber: this.lineNumber
     });
   }
 

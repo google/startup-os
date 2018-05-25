@@ -1,20 +1,11 @@
 import { RouterModule, Routes } from '@angular/router';
-import {
-  DiffComponent,
-  HomeComponent,
-  ReviewComponent,
-  ReviewsPanelComponent
-} from './';
+import { DiffComponent, ReviewComponent, ReviewsPanelComponent } from './';
 
 const routes: Routes = [
   {
     path: '',
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-      {
-        path: 'dashboard',
-        component: HomeComponent
-      },
+      { path: '', pathMatch: 'full', redirectTo: 'diffs' },
       {
         path: 'diffs',
         component: ReviewsPanelComponent

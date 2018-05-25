@@ -1,9 +1,7 @@
 import { AuthService, FirebaseService, Lists, ProtoService } from '@/shared';
 import { Diff } from '@/shared/services/proto/messages';
 import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-reviews-panel',
@@ -20,7 +18,7 @@ export class ReviewsPanelComponent implements OnInit {
     private appRef: ApplicationRef,
     private router: Router,
     private zone: NgZone,
-    private auth: AuthService
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -29,9 +27,11 @@ export class ReviewsPanelComponent implements OnInit {
     this.username = this.router.parseUrl(this.router.url).queryParams['user'];
     if (!this.username) {
       // Get user from AuthService
-      this.auth.getUser().subscribe(user => {
-        const email = user.email;
-        this.username = email.split('@')[0];
+      this.authService.getUser().subscribe(user => {
+        if (user) {
+          const email = user.email;
+          this.username = email.split('@')[0];
+        }
       });
     }
     this.getReviews();
@@ -85,7 +85,6 @@ export class ReviewsPanelComponent implements OnInit {
       },
       () => {
         // Permission Denied
-        console.log('Permission Denied');
       }
     );
   }

@@ -1,7 +1,5 @@
-export * from './home/home.component';
 export * from './reviews-panel/';
 
-import { HomeComponent } from './home/home.component';
 import {
   AddCommentButtonsComponent,
   BugComponent,
@@ -19,7 +17,6 @@ import {
 export const DashboardComponents = [
   BugComponent,
   DiffComponent,
-  HomeComponent,
   ReviewComponent,
   ReviewsPanelComponent,
   PersonListComponent,
