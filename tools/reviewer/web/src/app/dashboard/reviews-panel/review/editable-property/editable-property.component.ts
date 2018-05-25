@@ -8,7 +8,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class EditablePropertyComponent {
   @Input() diff: Diff;
-  // Property name in Diff, e.g 'reviewers' or 'cc'.
+  // Property name in Diff, e.g 'bug' or 'description'.
   // The property value is stored in propertyValue
   @Input() property: string;
   @Input() editable: boolean = true;
