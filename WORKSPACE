@@ -1,3 +1,6 @@
+# To find the sha256 for an http_archive, run wget on the URL to download the
+# file, and use sha256sum on the file to produce the sha256.
+
 # bazel-deps-deploy is a prebuilt version of johnynek/bazel-deps
 # we cannot use it via http_archive directly for the moment
 # relevant issue: https://github.com/johnynek/bazel-deps/issues/126
@@ -13,6 +16,7 @@ maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
+    sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",
     strip_prefix = "grpc-java-1.12.0",
     urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
 )
@@ -54,6 +58,7 @@ GMAVEN_TAG = "20180513-1"
 
 http_archive(
     name = "gmaven_rules",
+    sha256 = "da44017f6d7bc5148a73cfd9bf8dbb1ee5a1301a596edad9181c5dc7648076ae",
     strip_prefix = "gmaven_rules-%s" % GMAVEN_TAG,
     url = "https://github.com/bazelbuild/gmaven_rules/archive/%s.tar.gz" % GMAVEN_TAG,
 )
@@ -82,6 +87,7 @@ maven_jar(
 
 http_archive(
     name = "com_google_protobuf",
+    sha256 = "091d4263d9a55eccb6d3c8abde55c26eaaa933dea9ecabb185cdf3795f9b5ca2",
     strip_prefix = "protobuf-3.5.1.1",
     urls = ["https://github.com/google/protobuf/archive/3.5.1.1.zip"],
 )
@@ -130,18 +136,21 @@ http_file(
 
 http_archive(
     name = "com_google_googletest",
+    sha256 = "d5ea270c46a25bf3d16643b5333273f2c8e97e73ca8c47586691a92fab476d83",
     strip_prefix = "googletest-08d5b1f33af8c18785fb8ca02792b5fac81e248f",
     urls = ["https://github.com/google/googletest/archive/08d5b1f33af8c18785fb8ca02792b5fac81e248f.zip"],
 )
 
 http_archive(
     name = "com_github_google_benchmark",
+    sha256 = "3a94ccd74b7d7db1c4e4a9a22d8e56101023c01b378b752eeeee5b2907fcbca1",
     strip_prefix = "benchmark-6d74c0625b8e88c1afce72b4f383c91b9a99dbe6",
     urls = ["https://github.com/google/benchmark/archive/6d74c0625b8e88c1afce72b4f383c91b9a99dbe6.zip"],
 )
 
 http_archive(
     name = "com_google_absl",
+    sha256 = "1375c123bda19875941625fb34a7280b8663bb4ed99344736f85ac5ddb955721",
     strip_prefix = "abseil-cpp-59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7",
     urls = ["https://github.com/abseil/abseil-cpp/archive/59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7.zip"],
 )
