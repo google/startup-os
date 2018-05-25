@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BugComponent } from './bug.component';
+import { EditablePropertyComponent } from './editable-property.component';
 
-describe('BugComponent', () => {
-  let component: BugComponent;
-  let fixture: ComponentFixture<BugComponent>;
+describe('EditablePropertyComponent', () => {
+  let component: EditablePropertyComponent;
+  let fixture: ComponentFixture<EditablePropertyComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BugComponent ]
+      declarations: [ EditablePropertyComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BugComponent);
+    fixture = TestBed.createComponent(EditablePropertyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

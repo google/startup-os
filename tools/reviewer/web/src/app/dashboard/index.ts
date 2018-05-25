@@ -2,33 +2,31 @@ export * from './reviews-panel/';
 
 import {
   AddCommentButtonsComponent,
-  BugComponent,
   ChangesHighlightingComponent,
   CodeBlockComponent,
   CommentsComponent,
   DiffComponent,
   DiffService,
+  EditablePropertyComponent,
   LineNumbersComponent,
   PersonListComponent,
   ReviewComponent,
-  ReviewsPanelComponent,
+  ReviewsPanelComponent
 } from './reviews-panel/';
 
 export const DashboardComponents = [
-  BugComponent,
-  DiffComponent,
-  ReviewComponent,
-  ReviewsPanelComponent,
-  PersonListComponent,
-  CodeBlockComponent,
-  CommentsComponent,
-  LineNumbersComponent,
   AddCommentButtonsComponent,
+  CommentsComponent,
   ChangesHighlightingComponent,
+  CodeBlockComponent,
+  DiffComponent,
+  EditablePropertyComponent,
+  LineNumbersComponent,
+  PersonListComponent,
+  ReviewComponent,
+  ReviewsPanelComponent
 ];
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [
-  DiffService
-];
+export const DashboardProviders = [DiffService];
