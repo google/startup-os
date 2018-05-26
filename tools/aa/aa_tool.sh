@@ -25,7 +25,7 @@ function _aa_completions()
         # completing command name
         unset command
         COMPREPLY=( $(compgen -W "${commands}" -- ${cur_word}) )
-    elif [ "$prev_word" = "workspace" ]; then
+    elif [ "$prev_word" = "workspace" ] || [ "$prev_word" = "aaw" ] ; then
         # completing names of workspaces
         find_base_folder
         workspaces=$(ls -1 $AA_BASE/ws/)
@@ -103,4 +103,6 @@ function aa {
 
 # make aa available as command
 export -f aa
+alias aaw="aa workspace"
 complete -F _aa_completions aa
+complete -F _aa_completions aaw
