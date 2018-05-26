@@ -59,14 +59,18 @@ public class ReviewCommand implements AaCommand {
       System.out.println("Workspace has no diff to review (git branch has no D# branch)");
       return;
     }
-    Diff diff = codeReviewBlockingStub.getDiff(
-        GetDiffRequest.newBuilder().setDiffId(currentDiffNumber).build());
-    if (diff.getReviewerCount() == 0) {
+    Diff.Builder diffBuilder = codeReviewBlockingStub.getDiff(
+        GetDiffRequest.newBuilder().setDiffId(currentDiffNumber).build()).toBuilder();
+    if (diffBuilder.getReviewerCount() == 0) {
       System.out.println(String.format("D%d has no reviewers", currentDiffNumber));
       return;
     }
-    diff = diff.toBuilder().setStatus(Status.UNDER_REVIEW).build();
+    for (int i = 0; i < diffBuilder.getReviewerCount(); i++) {
+      diffBuilder.setReviewer(i, diffBuilder.getReviewer(i).toBuilder().setNeedsAttention(true));
+    }
+    diffBuilder.setAuthor(diffBuilder.getAuthor().toBuilder().setNeedsAttention(false));
+    diffBuilder.setStatus(Status.UNDER_REVIEW).build();
     codeReviewBlockingStub.createDiff(
-        CreateDiffRequest.newBuilder().setDiff(diff).build());
+        CreateDiffRequest.newBuilder().setDiff(diffBuilder.build()).build());
   }
 }
