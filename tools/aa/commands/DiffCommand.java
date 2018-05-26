@@ -101,7 +101,6 @@ public class DiffCommand implements AaCommand {
                 System.out.println(
                     String.format("[%s/%s]: committing changes", currentWorkspaceName, repoName));
                 Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
-                diffBuilder.addAllFile(commit.getFileList());
 
                 snapshotBuilder.addSnapshot(
                     SingleRepoSnapshot.newBuilder()
@@ -119,6 +118,8 @@ public class DiffCommand implements AaCommand {
                 System.out.println(
                     String.format("[%s/%s]: merging changes", currentWorkspaceName, repoName));
                 repo.merge(branchName);
+                diffBuilder.clearFile();
+                diffBuilder.addAllFile(repo.getUncommittedFiles());
               });
     } catch (IOException e) {
       e.printStackTrace();
@@ -193,7 +194,6 @@ public class DiffCommand implements AaCommand {
                 
                 System.out.println(String.format("[%s]: Committing changes", repoName));
                 Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
-                diffBuilder.addAllFile(commit.getFileList());
 
                 snapshotBuilder.addSnapshot(
                     SingleRepoSnapshot.newBuilder()
@@ -222,6 +222,8 @@ public class DiffCommand implements AaCommand {
 
                 System.out.println(String.format("[%s]: Merging changes", repoName));
                 repo.merge(branchName);
+                diffBuilder.clearFile();
+                diffBuilder.addAllFile(repo.getUncommittedFiles());
               });
     } catch (IOException e) {
       e.printStackTrace();

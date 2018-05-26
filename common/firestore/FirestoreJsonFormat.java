@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 import com.google.protobuf.Descriptors.FieldDescriptor.JavaType;
+import com.google.protobuf.Descriptors.FieldDescriptor.Type;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
@@ -79,7 +80,11 @@ public class FirestoreJsonFormat {
           json.add(
               key, formatJsonArray(protoField, value.getAsJsonArray(), (List) protoFieldValue));
         } else if (value.isJsonPrimitive()) {
-          json.add(key, wrapJsonPrimitive(value, protoField.getJavaType()));
+          if (protoField.getType() == Type.ENUM) {
+            json.add(key, wrapJsonPrimitive(value, JavaType.STRING));
+          } else {
+            json.add(key, wrapJsonPrimitive(value, protoField.getJavaType()));
+          }          
         } else {
           throw new UnsupportedOperationException("No support yet for JsonNull");
         }
@@ -112,7 +117,6 @@ public class FirestoreJsonFormat {
 
     private JsonObject wrapJsonPrimitive(JsonElement json, JavaType type) {
       JsonObject wrapper = new JsonObject();
-
       if (type == JavaType.STRING || type == JavaType.BYTE_STRING) {
         wrapper.addProperty("stringValue", json.getAsString());
       } else if (type == JavaType.ENUM || type == JavaType.INT || type == JavaType.LONG) {

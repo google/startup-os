@@ -41,6 +41,7 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
 
 // TODO: Implement methods
 @AutoFactory
@@ -182,9 +183,14 @@ public class GitRepo implements Repo {
       for (String file : jGit.status().call().getUntracked()) {
         add.addFilepattern(file);
       }
-      add.call();
-      jGit.commit().setAll(true).setMessage("Updated changes").call();
-      return true;
+      try {
+        add.call();
+        jGit.commit().setAll(true).setMessage("Updated changes").call();
+        return true;
+      } catch (NoFilepatternException e) {      
+        // Nothing to commit
+        return true;
+      }
     } catch (GitAPIException | IOException e) {
       throw new RuntimeException(e);
     }
