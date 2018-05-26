@@ -47,6 +47,7 @@ function _aa_completions()
 
 # Find base folder based on existence of BASE file, and put it in AA_BASE
 function find_base_folder {
+  CWD=`pwd`
   while [[ `pwd` != / ]]; do
     if [ -f `pwd`/BASE ]; then
       AA_BASE=`pwd`
