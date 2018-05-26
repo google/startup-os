@@ -71,7 +71,7 @@ function aa {
   STARTUP_OS=$AA_BASE/head/startup-os
 
   # Uncomment to override StartupOS repo:
-  #STARTUP_OS=~/devel/base/ws/aa_workspace_fixes/startup-os
+  #STARTUP_OS=<repo path>
   # Uncomment to force recompile:
   #AA_FORCE_COMPILE=1
 
