@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018 The StartupOS Authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.google.startupos.tools.aa.commands;
 
 import com.google.common.collect.ImmutableList;
@@ -11,6 +26,7 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.service.Protos.Author;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
@@ -18,6 +34,7 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.SingleRepoSnapshot;
 import com.google.startupos.tools.reviewer.service.Protos.Snapshot;
+import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
@@ -25,6 +42,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.stream.Collectors;
 
 public class DiffCommand implements AaCommand {
   private FileUtils fileUtils;
@@ -66,6 +84,12 @@ public class DiffCommand implements AaCommand {
     codeReviewBlockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
+  private ImmutableList<Reviewer> getReviewers(String reviewersInput) {
+    return ImmutableList.copyOf(Arrays.asList(reviewersInput.split(",")).stream().map(
+        reviewer -> Reviewer.newBuilder().setName(reviewer.trim()).build())
+        .collect(Collectors.toList()));
+  }
+
   private Diff createDiff() {
     System.out.println("mode: creating diff");
     DiffNumberResponse response =
@@ -79,9 +103,9 @@ public class DiffCommand implements AaCommand {
             .setWorkspace(currentWorkspaceName)
             .setDescription(description.get())
             .setBug(buglink.get())
-            .addAllReviewer(Arrays.asList(reviewers.get().split(",")))
+            .addAllReviewer(getReviewers(reviewers.get()))
             .setNumber(response.getLastDiffId())
-            .addAuthor(config.getUser());
+            .setAuthor(Author.newBuilder().setName(config.getUser()).build());
 
     try {
       fileUtils
@@ -149,7 +173,7 @@ public class DiffCommand implements AaCommand {
             .toBuilder();
     if (!reviewers.get().isEmpty()) {
       // adding specified reviewers
-      diffBuilder.addAllReviewer(Arrays.asList(reviewers.get().split(",")));
+      diffBuilder.addAllReviewer(getReviewers(reviewers.get()));
     }
 
     if (!description.get().isEmpty()) {

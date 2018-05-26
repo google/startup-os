@@ -22,6 +22,7 @@ import com.google.startupos.tools.aa.commands.DiffCommand;
 import com.google.startupos.tools.aa.commands.FixCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.SyncCommand;
+import com.google.startupos.tools.aa.commands.ReviewCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
 import dagger.Lazy;
@@ -40,12 +41,14 @@ public class AaTool {
       Lazy<WorkspaceCommand> workspaceCommand,
       Lazy<SyncCommand> syncCommand,
       Lazy<DiffCommand> diffCommand,
-      Lazy<FixCommand> fixCommand) {
+      Lazy<FixCommand> fixCommand,
+      Lazy<ReviewCommand> reviewCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
     commands.put("diff", diffCommand);
     commands.put("fix", fixCommand);
+    commands.put("review", reviewCommand);
   }
 
   private void printUsage() {

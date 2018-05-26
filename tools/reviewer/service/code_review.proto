@@ -59,9 +59,9 @@ message Diff {
 
   int64 firestore_id = 1;
   int64 number = 2;
-  // Authors list is auto-generated based on snapshot authors.
-  repeated string author = 3;
-  repeated string reviewer = 4;
+  // The main author of the diff, though certain snapshots can be made by others.
+  Author author = 3;
+  repeated Reviewer reviewer = 4;
   string description = 5;
   string bug = 6;
   Status status = 7;
@@ -72,6 +72,17 @@ message Diff {
   repeated File file = 11;
   repeated Snapshot snapshot = 12;
   repeated Thread thread = 13;
+}
+
+message Reviewer {
+  string name = 1;
+  bool needsAttention = 2;
+  bool approved = 3;
+}
+
+message Author {
+  string name = 1;
+  bool needsAttention = 2;
 }
 
 /* A file can be:
