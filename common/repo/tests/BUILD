@@ -24,6 +24,10 @@ java_binary(
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common/repo",
+        "//common/repo:repo_java_proto",
+        "//tools/reviewer/service:code_review_java_proto",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
