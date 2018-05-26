@@ -146,7 +146,11 @@ public class FileUtils {
 
   /** Get the current working directory */
   public String getCurrentWorkingDirectory() {
-    return fileSystem.getPath("").toAbsolutePath().toString();
+    if (System.getenv("BUILD_WORKSPACE_DIRECTORY") != null) {
+      return System.getenv("BUILD_WORKSPACE_DIRECTORY");
+    } else {
+      return fileSystem.getPath("").toAbsolutePath().toString();
+    }
   }
 
   /** Gets file and folder names in path. */

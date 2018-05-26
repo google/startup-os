@@ -17,6 +17,7 @@ java_test(
         "//third_party/maven/org/objenesis",
         "//tools/aa:aa_module",
         "//tools/aa/commands",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
     ],
 )
 
@@ -38,5 +39,6 @@ java_test(
         "//third_party/maven/org/objenesis",
         "//tools/aa:aa_module",
         "//tools/aa/commands",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
     ],
 )

@@ -96,6 +96,7 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheEnd() throws Exception {
     assertEquals(
         ImmutableList.of(
+            newTextChange(0, 0, "No Change", Type.NO_CHANGE).build(),
             newTextChange(9, 9, ".", Type.DELETE).build(),
             newTextChange(9, 9, "!", Type.ADD).build()),
             differencer.getAllTextChanges("No Change.", "No Change!"));

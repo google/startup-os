@@ -1,7 +1,5 @@
-# Build every buildable Bazel target
-# Run this to ensure that everything still builds, kind of a regression test
-# This can take several minutes depending hardware and repo size
-bazel query //... | grep -v ^\/\/third_party | xargs bazel build
+# Build every buildable Bazel target and tests every testable target
+bazel query //... | grep -v ^\/\/third_party | xargs bazel test
 
 # Format dependencies.yaml
 # format-deps command ensures that dependencies.yaml is formatted properly
