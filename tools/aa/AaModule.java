@@ -41,7 +41,9 @@ public class AaModule {
       File file = new File(currentFolder);
       currentFolder = file.getAbsoluteFile().getParent();
     }
-    throw new IllegalStateException("BASE file not found in path until root");
+    throw new IllegalStateException(
+      String.format(
+          "BASE file not found from %s until root", fileUtils.getCurrentWorkingDirectory()));
   }
 
   @Provides
