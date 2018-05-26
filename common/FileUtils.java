@@ -149,6 +149,11 @@ public class FileUtils {
     return fileSystem.getPath("").toAbsolutePath().toString();
   }
 
+  /** Get the current working directory */
+  public String getCurrentWorkingDirectoryName() {
+    return fileSystem.getPath("").toAbsolutePath().getFileName().toString();
+  }
+
   /** Gets file and folder names in path. */
   public ImmutableList<String> listContents(String path) throws IOException {
     try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {

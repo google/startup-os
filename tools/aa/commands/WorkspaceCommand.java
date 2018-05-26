@@ -51,6 +51,29 @@ public class WorkspaceCommand implements AaCommand {
     this.config = config;
   }
 
+  // Guess folder to cd into after workspace command
+  private String guessFolderForCd(String workspacePath) {
+    // Try using current workspace subfolder
+    String guessedRepoFolder = fileUtils.joinPaths(
+      workspacePath, fileUtils.getCurrentWorkingDirectoryName());
+    if (fileUtils.folderExists(guessedRepoFolder)) {
+      return guessedRepoFolder;
+    }
+    // If target workspace has only 1 subfolder, use it
+    try {
+      if (fileUtils.listContents(workspacePath).size() == 1) {
+        guessedRepoFolder = fileUtils.joinPaths(
+            workspacePath, fileUtils.listContents(workspacePath).get(0));
+        if (fileUtils.folderExists(guessedRepoFolder)) {
+          return guessedRepoFolder;
+        }
+      }
+    } catch(Exception e) {
+      // Fail silently. It's just a nice-to-have.
+    }
+    return null;
+  }
+
   @Override
   public void run(String[] args) {
     // Note: System.out gets executed by the calling aa_tool.sh to run commands such as cd.
@@ -98,6 +121,11 @@ public class WorkspaceCommand implements AaCommand {
       }
     }
     // System.out command will be run by calling script aa_tool.sh.
-    System.out.println(String.format("cd %s", workspacePath));
+    String guessedRepoFolder = guessFolderForCd(workspacePath);
+    if (guessedRepoFolder != null) {
+      System.out.println(String.format("cd %s", guessedRepoFolder));
+    } else {
+      System.out.println(String.format("cd %s", workspacePath));
+    }
   }
 }
