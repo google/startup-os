@@ -124,6 +124,10 @@ public abstract class Flag<T> {
     this.required = required;
   }
 
+  public void resetValueForTesting() {
+    value = null;
+  }
+
   public T get() {
     T prevValue = value;
     if (Flags.getFlagValue(name) != null) {

@@ -152,11 +152,6 @@ dependencies:
     objenesis:
       lang: java
       version: "2.6"
-  
-  org.reflections:
-    reflections:
-      lang: java
-      version: "0.9.11"
 
   org.slf4j:
     slf4j-simple:
