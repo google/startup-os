@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -82,6 +83,7 @@ public class ClassScanner {
 
   private ImmutableList<Field> getFields(String packageName) throws IOException {
     ImmutableList.Builder<Field> result = ImmutableList.builder();
+    Set<String> classes = new HashSet<>();
     String resourceName = resourceName(packageName);
     Enumeration<URL> urls = ClassLoader.getSystemClassLoader().getResources(resourceName);
     while (urls.hasMoreElements()) {
@@ -91,6 +93,10 @@ public class ClassScanner {
       while (entries.hasMoreElements()) {
         ClassFile classFile = getClassFile(jarFile, entries.nextElement());
         if (classFile == null) {
+          continue;
+        }
+        if (!classes.add(classFile.getName())) {
+          // We've already gone through this class - skip
           continue;
         }
 
@@ -131,7 +137,8 @@ public class ClassScanner {
       Class<?> declaringClass = field.getDeclaringClass();
       Flag<?> flag = getFlagMember(declaringClass, field);
       FlagData flagData = createFlagData(declaringClass, field, flag);
-      if (flags.containsKey(flagData.getName())) {
+      if (flags.containsKey(flagData.getName())
+          && !declaringClass.getName().equals(flagData.getClassName())) {
         throw new IllegalArgumentException(
             String.format(
                 "Flag '%s' is already defined here:\n%s", field, flags.get(flagData.getName())));
