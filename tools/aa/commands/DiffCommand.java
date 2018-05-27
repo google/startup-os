@@ -32,8 +32,6 @@ import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.SingleRepoSnapshot;
-import com.google.startupos.tools.reviewer.service.Protos.Snapshot;
 import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -96,8 +94,6 @@ public class DiffCommand implements AaCommand {
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
     String branchName = String.format("D%s", response.getLastDiffId());
 
-    Snapshot.Builder snapshotBuilder = Snapshot.newBuilder();
-
     Diff.Builder diffBuilder =
         Diff.newBuilder()
             .setWorkspace(currentWorkspaceName)
@@ -121,34 +117,13 @@ public class DiffCommand implements AaCommand {
                     String.format(
                         "[%s/%s]: switching to diff branch", currentWorkspaceName, repoName));
                 repo.switchBranch(branchName);
-                ImmutableList<File> files = repo.getUncommittedFiles();
-                System.out.println(
-                    String.format("[%s/%s]: committing changes", currentWorkspaceName, repoName));
-                Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
-
-                snapshotBuilder.addSnapshot(
-                    SingleRepoSnapshot.newBuilder()
-                        .setTimestamp(System.currentTimeMillis())
-                        .setRepoId(repoName)
-                        .setCommitId(commit.getId())
-                        .setAuthor(config.getUser())
-                        .setForReview(false)
-                        .addAllFile(commit.getFileList())
-                        .build());
-
-                System.out.println(
-                    String.format("[%s/%s]: switching to master", currentWorkspaceName, repoName));
-                repo.switchBranch("master");
-                System.out.println(
-                    String.format("[%s/%s]: merging changes", currentWorkspaceName, repoName));
-                repo.merge(branchName);
-                diffBuilder.clearFile();
-                diffBuilder.addAllFile(repo.getUncommittedFiles());
+                // Tag branch so its commits won't get removed by git garbage collection.
+                // TODO: Understand tagging better, make sure we're doing it right.
+                repo.tagHead(branchName);
               });
     } catch (IOException e) {
       e.printStackTrace();
     }
-    diffBuilder.addSnapshot(snapshotBuilder);
     return diffBuilder.build();
   }
 
@@ -186,75 +161,74 @@ public class DiffCommand implements AaCommand {
       diffBuilder.setBug(buglink.get());
     }
 
-    Snapshot.Builder snapshotBuilder = Snapshot.newBuilder();
+    // NOTE: This part would be part of `aa snapshot`, which would actually do a commit,
+    // but assume you're on your D# branch. Maybe we'll just call it `aa commitall`
 
-    try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
-          .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
-          .forEach(
-              path -> {
-                String repoName = Paths.get(path).getFileName().toString();
-                GitRepo repo = this.gitRepoFactory.create(path);
-                // Always start from master
-                repo.switchBranch("master");
-                ImmutableList<File> files = repo.getUncommittedFiles();
-                if (files.isEmpty()) {
-                    System.out.println(
-                        String.format("[%s]: No files to update", repoName));
-                    return; // Only skips this iteration
-                }
-                if (repo.listBranches().contains("_temporary")) {
-                  System.out.println(
-                      String.format("[%s]: Removing temporary branch leftover", repoName));
+    // try {
+    //   fileUtils
+    //       .listContents(workspacePath)
+    //       .stream()
+    //       .map(path -> fileUtils.joinPaths(workspacePath, path))
+    //       .filter(path -> fileUtils.folderExists(path))
+    //       .forEach(
+    //           path -> {
+    //             String repoName = Paths.get(path).getFileName().toString();
+    //             GitRepo repo = this.gitRepoFactory.create(path);
+    //             // Always start from master
+    //             repo.switchBranch("master");
+    //             ImmutableList<File> files = repo.getUncommittedFiles();
+    //             if (files.isEmpty()) {
+    //                 System.out.println(
+    //                     String.format("[%s]: No files to update", repoName));
+    //                 return; // Only skips this iteration
+    //             }
+    //             if (repo.listBranches().contains("_temporary")) {
+    //               System.out.println(
+    //                   String.format("[%s]: Removing temporary branch leftover", repoName));
   
-                  repo.removeBranch("_temporary");
-                }
-                System.out.println(
-                    String.format("[%s]: Switching to temporary branch", repoName));
-                repo.switchBranch("_temporary");
+    //               repo.removeBranch("_temporary");
+    //             }
+    //             System.out.println(
+    //                 String.format("[%s]: Switching to temporary branch", repoName));
+    //             repo.switchBranch("_temporary");
                 
-                System.out.println(String.format("[%s]: Committing changes", repoName));
-                Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
+    //             System.out.println(String.format("[%s]: Committing changes", repoName));
+    //             Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
 
-                snapshotBuilder.addSnapshot(
-                    SingleRepoSnapshot.newBuilder()
-                        .setTimestamp(System.currentTimeMillis())
-                        .setRepoId(repoName)
-                        .setCommitId(commit.getId())
-                        .setAuthor(config.getUser())
-                        .setForReview(false)
-                        .addAllFile(commit.getFileList())
-                        .build());
+    //             snapshotBuilder.addSnapshot(
+    //                 SingleRepoSnapshot.newBuilder()
+    //                     .setTimestamp(System.currentTimeMillis())
+    //                     .setRepoId(repoName)
+    //                     .setCommitId(commit.getId())
+    //                     .setAuthor(config.getUser())
+    //                     .setForReview(false)
+    //                     .addAllFile(commit.getFileList())
+    //                     .build());
 
-                System.out.println(
-                    String.format("[%s]: Switching to diff branch", repoName));
-                repo.switchBranch(branchName);
+    //             System.out.println(
+    //                 String.format("[%s]: Switching to diff branch", repoName));
+    //             repo.switchBranch(branchName);
 
-                System.out.println(
-                    String.format("[%s]: Merging temporary branch", repoName));
-                repo.mergeTheirs("_temporary");
+    //             System.out.println(
+    //                 String.format("[%s]: Merging temporary branch", repoName));
+    //             repo.mergeTheirs("_temporary");
 
-                System.out.println(
-                    String.format("[%s]: Removing temporary branch", repoName));
-                repo.removeBranch("_temporary");
+    //             System.out.println(
+    //                 String.format("[%s]: Removing temporary branch", repoName));
+    //             repo.removeBranch("_temporary");
 
-                System.out.println(String.format("[%s]: Switching to master", repoName));
-                repo.switchBranch("master");
+    //             System.out.println(String.format("[%s]: Switching to master", repoName));
+    //             repo.switchBranch("master");
 
-                System.out.println(String.format("[%s]: Merging changes", repoName));
-                repo.merge(branchName);
-                diffBuilder.clearFile();
-                diffBuilder.addAllFile(repo.getUncommittedFiles());
-              });
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    if (snapshotBuilder.getSnapshotCount() > 0) {
-      diffBuilder.addSnapshot(snapshotBuilder);
-    }
+    //             System.out.println(String.format("[%s]: Merging changes", repoName));
+    //             repo.merge(branchName);
+    //             diffBuilder.clearFile();
+    //             diffBuilder.addAllFile(repo.getUncommittedFiles());
+    //           });
+    // } catch (IOException e) {
+    //   e.printStackTrace();
+    // }
+
     return diffBuilder.build();
   }
 

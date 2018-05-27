@@ -77,6 +77,14 @@ public class GitRepo implements Repo {
     }
   }
 
+  public void tagHead(String name) {
+    try {
+      jGit.tag().setName(name).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+  }  
+
   public ImmutableList<Commit> getCommits(String branch) {
     throw new UnsupportedOperationException("Not implemented");
   }

@@ -29,8 +29,6 @@ import com.google.startupos.tools.reviewer.service.Protos.Diff.Status;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.SingleRepoSnapshot;
-import com.google.startupos.tools.reviewer.service.Protos.Snapshot;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
