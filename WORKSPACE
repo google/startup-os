@@ -184,3 +184,10 @@ local_repository(
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
 ts_setup_workspace()
+
+http_archive(
+    name = "com_github_gflags_gflags",
+    sha256 = "7d17922978692175c67ef5786a014df44bfbfe3b48b30937cca1413d4ff65f75",
+    strip_prefix = "gflags-e292e0452fcfd5a8ae055b59052fc041cbab4abf",
+    urls = ["https://github.com/gflags/gflags/archive/e292e0452fcfd5a8ae055b59052fc041cbab4abf.zip"],
+)
