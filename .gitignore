@@ -2,3 +2,4 @@
 bazel-*
 *.iml
 .project
+node_modules
