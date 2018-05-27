@@ -21,8 +21,9 @@ import com.google.startupos.tools.aa.commands.AaCommand;
 import com.google.startupos.tools.aa.commands.DiffCommand;
 import com.google.startupos.tools.aa.commands.FixCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
-import com.google.startupos.tools.aa.commands.SyncCommand;
 import com.google.startupos.tools.aa.commands.ReviewCommand;
+import com.google.startupos.tools.aa.commands.SubmitCommand;
+import com.google.startupos.tools.aa.commands.SyncCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
 import dagger.Lazy;
@@ -42,13 +43,15 @@ public class AaTool {
       Lazy<SyncCommand> syncCommand,
       Lazy<DiffCommand> diffCommand,
       Lazy<FixCommand> fixCommand,
-      Lazy<ReviewCommand> reviewCommand) {
+      Lazy<ReviewCommand> reviewCommand,
+      Lazy<SubmitCommand> submitCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
     commands.put("diff", diffCommand);
     commands.put("fix", fixCommand);
     commands.put("review", reviewCommand);
+    commands.put("submit", submitCommand);
   }
 
   private void printUsage() {
