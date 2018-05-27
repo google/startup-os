@@ -154,3 +154,30 @@ http_archive(
     strip_prefix = "abseil-cpp-59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7",
     urls = ["https://github.com/abseil/abseil-cpp/archive/59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7.zip"],
 )
+
+
+http_archive(
+    name = "io_bazel_rules_webtesting",
+    strip_prefix = "rules_webtesting-master",
+    urls = [
+        "https://github.com/bazelbuild/rules_webtesting/archive/master.tar.gz",
+    ],
+)
+
+git_repository(
+    name = "build_bazel_rules_nodejs",
+    remote = "https://github.com/bazelbuild/rules_nodejs.git",
+    tag = "0.9.1",
+)
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
+node_repositories(package_json = ["//:package.json"])
+
+
+local_repository(
+    name = "build_bazel_rules_typescript",
+    path = "node_modules/@bazel/typescript",
+)
+
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
+ts_setup_workspace()
