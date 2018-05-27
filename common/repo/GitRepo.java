@@ -31,6 +31,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoFilepatternException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
@@ -41,7 +42,6 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
 
 // TODO: Implement methods
 @AutoFactory
@@ -139,7 +139,11 @@ public class GitRepo implements Repo {
   }
 
   public void pushAll() {
-    throw new UnsupportedOperationException("Not implemented");
+    try {
+      jGit.push().setPushAll().setAtomic(true).call();
+    } catch (GitAPIException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public void pull() {
@@ -187,7 +191,7 @@ public class GitRepo implements Repo {
         add.call();
         jGit.commit().setAll(true).setMessage("Updated changes").call();
         return true;
-      } catch (NoFilepatternException e) {      
+      } catch (NoFilepatternException e) {
         // Nothing to commit
         return true;
       }
