@@ -20,6 +20,7 @@ import dagger.Module;
 import dagger.Provides;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Module
@@ -27,7 +28,8 @@ public class CommonModule {
   public @Provides @Singleton FileSystem provideDefaultFileSystem() {
     return FileSystems.getDefault();
   }
-  public @Provides @Singleton String provideUserHome() {
+
+  public @Provides @Singleton @Named("user_home") String provideUserHome() {
     return System.getProperty("user.home");
   }
 }

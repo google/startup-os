@@ -33,6 +33,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.inject.Inject;
 
@@ -43,7 +44,7 @@ public class FileUtils {
   private FileSystem fileSystem;
 
   @Inject
-  FileUtils(FileSystem fileSystem, String userHome) {
+  FileUtils(FileSystem fileSystem, @Named("user_home") String userHome) {
     this.fileSystem = fileSystem;
     this.userHome = userHome;
   }
