@@ -1,4 +1,5 @@
-<!-- Issue -->
+<!-- This component is used to display description and bug with 
+a little change in html template -->
 <div 
 fxLayout="row"
 fxLayoutAlign="start center"
@@ -8,32 +9,37 @@ class="bug">
 <div fxFlex="150px" fxFlex.xs="" 
   fxLayoutAlign="start center" 
   class="property">
-  Issue:
+  {{ property }}:
 </div>
 <div fxFlex class="detail">
   <ng-container>
     <div
       class="issue-detail"
-      *ngIf="!showEditableBug"
+      *ngIf="!showEditableProperty"
       fxLayoutAlign="start center">
-      <a class="link" href="{{bug}}">
-        {{ bug.length ? bug : '&nbsp;' }}
+      <!-- Display a span if the property 
+        being displayed is Diff Description -->
+      <span *ngIf="property === 'description'"> {{ propertyValue }}</span>
+      <!-- Display inside a clickable `<a>` element if the property
+        being displayed is bug property of Diff -->
+      <a *ngIf="property === 'bug'" class="link" href="{{ propertyValue }}">
+        {{ propertyValue.length ? propertyValue : '&nbsp;' }}
       </a>
       <button 
         mat-icon-button
-        (click)="showEditableBug = true"
+        (click)="showEditableProperty = true"
         *ngIf="editable"
         >
         <mat-icon>edit</mat-icon>
       </button>
     </div>
     <div class="editableInput" 
-      *ngIf="showEditableBug">
+      *ngIf="showEditableProperty">
       <mat-form-field>
         <input matInput placeholder="" 
-          [(ngModel)]="bug"
+          [(ngModel)]="propertyValue"
           (keyup.enter)=
-          "showEditableBug = false; saveBug()"
+          "showEditableProperty = false; savePropertyValue()"
           >
       </mat-form-field>
       <div
@@ -45,8 +51,8 @@ class="bug">
         <span class="input cancel">
           <button 
             mat-raised-button 
-            (click)="showEditableBug = false; 
-            getBug()"
+            (click)="showEditableProperty = false; 
+            getPropertyValue()"
             >
             Cancel
           </button>
@@ -55,8 +61,8 @@ class="bug">
           <button 
             mat-raised-button 
             color="primary"
-            (click)="showEditableBug = false; 
-            saveBug()"
+            (click)="showEditableProperty = false; 
+            savePropertyValue()"
             >
             Save
           </button>

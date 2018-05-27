@@ -39,9 +39,13 @@
   <mat-card-content class="review-details">
     
     <!-- Review Description -->
-    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap.xs="10px">
-      <div fxFlex="150px" fxFlex.xs="" class="property">Description: </div>
-      <div fxFlex class="detail">{{ diff.description }}</div>
+    <div>
+      <app-editable-property
+        [diff]="diff"
+        [property]="'description'"
+        [editable]="editable"
+        (onUpdateDiff)="updateDiff($event, 'Description Updated')"
+      ></app-editable-property>
     </div>
     
     <!-- Status -->
@@ -86,11 +90,12 @@
 
     <!-- Bug property of Diff that is a link to related Github Issue -->
     <div>
-      <app-bug 
-        [diff]="diff"
-        [editable]="editable"
-        (onUpdateDiff)="updateDiff($event, 'Bug Updated')"
-        ></app-bug>
+      <app-editable-property
+      [diff]="diff"
+      [property]="'bug'"
+      [editable]="editable"
+      (onUpdateDiff)="updateDiff($event, 'Bug Updated')"
+      ></app-editable-property>
     </div>
 
     <!-- Created At timestamp -->
