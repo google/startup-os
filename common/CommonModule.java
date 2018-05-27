@@ -27,4 +27,7 @@ public class CommonModule {
   public @Provides @Singleton FileSystem provideDefaultFileSystem() {
     return FileSystems.getDefault();
   }
+  public @Provides @Singleton String provideUserHome() {
+    return System.getProperty("user.home");
+  }
 }
