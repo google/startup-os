@@ -207,3 +207,8 @@ new_http_archive(
     build_file="third_party/BUILD.jsoncpp",
 )
 
+http_archive(
+    name = "io_bazel",
+    sha256 = "b0269e75b40d87ff87886e5f3432cbf88f70c96f907ab588e6c21b2922d72db0",
+    url = "https://github.com/bazelbuild/bazel/releases/download/0.13.1/bazel-0.13.1-dist.zip",
+)
