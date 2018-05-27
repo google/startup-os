@@ -90,7 +90,9 @@ public class FileUtils {
   /** Writes a string to file. */
   public void writeString(String text, String path) throws IOException {
     File file = new File(path);
-    mkdirs(file.getParent());
+    if (file.getParent() != null) {
+      mkdirs(file.getParent());
+    }
     Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes());
   }
 
@@ -201,7 +203,9 @@ public class FileUtils {
   /** Writes a proto to binary file. */
   public void writeProtoBinary(Message proto, String path) throws IOException {
     File file = new File(path);
-    mkdirs(file.getParent());
+    if (file.getParent() != null) {
+      mkdirs(file.getParent());
+    }
     proto.writeTo(Files.newOutputStream(fileSystem.getPath(expandHomeDirectory(path))));
   }
 

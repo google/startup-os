@@ -22,7 +22,6 @@ java_library(
         "//external:jar/com/google/protobuf/protobuf_java",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/reflections",
         "//tools/aa/commands",
     ],
 )
@@ -40,7 +39,6 @@ java_binary(
         "//external:jar/com/google/protobuf/protobuf_java",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/reflections",
         "//tools/aa/commands",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/org/slf4j:slf4j_simple",

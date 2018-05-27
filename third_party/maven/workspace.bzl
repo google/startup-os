@@ -81,7 +81,6 @@ def list_dependencies():
 # - com.google.protobuf:protobuf-java-util:3.5.1 wanted version 19.0
 # - io.grpc:grpc-core:1.12.0 wanted version 20.0
 # - io.grpc:grpc-protobuf:1.12.0 wanted version 20.0
-# - org.reflections:reflections:0.9.11 wanted version 20.0
     {"artifact": "com.google.guava:guava:24.0-android", "lang": "java", "sha1": "bfc941bd9285e7534ebde47236f14e5c7396a90c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_guava_guava", "actual": "@com_google_guava_guava//jar", "bind": "jar/com/google/guava/guava"},
     {"artifact": "com.google.http-client:google-http-client-appengine:1.23.0", "lang": "java", "sha1": "0eda0d0f758c1cc525866e52e1226c4eb579d130", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_appengine", "actual": "@com_google_http_client_google_http_client_appengine//jar", "bind": "jar/com/google/http_client/google_http_client_appengine"},
     {"artifact": "com.google.http-client:google-http-client-gson:1.23.0", "lang": "java", "sha1": "7029b196174e7f424217d047a9d1966dd2aa61df", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_gson", "actual": "@com_google_http_client_google_http_client_gson//jar", "bind": "jar/com/google/http_client/google_http_client_gson"},
@@ -164,7 +163,6 @@ def list_dependencies():
     {"artifact": "org.jsoup:jsoup:1.11.2", "lang": "java", "sha1": "e3eeb8a0b4ce1db246059a41e353cd7413dad226", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_jsoup_jsoup", "actual": "@org_jsoup_jsoup//jar", "bind": "jar/org/jsoup/jsoup"},
     {"artifact": "org.mockito:mockito-core:2.15.0", "lang": "java", "sha1": "b84bfbbc29cd22c9529409627af6ea2897f4fa85", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_mockito_mockito_core", "actual": "@org_mockito_mockito_core//jar", "bind": "jar/org/mockito/mockito_core"},
     {"artifact": "org.objenesis:objenesis:2.6", "lang": "java", "sha1": "639033469776fd37c08358c6b92a4761feb2af4b", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_objenesis_objenesis", "actual": "@org_objenesis_objenesis//jar", "bind": "jar/org/objenesis/objenesis"},
-    {"artifact": "org.reflections:reflections:0.9.11", "lang": "java", "sha1": "4c686033d918ec1727e329b7222fcb020152e32b", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_reflections_reflections", "actual": "@org_reflections_reflections//jar", "bind": "jar/org/reflections/reflections"},
 # duplicates in org.slf4j:slf4j-api promoted to 1.7.25
 # - com.google.firebase:firebase-admin:5.9.0 wanted version 1.7.25
 # - org.eclipse.jgit:org.eclipse.jgit:4.10.0.201712302008-r wanted version 1.7.2

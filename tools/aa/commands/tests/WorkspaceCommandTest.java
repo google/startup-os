@@ -83,6 +83,7 @@ public class WorkspaceCommandTest {
     System.setOut(new PrintStream(outContent));
     System.setErr(new PrintStream(errContent));
     Flags.resetForTesting();
+    WorkspaceCommand.force.resetValueForTesting();
   }
   
   @After
@@ -116,9 +117,7 @@ public class WorkspaceCommandTest {
     String[] args = {"workspace", "workspace_name"};
     workspaceCommand.run(args);
     assertEquals("", outContent.toString());
-    // TODO: Remove Reflections log and make this assertEquals. Log is:
-    // INFO org.reflections.Reflections - Reflections took 27 ms...
-    assertTrue(errContent.toString().contains("Workspace does not exist"));
+    assertEquals("Workspace does not exist\n", errContent.toString());
   }
 
   @Test
@@ -126,9 +125,8 @@ public class WorkspaceCommandTest {
     fileUtils.mkdirs("/base/ws/workspace_name/repo_name");
     String[] args = {"workspace", "workspace_name"};
     workspaceCommand.run(args);
-    assertEquals("cd /base/ws/workspace_name\n", outContent.toString());
-    // TODO: Once not printing "Reflections" (see TODO above), uncomment this:
-    //assertEquals("", errContent.toString());
+    assertEquals("cd /base/ws/workspace_name/repo_name\n", outContent.toString());
+    assertEquals("", errContent.toString());
   }
 
   @Test

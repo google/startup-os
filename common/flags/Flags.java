@@ -20,6 +20,7 @@ import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.IOException;
 import java.lang.Package;
 import java.util.stream.Collectors;
 
@@ -107,8 +108,12 @@ public class Flags {
   }
 
   private void scan(Iterable<String> packages) {
-    for (String pkg : packages) {
-      classScanner.scanPackage(pkg, flags);
+    for (String packageName : packages) {
+      try {
+        classScanner.scanPackage(packageName, flags);
+      } catch (IOException e) {
+        throw new RuntimeException("Package cannot be scanned: " + packageName, e);
+      }
     }
   }
 

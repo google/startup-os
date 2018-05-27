@@ -17,18 +17,31 @@
 package com.google.startupos.common.flags;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.flogger.FluentLogger;
+import com.google.common.reflect.ClassPath;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
-import com.google.common.flogger.FluentLogger;
-import org.reflections.Reflections;
-import org.reflections.scanners.FieldAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.FieldInfo;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.annotation.Annotation;
+
 
 /**
  * Scans for {@code Flag} fields using reflection and saves their data.
@@ -39,25 +52,82 @@ import org.reflections.util.FilterBuilder;
 public class ClassScanner {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
 
-  public void scanPackage(String packagePrefix, Map<String, FlagData> flags) {
-    // TODO - figure out configuration builder.
-    Reflections reflections =
-        new Reflections(
-            new ConfigurationBuilder()
-                .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(packagePrefix)))
-                .setUrls(ClasspathHelper.forPackage(packagePrefix))
-                .setScanners(new FieldAnnotationsScanner()));
+  private String resourceName(String packageName) {
+    String resourceName = packageName.replaceAll("[.\\\\]", "/");
+    if (resourceName.startsWith("/")) {
+      resourceName = resourceName.substring(1);
+    }
+    return resourceName;
+  }
 
-    Set<Field> fields = reflections.getFieldsAnnotatedWith(FlagDesc.class);
-    for (Field field : fields) {
-      Class<?> clazz = field.getType();
-      if (!Flag.class.isAssignableFrom(clazz)) {
-        throw new IllegalArgumentException("Annotation '" + field + "' does not annotate a flag.");
+  private ClassFile getClassFile(JarFile jarFile, ZipEntry zipEntry) {
+    if (!zipEntry.isDirectory()) {
+      try {
+        InputStream inputStream = jarFile.getInputStream(zipEntry);
+        DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(inputStream));
+        return new ClassFile(dataInputStream);
+      } catch (IOException e) {
+        // Some zip entries are not class files
+        return null;
       }
+    }
+    return null;
+  }
+
+  private JarFile getJarFile(URL url) throws IOException {
+    JarURLConnection urlConnection = (JarURLConnection)url.openConnection();
+    urlConnection.setUseCaches(false);
+    return urlConnection.getJarFile();
+  }
+
+  private ImmutableList<Field> getFields(String packageName) throws IOException {
+    ImmutableList.Builder<Field> result = ImmutableList.builder();
+    String resourceName = resourceName(packageName);
+    Enumeration<URL> urls = ClassLoader.getSystemClassLoader().getResources(resourceName);
+    while (urls.hasMoreElements()) {
+      URL url = urls.nextElement();
+      JarFile jarFile = getJarFile(url);
+      Enumeration<? extends ZipEntry> entries = jarFile.entries();
+      while (entries.hasMoreElements()) {
+        ClassFile classFile = getClassFile(jarFile, entries.nextElement());
+        if (classFile == null) {
+          continue;
+        }
+
+        for (Object fieldInfoObject : classFile.getFields()) {
+          FieldInfo fieldInfo = (FieldInfo)fieldInfoObject;
+          AnnotationsAttribute annotationsAttribute =
+              (AnnotationsAttribute) fieldInfo.getAttribute(AnnotationsAttribute.visibleTag);
+          if (annotationsAttribute != null) {
+            for (Annotation annotation : annotationsAttribute.getAnnotations()) {
+              try {
+                if (FlagDesc.class.getName().equals(annotation.getTypeName​())) {
+                  Class clazz = ClassLoader.getSystemClassLoader().loadClass(classFile.getName());
+                  Field field = clazz.getDeclaredField(fieldInfo.getName());
+                  if (Flag.class.isAssignableFrom(field.getType())) {
+                    result.add(field);
+                  } else {
+                    throw new IllegalArgumentException(
+                        "Field annotated with FlagDesc does not inherit from Flag " + field);
+                  }
+                }
+              } catch (Exception e) {
+                e.printStackTrace();
+              } 
+            }
+          }
+        }
+      }
+    }
+    return result.build();
+  }
+
+  public void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
+    for (Field field : getFields(packagePrefix)) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
-        throw new IllegalArgumentException("Flag '" + field + "' should be static but is not.");
+        throw new IllegalArgumentException(
+            "Flag '" + field + "' should be static but is not.");
       }
-
       Class<?> declaringClass = field.getDeclaringClass();
       Flag<?> flag = getFlagMember(declaringClass, field);
       FlagData flagData = createFlagData(declaringClass, field, flag);

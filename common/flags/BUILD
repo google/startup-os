@@ -17,7 +17,6 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/org/javassist",
-        "//third_party/maven/org/reflections",
     ],
 )
 
