@@ -174,8 +174,8 @@ git_repository(
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
-node_repositories(package_json = ["//:package.json"])
 
+node_repositories(package_json = ["//:package.json"])
 
 local_repository(
     name = "build_bazel_rules_typescript",
@@ -190,4 +190,11 @@ http_archive(
     sha256 = "7d17922978692175c67ef5786a014df44bfbfe3b48b30937cca1413d4ff65f75",
     strip_prefix = "gflags-e292e0452fcfd5a8ae055b59052fc041cbab4abf",
     urls = ["https://github.com/gflags/gflags/archive/e292e0452fcfd5a8ae055b59052fc041cbab4abf.zip"],
+)
+
+http_archive(
+    name = "com_github_google_glog",
+    sha256 = "ae86d645a282137007420c280494a51cc1eb8729cd095348de0953a444705f45",
+    strip_prefix = "glog-2faa186e62d544e930305ffd8f8e507b2054cc9b",
+    urls = ["https://github.com/google/glog/archive/2faa186e62d544e930305ffd8f8e507b2054cc9b.zip"],
 )
