@@ -1,4 +1,5 @@
 # Build every buildable Bazel target and test every testable target
+# TODO: Until we move to Angular Bazel, execute `npm install` beforehand
 bazel query //... | grep -v ^\/\/third_party | xargs bazel test
 
 # Format dependencies.yaml

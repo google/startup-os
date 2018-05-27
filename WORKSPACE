@@ -155,6 +155,9 @@ http_archive(
     urls = ["https://github.com/abseil/abseil-cpp/archive/59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7.zip"],
 )
 
+# TODO: Once we move to Angular Bazel,
+# remove all below and changes in commit that added it
+# (you can find it by running git blame)
 
 http_archive(
     name = "io_bazel_rules_webtesting",
