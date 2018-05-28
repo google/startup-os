@@ -19,7 +19,9 @@ class="bug">
       fxLayoutAlign="start center">
       <!-- Display a span if the property 
         being displayed is Diff Description -->
-      <span *ngIf="property === 'description'"> {{ propertyValue }}</span>
+      <div *ngIf="property === 'description'" 
+        class="review-description">{{ propertyValue }}
+      </div>
       <!-- Display inside a clickable `<a>` element if the property
         being displayed is bug property of Diff -->
       <a *ngIf="property === 'bug'" class="link" href="{{ propertyValue }}">
@@ -35,12 +37,19 @@ class="bug">
     </div>
     <div class="editableInput" 
       *ngIf="showEditableProperty">
-      <mat-form-field>
+      <mat-form-field *ngIf="property === 'bug'">
         <input matInput placeholder="" 
           [(ngModel)]="propertyValue"
           (keyup.enter)=
           "showEditableProperty = false; savePropertyValue()"
           >
+      </mat-form-field>
+      <mat-form-field *ngIf="property === 'description'">
+        <textarea matInput placeholder=""
+          matTextareaAutosize 
+          matAutosizeMinRows="8" 
+          [(ngModel)]="propertyValue">
+        </textarea>
       </mat-form-field>
       <div
         class="actions"

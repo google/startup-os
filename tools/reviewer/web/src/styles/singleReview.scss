@@ -2,6 +2,8 @@
 
 .single-review {
   margin-top: 30px;
+  background-color: #f3f3f3;
+
   mat-card-title div:first-child {
     width: 500px;
   }
@@ -33,9 +35,17 @@
       .detail {
         font-size: 16px;
         line-height: 32px;
+        background: white;
+        border-radius: 5px;
+        border: 1px solid #dedbdb;
+        padding: 0px 8px;
+        .review-description {
+          white-space: pre-wrap;
+          line-height: normal;
+          height: 185.3px;
+        }
         .mat-icon-button {
           display: none;
-          margin-left: 100px;
           background-color: #f9f6f6;
           width: 30px;
           height: 30px;
@@ -50,8 +60,7 @@
           }
         }
       }
-      .editableInput,
-      .reviewer-detail {
+      .editableInput {
         width: 600px;
       }
       .editableInput {
