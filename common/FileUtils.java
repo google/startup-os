@@ -44,7 +44,7 @@ public class FileUtils {
   private FileSystem fileSystem;
 
   @Inject
-  FileUtils(FileSystem fileSystem, @Named("user_home") String userHome) {
+  FileUtils(FileSystem fileSystem, @Named("Home folder") String userHome) {
     this.fileSystem = fileSystem;
     this.userHome = userHome;
   }

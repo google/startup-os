@@ -29,7 +29,7 @@ public class CommonModule {
     return FileSystems.getDefault();
   }
 
-  public @Provides @Singleton @Named("user_home") String provideUserHome() {
+  public @Provides @Singleton @Named("Home folder") String provideUserHome() {
     return System.getProperty("user.home");
   }
 }
