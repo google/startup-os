@@ -30,29 +30,29 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /** File utils */
 @Singleton
 public class FileUtils {
+  private final String userHome;
   private FileSystem fileSystem;
 
   @Inject
-  FileUtils(FileSystem fileSystem) {
+  FileUtils(FileSystem fileSystem, @Named("Home folder") String userHome) {
     this.fileSystem = fileSystem;
+    this.userHome = userHome;
   }
 
   /** Replace the ~ in e.g ~/path with the home directory. */
-  // TODO  Inject System.getProperty("user.home")
   public String expandHomeDirectory(String path) {
     if (path.startsWith("~" + fileSystem.getSeparator())) {
-      path = System.getProperty("user.home") + path.substring(1);
+      path = userHome + path.substring(1);
     }
     return path;
   }
