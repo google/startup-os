@@ -18,11 +18,15 @@ package com.google.startupos.common.flags;
 
 import javax.annotation.Nonnull;
 import com.google.common.flogger.FluentLogger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /** Flag class, with implementations for various flag types. */
-// TODO: Add support for lists
 public abstract class Flag<T> {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
+  private static final String STRING_DELIMITER = ",\\s*";
+  private static final String NUMBER_AND_BOOLEAN_DELIMITER = "\\s*,\\s*";
 
   public static Flag<String> create(String defaultValue) {
     return new Flag.StringFlag(defaultValue);
@@ -42,6 +46,26 @@ public abstract class Flag<T> {
 
   public static Flag<Double> create(Double defaultValue) {
     return new Flag.DoubleFlag(defaultValue);
+  }
+
+  public static Flag<List<String>> createStringsListFlag(List<String> defaultValue) {
+    return new Flag.StringsListFlag(defaultValue);
+  }
+
+  public static Flag<List<Boolean>> createBooleansListFlag(List<Boolean> defaultValue) {
+    return new Flag.BooleansListFlag(defaultValue);
+  }
+
+  public static Flag<List<Integer>> createIntegersListFlag(List<Integer> defaultValue) {
+    return new Flag.IntegersListFlag(defaultValue);
+  }
+
+  public static Flag<List<Long>> createLongsListFlag(List<Long> defaultValue) {
+    return new Flag.LongsListFlag(defaultValue);
+  }
+
+  public static Flag<List<Double>> createDoublesListFlag(List<Double> defaultValue) {
+    return new Flag.DoublesListFlag(defaultValue);
   }
 
   private static class StringFlag extends Flag<String> {
@@ -96,6 +120,69 @@ public abstract class Flag<T> {
     @Override
     Double parse(@Nonnull String value) {
       return Double.valueOf(value);
+    }
+  }
+
+  private static class StringsListFlag extends Flag<List<String>> {
+    StringsListFlag(@Nonnull List<String> defaultValue) {
+      super(defaultValue);
+    }
+
+    @Override
+    List<String> parse(@Nonnull String value) {
+      return Arrays.asList(value.split(STRING_DELIMITER));
+    }
+  }
+
+  private static class BooleansListFlag extends Flag<List<Boolean>> {
+    BooleansListFlag(@Nonnull List<Boolean> defaultValue) {
+      super(defaultValue);
+    }
+
+    @Override
+    List<Boolean> parse(@Nonnull String value) {
+      return Arrays.stream(value.split(NUMBER_AND_BOOLEAN_DELIMITER))
+          .map(Boolean::valueOf)
+          .collect(Collectors.toList());
+    }
+  }
+
+  private static class IntegersListFlag extends Flag<List<Integer>> {
+    IntegersListFlag(@Nonnull List<Integer> defaultValue) {
+      super(defaultValue);
+    }
+
+    @Override
+    List<Integer> parse(@Nonnull String value) {
+      return Arrays.stream(value.trim().split(NUMBER_AND_BOOLEAN_DELIMITER))
+          .map(Integer::valueOf)
+          .collect(Collectors.toList());
+    }
+  }
+
+  private static class LongsListFlag extends Flag<List<Long>> {
+    LongsListFlag(@Nonnull List<Long> defaultValue) {
+      super(defaultValue);
+    }
+
+    @Override
+    List<Long> parse(@Nonnull String value) {
+      return Arrays.stream(value.trim().split(NUMBER_AND_BOOLEAN_DELIMITER))
+          .map(Long::valueOf)
+          .collect(Collectors.toList());
+    }
+  }
+
+  private static class DoublesListFlag extends Flag<List<Double>> {
+    DoublesListFlag(@Nonnull List<Double> defaultValue) {
+      super(defaultValue);
+    }
+
+    @Override
+    List<Double> parse(@Nonnull String value) {
+      return Arrays.stream(value.trim().split(NUMBER_AND_BOOLEAN_DELIMITER))
+          .map(Double::valueOf)
+          .collect(Collectors.toList());
     }
   }
 

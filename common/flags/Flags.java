@@ -104,7 +104,13 @@ public class Flags {
 
   @VisibleForTesting
   static String getDefaultFlagValue(String flagName) {
-    return instance().getFlag(flagName).getDefault();
+    FlagData flagData = instance().getFlag(flagName);
+    if(flagData.getIsListFlag()){
+      // deleting characters "[" and "]" at the beginning and end of the List
+      return flagData.getDefault().substring(1, flagData.getDefault().length() - 1);
+    } else {
+      return flagData.getDefault();
+    }
   }
 
   private void scan(Iterable<String> packages) {

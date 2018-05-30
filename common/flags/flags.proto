@@ -20,4 +20,5 @@ message FlagData {
   bool hasValue = 7;
   // Throw exception if flag has no value
   bool required = 8;
+  bool isListFlag = 9;
 }

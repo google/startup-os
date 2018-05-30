@@ -20,7 +20,6 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.flogger.FluentLogger;
-import com.google.common.reflect.ClassPath;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -37,7 +36,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.AnnotationsAttribute;
@@ -52,6 +50,12 @@ import javassist.bytecode.annotation.Annotation;
  */
 public class ClassScanner {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
+  private static final Set<String> LIST_TYPE_NAMES = ImmutableSet.of(
+       "java.util.List<java.lang.String>",
+      "java.util.List<java.lang.Boolean>",
+      "java.util.List<java.lang.Integer>",
+      "java.util.List<java.lang.Long>",
+      "java.util.List<java.lang.Double>");
 
   private String resourceName(String packageName) {
     String resourceName = packageName.replaceAll("[.\\\\]", "/");
@@ -107,7 +111,7 @@ public class ClassScanner {
           if (annotationsAttribute != null) {
             for (Annotation annotation : annotationsAttribute.getAnnotations()) {
               try {
-                if (FlagDesc.class.getName().equals(annotation.getTypeName​())) {
+                if (FlagDesc.class.getName().equals(annotation.getTypeName())) {
                   Class clazz = ClassLoader.getSystemClassLoader().loadClass(classFile.getName());
                   Field field = clazz.getDeclaredField(fieldInfo.getName());
                   if (Flag.class.isAssignableFrom(field.getType())) {
@@ -182,6 +186,7 @@ public class ClassScanner {
             .setName(desc.name())
             .setClassName(declaringClass.getCanonicalName())
             .setIsBooleanFlag(isBooleanFlag(field))
+            .setIsListFlag(isListFlag(field))
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
@@ -210,6 +215,31 @@ public class ClassScanner {
           "Cannot check if flag '"
               + field
               + "' is of boolean type. It's"
+              + " not a ParameterizedType");
+    }
+    return false;
+  }
+
+  private boolean isListFlag(Field field) {
+    if (field.getGenericType() instanceof ParameterizedType) {
+      ParameterizedType flagType = (ParameterizedType) field.getGenericType();
+      Type[] innerTypes = flagType.getActualTypeArguments();
+      if (innerTypes.length != 1) {
+        log.atWarning().log(
+            "Cannot check if flag '"
+                + field
+                + "' is of list type. It"
+                + " has "
+                + innerTypes.length
+                + " inner types instead of 1.");
+      } else if (LIST_TYPE_NAMES.contains(innerTypes[0].getTypeName())) {
+        return true;
+      }
+    } else {
+      log.atWarning().log(
+          "Cannot check if flag '"
+              + field
+              + "' is of list type. It's"
               + " not a ParameterizedType");
     }
     return false;
