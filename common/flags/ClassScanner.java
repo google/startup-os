@@ -18,9 +18,7 @@ package com.google.startupos.common.flags;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.flogger.FluentLogger;
-import com.google.common.reflect.ClassPath;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -37,7 +35,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.AnnotationsAttribute;
@@ -81,7 +78,19 @@ public class ClassScanner {
     return urlConnection.getJarFile();
   }
 
-  private ImmutableList<Field> getFields(String packageName) throws IOException {
+  private ImmutableList<Field> getClassFields(Class clazz){
+    ImmutableList.Builder<Field> result = ImmutableList.builder();
+    Field[] fields = clazz.getDeclaredFields();
+    for(Field field: fields){
+      FlagDesc flagDesc =  field.getAnnotation(FlagDesc.class);
+      if(flagDesc != null){
+        result.add(field);
+      }
+   }
+    return result.build();
+  }
+
+  private ImmutableList<Field> getPackageFields(String packageName) throws IOException {
     ImmutableList.Builder<Field> result = ImmutableList.builder();
     Set<String> classes = new HashSet<>();
     String resourceName = resourceName(packageName);
@@ -107,7 +116,7 @@ public class ClassScanner {
           if (annotationsAttribute != null) {
             for (Annotation annotation : annotationsAttribute.getAnnotations()) {
               try {
-                if (FlagDesc.class.getName().equals(annotation.getTypeName​())) {
+                if (FlagDesc.class.getName().equals(annotation.getTypeName())) {
                   Class clazz = ClassLoader.getSystemClassLoader().loadClass(classFile.getName());
                   Field field = clazz.getDeclaredField(fieldInfo.getName());
                   if (Flag.class.isAssignableFrom(field.getType())) {
@@ -128,8 +137,28 @@ public class ClassScanner {
     return result.build();
   }
 
+  public void scanClass(Class clazz, Map<String,FlagData> flags) {
+    for(Field field: getClassFields(clazz)){
+      if ((field.getModifiers() & Modifier.STATIC) == 0) {
+        throw new IllegalArgumentException(
+                "Flag '" + field + "' should be static but is not.");
+      }
+      Flag<?> flag = getFlagMember(clazz, field);
+      FlagData flagData = createFlagData(clazz, field, flag);
+      if (flags.containsKey(flagData.getName())
+              && !clazz.getName().equals(flagData.getClassName())) {
+        throw new IllegalArgumentException(
+                String.format(
+                        "Flag '%s' is already defined here:\n%s", field, flags.get(flagData.getName())));
+      }
+      flags.put(flagData.getName(), flagData);
+      flag.setName(flagData.getName());
+      flag.setRequired(flagData.getRequired());
+    }
+  }
+
   public void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
-    for (Field field : getFields(packagePrefix)) {
+    for (Field field : getPackageFields(packagePrefix)) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
         throw new IllegalArgumentException(
             "Flag '" + field + "' should be static but is not.");

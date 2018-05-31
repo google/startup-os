@@ -64,7 +64,18 @@ public class Flags {
    * @param packages list of package roots to scan flags
    */
   public static String[] parse(String[] args, String... packages) {
-    instance().scan(Arrays.asList(packages));
+    instance().scanPackages(Arrays.asList(packages));
+    return instance._parse(args);
+  }
+
+  /**
+   * Initializes flag values from command-line style arguments.
+   *
+   * @param args command-line arguments to parse values from
+   * @param clazz class to scan flags
+   */
+  public static String[] parse(String[] args, Class clazz) {
+    instance().scanClass(clazz);
     return instance._parse(args);
   }
 
@@ -107,7 +118,7 @@ public class Flags {
     return instance().getFlag(flagName).getDefault();
   }
 
-  private void scan(Iterable<String> packages) {
+  private void scanPackages(Iterable<String> packages) {
     for (String packageName : packages) {
       try {
         classScanner.scanPackage(packageName, flags);
@@ -115,6 +126,10 @@ public class Flags {
         throw new RuntimeException("Package cannot be scanned: " + packageName, e);
       }
     }
+  }
+
+  private void scanClass(Class clazz) {
+    classScanner.scanClass(clazz, flags);
   }
 
   private static Flags instance() {
