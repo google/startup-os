@@ -6,7 +6,8 @@ fxLayoutAlign="start center"
 fxLayout.xs="column"
 fxLayoutGap.xs="10px"
 class="bug">
-<div fxFlex="150px" fxFlex.xs="" 
+<div *ngIf="property != 'description'" 
+  fxFlex="150px" fxFlex.xs="" 
   fxLayoutAlign="start center" 
   class="property">
   {{ property }}:
@@ -19,7 +20,7 @@ class="bug">
       fxLayoutAlign="start center">
       <!-- Display a span if the property 
         being displayed is Diff Description -->
-      <div *ngIf="property === 'description'" 
+      <div fxFlex *ngIf="property === 'description'" 
         class="review-description">{{ propertyValue }}
       </div>
       <!-- Display inside a clickable `<a>` element if the property
@@ -27,7 +28,8 @@ class="bug">
       <a *ngIf="property === 'bug'" class="link" href="{{ propertyValue }}">
         {{ propertyValue.length ? propertyValue : '&nbsp;' }}
       </a>
-      <button 
+      <button
+        class="edit-button" 
         mat-icon-button
         (click)="showEditableProperty = true"
         *ngIf="editable"
@@ -37,14 +39,16 @@ class="bug">
     </div>
     <div class="editableInput" 
       *ngIf="showEditableProperty">
-      <mat-form-field *ngIf="property === 'bug'">
+      <mat-form-field fxFlex 
+        *ngIf="property === 'bug'">
         <input matInput placeholder="" 
           [(ngModel)]="propertyValue"
           (keyup.enter)=
           "showEditableProperty = false; savePropertyValue()"
           >
       </mat-form-field>
-      <mat-form-field *ngIf="property === 'description'">
+      <mat-form-field fxFlex 
+        *ngIf="property === 'description'">
         <textarea matInput placeholder=""
           matTextareaAutosize 
           matAutosizeMinRows="8" 
@@ -53,27 +57,41 @@ class="bug">
       </mat-form-field>
       <div
         class="actions"
-        fxFlex
         fxLayoutAlign="end center"
         fxLayoutGap="10px"
         >
         <span class="input cancel">
-          <button 
+          <!-- <button 
             mat-raised-button 
             (click)="showEditableProperty = false; 
             getPropertyValue()"
             >
             Cancel
+          </button> -->
+          <button 
+            mat-icon-button
+            color="warn"
+            (click)="showEditableProperty = false; 
+            getPropertyValue()">
+            <mat-icon>close</mat-icon>
           </button>
         </span>
         <span class="input save">
-          <button 
+          <!-- <button 
             mat-raised-button 
             color="primary"
             (click)="showEditableProperty = false; 
             savePropertyValue()"
             >
             Save
+          </button> -->
+          <button 
+            mat-icon-button 
+            color="primary"
+            (click)="showEditableProperty = false; 
+            savePropertyValue()"
+            >
+            <mat-icon>done</mat-icon>
           </button>
         </span>
       </div>

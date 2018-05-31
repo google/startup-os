@@ -100,4 +100,10 @@ export class ReviewComponent implements OnInit {
       }
     );
   }
+
+  getTotalComments(): number {
+    const x = this.diff.threads.map(v => v.comments.length);
+    console.log(x);
+    return x.reduce((a, b) => a + b, 0);
+  }
 }

@@ -1,42 +1,42 @@
-<mat-card *ngIf="diff" class="single-review">
-  <mat-card-header>
-    <mat-card-title class="crw-header">
-      <div>
-        Diff {{ diff.number }} by
-        <span [ngClass]="{ 
-          'bold-text': 
-            diff.needAttentionOf.includes(diff.author),
-            'author-name': true
-          }">
-          <button mat-raised-button 
-            class="add-to-list"
-            *ngIf="editable"
-            (click)="saveAttentionList(diff.author);
-            $event.stopPropagation()"
-            >
-            {{ 
-              diff.needAttentionOf.indexOf(diff.author) > -1
-              ? 'Remove from Needs Attention'
-              : 'Add to Needs Attention'
-            }}
-          </button>
-          {{ diff.author }}
-        </span>
-      </div>
-      <div fxFlex>
-        <ng-container [ngSwitch]="diff.status">
-          <ng-container *ngSwitchCase="0">Review not started</ng-container>
-          <ng-container *ngSwitchCase="1">Needs more work</ng-container>
-          <ng-container *ngSwitchCase="2">Under Review</ng-container>
-          <ng-container *ngSwitchCase="3">Accepted</ng-container>
-          <ng-container *ngSwitchCase="4">Submitted</ng-container>
-          <ng-container *ngSwitchCase="5">Reverted</ng-container>
-        </ng-container>
-      </div>
-    </mat-card-title>
-  </mat-card-header>
+<div *ngIf="diff" class="single-review">
+  <!-- Title -->
+  <div class="review-title">
+    <div>
+      Diff {{ diff.number }} by
+      <span [ngClass]="{ 
+        'bold-text': 
+          diff.needAttentionOf.includes(diff.author),
+          'author-name': true
+        }">
+        <button mat-raised-button 
+          class="add-to-list"
+          *ngIf="editable"
+          (click)="saveAttentionList(diff.author);
+          $event.stopPropagation()"
+          >
+          {{ 
+            diff.needAttentionOf.indexOf(diff.author) > -1
+            ? 'Remove from Needs Attention'
+            : 'Add to Needs Attention'
+          }}
+        </button>
+        {{ diff.author }}
+      </span>
+    </div>
+    <div class="review-status" fxFlex>
+      <ng-container [ngSwitch]="diff.status">
+        <ng-container *ngSwitchCase="0">Review not started</ng-container>
+        <ng-container *ngSwitchCase="1">Needs more work</ng-container>
+        <ng-container *ngSwitchCase="2">Under Review</ng-container>
+        <ng-container *ngSwitchCase="3">Accepted</ng-container>
+        <ng-container *ngSwitchCase="4">Submitted</ng-container>
+        <ng-container *ngSwitchCase="5">Reverted</ng-container>
+      </ng-container>
+    </div>
+  </div>
+
   <!-- Details of the review -->
-  <mat-card-content class="review-details">
+  <div class="review-details">
     
     <div fxLayout="row" fxLayoutGap="10%">
       <div fxLayout="column" fxLayoutGap="20px" fxFlex="45%">
@@ -85,7 +85,7 @@
             class="property">
             Created:
           </div>
-          <div fxFlex class="detail">
+          <div fxFlex class="">
             {{ diff.createdTimestamp | date:'medium' }}
           </div>
         </div>
@@ -100,35 +100,8 @@
             Modified:
           </div>
           <div fxFlex 
-            class="detail">
+            class="">
             {{ diff.modifiedTimestamp | date:'medium' }}
-          </div>
-        </div>
-
-        <!-- Review files -->
-        <div fxLayout="row" 
-          fxLayout.xs="column" 
-          fxLayoutGap.xs="10px"
-          *ngFor="let file of diff.files; let i = index">
-          <div fxFlex="150px" 
-            fxFlex.xs="" class="property">
-            <ng-container *ngIf="i === 0">
-              Files: 
-            </ng-container>
-          </div>
-          <div fxFlex fxLayout="row" class="detail">
-            <div fxFlex="120px" fxFlex.xs="">
-              <ng-container [ngSwitch]="file.fileAction">
-                <ng-container *ngSwitchCase="0">Added</ng-container>
-                <ng-container *ngSwitchCase="1">Deleted</ng-container>
-                <ng-container *ngSwitchCase="2">Renamed</ng-container>
-                <ng-container *ngSwitchCase="3">Modified</ng-container>
-              </ng-container>
-            </div>
-            <a class="link" 
-              (click)="openFile(file.filePosition)"> 
-              {{ file.filePosition }}
-            </a>
           </div>
         </div>
 
@@ -148,8 +121,59 @@
       </div>
 
     </div>
+  </div>
 
-    <!-- Review Comments -->
+  <!-- Files -->
+  <div>
+    <div fxLayout="column" fxLayoutAlign="space-around stretch">
+      <div class="review-title">
+        Files
+      </div>
+      <div class="review-sub-title">
+        <div fxFlex="60%">
+          File
+        </div>
+        <div fxFlex="120px" fxFlex.xs="">
+          Modified
+        </div>
+      </div>
+    </div>
+    <div class="files-info-container">
+      <div fxLayout="row" 
+        fxLayout.xs="column" 
+        fxLayoutGap.xs="10px"
+        *ngFor="let file of diff.files; let i = index"
+        class="file-info">
+        <div fxFlex fxLayout="row">
+          <div fxFlex="60%">
+            <a class="link" 
+              (click)="openFile(file.filePosition)"> 
+              {{ file.filePosition }}
+            </a>
+          </div>
+          <div fxFlex="120px" fxFlex.xs="">
+            <ng-container [ngSwitch]="file.fileAction">
+              <ng-container *ngSwitchCase="0">Added</ng-container>
+              <ng-container *ngSwitchCase="1">Deleted</ng-container>
+              <ng-container *ngSwitchCase="2">Renamed</ng-container>
+              <ng-container *ngSwitchCase="3">Modified</ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Review Comments -->
+  <div>
+    <div fxLayout="column" fxLayoutAlign="space-around stretch">
+      <div class="review-title">
+        Discussion
+      </div>
+      <div class="review-sub-title">
+        General discussions ({{ getTotalComments() }} comments, X unresolved)
+      </div>
+    </div>
     <div class="thread" 
       fxLayout="column" 
       fxLayout.xs="column" 
@@ -160,39 +184,9 @@
           {{ thread.filename }}
         </div>
         <div fxFlex="10%" class="line-number-label">
-          Snapshot:
-        </div>
-        <div fxFlex="10%" class=""> 
-          {{ thread.snapshot }}
-        </div>
-        <div fxFlex="20%" class="line-number-label">
-          Line number:
-        </div>
-        <div fxFlex="10%" class=""> 
-          {{ thread.lineNumber }}
-        </div>
-      </div>
-      <div *ngFor="let comment of thread.comments" 
-        class="thread-contents">
-        <div class="comment">
-          <div class="content"> 
-            {{ comment.content }} 
-          </div> 
-          <div fxLayout="row" 
-            fxLayoutGap="5px" 
-            class="details">
-            <div> 
-              <span> by </span>
-              {{ comment.createdBy }} 
-            </div>
-            <div> 
-              <span> on </span> 
-              {{ comment.timestamp |  
-                date:'MMM dd, yyyy HH:mm a' : timezone }}
-            </div>
-          </div>
+          ( {{ thread.comments.length }} comments)
         </div>
       </div>
     </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>

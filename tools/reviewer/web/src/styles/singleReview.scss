@@ -1,14 +1,15 @@
 @import 'variables';
 
 .single-review {
-  margin-top: 30px;
   background-color: #f3f3f3;
 
-  mat-card-title div:first-child {
-    width: 500px;
-  }
-  .crw-header {
+  .review-title {
     font-size: 24px;
+    background-color: #cdecff;
+    padding: 5px 40px;
+    .review-status {
+      margin-left: 30px;
+    }
   }
   .reviewer-name,
   .author-name {
@@ -44,7 +45,7 @@
           line-height: normal;
           height: 185.3px;
         }
-        .mat-icon-button {
+        .edit-button {
           display: none;
           background-color: #f9f6f6;
           width: 30px;
@@ -55,17 +56,9 @@
           }
         }
         &:hover {
-          .mat-icon-button {
+          .edit-button {
             display: block;
           }
-        }
-      }
-      .editableInput {
-        width: 600px;
-      }
-      .editableInput {
-        mat-form-field {
-          width: 400px;
         }
       }
       .link {
@@ -74,23 +67,24 @@
         text-decoration: underline;
       }
     }
-    .thread {
-      border: 1px solid $borderColor;
-      border-radius: 3px;
-      .thread-header {
-        padding: 5px 20px;
-        border-bottom: 1px solid $borderColor;
-        background: azure;
-        .line-number-label {
-          font-size: 14px;
-        }
-      }
-      .thread-contents {
-        margin: 10px;
-      }
-      .comment {
-        margin-bottom: 20px;
-      }
+  }
+  .thread {
+    border-radius: 3px;
+    background: white;
+    .thread-header {
+      padding: 5px 20px;
+      border-bottom: 1px solid $borderColor;
+    }
+  }
+  .review-sub-title {
+    font-weight: bold;
+    padding: 5px 25px;
+  }
+  .files-info-container {
+    background-color: white;
+    .file-info {
+      border-bottom: 1px solid $borderColor;
+      padding: 5px 10px;
     }
   }
   .bold-text {

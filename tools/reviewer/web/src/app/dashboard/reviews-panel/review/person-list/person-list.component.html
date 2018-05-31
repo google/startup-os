@@ -38,7 +38,8 @@
         </span>
         <!-- If no persons are present -->
         <span *ngIf="diff[property].length === 0">&nbsp;</span>
-        <button 
+        <button
+          class="edit-button" 
           mat-icon-button
           (click)="showEditableProperty = true"
           *ngIf="editable"
@@ -49,7 +50,7 @@
       <div 
         class="editableInput"
         *ngIf="showEditableProperty">
-        <mat-form-field>
+        <mat-form-field fxFlex>
           <input matInput placeholder="" 
             [(ngModel)]="propertyValue"
             (keyup.enter)=
@@ -59,28 +60,27 @@
         </mat-form-field>
         <div
           class="actions"
-          fxFlex
           fxLayoutAlign="end center"
           fxLayoutGap="10px"
           >
           <span class="input cancel">
             <button 
-              mat-raised-button 
-              (click)=
-              "showEditableProperty = false; 
+              mat-icon-button
+              color="warn"
+              (click)="showEditableProperty = false; 
               getPropertyValue()"
               >
-              Cancel
+              <mat-icon>close</mat-icon>
             </button>
           </span>
           <span class="input save">
             <button 
-              mat-raised-button 
+              mat-icon-button 
               color="primary"
               (click)="showEditableProperty = false; 
               savePropertyValue()"
               >
-              Save
+              <mat-icon>done</mat-icon>
             </button>
           </span>
         </div>
