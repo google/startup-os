@@ -45,7 +45,7 @@ public class SyncCommand implements AaCommand {
   }
 
   @Override
-  public void run(String[] args) {
+  public boolean run(String[] args) {
     String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
 
     // Pull all repos in head
@@ -107,5 +107,6 @@ public class SyncCommand implements AaCommand {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    return true;
   }
 }

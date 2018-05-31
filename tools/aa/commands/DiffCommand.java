@@ -89,7 +89,7 @@ public class DiffCommand implements AaCommand {
   }
 
   private Diff createDiff() {
-    System.out.println("mode: creating diff");
+    System.out.println("Creating diff");
     DiffNumberResponse response =
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
     String branchName = String.format("D%s", response.getLastDiffId());
@@ -117,9 +117,6 @@ public class DiffCommand implements AaCommand {
                     String.format(
                         "[%s/%s]: switching to diff branch", currentWorkspaceName, repoName));
                 repo.switchBranch(branchName);
-                // Tag branch so its commits won't get removed by git garbage collection.
-                // TODO: Understand tagging better, make sure we're doing it right.
-                repo.tagHead(branchName);
               });
     } catch (IOException e) {
       e.printStackTrace();
@@ -161,83 +158,16 @@ public class DiffCommand implements AaCommand {
       diffBuilder.setBug(buglink.get());
     }
 
-    // NOTE: This part would be part of `aa snapshot`, which would actually do a commit,
-    // but assume you're on your D# branch. Maybe we'll just call it `aa commitall`
-
-    // try {
-    //   fileUtils
-    //       .listContents(workspacePath)
-    //       .stream()
-    //       .map(path -> fileUtils.joinPaths(workspacePath, path))
-    //       .filter(path -> fileUtils.folderExists(path))
-    //       .forEach(
-    //           path -> {
-    //             String repoName = Paths.get(path).getFileName().toString();
-    //             GitRepo repo = this.gitRepoFactory.create(path);
-    //             // Always start from master
-    //             repo.switchBranch("master");
-    //             ImmutableList<File> files = repo.getUncommittedFiles();
-    //             if (files.isEmpty()) {
-    //                 System.out.println(
-    //                     String.format("[%s]: No files to update", repoName));
-    //                 return; // Only skips this iteration
-    //             }
-    //             if (repo.listBranches().contains("_temporary")) {
-    //               System.out.println(
-    //                   String.format("[%s]: Removing temporary branch leftover", repoName));
-  
-    //               repo.removeBranch("_temporary");
-    //             }
-    //             System.out.println(
-    //                 String.format("[%s]: Switching to temporary branch", repoName));
-    //             repo.switchBranch("_temporary");
-                
-    //             System.out.println(String.format("[%s]: Committing changes", repoName));
-    //             Commit commit = repo.commit(files, String.format("Changes done in %s", branchName));
-
-    //             snapshotBuilder.addSnapshot(
-    //                 SingleRepoSnapshot.newBuilder()
-    //                     .setTimestamp(System.currentTimeMillis())
-    //                     .setRepoId(repoName)
-    //                     .setCommitId(commit.getId())
-    //                     .setAuthor(config.getUser())
-    //                     .setForReview(false)
-    //                     .addAllFile(commit.getFileList())
-    //                     .build());
-
-    //             System.out.println(
-    //                 String.format("[%s]: Switching to diff branch", repoName));
-    //             repo.switchBranch(branchName);
-
-    //             System.out.println(
-    //                 String.format("[%s]: Merging temporary branch", repoName));
-    //             repo.mergeTheirs("_temporary");
-
-    //             System.out.println(
-    //                 String.format("[%s]: Removing temporary branch", repoName));
-    //             repo.removeBranch("_temporary");
-
-    //             System.out.println(String.format("[%s]: Switching to master", repoName));
-    //             repo.switchBranch("master");
-
-    //             System.out.println(String.format("[%s]: Merging changes", repoName));
-    //             repo.merge(branchName);
-    //             diffBuilder.clearFile();
-    //             diffBuilder.addAllFile(repo.getUncommittedFiles());
-    //           });
-    // } catch (IOException e) {
-    //   e.printStackTrace();
-    // }
-
     return diffBuilder.build();
   }
 
   @Override
-  public void run(String[] args) {
+  public boolean run(String[] args) {
     Flags.parse(args, this.getClass().getPackage());
 
     Diff diff = (currentDiffNumber == -1) ? createDiff() : updateDiff(currentDiffNumber);
     CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
     codeReviewBlockingStub.createDiff(request);
+    return true;
   }
 }

@@ -17,7 +17,12 @@
 package com.google.startupos.tools.aa.commands;
 
 public interface AaCommand {
-  void run(String[] args);
+  public static final String ANSI_RED = "\u001B[31m";
+  public static final String ANSI_BOLD = "\u001b[1m";
+  public static final String ANSI_RESET = "\u001B[0m";
+  String RED_ERROR = ANSI_RED + ANSI_BOLD + "ERROR: " + ANSI_RESET;
+  // Run command, return true on success.
+  boolean run(String[] args);
   // TODO: implement ability to interrupt commands
   // with leaving workspace in defined state
 }

@@ -18,7 +18,7 @@ function _aa_completions()
     cur_word="${COMP_WORDS[COMP_CWORD]}"
     prev_word="${COMP_WORDS[COMP_CWORD-1]}"
 
-    commands="init workspace diff fix sync"
+    commands="init workspace diff fix sync snapshot"
     init_options="--base_path --startupos_repo --user"
 
     if [ "$prev_word" = "aa" ] ; then
@@ -71,9 +71,9 @@ function aa {
   STARTUP_OS=$AA_BASE/head/startup-os
 
   # Uncomment to override StartupOS repo:
-  STARTUP_OS=/home/oferb/devel/base/ws/aa_checks2/startup-os
+  #STARTUP_OS=<repo path>
   # Uncomment to force recompile:
-  AA_FORCE_COMPILE=1
+  #AA_FORCE_COMPILE=1
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/aa/aa_tool"
   if [ ! -f $AA_BINARY ] || [ "$AA_FORCE_COMPILE" = "1" ]; then
@@ -89,20 +89,31 @@ function aa {
       # For workspace command, instead of letting `aa` print to stdout
       # we need to capture its output and execute it as command
       AA_RESULT=$(eval $AA_BINARY $*)
+      AA_RESULT_CODE=$?
       $AA_RESULT
   else
       # if command is not workspace, let `aa` execute as is
       eval $AA_BINARY $*
+      AA_RESULT_CODE=$?
   fi
   unset AA_BASE
   unset AA_BINARY
   unset AA_RESULT
   unset CWD
   unset AA_FORCE_COMPILE
+  return $AA_RESULT_CODE
+}
+
+function aaw(){
+  aa workspace $*
+  # Workspace command succeeded, and was "-f"
+  if [ $? -eq 0 ] && [[ $* == -f* ]]; then
+    aa diff
+  fi
 }
 
 # make aa available as command
 export -f aa
-alias aaw="aa workspace"
+export -f aaw
 complete -F _aa_completions aa
 complete -F _aa_completions aaw
