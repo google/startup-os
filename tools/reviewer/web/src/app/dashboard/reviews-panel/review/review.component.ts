@@ -102,8 +102,12 @@ export class ReviewComponent implements OnInit {
   }
 
   getTotalComments(): number {
-    const x = this.diff.threads.map(v => v.comments.length);
-    console.log(x);
-    return x.reduce((a, b) => a + b, 0);
+    return this.diff.threads
+      .map(v => v.comments.length)
+      .reduce((a, b) => a + b, 0);
+  }
+
+  getUnresolvedComments(): number {
+    return this.diff.threads.filter(v => !v.isDone).length;
   }
 }
