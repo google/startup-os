@@ -78,6 +78,10 @@ public class MemoryRepo implements Repo {
     currentBranch = branch;
   }
 
+  public void tagHead(String name) {
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
   public ImmutableList<Protos.Commit> getCommits(String branch) {
     ImmutableList.Builder<Protos.Commit> result = new ImmutableList.Builder<Protos.Commit>();
     for (Commit commit : branches.get(branch).commits.values()) {

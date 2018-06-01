@@ -46,10 +46,11 @@ public class SubmitCommand implements AaCommand {
   }
 
   @Override
-  public void run(String[] args) {
+  public boolean run(String[] args) {
     if (currentDiffNumber == -1) {
-      System.out.println("Workspace has no diff to submit (git branch has no D# branch)");
-      return;
+      System.out.println(
+          RED_ERROR + "Workspace has no diff to submit (git branch has no D# branch)");
+      return false;
     }
 
     final Diff.Builder diffBuilder =
@@ -61,8 +62,8 @@ public class SubmitCommand implements AaCommand {
         diffBuilder.getReviewerList().stream().anyMatch(Reviewer::getApproved);
 
     if (!hasApprovedReviews) {
-      System.out.println(String.format("D%d is not approved yet", currentDiffNumber));
-      return;
+      System.out.println(RED_ERROR + String.format("D%d is not approved yet", currentDiffNumber));
+      return false;
     }
 
     System.out.println("Updating diff status: SUBMITTING");
@@ -109,5 +110,6 @@ public class SubmitCommand implements AaCommand {
     System.out.println("Updating diff status: SUBMITTED");
     codeReviewBlockingStub.createDiff(
         CreateDiffRequest.newBuilder().setDiff(diffBuilder.setStatus(Status.SUBMITTED)).build());
+    return true;
   }
 }

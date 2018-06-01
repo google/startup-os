@@ -75,7 +75,7 @@ public class WorkspaceCommand implements AaCommand {
   }
 
   @Override
-  public void run(String[] args) {
+  public boolean run(String[] args) {
     // Note: System.out gets executed by the calling aa_tool.sh to run commands such as cd.
 
     // The Flags library does not support short flags by design, as this increases the chance of
@@ -86,14 +86,14 @@ public class WorkspaceCommand implements AaCommand {
       }
     }
     if (args.length < 2) {
-      System.err.println("Missing workspace name");
-      return;
+      System.err.println(RED_ERROR + "Missing workspace name");
+      return false;
     }
 
     String workspaceName = args[args.length - 1];
     if (workspaceName.startsWith("-")) {
-      System.err.println("Missing workspace name");
-      return;
+      System.err.println(RED_ERROR + "Missing workspace name");
+      return false;
     }
 
     args = Arrays.copyOfRange(args, 0, args.length - 1);
@@ -104,7 +104,8 @@ public class WorkspaceCommand implements AaCommand {
 
     if (force.get()) {
       if (fileUtils.folderExists(workspacePath)) {
-        System.err.println("Workspace already exists");
+        System.err.println(RED_ERROR + "Workspace already exists");
+        return false;
       } else {
         fileUtils.mkdirs(workspacePath);
         try {
@@ -112,12 +113,13 @@ public class WorkspaceCommand implements AaCommand {
               fileUtils.joinPaths(basePath, "head"), workspacePath, "^bazel-.*$");
         } catch (IOException e) {
           e.printStackTrace();
+          return false;
         }
       }
     } else {
       if (!fileUtils.folderExists(workspacePath)) {
-        System.err.println("Workspace does not exist");
-        return;
+        System.err.println(RED_ERROR + "Workspace does not exist");
+        return false;
       }
     }
     // System.out command will be run by calling script aa_tool.sh.
@@ -127,5 +129,6 @@ public class WorkspaceCommand implements AaCommand {
     } else {
       System.out.println(String.format("cd %s", workspacePath));
     }
+    return true;
   }
 }

@@ -22,6 +22,7 @@ import com.google.startupos.tools.aa.commands.DiffCommand;
 import com.google.startupos.tools.aa.commands.FixCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.ReviewCommand;
+import com.google.startupos.tools.aa.commands.SnapshotCommand;
 import com.google.startupos.tools.aa.commands.SubmitCommand;
 import com.google.startupos.tools.aa.commands.SyncCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
@@ -44,6 +45,7 @@ public class AaTool {
       Lazy<DiffCommand> diffCommand,
       Lazy<FixCommand> fixCommand,
       Lazy<ReviewCommand> reviewCommand,
+      Lazy<SnapshotCommand> snapshotCommand,
       Lazy<SubmitCommand> submitCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
@@ -51,6 +53,7 @@ public class AaTool {
     commands.put("diff", diffCommand);
     commands.put("fix", fixCommand);
     commands.put("review", reviewCommand);
+    commands.put("snapshot", snapshotCommand);
     commands.put("submit", submitCommand);
   }
 
@@ -66,11 +69,11 @@ public class AaTool {
     AaTool getAaTool();
   }
 
-  private void run(String[] args) {
+  private boolean run(String[] args) {
     if (args.length > 0) {
       String command = args[0];
       if (commands.containsKey(command)) {
-        commands.get(command).get().run(args);
+        return commands.get(command).get().run(args);
       } else {
         System.out.println();
         printUsage();
@@ -78,9 +81,12 @@ public class AaTool {
     } else {
       printUsage();
     }
+    return false;
   }
 
   public static void main(String[] args) {
-    DaggerAaTool_AaToolComponent.create().getAaTool().run(args);
+    if (!DaggerAaTool_AaToolComponent.create().getAaTool().run(args)) {
+      System.exit(1);
+    }
   }
 }
