@@ -4,6 +4,7 @@ java_test(
     name = "FlagsTest",
     srcs = [
         "FlagDescTestClass.java",
+        "FlagTestClass.java",
         "FlagsTest.java",
     ],
     test_class = "com.google.startupos.common.flags.testpackage1.FlagsTest",

@@ -237,140 +237,7 @@ public class FlagsTest {
   }
 
   @Test
-  public void defaultsTest_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(Flags.parse(new String[0], TESTFLAGS_CLASS));
-
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, "default value", FlagDescTestClass.getStringFlagValue());
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, true, FlagDescTestClass.booleanFlag.get());
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(123), FlagDescTestClass.integerFlag.get());
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Long(123456789L), FlagDescTestClass.longFlag.get());
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Double(1.23), FlagDescTestClass.doubleFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void onlyFlagTest_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(
-                            new String[] {"--string_flag", "some value"}, TESTFLAGS_CLASS));
-
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, "some value", FlagDescTestClass.getStringFlagValue());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void onlyArgsTest_WithParsingParticularClass() {
-    List<String> nonFlags =
-            Arrays.asList(Flags.parse(new String[] {"just", "args"}, TESTFLAGS_CLASS));
-
-    assertEquals(
-            "Should inject flag value", "default value", FlagDescTestClass.getStringFlagValue());
-    assertArrayEquals(
-            "Arguments should be: just, args",
-            nonFlags.toArray(new String[0]),
-            new String[] {"just", "args"});
-  }
-
-  @Test
-  public void flagsThenArgsTest_WithParsingParticularClass() {
-    List<String> nonFlags =
-            Arrays.asList(
-                    Flags.parse(
-                            new String[] {"--string_flag", "some value", "just", "args"},
-                            TESTFLAGS_CLASS));
-
-    assertEquals("Should inject flag value", "some value", FlagDescTestClass.getStringFlagValue());
-    assertArrayEquals(
-            "Arguments should be: just, args",
-            nonFlags.toArray(new String[0]),
-            new String[] {"just", "args"});
-  }
-
-  @Test
-  public void firstArgsThenFlagsTest_WithParsingParticularClass() {
-    List<String> nonFlags =
-            Arrays.asList(
-                    Flags.parse(
-                            new String[] {"just", "args", "--string_flag", "some value"},
-                            TESTFLAGS_CLASS));
-
-    assertEquals("Should inject flag value", "some value", FlagDescTestClass.getStringFlagValue());
-    assertArrayEquals(
-            "Arguments should be: just, args",
-            nonFlags.toArray(new String[0]),
-            new String[] {"just", "args"});
-  }
-
-  @Test
-  public void printUsageTest_WithParsingParticularClass() {
-    PrintStream stdout = System.out;
-    ByteArrayOutputStream catchStream = new ByteArrayOutputStream();
-    System.setOut(new PrintStream(catchStream));
-
-    Flags.parse(new String[0], TESTFLAGS_CLASS);
-    Flags.printUsage();
-    String result = new String(catchStream.toByteArray());
-
-    System.setOut(stdout);
-    System.out.print(result);
-
-    assertTrue("Should print flag name", result.contains("string_flag"));
-    assertTrue("Should print flag description", result.contains("A flag description"));
-  }
-
-  @Test
-  public void testBooleanFlagSetToFalse_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(
-                            new String[] {"--boolean_flag", "false"}, TESTFLAGS_CLASS));
-
-    assertEquals("Flag should have false value", false, FlagDescTestClass.booleanFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void testBooleanFlagSetToTrue_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(new String[] {"--boolean_flag", "true"}, TESTFLAGS_CLASS));
-
-    assertEquals("Flag should have true value", true, FlagDescTestClass.booleanFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void testBooleanFlagSetToFalseUsingNoX_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(new String[] {"--noboolean_flag"}, TESTFLAGS_CLASS));
-    assertEquals("Flag should have false value", false, FlagDescTestClass.booleanFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void testBooleanFlagSetToFalseUsingX_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(new String[] {"--boolean_flag"}, TESTFLAGS_CLASS));
-    assertEquals("Flag should have true value", true, FlagDescTestClass.booleanFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void testStringFlag_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(new String[] {"--string_flag", "abcd"}, TESTFLAGS_CLASS));
-
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, "abcd", FlagDescTestClass.getStringFlagValue());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void testIntegerFlag_WithParsingParticularClass() {
+  public void testFindExistingFlag_WithParsingParticularClass() {
     List<String> leftOverArgs =
             Arrays.asList(
                     Flags.parse(new String[] {"--integer_flag", "1234"}, TESTFLAGS_CLASS));
@@ -380,51 +247,23 @@ public class FlagsTest {
   }
 
   @Test
-  public void testLongFlag_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(
-                            new String[] {"--long_flag", "987654321"}, TESTFLAGS_CLASS));
-
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Long(987654321L), FlagDescTestClass.longFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
-  }
-
-  @Test
-  public void testDoubleFlag_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(new String[] {"--double_flag", "9.87"}, TESTFLAGS_CLASS));
-
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Double(9.87), FlagDescTestClass.doubleFlag.get());
-    assertEquals(leftOverArgs.size(), 0);
+  public void testNotFailWhenClassDoesNotHaveAnyFlags_WithParsingParticularClass() {
+    Flags.parse(new String[0] , FlagTestClass.ClassWithoutFlags.class);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testRequiredStringFlagNotSupplied_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(Flags.parse(new String[] {}, TESTFLAGS_CLASS));
+  public void testNotTakeFlagInAnotherClass_WithParsingParticularClass() {
+    Flags.parse(new String[0], TESTFLAGS_CLASS);
 
-    FlagDescTestClass.requiredFlag.get();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testRequiredStringFlagNoValue_WithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(new String[] {"--required_flag"}, TESTFLAGS_CLASS));
-
-    FlagDescTestClass.requiredFlag.get();
+    FlagTestClass.stringTestFlag.get();
   }
 
   @Test
-  public void testRequiredStringFlag_WithValueWithParsingParticularClass() {
-    List<String> leftOverArgs =
-            Arrays.asList(
-                    Flags.parse(
-                            new String[] {"--required_flag", "required"}, TESTFLAGS_CLASS));
+  public void testTakeFlagsInTwoClasses_WithParsingParticularClass() {
+    Flags.parse(new String[0], TESTFLAGS_CLASS);
+    Flags.parse(new String[0], FlagTestClass.class);
 
-    assertEquals(0, leftOverArgs.size());
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, "required", FlagDescTestClass.requiredFlag.get());
+    assertEquals("default value", FlagDescTestClass.getStringFlagValue());
+    assertEquals("default value", FlagTestClass.stringTestFlag.get());
   }
 }

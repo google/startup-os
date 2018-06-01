@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import javassist.bytecode.ClassFile;
@@ -83,7 +84,7 @@ public class ClassScanner {
     Field[] fields = clazz.getDeclaredFields();
     for(Field field: fields){
       FlagDesc flagDesc =  field.getAnnotation(FlagDesc.class);
-      if(flagDesc != null){
+      if(flagDesc != null && Flag.class.isAssignableFrom(field.getType())){
         result.add(field);
       }
    }
@@ -138,15 +139,24 @@ public class ClassScanner {
   }
 
   public void scanClass(Class clazz, Map<String,FlagData> flags) {
-    for(Field field: getClassFields(clazz)){
+    scan(getClassFields(clazz), flags);
+  }
+
+  public void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
+    scan(getPackageFields(packagePrefix), flags);
+  }
+
+  private void scan(List<Field> fields, Map<String,FlagData> flags){
+    for (Field field : fields) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
         throw new IllegalArgumentException(
                 "Flag '" + field + "' should be static but is not.");
       }
-      Flag<?> flag = getFlagMember(clazz, field);
-      FlagData flagData = createFlagData(clazz, field, flag);
+      Class<?> declaringClass = field.getDeclaringClass();
+      Flag<?> flag = getFlagMember(declaringClass, field);
+      FlagData flagData = createFlagData(declaringClass, field, flag);
       if (flags.containsKey(flagData.getName())
-              && !clazz.getName().equals(flagData.getClassName())) {
+              && !declaringClass.getName().equals(flagData.getClassName())) {
         throw new IllegalArgumentException(
                 String.format(
                         "Flag '%s' is already defined here:\n%s", field, flags.get(flagData.getName())));
@@ -157,30 +167,9 @@ public class ClassScanner {
     }
   }
 
-  public void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
-    for (Field field : getPackageFields(packagePrefix)) {
-      if ((field.getModifiers() & Modifier.STATIC) == 0) {
-        throw new IllegalArgumentException(
-            "Flag '" + field + "' should be static but is not.");
-      }
-      Class<?> declaringClass = field.getDeclaringClass();
-      Flag<?> flag = getFlagMember(declaringClass, field);
-      FlagData flagData = createFlagData(declaringClass, field, flag);
-      if (flags.containsKey(flagData.getName())
-          && !declaringClass.getName().equals(flagData.getClassName())) {
-        throw new IllegalArgumentException(
-            String.format(
-                "Flag '%s' is already defined here:\n%s", field, flags.get(flagData.getName())));
-      }
-      flags.put(flagData.getName(), flagData);
-      flag.setName(flagData.getName());
-      flag.setRequired(flagData.getRequired());
-    }
-  }
-
   private FlagData createFlagData(Class<?> declaringClass, Field field, Flag<?> flag) {
     FlagDesc[] flagDescs = field.getAnnotationsByType(FlagDesc.class);
-    // TOOD: Get nicer string for field
+    // TODO: Get nicer string for field
     if (flagDescs.length == 0) {
       throw new IllegalArgumentException("Flag '" + field + "' should be annotated with @FlagDesc");
     }
