@@ -1,6 +1,6 @@
 # StartupOS
 
-[![Gitter version](https://img.shields.io/gitter/room/gitterHQ/gitter.svg)](https://gitter.im/google/startup-os)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
 
 > Working examples for using Google's Open Source tools and deploying to the cloud.
 
