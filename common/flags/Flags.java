@@ -105,9 +105,11 @@ public class Flags {
   @VisibleForTesting
   static String getDefaultFlagValue(String flagName) {
     FlagData flagData = instance().getFlag(flagName);
-    if(flagData.getIsListFlag()){
-      // deleting characters "[" and "]" at the beginning and end of the List
-      return flagData.getDefault().substring(1, flagData.getDefault().length() - 1);
+    if (flagData.getIsListFlag()) {
+      // deleting characters "[" and "]" at the beginning and end of the List and spaces after commas
+      return flagData.getDefault()
+          .substring(1, flagData.getDefault().length() - 1)
+          .replaceAll(", ", ",");
     } else {
       return flagData.getDefault();
     }

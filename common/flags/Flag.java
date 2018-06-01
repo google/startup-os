@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 /** Flag class, with implementations for various flag types. */
 public abstract class Flag<T> {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
-  private static final String STRING_DELIMITER = ",\\s*";
+  private static final String STRING_DELIMITER = ",";
   private static final String NUMBER_AND_BOOLEAN_DELIMITER = "\\s*,\\s*";
 
   public static Flag<String> create(String defaultValue) {
