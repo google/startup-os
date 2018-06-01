@@ -28,8 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class FlagsTest {
-  public static final String TESTFLAGS_PACKAGE = FlagDescTestClass.class.getPackage().getName();
-  private static final Class TESTFLAGS_CLASS = FlagDescTestClass.class;
+  private static final String TESTFLAGS_PACKAGE = FlagDescTestClass.class.getPackage().getName();
   private static final String FLAG_SHOULD_HAVE_VALUE = "Flag should have value";
 
   @Before
@@ -240,7 +239,7 @@ public class FlagsTest {
   public void testFindExistingFlag_WithParsingParticularClass() {
     List<String> leftOverArgs =
             Arrays.asList(
-                    Flags.parse(new String[] {"--integer_flag", "1234"}, TESTFLAGS_CLASS));
+                    Flags.parse(new String[] {"--integer_flag", "1234"}, FlagDescTestClass.class));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(1234), FlagDescTestClass.integerFlag.get());
     assertEquals(leftOverArgs.size(), 0);
@@ -253,14 +252,14 @@ public class FlagsTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testNotTakeFlagInAnotherClass_WithParsingParticularClass() {
-    Flags.parse(new String[0], TESTFLAGS_CLASS);
+    Flags.parse(new String[0], FlagDescTestClass.class);
 
     FlagTestClass.stringTestFlag.get();
   }
 
   @Test
   public void testTakeFlagsInTwoClasses_WithParsingParticularClass() {
-    Flags.parse(new String[0], TESTFLAGS_CLASS);
+    Flags.parse(new String[0], FlagDescTestClass.class);
     Flags.parse(new String[0], FlagTestClass.class);
 
     assertEquals("default value", FlagDescTestClass.getStringFlagValue());

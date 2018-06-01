@@ -84,8 +84,13 @@ public class ClassScanner {
     Field[] fields = clazz.getDeclaredFields();
     for(Field field: fields){
       FlagDesc flagDesc =  field.getAnnotation(FlagDesc.class);
-      if(flagDesc != null && Flag.class.isAssignableFrom(field.getType())){
-        result.add(field);
+      if (flagDesc != null) {
+        if (Flag.class.isAssignableFrom(field.getType())) {
+          result.add(field);
+        } else {
+          throw new IllegalArgumentException(
+              "Field annotated with FlagDesc does not inherit from Flag " + field);
+        }
       }
    }
     return result.build();
@@ -150,16 +155,16 @@ public class ClassScanner {
     for (Field field : fields) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
         throw new IllegalArgumentException(
-                "Flag '" + field + "' should be static but is not.");
+            "Flag '" + field + "' should be static but is not.");
       }
       Class<?> declaringClass = field.getDeclaringClass();
       Flag<?> flag = getFlagMember(declaringClass, field);
       FlagData flagData = createFlagData(declaringClass, field, flag);
       if (flags.containsKey(flagData.getName())
-              && !declaringClass.getName().equals(flagData.getClassName())) {
+          && !declaringClass.getName().equals(flagData.getClassName())) {
         throw new IllegalArgumentException(
-                String.format(
-                        "Flag '%s' is already defined here:\n%s", field, flags.get(flagData.getName())));
+            String.format(
+                "Flag '%s' is already defined here:\n%s", field, flags.get(flagData.getName())));
       }
       flags.put(flagData.getName(), flagData);
       flag.setName(flagData.getName());
