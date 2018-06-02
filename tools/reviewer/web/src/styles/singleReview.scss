@@ -6,7 +6,7 @@
   .review-title {
     font-size: 24px;
     background-color: #cdecff;
-    padding: 5px 40px;
+    padding: 5px $pagePadding;
     .review-status {
       margin-left: 30px;
     }
@@ -25,12 +25,11 @@
     }
   }
   .review-details {
-    padding: 30px;
+    padding: 15px $pagePadding;
     > div {
       margin-bottom: 20px;
       .property {
         font-size: 18px;
-        font-weight: bold;
         text-transform: capitalize;
       }
       .detail {
@@ -61,6 +60,9 @@
           }
         }
       }
+      .timestamp {
+        font-weight: bold;
+      }
       .link {
         cursor: pointer;
         color: #0000ee;
@@ -71,20 +73,20 @@
   .thread {
     border-radius: 3px;
     background: white;
-    .thread-header {
-      padding: 5px 20px;
+    .comment-file {
+      padding: 10px $pagePadding;
       border-bottom: 1px solid $borderColor;
     }
   }
   .review-sub-title {
     font-weight: bold;
-    padding: 5px 25px;
+    padding: 10px $pagePadding;
   }
   .files-info-container {
     background-color: white;
     .file-info {
+      padding: 10px $pagePadding;
       border-bottom: 1px solid $borderColor;
-      padding: 5px 10px;
     }
   }
   .bold-text {

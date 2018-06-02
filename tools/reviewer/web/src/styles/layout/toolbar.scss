@@ -1,7 +1,8 @@
-mat-toolbar {
-  mat-toolbar-row {
+.mat-toolbar {
+  .mat-toolbar-row {
     background-color: #4898fd;
     color: #fff;
+    padding: 0px $pagePadding;
   }
   .title {
     font-size: 25px;

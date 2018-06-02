@@ -85,7 +85,7 @@
             class="property">
             Created:
           </div>
-          <div fxFlex class="">
+          <div fxFlex class="timestamp">
             {{ diff.createdTimestamp | date:'medium' }}
           </div>
         </div>
@@ -100,7 +100,7 @@
             Modified:
           </div>
           <div fxFlex 
-            class="">
+            class="timestamp">
             {{ diff.modifiedTimestamp | date:'medium' }}
           </div>
         </div>
@@ -181,7 +181,7 @@
       fxLayout.xs="column" 
       fxLayoutGap.xs="10px" 
       *ngFor="let thread of diff.threads; let i = index">
-      <div fxLayout="row" class="thread-header">
+      <div fxLayout="row" class="comment-file">
         <div fxFlex="50%" class=""> 
           {{ thread.filename }}
         </div>
