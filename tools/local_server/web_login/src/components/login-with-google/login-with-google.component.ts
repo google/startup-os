@@ -42,6 +42,7 @@ export class LoginWithGoogleComponent {
       refreshToken: refreshToken,
       jwtToken: jwtToken,
       projectId: config.projectId,
+      apiKey: config.apiKey,
     }).subscribe(() => { });
   }
 }
