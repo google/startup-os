@@ -72,6 +72,11 @@ public class FlagDescTestClass {
   public static final Flag<String> requiredFlag = Flag.create("");
 
   @SuppressWarnings("unused")
+  @FlagDesc(name = "strings_list_with_comma_flag", description = "A flag description")
+  public static final Flag<List<String>> stringsListWithCommaFlag
+      = Flag.createStringsListFlag(Arrays.asList("a, b", "c,d"));
+
+  @SuppressWarnings("unused")
   public static final String notAFlag = "";
 
   public static String getStringFlagValue() {

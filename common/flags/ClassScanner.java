@@ -18,7 +18,6 @@ package com.google.startupos.common.flags;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.flogger.FluentLogger;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -50,12 +49,6 @@ import javassist.bytecode.annotation.Annotation;
  */
 public class ClassScanner {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
-  private static final Set<String> LIST_TYPE_NAMES = ImmutableSet.of(
-       "java.util.List<java.lang.String>",
-      "java.util.List<java.lang.Boolean>",
-      "java.util.List<java.lang.Integer>",
-      "java.util.List<java.lang.Long>",
-      "java.util.List<java.lang.Double>");
 
   private String resourceName(String packageName) {
     String resourceName = packageName.replaceAll("[.\\\\]", "/");
@@ -190,7 +183,7 @@ public class ClassScanner {
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
-      result.setDefault(flag.getDefault().toString());
+      result.setDefault(flag.getDefault());
     }
     return result.build();
   }
@@ -201,9 +194,7 @@ public class ClassScanner {
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
         log.atWarning().log(
-            "Cannot check if flag '%s'"
-                + " is of boolean type. It has %s"
-                + " inner types instead of 1.",
+            "Cannot check if flag '%s' is of boolean type. It has %s inner types instead of 1.",
                 field,
                 innerTypes.length);
       } else if (innerTypes[0].getTypeName().equals("java.lang.Boolean")) {
@@ -211,9 +202,7 @@ public class ClassScanner {
       }
     } else {
       log.atWarning().log(
-          "Cannot check if flag '%s'"
-              + " is of boolean type. It's"
-              + " not a ParameterizedType",
+          "Cannot check if flag '%s' is of boolean type. It's not a ParameterizedType",
               field);
     }
     return false;
@@ -225,9 +214,7 @@ public class ClassScanner {
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
         log.atWarning().log(
-            "Cannot check if flag '%s'"
-                + " is of list type. It has %s"
-                + " inner types instead of 1.",
+            "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
                 field,
                 innerTypes.length);
       }
@@ -235,14 +222,12 @@ public class ClassScanner {
       if (!type.startsWith("java.util.List")) {
         log.atWarning().log("'%s' isn't a List", type);
         return false;
-      } else if (LIST_TYPE_NAMES.contains(type)) {
+      } else {
         return true;
       }
     } else {
       log.atWarning().log(
-          "Cannot check if flag '%s'"
-              + " is of list type. It's"
-              + " not a ParameterizedType",
+          "Cannot check if flag '%s' is of list type. It's not a ParameterizedType",
               field);
     }
     return false;

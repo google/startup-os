@@ -18,6 +18,7 @@ package com.google.startupos.common.flags;
 
 import javax.annotation.Nonnull;
 import com.google.common.flogger.FluentLogger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +26,6 @@ import java.util.stream.Collectors;
 /** Flag class, with implementations for various flag types. */
 public abstract class Flag<T> {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
-  private static final String STRING_DELIMITER = ",";
-  private static final String NUMBER_AND_BOOLEAN_DELIMITER = "\\s*,\\s*";
 
   public static Flag<String> create(String defaultValue) {
     return new Flag.StringFlag(defaultValue);
@@ -130,7 +129,26 @@ public abstract class Flag<T> {
 
     @Override
     List<String> parse(@Nonnull String value) {
-      return Arrays.asList(value.split(STRING_DELIMITER));
+      List<String> result = new ArrayList<>();
+      for(String element: value.split(",")){
+        result.add(element.replaceAll("/comma character/", ","));
+      }
+      return result;
+    }
+
+    @Override
+    String getDefault() {
+      StringBuilder result = new StringBuilder();
+      for(String element: defaultValue){
+        if(element.contains(",")){
+          result.append(element.replaceAll(",", "/comma character/"))
+              .append(",");
+        } else {
+          result.append(element)
+              .append(",");
+        }
+      }
+      return result.toString();
     }
   }
 
@@ -141,9 +159,14 @@ public abstract class Flag<T> {
 
     @Override
     List<Boolean> parse(@Nonnull String value) {
-      return Arrays.stream(value.split(NUMBER_AND_BOOLEAN_DELIMITER))
+      return Arrays.stream(value.split(","))
           .map(Boolean::valueOf)
           .collect(Collectors.toList());
+    }
+
+    @Override
+    String getDefault() {
+      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
     }
   }
 
@@ -154,9 +177,14 @@ public abstract class Flag<T> {
 
     @Override
     List<Integer> parse(@Nonnull String value) {
-      return Arrays.stream(value.trim().split(NUMBER_AND_BOOLEAN_DELIMITER))
+      return Arrays.stream(value.trim().split(","))
           .map(Integer::valueOf)
           .collect(Collectors.toList());
+    }
+
+    @Override
+    String getDefault() {
+      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
     }
   }
 
@@ -167,9 +195,14 @@ public abstract class Flag<T> {
 
     @Override
     List<Long> parse(@Nonnull String value) {
-      return Arrays.stream(value.trim().split(NUMBER_AND_BOOLEAN_DELIMITER))
+      return Arrays.stream(value.trim().split(","))
           .map(Long::valueOf)
           .collect(Collectors.toList());
+    }
+
+    @Override
+    String getDefault() {
+      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
     }
   }
 
@@ -180,10 +213,20 @@ public abstract class Flag<T> {
 
     @Override
     List<Double> parse(@Nonnull String value) {
-      return Arrays.stream(value.trim().split(NUMBER_AND_BOOLEAN_DELIMITER))
+      return Arrays.stream(value.trim().split(","))
           .map(Double::valueOf)
           .collect(Collectors.toList());
     }
+
+    @Override
+    String getDefault() {
+      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
+    }
+  }
+
+  private static String reorganizeDefaultListTextRepresentation(String value){
+    return value.substring(1, value.length() - 1)
+        .replaceAll(", ", ",");
   }
 
   protected T defaultValue;
@@ -199,8 +242,8 @@ public abstract class Flag<T> {
 
   // This accessor is only used to get the initial default value, which is then
   // stored in Flags.
-  T getDefault() {
-    return defaultValue;
+  String getDefault() {
+    return defaultValue.toString();
   }
 
   void setName(String name) {
@@ -225,9 +268,9 @@ public abstract class Flag<T> {
     Flags.setFlagValue(name, value.toString());
     if (prevValue != null && !prevValue.equals(value)) {
       log.atSevere()
-              .log("Flag value has changed between get() calls. "
-                  + "Previous value is %s and current is %s",
-              prevValue, value);
+              .log("Flag value has changed between get() calls. Previous value is %s and current is %s",
+              prevValue,
+              value);
     }
     if (required && value.equals(Flags.getDefaultFlagValue(name))) {
       throw new IllegalArgumentException(
