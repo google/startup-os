@@ -33,6 +33,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import javassist.bytecode.ClassFile;
@@ -78,7 +79,24 @@ public class ClassScanner {
     return urlConnection.getJarFile();
   }
 
-  private ImmutableList<Field> getFields(String packageName) throws IOException {
+  private ImmutableList<Field> getClassFields(Class clazz){
+    ImmutableList.Builder<Field> result = ImmutableList.builder();
+    Field[] fields = clazz.getDeclaredFields();
+    for(Field field: fields){
+      FlagDesc flagDesc =  field.getAnnotation(FlagDesc.class);
+      if (flagDesc != null) {
+        if (Flag.class.isAssignableFrom(field.getType())) {
+          result.add(field);
+        } else {
+          throw new IllegalArgumentException(
+              "Field annotated with FlagDesc does not inherit from Flag " + field);
+        }
+      }
+   }
+    return result.build();
+  }
+
+  private ImmutableList<Field> getPackageFields(String packageName) throws IOException {
     ImmutableList.Builder<Field> result = ImmutableList.builder();
     Set<String> classes = new HashSet<>();
     String resourceName = resourceName(packageName);
@@ -125,8 +143,16 @@ public class ClassScanner {
     return result.build();
   }
 
+  public void scanClass(Class clazz, Map<String,FlagData> flags) {
+    scan(getClassFields(clazz), flags);
+  }
+
   public void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
-    for (Field field : getFields(packagePrefix)) {
+    scan(getPackageFields(packagePrefix), flags);
+  }
+
+  private void scan(List<Field> fields, Map<String,FlagData> flags){
+    for (Field field : fields) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
         throw new IllegalArgumentException(
             "Flag '" + field + "' should be static but is not.");

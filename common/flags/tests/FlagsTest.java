@@ -298,4 +298,35 @@ public class FlagsTest {
   public void testFlagThrowsWithoutParsing() {
     FlagDescTestClass.integerFlag.get();
   }
+
+  @Test
+  public void testFindExistingFlag_WithParsingParticularClass() {
+    List<String> leftOverArgs =
+            Arrays.asList(
+                    Flags.parse(new String[] {"--integer_flag", "1234"}, FlagDescTestClass.class));
+
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(1234), FlagDescTestClass.integerFlag.get());
+    assertEquals(leftOverArgs.size(), 0);
+  }
+
+  @Test
+  public void testNotFailWhenClassDoesNotHaveAnyFlags_WithParsingParticularClass() {
+    Flags.parse(new String[0] , FlagTestClass.ClassWithoutFlags.class);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNotTakeFlagInAnotherClass_WithParsingParticularClass() {
+    Flags.parse(new String[0], FlagDescTestClass.class);
+
+    FlagTestClass.stringTestFlag.get();
+  }
+
+  @Test
+  public void testTakeFlagsInTwoClasses_WithParsingParticularClass() {
+    Flags.parse(new String[0], FlagDescTestClass.class);
+    Flags.parse(new String[0], FlagTestClass.class);
+
+    assertEquals("default value", FlagDescTestClass.getStringFlagValue());
+    assertEquals("default value", FlagTestClass.stringTestFlag.get());
+  }
 }
