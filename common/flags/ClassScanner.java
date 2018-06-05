@@ -18,9 +18,7 @@ package com.google.startupos.common.flags;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.flogger.FluentLogger;
-import com.google.common.reflect.ClassPath;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -37,7 +35,6 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.AnnotationsAttribute;
@@ -107,7 +104,7 @@ public class ClassScanner {
           if (annotationsAttribute != null) {
             for (Annotation annotation : annotationsAttribute.getAnnotations()) {
               try {
-                if (FlagDesc.class.getName().equals(annotation.getTypeName​())) {
+                if (FlagDesc.class.getName().equals(annotation.getTypeName())) {
                   Class clazz = ClassLoader.getSystemClassLoader().loadClass(classFile.getName());
                   Field field = clazz.getDeclaredField(fieldInfo.getName());
                   if (Flag.class.isAssignableFrom(field.getType())) {
@@ -119,7 +116,7 @@ public class ClassScanner {
                 }
               } catch (Exception e) {
                 e.printStackTrace();
-              } 
+              }
             }
           }
         }
@@ -151,7 +148,7 @@ public class ClassScanner {
 
   private FlagData createFlagData(Class<?> declaringClass, Field field, Flag<?> flag) {
     FlagDesc[] flagDescs = field.getAnnotationsByType(FlagDesc.class);
-    // TOOD: Get nicer string for field
+    // TODO: Get nicer string for field
     if (flagDescs.length == 0) {
       throw new IllegalArgumentException("Flag '" + field + "' should be annotated with @FlagDesc");
     }
@@ -182,6 +179,7 @@ public class ClassScanner {
             .setName(desc.name())
             .setClassName(declaringClass.getCanonicalName())
             .setIsBooleanFlag(isBooleanFlag(field))
+            .setIsListFlag(isListFlag(field))
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
@@ -196,21 +194,41 @@ public class ClassScanner {
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
         log.atWarning().log(
-            "Cannot check if flag '"
-                + field
-                + "' is of boolean type. It"
-                + " has "
-                + innerTypes.length
-                + " inner types instead of 1.");
+            "Cannot check if flag '%s' is of boolean type. It has %s inner types instead of 1.",
+                field,
+                innerTypes.length);
       } else if (innerTypes[0].getTypeName().equals("java.lang.Boolean")) {
         return true;
       }
     } else {
       log.atWarning().log(
-          "Cannot check if flag '"
-              + field
-              + "' is of boolean type. It's"
-              + " not a ParameterizedType");
+          "Cannot check if flag '%s' is of boolean type. It's not a ParameterizedType",
+              field);
+    }
+    return false;
+  }
+
+  private boolean isListFlag(Field field) {
+    if (field.getGenericType() instanceof ParameterizedType) {
+      ParameterizedType flagType = (ParameterizedType) field.getGenericType();
+      Type[] innerTypes = flagType.getActualTypeArguments();
+      if (innerTypes.length != 1) {
+        log.atWarning().log(
+            "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
+                field,
+                innerTypes.length);
+      }
+      String type = innerTypes[0].getTypeName();
+      if (!type.startsWith("java.util.List")) {
+        log.atWarning().log("'%s' isn't a List", type);
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      log.atWarning().log(
+          "Cannot check if flag '%s' is of list type. It's not a ParameterizedType",
+              field);
     }
     return false;
   }
