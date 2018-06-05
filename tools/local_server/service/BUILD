@@ -34,5 +34,6 @@ java_library(
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/json",
     ],
 )

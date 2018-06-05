@@ -97,7 +97,10 @@ public class LocalHttpGateway {
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.atInfo().log("Handling token post request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
-        client.postAuthData(json.getString("projectId"), json.getString("accessToken"));
+        client.postAuthData(json.getString("projectId"),
+            json.getString("apiKey"),
+            json.getString("jwtToken"),
+            json.getString("refreshToken"));
       }
       httpExchange.sendResponseHeaders(200, -1);
     }
