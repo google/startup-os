@@ -38,6 +38,10 @@ Working examples of:
 * [Dagger on Android](https://google.github.io/dagger/android.html)
 * More goodies...
 
+## Other repos
+Here are some other repos with examples of Bazel, gRPC and other related technologies:
+* Go: https://github.com/lucperkins/colossus
+
 ## Feedback
 If you're interested in StartupOS, please let us know!
 You can fill in this form: https://goo.gl/forms/jfAH0wLgedE8GoWg2
