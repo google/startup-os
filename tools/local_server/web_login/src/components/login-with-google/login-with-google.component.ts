@@ -19,29 +19,26 @@ export class LoginWithGoogleComponent {
 
   login(): void {
     this.firebaseService.login(result => {
-      const accessToken = result.credential.accessToken;
-      const refreshToken = result.user.refreshToken;
-      this.getJwtToken(accessToken, refreshToken);
+      this.getJwtToken(result.user.refreshToken);
     });
   }
 
-  getJwtToken(accessToken: string, refreshToken: string): void {
+  getJwtToken(refreshToken: string): void {
     this.firebaseService.access.auth.currentUser.getIdToken(true)
-      .then(token => {
-        this.sendToServer(accessToken, refreshToken, token);
+      .then(jwtToken => {
+        this.sendToServer(jwtToken, refreshToken);
       });
   }
 
   sendToServer(
-    accessToken: string,
-    refreshToken: string,
-    jwtToken: string
+    jwtToken: string,
+    refreshToken: string
   ): void {
     this.http.post(`http://localhost:${port}/token`, {
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-      jwtToken: jwtToken,
       projectId: config.projectId,
+      apiKey: config.apiKey,
+      jwtToken: jwtToken,
+      refreshToken: refreshToken,
     }).subscribe(() => { });
   }
 }

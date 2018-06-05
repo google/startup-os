@@ -11,8 +11,9 @@ service AuthService {
 
 message AuthDataRequest {
   string projectId = 1;
-  // Firestore token
-  string token = 2;
+  string apiKey = 2;
+  string jwtToken = 3;
+  string refreshToken = 4;
 }
 
 // TODO: Use Empty: https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto

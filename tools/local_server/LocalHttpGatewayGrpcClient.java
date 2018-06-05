@@ -60,10 +60,13 @@ public class LocalHttpGatewayGrpcClient {
     }
   }
 
-  public void postAuthData(String projectId, String token) {
+  public void postAuthData(String projectId, String apiKey, String jwtToken,
+      String refreshToken) {
     final AuthDataRequest request = AuthDataRequest.newBuilder()
         .setProjectId(projectId)
-        .setToken(token)
+        .setApiKey(apiKey)
+        .setJwtToken(jwtToken)
+        .setRefreshToken(refreshToken)
         .build();
     try {
       authBlockingStub.postAuthData(request);

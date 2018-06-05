@@ -17,15 +17,27 @@
 package com.google.startupos.tools.localserver.service;
 
 import com.google.common.flogger.FluentLogger;
-import io.grpc.Status;
-import io.grpc.stub.StreamObserver;
-import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
-import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
-import com.google.startupos.common.FileUtils;
+import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
+import com.google.startupos.tools.localserver.service.Protos.AuthDataResponse;
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Base64;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import org.json.JSONObject;
+import java.net.HttpURLConnection;
 
 /*
  * AuthService is a gRPC service to receive Firestore auth data from WebLogin.
@@ -33,15 +45,23 @@ import com.google.startupos.common.FileUtils;
 @Singleton
 public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
+  private static final String REFRESH_TOKEN = "https://securetoken.googleapis.com/v1/token?key=%s";
 
   @FlagDesc(
       name = "debug_token_mode",
       description = "Make it easy to debug by storing and reading the token from disk")
   private static final Flag<Boolean> debugTokenMode = Flag.create(false);
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
-
-  private String firestoreToken;
-  private String firestoreProjectId;
+  
+  private ScheduledExecutorService tokenRefreshScheduler = Executors.newScheduledThreadPool(1);
+  private String projectId;
+  private String apiKey;
+  private String jwtToken;
+  // Expiration time in seconds
+  private long tokenExpiration;
+  private String refreshToken;
+  private String userName;
+  private String userEmail;
   private FileUtils fileUtils;
 
   @Inject
@@ -50,8 +70,12 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
     if (debugTokenMode.get() && fileUtils.fileExists(DEBUGGING_TOKEN_PATH)) {
       AuthDataRequest req = (AuthDataRequest)fileUtils.readProtoBinaryUnchecked(
           DEBUGGING_TOKEN_PATH, AuthDataRequest.newBuilder());
-      firestoreProjectId = req.getProjectId();
-      firestoreToken = req.getToken();
+      projectId = req.getProjectId();
+      apiKey = req.getApiKey();
+      jwtToken = req.getJwtToken();
+      refreshToken = req.getRefreshToken();
+      decodeJwtToken();
+      setTokenRefreshScheduler();
       logger.atInfo().log("Loaded token from filesystem");
     }
   }
@@ -59,11 +83,15 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   @Override
   public void postAuthData(AuthDataRequest req, StreamObserver<AuthDataResponse> responseObserver) {
     try {
-      firestoreProjectId = req.getProjectId();
-      firestoreToken = req.getToken();
+      projectId = req.getProjectId();
+      apiKey = req.getApiKey();
+      jwtToken = req.getJwtToken();
+      refreshToken = req.getRefreshToken();
+      decodeJwtToken();
+      setTokenRefreshScheduler();
       responseObserver.onNext(AuthDataResponse.getDefaultInstance());
       responseObserver.onCompleted();
-      logger.atInfo().log("Received token for project " + firestoreProjectId);
+      logger.atInfo().log("Received token for project " + projectId);
       if (debugTokenMode.get()) {
         fileUtils.writeProtoBinaryUnchecked(req, DEBUGGING_TOKEN_PATH);
       }
@@ -76,11 +104,77 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
     }
   }
 
+  private void setTokenRefreshScheduler() {
+    // Wait until 10 seconds before token expiration to refresh.
+    long delay = tokenExpiration - System.currentTimeMillis()/1000 - 10;
+    tokenRefreshScheduler.schedule(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          refreshToken();
+          setTokenRefreshScheduler();
+        } catch (RuntimeException e) {
+          e.printStackTrace();
+        }
+      }
+    }, delay , TimeUnit.SECONDS);
+  }
+
+  // Sets some fields such as userName, userEmail from the token.
+  private void decodeJwtToken() {
+    String[] parts = jwtToken.split("[.]");
+    try {
+      if (parts.length < 2) {
+        throw new IllegalStateException("Expected 2 or more parts in token, found " + parts.length);
+      }
+      JSONObject json = new JSONObject(
+          new String(Base64.getUrlDecoder().decode(parts[1].getBytes("UTF-8")), "UTF-8"));
+      userName = json.getString("name");
+      userEmail = json.getString("email");
+      tokenExpiration = json.getLong("exp");
+    } catch(Exception e) {
+      throw new RuntimeException("Cannot decode JWT token", e);
+    }
+  }
+
+  public void refreshToken() {
+    try {
+      URL url = new URL(String.format(REFRESH_TOKEN, apiKey));
+      String data = "grant_type=refresh_token&refresh_token=" + refreshToken;
+      byte[] postDataBytes = data.getBytes("UTF-8");
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+      connection.setRequestMethod("POST");
+      connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+      connection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+      connection.setDoOutput(true);
+      connection.getOutputStream().write(postDataBytes);
+
+      InputStream stream;
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+        stream = connection.getInputStream();
+      } else {
+        stream = connection.getErrorStream();
+      }
+      String response = new BufferedReader(
+          new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
+      if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+        jwtToken = response;
+        decodeJwtToken();
+        logger.atInfo().log("Token refreshed. New expiration is %d", tokenExpiration);
+      } else {
+        throw new RuntimeException("Error on token refresh:\n" + response);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public String getToken() {
-    return firestoreToken;
+    return jwtToken;
   }
 
   public String getProjectId() {
-    return firestoreProjectId;
+    return projectId;
   }
 }
