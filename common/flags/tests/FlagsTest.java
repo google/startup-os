@@ -61,7 +61,6 @@ public class FlagsTest {
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(1, -2), FlagDescTestClass.integersListFlag.get());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(123456789L, -123123123L), FlagDescTestClass.longsListFlag.get());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(1.23, -3.21), FlagDescTestClass.doublesListFlag.get());
-    assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList("a, b", "c,d"), FlagDescTestClass.stringsListWithCommaFlag.get());
     assertEquals(leftOverArgs.size(), 0);
   }
 

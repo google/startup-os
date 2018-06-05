@@ -129,26 +129,9 @@ public abstract class Flag<T> {
 
     @Override
     List<String> parse(@Nonnull String value) {
-      List<String> result = new ArrayList<>();
-      for(String element: value.split(",")){
-        result.add(element.replaceAll("/comma character/", ","));
-      }
-      return result;
-    }
-
-    @Override
-    String getDefault() {
-      StringBuilder result = new StringBuilder();
-      for(String element: defaultValue){
-        if(element.contains(",")){
-          result.append(element.replaceAll(",", "/comma character/"))
-              .append(",");
-        } else {
-          result.append(element)
-              .append(",");
-        }
-      }
-      return result.toString();
+      return Arrays.stream(value.split(","))
+          .map(String::valueOf)
+          .collect(Collectors.toList());
     }
   }
 
@@ -163,11 +146,6 @@ public abstract class Flag<T> {
           .map(Boolean::valueOf)
           .collect(Collectors.toList());
     }
-
-    @Override
-    String getDefault() {
-      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
-    }
   }
 
   private static class IntegersListFlag extends Flag<List<Integer>> {
@@ -180,11 +158,6 @@ public abstract class Flag<T> {
       return Arrays.stream(value.trim().split(","))
           .map(Integer::valueOf)
           .collect(Collectors.toList());
-    }
-
-    @Override
-    String getDefault() {
-      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
     }
   }
 
@@ -199,11 +172,6 @@ public abstract class Flag<T> {
           .map(Long::valueOf)
           .collect(Collectors.toList());
     }
-
-    @Override
-    String getDefault() {
-      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
-    }
   }
 
   private static class DoublesListFlag extends Flag<List<Double>> {
@@ -217,16 +185,6 @@ public abstract class Flag<T> {
           .map(Double::valueOf)
           .collect(Collectors.toList());
     }
-
-    @Override
-    String getDefault() {
-      return Flag.reorganizeDefaultListTextRepresentation(defaultValue.toString());
-    }
-  }
-
-  private static String reorganizeDefaultListTextRepresentation(String value){
-    return value.substring(1, value.length() - 1)
-        .replaceAll(", ", ",");
   }
 
   protected T defaultValue;
@@ -242,8 +200,8 @@ public abstract class Flag<T> {
 
   // This accessor is only used to get the initial default value, which is then
   // stored in Flags.
-  String getDefault() {
-    return defaultValue.toString();
+  T getDefault() {
+    return defaultValue;
   }
 
   void setName(String name) {
