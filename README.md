@@ -1,6 +1,8 @@
 # StartupOS
 
-StartupOS provides working examples for using Google's Open Source tools and deploying to the cloud.
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
+
+> Working examples for using Google's Open Source tools and deploying to the cloud.
 
 ### StartupOS includes
 * Google's open source libraries and tools, integrated together
@@ -35,6 +37,11 @@ Working examples of:
 * [Kubernetes](https://kubernetes.io)
 * [Dagger on Android](https://google.github.io/dagger/android.html)
 * More goodies...
+
+## Other repos
+Here are some other repos with examples of Bazel, gRPC and other related technologies:
+* Go: https://github.com/lucperkins/colossus
+* Go: https://github.com/Staffjoy/v2
 
 ## Feedback
 If you're interested in StartupOS, please let us know!

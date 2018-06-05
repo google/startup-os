@@ -32,6 +32,8 @@ import com.google.startupos.tools.reviewer.service.Protos.File;
 public interface Repo {
   /** Switches to branch. Creates branch if needed. */
   void switchBranch(String branch);
+  /** Tags the commit at head. */
+  void tagHead(String name);
   /** Gets commits on branch since it diverged from master. */
   ImmutableList<Commit> getCommits(String branch);
   /** Gets all uncommited files. This includes new, modified and deleted files. */

@@ -69,8 +69,6 @@ message Diff {
   string workspace = 8;
   int64 created_timestamp = 9;
   int64 modified_timestamp = 10;
-  repeated File file = 11;
-  repeated Snapshot snapshot = 12;
   repeated Thread thread = 13;
 }
 
@@ -122,25 +120,13 @@ message File {
   Action action = 6;
 }
 
-message SingleRepoSnapshot {
-  int64 timestamp = 1;
-  string repo_id = 2;
-  // Commit ID, e.g Git SHA
-  string commit_id = 3;
-  string author = 4;
-  bool for_review = 5;
-  repeated File file = 6;
-}
-
-// A snapshot over multiple repos
-message Snapshot { repeated SingleRepoSnapshot snapshot = 1; }
-
 message Thread {
-  int32 snapshot = 1;
-  File file = 2;
-  int32 line_number = 3;
-  bool is_done = 4;
-  repeated Comment comment = 5;
+  string repo_id = 1;
+  string commit_id = 2;
+  File file = 3;
+  int32 line_number = 4;
+  bool is_done = 5;
+  repeated Comment comment = 6;
 }
 
 message Comment {

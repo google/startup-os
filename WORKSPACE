@@ -198,3 +198,17 @@ http_archive(
     strip_prefix = "glog-2faa186e62d544e930305ffd8f8e507b2054cc9b",
     urls = ["https://github.com/google/glog/archive/2faa186e62d544e930305ffd8f8e507b2054cc9b.zip"],
 )
+
+new_http_archive(
+    name = "startupos_external_jsoncpp",
+    strip_prefix = "jsoncpp-cfab607c0d6d4f4cab7bdde69769964c558913cb",
+    urls = ["https://github.com/open-source-parsers/jsoncpp/archive/cfab607c0d6d4f4cab7bdde69769964c558913cb.zip"],
+    sha256 = "0e0abc6b521a6df8eec5b32593781aa2f2f6f24ea71f8b9d3b504e966c849176",
+    build_file="third_party/BUILD.jsoncpp",
+)
+
+http_archive(
+    name = "io_bazel",
+    sha256 = "b0269e75b40d87ff87886e5f3432cbf88f70c96f907ab588e6c21b2922d72db0",
+    url = "https://github.com/bazelbuild/bazel/releases/download/0.13.1/bazel-0.13.1-dist.zip",
+)

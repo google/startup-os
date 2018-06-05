@@ -53,7 +53,7 @@ public class InitCommand implements AaCommand {
   }
 
   @Override
-  public void run(String[] args) {
+  public boolean run(String[] args) {
     // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
 
@@ -94,8 +94,10 @@ public class InitCommand implements AaCommand {
       System.out.println(e.getMessage());
       System.out.println("Input flags:");
       Flags.printUsage();
+      return false;
     } catch (Exception e) {
       e.printStackTrace();
     }
+    return true;
   }
 }

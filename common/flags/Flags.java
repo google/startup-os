@@ -115,7 +115,16 @@ public class Flags {
 
   @VisibleForTesting
   static String getDefaultFlagValue(String flagName) {
-    return instance().getFlag(flagName).getDefault();
+    FlagData flagData = instance().getFlag(flagName);
+    if (flagData.getIsListFlag()) {
+      // deleting characters "[" and "]" at the beginning and end of the List and spaces after commas
+      // for correct parse default values
+      return flagData.getDefault()
+          .substring(1, flagData.getDefault().length() - 1)
+          .replaceAll(", ", ",");
+    } else {
+      return flagData.getDefault();
+    }
   }
 
   private void scanPackages(Iterable<String> packages) {
@@ -135,14 +144,14 @@ public class Flags {
   private static Flags instance() {
     synchronized (Flags.class) {
       if (instance == null) {
-        instance = new Flags(new ClassScanner(), new HashMap<String, FlagData>());
+        instance = new Flags(new ClassScanner(), new HashMap<>());
       }
     }
     return instance;
   }
 
   public static void resetForTesting() {
-    instance = new Flags(new ClassScanner(), new HashMap<String, FlagData>());
+    instance = new Flags(new ClassScanner(), new HashMap<>());
   }
 
   private Flags(ClassScanner classScanner, Map<String, FlagData> flags) {

@@ -31,7 +31,7 @@ public class FixCommand implements AaCommand {
   public FixCommand() {}
 
   @Override
-  public void run(String[] args) {
+  public boolean run(String[] args) {
     checks.forEach(
         check -> {
           System.out.println(String.format("check: %s", check.name()));
@@ -39,5 +39,6 @@ public class FixCommand implements AaCommand {
             throw new RuntimeException(String.format("Check %s failed", check.name()));
           }
         });
+    return true;
   }
 }
