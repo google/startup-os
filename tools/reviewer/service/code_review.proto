@@ -16,7 +16,8 @@ service CodeReviewService {
   // returns available diff number and increments stored value by one
   rpc getAvailableDiffNumber(.google.protobuf.Empty)
       returns (DiffNumberResponse);
-  rpc getDiff(GetDiffRequest) returns (Diff);
+  rpc getDiff(DiffRequest) returns (Diff);
+  rpc getDiffFiles(DiffFilesRequest) returns (DiffFilesResponse);
 }
 
 message FileRequest { string filename = 1; }
@@ -39,7 +40,27 @@ message TextDiffResponse {
   string right_file_contents = 3;
 }
 
-message GetDiffRequest { int64 diff_id = 1; }
+message DiffFilesRequest {
+  string workspace = 1;
+  int64 diff_number = 2;
+}
+
+message DiffFilesResponse {
+  message Repo {
+    string repo_id = 1;
+    repeated Commit commit = 2;
+    repeated File uncomitted_file = 3;
+  }
+  
+  message Commit {
+    string commit_id = 1;
+    repeated File file = 2;
+  }
+  
+  repeated Repo repo = 1;
+}
+
+message DiffRequest { int64 diff_id = 1; }
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues

@@ -30,7 +30,7 @@ import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
-import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -139,7 +139,7 @@ public class DiffCommand implements AaCommand {
 
     Diff.Builder diffBuilder =
         codeReviewBlockingStub
-            .getDiff(GetDiffRequest.newBuilder().setDiffId(diffNumber).build())
+            .getDiff(DiffRequest.newBuilder().setDiffId(diffNumber).build())
             .toBuilder();
     if (!reviewers.get().isEmpty()) {
       // adding specified reviewers

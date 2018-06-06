@@ -25,6 +25,7 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -56,6 +57,7 @@ public class LocalHttpGateway {
   private static final String TOKEN_PATH = "/token";
   private static final String GET_FILE_PATH = "/get_file";
   private static final String GET_TEXT_DIFF_PATH = "/get_text_diff";
+  private static final String GET_DIFF_FILES_PATH = "/get_diff_files";
 
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
   public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
@@ -75,6 +77,7 @@ public class LocalHttpGateway {
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
     httpServer.createContext(GET_FILE_PATH, new GetFileHandler(client));
     httpServer.createContext(GET_TEXT_DIFF_PATH, new GetTextDiffHandler(client));
+    httpServer.createContext(GET_DIFF_FILES_PATH, new GetDiffFilesHandler(client));
     httpServer.setExecutor(null); // Creates a default executor
   }
 
@@ -175,6 +178,45 @@ public class LocalHttpGateway {
       logger.atInfo().log("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
       byte[] response = Base64.getEncoder().encode(
           client.getCodeReviewStub().getTextDiff(request).toByteArray());
+      httpExchange.sendResponseHeaders(200, response.length);
+      try (OutputStream stream = httpExchange.getResponseBody()) {
+        stream.write(response);
+      }
+    }
+  }
+
+  /* Handler for serving /get_diff_files?request=<protobin> where <protobin> is a request proto.
+   * The response is a protobin of the response proto.
+   */
+  static class GetDiffFilesHandler implements HttpHandler {
+    private LocalHttpGatewayGrpcClient client;
+
+    GetDiffFilesHandler(LocalHttpGatewayGrpcClient client) {
+      this.client = client;
+    }
+
+    private void printExampleEncodedBytes() {
+      // Here's an example of a url that should work, based on the example below:
+      // http://localhost:7000/get_diff_files?request=CgVhYWFhYRAU
+      final DiffFilesRequest request = DiffFilesRequest.newBuilder()
+          .setWorkspace("aaaaa")
+          .setDiffNumber(20)
+          .build();
+      byte[] bytes = request.toByteArray();
+      String encodedBytes = Base64.getEncoder().encodeToString(bytes);
+      System.out.println("encodedBytes");
+      System.out.println(encodedBytes);
+    }
+
+    public void handle(HttpExchange httpExchange) throws IOException {
+      // TODO: Remove printExampleEncodedBytes() once integration is working
+      printExampleEncodedBytes();
+      ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
+      String requestString = params.get("request");
+      DiffFilesRequest request = DiffFilesRequest.parseFrom(Base64.getDecoder().decode(requestString));
+      logger.atInfo().log("Handling " + GET_DIFF_FILES_PATH + " request:\n" + request);
+      byte[] response = Base64.getEncoder().encode(
+          client.getCodeReviewStub().getDiffFiles(request).toByteArray());
       httpExchange.sendResponseHeaders(200, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);

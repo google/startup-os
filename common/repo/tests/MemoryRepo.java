@@ -95,6 +95,10 @@ public class MemoryRepo implements Repo {
     throw new UnsupportedOperationException("Not implemented");
   }
 
+  public ImmutableList<File> getFilesInCommit(String commitId) {
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
   public Protos.Commit commit(ImmutableList<File> files, String message) {
     String id = String.valueOf(nextId);
     branches.get(currentBranch).commits.put(id, new Commit(id, message, files));

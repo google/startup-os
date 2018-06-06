@@ -33,7 +33,9 @@ import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
-import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffFilesResponse;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
 import io.grpc.Status;
@@ -203,7 +205,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
-  public void getDiff(GetDiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
+  public void getDiff(DiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
 
@@ -215,4 +217,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onNext(diff);
     responseObserver.onCompleted();
   }
+
+  @Override
+  public void getDiffFiles(DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
+    // TODO: Implement
+    logger.atInfo().log("DiffFiles request\n" + request.toString());
+    responseObserver.onNext(DiffFilesResponse.getDefaultInstance());
+    responseObserver.onCompleted();
+  } 
 }
