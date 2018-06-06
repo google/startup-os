@@ -10,6 +10,7 @@
 
 #include <fstream>
 #include <string>
+#include <cstdlib>
 
 #include <unistd.h>
 
@@ -59,7 +60,15 @@ int main(int argc, char **argv) {
 
   // Path to the current sandbox. This path is not valid after the extra action
   // completes.
+
+  #ifdef _GNU_SOURCE
   root["directory"] = get_current_dir_name();
+  #else
+  size_t directory_buffer_size = sizeof(char) * 1024;
+  char *directory_buffer = (char*) malloc(directory_buffer_size);
+  getcwd(directory_buffer, directory_buffer_size);
+  root["directory"] = directory_buffer;
+  #endif
 
   Json::Value arguments;
   arguments.resize(cpp_info.compiler_option_size());
