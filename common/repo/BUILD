@@ -3,7 +3,6 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "repo_proto",
     srcs = ["repo.proto"],
-    deps = ["//tools/reviewer/service:code_review_proto"],
 )
 
 java_proto_library(

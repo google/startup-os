@@ -27,7 +27,7 @@ import com.google.startupos.tools.reviewer.service.Protos.Author;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
-import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;

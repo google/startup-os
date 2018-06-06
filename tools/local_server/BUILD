@@ -47,6 +47,7 @@ java_binary(
     deps = [
         ":local_http_gateway_grpc_client",
         "//common/flags",
+        "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",

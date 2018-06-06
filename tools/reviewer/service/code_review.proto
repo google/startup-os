@@ -5,6 +5,7 @@ package com.google.startupos.tools.reviewer.service;
 option java_package = "com.google.startupos.tools.reviewer.service";
 option java_outer_classname = "Protos";
 
+import "common/repo/repo.proto";
 import "common/text_difference.proto";
 import "google/protobuf/empty.proto";
 
@@ -29,8 +30,8 @@ message CreateDiffRequest { Diff diff = 1; }
 message DiffNumberResponse { int64 last_diff_id = 1; }
 
 message TextDiffRequest {
-  File left_file = 1;
-  File right_file = 2;
+  com.google.startupos.common.repo.File left_file = 1;
+  com.google.startupos.common.repo.File right_file = 2;
 }
 
 message TextDiffResponse {
@@ -42,22 +43,11 @@ message TextDiffResponse {
 
 message DiffFilesRequest {
   string workspace = 1;
-  int64 diff_number = 2;
+  int64 diff_id = 2;
 }
 
 message DiffFilesResponse {
-  message Repo {
-    string repo_id = 1;
-    repeated Commit commit = 2;
-    repeated File uncomitted_file = 3;
-  }
-  
-  message Commit {
-    string commit_id = 1;
-    repeated File file = 2;
-  }
-  
-  repeated Repo repo = 1;
+  repeated com.google.startupos.common.repo.BranchInfo branchInfo = 1;
 }
 
 message DiffRequest { int64 diff_id = 1; }
@@ -104,47 +94,10 @@ message Author {
   bool needsAttention = 2;
 }
 
-/* A file can be:
- * - A committed file, in head repo
- *   <base>/head/<repo_id>/<commit_id>/<filename>
- *
- * - A local file for current user
- *   <base>/ws/<workspace>/<repo_id>/<filename>
- * - A committed file for current user
- *   <base>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
- *
- * - A local file for other user
- *   <base>/users/<user>/ws/<workspace>/<repo_id>/<filename>
- * - A committed file for other user
- *   <base>/users/<user>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
- *
- * Note that above paths are "conceptual" and not real filesystem paths.
- * The distinction between the above, is based on the fields, e.g user being
- * empty or not.
- */
-message File {
-  enum Action {
-    ADD = 0;
-    DELETE = 1;
-    RENAME = 2;
-    MODIFY = 3;
-  }
-  // Includes the path + filename, relative to repo
-  string filename = 1;
-  // Empty if referring to base/head or current user
-  string user = 2;
-  // Empty if referring to base/head
-  string workspace = 3;
-  string repo_id = 4;
-  // Empty if referring to a local file
-  string commit_id = 5;
-  Action action = 6;
-}
-
 message Thread {
   string repo_id = 1;
   string commit_id = 2;
-  File file = 3;
+  com.google.startupos.common.repo.File file = 3;
   int32 line_number = 4;
   bool is_done = 5;
   repeated Comment comment = 6;
