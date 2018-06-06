@@ -143,11 +143,11 @@ public class ClassScanner {
     return result.build();
   }
 
-  public void scanClass(Class clazz, Map<String,FlagData> flags) {
+  void scanClass(Class clazz, Map<String,FlagData> flags) {
     scan(getClassFields(clazz), flags);
   }
 
-  public void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
+  void scanPackage(String packagePrefix, Map<String, FlagData> flags) throws IOException {
     scan(getPackageFields(packagePrefix), flags);
   }
 
@@ -243,12 +243,7 @@ public class ClassScanner {
             "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
                 field,
                 innerTypes.length);
-      }
-      String type = innerTypes[0].getTypeName();
-      if (!type.startsWith("java.util.List")) {
-        log.atWarning().log("'%s' isn't a List", type);
-        return false;
-      } else {
+      } else if (innerTypes[0].getTypeName().startsWith("java.util.List")) {
         return true;
       }
     } else {

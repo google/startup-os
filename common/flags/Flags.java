@@ -100,7 +100,15 @@ public class Flags {
     if (!flagData.getHasValue()) {
       return null;
     }
-    return instance().getFlag(name).getValue();
+    if (flagData.getIsListFlag()){
+      return flagData.getValue()
+          // deleting characters "[" and "]" at the beginning and end of the List and spaces after commas
+          // for correct parse values
+          .replace("[", "")
+          .replace("]", "")
+          .replaceAll(", ", ",");
+    }
+    return flagData.getValue();
   }
 
   @VisibleForTesting
@@ -120,7 +128,8 @@ public class Flags {
       // deleting characters "[" and "]" at the beginning and end of the List and spaces after commas
       // for correct parse default values
       return flagData.getDefault()
-          .substring(1, flagData.getDefault().length() - 1)
+          .replace("[", "")
+          .replace("]", "")
           .replaceAll(", ", ",");
     } else {
       return flagData.getDefault();

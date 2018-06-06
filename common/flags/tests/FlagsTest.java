@@ -30,6 +30,7 @@ import org.junit.Test;
 public class FlagsTest {
   private static final String TESTFLAGS_PACKAGE = FlagDescTestClass.class.getPackage().getName();
   private static final String FLAG_SHOULD_HAVE_VALUE = "Flag should have value";
+  private static final String LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE = "List flag should have an element with value";
 
   @Before
   public void setup() {
@@ -61,6 +62,19 @@ public class FlagsTest {
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(1, -2), FlagDescTestClass.integersListFlag.get());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(123456789L, -123123123L), FlagDescTestClass.longsListFlag.get());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(1.23, -3.21), FlagDescTestClass.doublesListFlag.get());
+    assertEquals(leftOverArgs.size(), 0);
+  }
+
+  @Test
+  public void getItemFromDefaultValuesListTest() {
+    List<String> leftOverArgs =
+        Arrays.asList(Flags.parse(new String[]{}, TESTFLAGS_PACKAGE));
+
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE, "ab", FlagDescTestClass.stringsListFlag.get().get(0));
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,false, FlagDescTestClass.booleansListFlag.get().get(1));
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,1, (int) FlagDescTestClass.integersListFlag.get().get(0));
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,-123123123L, (long) FlagDescTestClass.longsListFlag.get().get(1));
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,1.23, FlagDescTestClass.doublesListFlag.get().get(0), 0.0);
     assertEquals(leftOverArgs.size(), 0);
   }
 
@@ -222,6 +236,7 @@ public class FlagsTest {
             Flags.parse(new String[] {"--strings_list_flag", "ab,cd,ef"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList("ab", "cd", "ef"), FlagDescTestClass.stringsListFlag.get());
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE, "cd", FlagDescTestClass.stringsListFlag.get().get(1));
     assertEquals(leftOverArgs.size(), 0);
   }
 
@@ -232,6 +247,7 @@ public class FlagsTest {
             Flags.parse(new String[] {"--booleans_list_flag", "false,true,false"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(false, true, false), FlagDescTestClass.booleansListFlag.get());
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE, false, FlagDescTestClass.booleansListFlag.get().get(0));
     assertEquals(leftOverArgs.size(), 0);
   }
 
@@ -242,6 +258,7 @@ public class FlagsTest {
             Flags.parse(new String[] {"--integers_list_flag", "1,2,-3"}, TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, Arrays.asList(1, 2, -3), FlagDescTestClass.integersListFlag.get());
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE, -3, (int)FlagDescTestClass.integersListFlag.get().get(2));
     assertEquals(leftOverArgs.size(), 0);
   }
 
@@ -254,6 +271,9 @@ public class FlagsTest {
     assertEquals(FLAG_SHOULD_HAVE_VALUE,
         Arrays.asList(321321321L, -123123123L, 987654321L),
         FlagDescTestClass.longsListFlag.get());
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,
+      -123123123L,
+        (long)FlagDescTestClass.longsListFlag.get().get(1));
     assertEquals(leftOverArgs.size(), 0);
   }
 
@@ -266,6 +286,9 @@ public class FlagsTest {
     assertEquals(FLAG_SHOULD_HAVE_VALUE,
         Arrays.asList(3.21, -1.23, 9.87),
         FlagDescTestClass.doublesListFlag.get());
+    assertEquals(LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,
+     3.21,
+        FlagDescTestClass.doublesListFlag.get().get(0), 0.0);
     assertEquals(leftOverArgs.size(), 0);
   }
 
