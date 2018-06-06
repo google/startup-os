@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.concurrent.Executors;
@@ -37,7 +38,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.json.JSONObject;
-import java.net.HttpURLConnection;
 
 /*
  * AuthService is a gRPC service to receive Firestore auth data from WebLogin.
@@ -52,7 +52,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       description = "Make it easy to debug by storing and reading the token from disk")
   private static final Flag<Boolean> debugTokenMode = Flag.create(false);
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
-  
+
   private ScheduledExecutorService tokenRefreshScheduler = Executors.newScheduledThreadPool(1);
   private String projectId;
   private String apiKey;
@@ -159,7 +159,8 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       String response = new BufferedReader(
           new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
       if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-        jwtToken = response;
+        JSONObject json = new JSONObject(response);
+        jwtToken = json.getString("access_token");
         decodeJwtToken();
         logger.atInfo().log("Token refreshed. New expiration is %d", tokenExpiration);
       } else {
@@ -176,5 +177,9 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   public String getProjectId() {
     return projectId;
+  }
+
+  public String getUserName() {
+    return userName;
   }
 }

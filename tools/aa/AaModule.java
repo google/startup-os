@@ -48,12 +48,7 @@ public class AaModule {
 
   @Provides
   public static Config getConfig(FileUtils fileUtils, @Named("Base path") String basePath) {
-    Config config =
-        (Config)
-            fileUtils.readPrototxtUnchecked(
-                fileUtils.joinPaths(basePath, InitCommand.BASE_FILENAME), Config.newBuilder());
-    config = config.toBuilder().setBasePath(basePath).build();
-    return config;
+    return Config.newBuilder().setBasePath(basePath).build();
   }
 
   @Provides

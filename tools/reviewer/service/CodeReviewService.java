@@ -26,6 +26,7 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.service.Protos.Author;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
@@ -154,7 +155,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
     String diffPath = fileUtils.joinPaths(firestoreReviewRoot.get(), "data/diff");
-    client.createDocument(diffPath, String.valueOf(req.getDiff().getNumber()), req.getDiff());
+    Diff diff = req.getDiff().toBuilder()
+        .setAuthor(Author.newBuilder().setName(authService.getUserName()).build()).build();
+    client.createDocument(diffPath, String.valueOf(diff.getNumber()), diff);
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
