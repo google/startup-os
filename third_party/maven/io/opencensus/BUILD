@@ -1,29 +1,25 @@
 java_library(
     name = "opencensus_api",
-    exports = [
-        "//external:jar/io/opencensus/opencensus_api"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/io/opencensus/opencensus_api",
+    ],
 )
-
-
 
 java_library(
     name = "opencensus_contrib_grpc_metrics",
-    exports = [
-        "//external:jar/io/opencensus/opencensus_contrib_grpc_metrics"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/io/opencensus/opencensus_contrib_grpc_metrics",
+    ],
 )
-
-

@@ -9,6 +9,7 @@ java_test(
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/jimfs",
         "//third_party/maven/javax/inject:javax_inject",
@@ -17,7 +18,6 @@ java_test(
         "//third_party/maven/org/objenesis",
         "//tools/aa:aa_module",
         "//tools/aa/commands",
-        "//third_party/maven/com/google/flogger:flogger_system_backend",
     ],
 )
 
@@ -31,6 +31,7 @@ java_test(
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/jimfs",
         "//third_party/maven/javax/inject:javax_inject",
@@ -39,6 +40,5 @@ java_test(
         "//third_party/maven/org/objenesis",
         "//tools/aa:aa_module",
         "//tools/aa/commands",
-        "//third_party/maven/com/google/flogger:flogger_system_backend",
     ],
 )

@@ -26,10 +26,10 @@ java_library(
         "AuthService.java",
     ],
     deps = [
-        "//common",
-        "//common/flags",
         ":auth_service_java_grpc",
         ":auth_service_java_proto",
+        "//common",
+        "//common/flags",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_stub",

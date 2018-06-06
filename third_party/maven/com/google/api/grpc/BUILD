@@ -1,44 +1,38 @@
 java_library(
     name = "proto_google_cloud_firestore_v1beta1",
-    exports = [
-        "//external:jar/com/google/api/grpc/proto_google_cloud_firestore_v1beta1"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/grpc/proto_google_cloud_firestore_v1beta1",
+    ],
 )
-
-
 
 java_library(
     name = "proto_google_common_protos",
-    exports = [
-        "//external:jar/com/google/api/grpc/proto_google_common_protos"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/grpc/proto_google_common_protos",
+    ],
 )
-
-
 
 java_library(
     name = "proto_google_iam_v1",
-    exports = [
-        "//external:jar/com/google/api/grpc/proto_google_iam_v1"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/grpc/proto_google_iam_v1",
+    ],
 )
-
-

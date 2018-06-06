@@ -39,8 +39,8 @@ java_test(
     deps = [
         "//common:text_difference_java_proto",
         "//common:text_differencer",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/junit",
-        "//third_party/maven/com/google/flogger:flogger_system_backend",
     ],
 )

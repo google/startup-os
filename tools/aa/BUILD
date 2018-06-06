@@ -37,10 +37,10 @@ java_binary(
         "//common:dagger_with_annotation_processor",
         "//common/flags",
         "//external:jar/com/google/protobuf/protobuf_java",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
-        "//tools/aa/commands",
-        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/org/slf4j:slf4j_simple",
+        "//tools/aa/commands",
     ],
 )

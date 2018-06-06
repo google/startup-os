@@ -1,14 +1,12 @@
 java_library(
     name = "animal_sniffer_annotations",
-    exports = [
-        "//external:jar/org/codehaus/mojo/animal_sniffer_annotations"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/org/codehaus/mojo/animal_sniffer_annotations",
+    ],
 )
-
-

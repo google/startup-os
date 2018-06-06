@@ -1,67 +1,59 @@
 java_library(
     name = "api_common",
-    exports = [
-        "//external:jar/com/google/api/api_common"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/api_common",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
-        "//third_party/maven/com/google/guava:guava"
+        "//third_party/maven/com/google/guava",
     ],
-    visibility = [
-        "//visibility:public"
-    ]
 )
-
-
 
 java_library(
     name = "gax",
-    exports = [
-        "//external:jar/com/google/api/gax"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/gax",
+    ],
 )
-
-
 
 java_library(
     name = "gax_grpc",
-    exports = [
-        "//external:jar/com/google/api/gax_grpc"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/gax_grpc",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/auto/value:auto_value",
-        "//third_party/maven/org/threeten:threetenbp"
+        "//third_party/maven/org/threeten:threetenbp",
     ],
-    visibility = [
-        "//visibility:public"
-    ]
 )
-
-
 
 java_library(
     name = "gax_httpjson",
-    exports = [
-        "//external:jar/com/google/api/gax_httpjson"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/api/gax_httpjson",
+    ],
 )
-
-

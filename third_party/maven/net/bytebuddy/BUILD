@@ -1,29 +1,25 @@
 java_library(
     name = "byte_buddy",
-    exports = [
-        "//external:jar/net/bytebuddy/byte_buddy"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/net/bytebuddy/byte_buddy",
+    ],
 )
-
-
 
 java_library(
     name = "byte_buddy_agent",
-    exports = [
-        "//external:jar/net/bytebuddy/byte_buddy_agent"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/net/bytebuddy/byte_buddy_agent",
+    ],
 )
-
-
