@@ -24,7 +24,7 @@ import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.Diff.Status;
-import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -71,7 +71,7 @@ public class SubmitCommand implements AaCommand {
 
     final Diff.Builder diffBuilder =
         codeReviewBlockingStub
-            .getDiff(GetDiffRequest.newBuilder().setDiffId(currentDiffNumber).build())
+            .getDiff(DiffRequest.newBuilder().setDiffId(currentDiffNumber).build())
             .toBuilder();
 
     boolean hasApprovedReviews =

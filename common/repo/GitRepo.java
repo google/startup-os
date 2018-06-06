@@ -129,6 +129,11 @@ public class GitRepo implements Repo {
     return files.build();
   }
 
+  public ImmutableList<File> getFilesInCommit(String commitId) {
+    // TODO: Implement
+    throw new UnsupportedOperationException("Not implemented");
+  }
+
   public Commit commit(ImmutableList<File> files, String message) {
     Commit.Builder commitBuilder = Commit.newBuilder();
     try {

@@ -28,7 +28,7 @@ import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.Diff.Status;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.service.Protos.File;
-import com.google.startupos.tools.reviewer.service.Protos.GetDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class ReviewCommand implements AaCommand {
       return false;
     }
     Diff.Builder diffBuilder = codeReviewBlockingStub.getDiff(
-        GetDiffRequest.newBuilder().setDiffId(currentDiffNumber).build()).toBuilder();
+        DiffRequest.newBuilder().setDiffId(currentDiffNumber).build()).toBuilder();
     if (diffBuilder.getReviewerCount() == 0) {
       System.out.println(String.format("D%d has no reviewers", currentDiffNumber));
       return false;
