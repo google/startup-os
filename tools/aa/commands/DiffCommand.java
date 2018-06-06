@@ -26,7 +26,6 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.service.Protos.Author;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
@@ -100,8 +99,7 @@ public class DiffCommand implements AaCommand {
             .setDescription(description.get())
             .setBug(buglink.get())
             .addAllReviewer(getReviewers(reviewers.get()))
-            .setNumber(response.getLastDiffId())
-            .setAuthor(Author.newBuilder().setName(config.getUser()).build());
+            .setNumber(response.getLastDiffId());
 
     try {
       fileUtils

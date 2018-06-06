@@ -42,9 +42,6 @@ public class InitCommand implements AaCommand {
   @FlagDesc(name = "startupos_repo", description = "StartupOS git repo")
   public static Flag<String> startuposRepo = Flag.create("https://github.com/google/startup-os.git");
 
-  @FlagDesc(name = "user", description = "User")
-  public static Flag<String> user = Flag.create(System.getenv("USER"));
-
   private FileUtils fileUtils;
 
   @Inject
@@ -68,14 +65,8 @@ public class InitCommand implements AaCommand {
       fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "local"));
       fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "logs"));
 
-      // Write config
-      Config config =
-          Config.newBuilder()
-              .setUser(user.get())
-              .build();
-      fileUtils.writePrototxt(
-          config,
-          fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
+      // Write BASE file
+      fileUtils.writeString("", fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
 
       if (!startuposRepo.get().isEmpty()) {
         // Clone StartupOS repo into head:
