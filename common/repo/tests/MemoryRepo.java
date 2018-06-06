@@ -19,7 +19,7 @@ package com.google.startupos.common.repo.tests;
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.repo.Protos;
 import com.google.startupos.common.repo.Repo;
-import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.common.repo.Protos.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

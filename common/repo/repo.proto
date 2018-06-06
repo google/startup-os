@@ -1,12 +1,55 @@
 syntax = "proto3";
 package com.google.startupos.common.repo;
 
-import "tools/reviewer/service/code_review.proto";
-
 option java_package = "com.google.startupos.common.repo";
 option java_outer_classname = "Protos";
 
+/* A file can be:
+ * - A committed file, in head repo
+ *   <base>/head/<repo_id>/<commit_id>/<filename>
+ *
+ * - A local file for current user
+ *   <base>/ws/<workspace>/<repo_id>/<filename>
+ * - A committed file for current user
+ *   <base>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
+ *
+ * - A local file for other user
+ *   <base>/users/<user>/ws/<workspace>/<repo_id>/<filename>
+ * - A committed file for other user
+ *   <base>/users/<user>/ws/<workspace>/<repo_id>/<commit_id>/<filename>
+ *
+ * Note that above paths are "conceptual" and not real filesystem paths.
+ * The distinction between the above, is based on the fields, e.g user being
+ * empty or not.
+ */
+ message File {
+  enum Action {
+    ADD = 0;
+    DELETE = 1;
+    RENAME = 2;
+    MODIFY = 3;
+  }
+  // Includes the path + filename, relative to repo
+  string filename = 1;
+  // Empty if referring to base/head or current user
+  string user = 2;
+  // Empty if referring to base/head
+  string workspace = 3;
+  string repo_id = 4;
+  // Empty if referring to a local file
+  string commit_id = 5;
+  Action action = 6;
+}
+
 message Commit {
   string id = 1;
-  repeated com.google.startupos.tools.reviewer.service.File file = 2;
+  repeated File file = 2;
+}
+
+message BranchInfo {
+  int64 diff_id = 1;
+  string repo_id = 2;
+  // Commits since divergence from master
+  repeated Commit commit = 3;
+  repeated File uncommitted_file = 4;
 }

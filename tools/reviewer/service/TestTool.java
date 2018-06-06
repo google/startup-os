@@ -22,7 +22,7 @@ import io.grpc.StatusRuntimeException;
 import java.util.concurrent.TimeUnit;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;

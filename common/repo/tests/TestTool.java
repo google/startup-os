@@ -23,7 +23,7 @@ import dagger.Component;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.common.repo.Protos.File;
 
 
 /** Test tool for GitRepo. */

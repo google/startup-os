@@ -23,7 +23,7 @@ import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
 import com.sun.net.httpserver.HttpExchange;
@@ -197,10 +197,10 @@ public class LocalHttpGateway {
 
     private void printExampleEncodedBytes() {
       // Here's an example of a url that should work, based on the example below:
-      // http://localhost:7000/get_diff_files?request=CgVhYWFhYRAU
+      // http://localhost:7000/get_diff_files?request=Cg5nZXRfZGlmZl9maWxlcxAV
       final DiffFilesRequest request = DiffFilesRequest.newBuilder()
-          .setWorkspace("aaaaa")
-          .setDiffNumber(20)
+          .setWorkspace("get_diff_files")
+          .setDiffId(21)
           .build();
       byte[] bytes = request.toByteArray();
       String encodedBytes = Base64.getEncoder().encodeToString(bytes);

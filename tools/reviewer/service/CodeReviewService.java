@@ -30,7 +30,7 @@ import com.google.startupos.tools.reviewer.service.Protos.Author;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
-import com.google.startupos.tools.reviewer.service.Protos.File;
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
@@ -45,6 +45,9 @@ import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import com.google.startupos.common.repo.Protos.Commit;
+import com.google.startupos.common.repo.Protos.BranchInfo;
+import com.google.common.collect.ImmutableList;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -220,9 +223,36 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void getDiffFiles(DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
-    // TODO: Implement
+    String workspacePath = fileUtils.joinPaths(basePath, "ws", request.getWorkspace());
+    String branch = "D" + request.getDiffId();
+    DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
+    try {
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
+          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .filter(path -> fileUtils.folderExists(path))
+          .forEach(
+              path -> {
+                String repoName = Paths.get(path).getFileName().toString();
+                Repo repo = repoFactory.create(path);
+                // TODO: Uncomment once repo.getCommits() is implemented
+                //ImmutableList<Commit> commits = repo.getCommits(branch);
+                ImmutableList<Commit> commits = ImmutableList.of();
+                ImmutableList<File> uncommittedFiles = repo.getUncommittedFiles();
+                response.addBranchInfo(BranchInfo.newBuilder()
+                    .setDiffId(request.getDiffId())
+                    .setRepoId(repoName)
+                    .addAllCommit(commits)
+                    .addAllUncommittedFile(uncommittedFiles)
+                    .build());
+              });
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     logger.atInfo().log("DiffFiles request\n" + request.toString());
-    responseObserver.onNext(DiffFilesResponse.getDefaultInstance());
+    responseObserver.onNext(response.build());
     responseObserver.onCompleted();
   } 
 }

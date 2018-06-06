@@ -7,6 +7,7 @@ proto_library(
     srcs = ["code_review.proto"],
     deps = [
         "//common:text_difference_proto",
+        "//common/repo:repo_proto",
         "@com_google_protobuf//:empty_proto",
     ],
 )
@@ -38,6 +39,7 @@ java_library(
         "//common/firestore",
         "//common/flags",
         "//common/repo",
+        "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_stub",
@@ -45,6 +47,7 @@ java_library(
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/local_server/service:auth_service",
         "@com_google_protobuf//:protobuf_java",
+        "//third_party/maven/com/google/guava",
     ],
 )
 
@@ -59,6 +62,7 @@ java_binary(
         ":code_review_java_proto",
         ":service",
         "//common",
+        "//common/repo:repo_java_proto",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
     ],
