@@ -118,6 +118,9 @@ public class LocalHttpGateway {
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
+          "Origin, X-Requested-With, Content-Type, Accept");
       String requestPath = httpExchange.getRequestURI().getPath();
       String relativeFilePath = requestPath.substring(GET_FILE_PATH.length());
       logger.atInfo().log("Handling get_file request for " + relativeFilePath);
@@ -170,6 +173,9 @@ public class LocalHttpGateway {
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
+          "Origin, X-Requested-With, Content-Type, Accept");
       // TODO: Remove printExampleEncodedBytes() once integration is working
       printExampleEncodedBytes();
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
@@ -209,6 +215,9 @@ public class LocalHttpGateway {
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
+          "Origin, X-Requested-With, Content-Type, Accept");
       // TODO: Remove printExampleEncodedBytes() once integration is working
       printExampleEncodedBytes();
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
