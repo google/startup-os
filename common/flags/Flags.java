@@ -100,14 +100,6 @@ public class Flags {
     if (!flagData.getHasValue()) {
       return null;
     }
-    if (flagData.getIsListFlag()){
-      return flagData.getValue()
-          // deleting characters "[" and "]" at the beginning and end of the List and spaces after commas
-          // for correct parse values
-          .replace("[", "")
-          .replace("]", "")
-          .replaceAll(", ", ",");
-    }
     return flagData.getValue();
   }
 
@@ -118,22 +110,17 @@ public class Flags {
 
   @VisibleForTesting
   static void setFlagValue(String name, String value) {
-    instance().flags.put(name, getFlag(name).toBuilder().setValue(value).setHasValue(true).build());
+    instance().flags.put(name, getFlag(name).toBuilder()
+        .setValue(value
+            .replace("[", "")
+            .replace("]", "")
+            .replaceAll(", ", ","))
+        .setHasValue(true).build());
   }
 
   @VisibleForTesting
   static String getDefaultFlagValue(String flagName) {
-    FlagData flagData = instance().getFlag(flagName);
-    if (flagData.getIsListFlag()) {
-      // deleting characters "[" and "]" at the beginning and end of the List and spaces after commas
-      // for correct parse default values
-      return flagData.getDefault()
-          .replace("[", "")
-          .replace("]", "")
-          .replaceAll(", ", ",");
-    } else {
-      return flagData.getDefault();
-    }
+    return instance().getFlag(flagName).getDefault();
   }
 
   private void scanPackages(Iterable<String> packages) {

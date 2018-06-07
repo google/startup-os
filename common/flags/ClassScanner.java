@@ -209,7 +209,10 @@ public class ClassScanner {
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
-      result.setDefault(flag.getDefault().toString());
+      result.setDefault(flag.getDefault().toString()
+          .replace("[", "")
+          .replace("]", "")
+          .replaceAll(", ", ","));
     }
     return result.build();
   }
