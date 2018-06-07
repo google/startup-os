@@ -582,4 +582,51 @@ public class FileUtilsTest {
     }
     fileUtils.writeProtoBinaryUnchecked(TestMessage.getDefaultInstance(), "");
   }
+
+  @Test
+  public void testDeleteDirectoryContent() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath("/foo/empty_folder"));
+    Files.createDirectories(fileSystem.getPath("/foo/path/to/folder"));
+    Files.createFile(fileSystem.getPath("/foo/first_file.txt"));
+    Files.createFile(fileSystem.getPath("/foo/path/to/folder/second_file.txt"));
+    Files.createFile(fileSystem.getPath("/foo/path/to/folder/third_file.txt"));
+    fileUtils.deleteDirectoryContent("/foo");
+    assertFalse(Files.isDirectory(fileSystem.getPath("/foo/empty_folder")));
+    assertFalse(Files.isDirectory(fileSystem.getPath("/foo/path/to/folder")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/first_file.txt")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/path/to/folder/second_file.txt")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/path/to/folder/third_file.txt")));
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testDeleteDirectoryContentUnchecked() {
+    if (fileSystemName.equals("Windows")) {
+      throw new RuntimeException();
+    }
+    fileUtils.deleteDirectoryContentUnchecked("");
+  }
+
+  @Test
+  public void testDeleteFileOrDirectoryIfExist() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath("/foo/folder"));
+    Files.createFile(fileSystem.getPath("/foo/file.txt"));
+    fileUtils.deleteFileOrDirectoryIfExist("/foo/folder");
+    fileUtils.deleteFileOrDirectoryIfExist("/foo/file.txt");
+    assertFalse(Files.isDirectory(fileSystem.getPath("/foo/folder")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/file.txt")));
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testDeleteFileOrDirectoryIfExistUnchecked() {
+    if (fileSystemName.equals("Windows")) {
+      throw new RuntimeException();
+    }
+    fileUtils.deleteFileOrDirectoryIfExistUnchecked("");
+  }
 }

@@ -170,7 +170,7 @@ public class FileUtils {
     }
   }
 
-  /** 
+  /**
    * Gets file and folder absolute paths recursively.
    * Throws NoSuchFileException if directory doesn't exist
    */
@@ -184,7 +184,7 @@ public class FileUtils {
               absolutePath -> absolutePath.toString())
               .collect(Collectors.toList()));
     }
-} 
+}
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
@@ -268,5 +268,50 @@ public class FileUtils {
 
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
     copyDirectoryToDirectory(source, destination, null);
+  }
+
+  /** Deletes all files and folders in directory. */
+  public void deleteDirectoryContent(String path) throws IOException {
+    final Path directory = fileSystem.getPath(expandHomeDirectory(path));
+      Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          Files.delete(file);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
+          if (exception == null) {
+            Files.delete(dir);
+            return FileVisitResult.CONTINUE;
+          } else {
+            throw exception;
+          }
+        }
+      });
+  }
+
+  /** Deletes all files and folders in directory, rethrows exceptions as unchecked. */
+  public void deleteDirectoryContentUnchecked(String path){
+    try {
+      deleteDirectoryContent(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Deletes file or folder. */
+  public void deleteFileOrDirectoryIfExist(String path) throws IOException {
+    Files.deleteIfExists(fileSystem.getPath(expandHomeDirectory(path)));
+  }
+
+  /** Deletes file or folder, rethrows exceptions as unchecked. */
+  public void deleteFileOrDirectoryIfExistUnchecked(String path){
+    try {
+      deleteFileOrDirectoryIfExist(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
