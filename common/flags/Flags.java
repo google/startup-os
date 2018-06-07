@@ -110,12 +110,16 @@ public class Flags {
 
   @VisibleForTesting
   static void setFlagValue(String name, String value) {
-    instance().flags.put(name, getFlag(name).toBuilder()
-        .setValue(value
-            .replace("[", "")
-            .replace("]", "")
-            .replaceAll(", ", ","))
-        .setHasValue(true).build());
+    FlagData.Builder builder = instance().getFlag(name).toBuilder();
+    if (builder.getIsListFlag()){
+      builder.setValue(value
+          .replace("[", "")
+          .replace("]", "")
+          .replaceAll(", ", ","));
+    } else {
+      builder.setValue(value);
+    }
+    instance().flags.put(name, builder.setHasValue(true).build());
   }
 
   @VisibleForTesting

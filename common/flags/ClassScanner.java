@@ -209,10 +209,14 @@ public class ClassScanner {
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
-      result.setDefault(flag.getDefault().toString()
-          .replace("[", "")
-          .replace("]", "")
-          .replaceAll(", ", ","));
+      if(result.getIsListFlag()){
+        result.setDefault(flag.getDefault().toString()
+            .replace("[", "")
+            .replace("]", "")
+            .replaceAll(", ", ","));
+      } else {
+        result.setDefault(flag.getDefault().toString());
+      }
     }
     return result.build();
   }

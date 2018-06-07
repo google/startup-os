@@ -199,6 +199,16 @@ public class FlagsTest {
   }
 
   @Test
+  public void testStringFlagWithSquareScopes() {
+    List<String> leftOverArgs =
+        Arrays.asList(
+            Flags.parse(new String[] {"--string_flag", "[abcd]"}, TESTFLAGS_PACKAGE));
+
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, "[abcd]", FlagDescTestClass.getStringFlagValue());
+    assertEquals(leftOverArgs.size(), 0);
+  }
+
+  @Test
   public void testIntegerFlag() {
     List<String> leftOverArgs =
         Arrays.asList(
