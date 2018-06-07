@@ -1,0 +1,50 @@
+# To deploy the hello-server example, update the following line below:
+#     image: gcr.io/startup-os/hello-server:latest
+# to reflect the registry, repository and tag that you configured in the container_push rule in:
+#     examples/docker/BUILD
+#
+# Make sure you have a kubernetes cluster set up by following:
+#    https://cloud.google.com/kubernetes-engine/docs/quickstart
+#
+# The server and service can be created by running:
+#
+# $ kubectl apply -f examples/k8s/hello-server.yml
+#
+# Then run the following to get the external IP address assigned to the service:
+#
+# $ kubectl get service hello-world-service
+# NAME                  TYPE           CLUSTER-IP      EXTERNAL-IP     PORT(S)        AGE
+# hello-world-service   LoadBalancer   10.35.255.117   12.34.56.78   80:32244/TCP   11m
+#
+# You can now visit the service at http://12.34.56.78/test
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: hello-server-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-server
+    spec:
+      containers:
+      - name: hello-server-container
+        image: gcr.io/startup-os/hello-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: hello-server-service
+spec:
+  selector:
+    app: hello-server
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
