@@ -212,3 +212,18 @@ http_archive(
     sha256 = "b0269e75b40d87ff87886e5f3432cbf88f70c96f907ab588e6c21b2922d72db0",
     url = "https://github.com/bazelbuild/bazel/releases/download/0.13.1/bazel-0.13.1-dist.zip",
 )
+
+# Rules for examples/docker/
+
+http_archive(
+    name = "io_bazel_rules_docker",
+    strip_prefix = "rules_docker-0.4.0",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.4.0.tar.gz"],
+)
+
+load(
+    "@io_bazel_rules_docker//java:image.bzl",
+    _java_image_repos = "repositories",
+)
+
+_java_image_repos()
