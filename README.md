@@ -32,6 +32,7 @@ Working examples of:
 
 #### Milestone II
 Working examples of:
+* ✓ Bazel building Docker containers
 * [ABC](http://g.co/ng/abc) (Angular Bazel Closure)
 * [j2objc](https://developers.google.com/j2objc)
 * [Kubernetes](https://kubernetes.io)
