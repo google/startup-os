@@ -40,7 +40,7 @@ Working examples of:
 
 ## Other repos
 Here are some other repos with examples of Bazel, gRPC and other related technologies:
-* Go, C++: https://github.com/lucperkins/colossus
+* Go, C++, Java: https://github.com/lucperkins/colossus
 * Go: https://github.com/Staffjoy/v2
 
 ## Feedback
