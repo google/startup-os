@@ -2,7 +2,8 @@
   <!-- Title -->
   <div class="review-title">
     <div>
-      Diff {{ diff.number }} by
+      <span class="diffNumber"> Diff {{ diff.number }} </span> 
+      by
       <span [ngClass]="{ 
         'bold-text': 
           diff.needAttentionOf.includes(diff.author),
@@ -25,12 +26,48 @@
     </div>
     <div class="review-status" fxFlex>
       <ng-container [ngSwitch]="diff.status">
-        <ng-container *ngSwitchCase="0">Review not started</ng-container>
-        <ng-container *ngSwitchCase="1">Needs more work</ng-container>
-        <ng-container *ngSwitchCase="2">Under Review</ng-container>
-        <ng-container *ngSwitchCase="3">Accepted</ng-container>
-        <ng-container *ngSwitchCase="4">Submitted</ng-container>
-        <ng-container *ngSwitchCase="5">Reverted</ng-container>
+        <ng-container *ngSwitchCase="0">
+          <span class="reviewNotStarted">
+            <mat-icon>check_circle</mat-icon>
+            Review not started
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="1">
+          <span class="needsMoreWork">
+            <mat-icon>check_circle</mat-icon>
+            Needs more work
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="2">
+          <span class="underReview">
+            <mat-icon>check_circle</mat-icon>
+            Under Review
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="3">
+          <span class="accepted">
+            <mat-icon>check_circle</mat-icon>
+            Accepted
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="4">
+          <span class="submitted">
+            <mat-icon>check_circle</mat-icon>
+            Submitted
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="5">
+          <span class="reverting">
+            <mat-icon>check_circle</mat-icon>
+            Reverting
+          </span>
+        </ng-container>
+        <ng-container *ngSwitchCase="6">
+          <span class="reverted">
+            <mat-icon>check_circle</mat-icon>
+            Reverted
+          </span>
+        </ng-container>
       </ng-container>
     </div>
   </div>
@@ -133,8 +170,14 @@
         <div fxFlex="60%">
           File
         </div>
-        <div fxFlex="120px" fxFlex.xs="">
+        <div fxFlex="13%" fxFlex.xs="">
+          Comments
+        </div>
+        <div fxFlex="13%" fxFlex.xs="">
           Modified
+        </div>
+        <div fxFlex="13%" fxFlex.xs="">
+          Delta
         </div>
       </div>
     </div>
@@ -151,14 +194,6 @@
               {{ file.filePosition }}
             </a>
           </div>
-          <div fxFlex="120px" fxFlex.xs="">
-            <ng-container [ngSwitch]="file.fileAction">
-              <ng-container *ngSwitchCase="0">Added</ng-container>
-              <ng-container *ngSwitchCase="1">Deleted</ng-container>
-              <ng-container *ngSwitchCase="2">Renamed</ng-container>
-              <ng-container *ngSwitchCase="3">Modified</ng-container>
-            </ng-container>
-          </div>
         </div>
       </div>
     </div>
@@ -170,7 +205,7 @@
       <div class="review-title">
         Discussion
       </div>
-      <div class="review-sub-title">
+      <div class="review-sub-title bold-text">
         General discussions (
           {{ getTotalComments() }} comments, 
           {{ getUnresolvedComments() }} unresolved)
