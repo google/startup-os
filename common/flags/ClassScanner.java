@@ -209,7 +209,7 @@ public class ClassScanner {
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
-      if(result.getIsListFlag()){
+      if (result.getIsListFlag()){
         result.setDefault(flag.getDefault().toString()
             .replace("[", "")
             .replace("]", "")
