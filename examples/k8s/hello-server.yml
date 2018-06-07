@@ -1,6 +1,7 @@
-# To deploy the hello-server example, update the image spec to reflect the full
-# path the you configured in the container push rule in:
-#   examples/docker/BUILD
+# To deploy the hello-server example, update the following line below:
+#     image: gcr.io/startup-os/hello-server:latest
+# to reflect the registry, repository and tag that you configured in the container_push rule in:
+#     examples/docker/BUILD
 #
 # Make sure you have a kubernetes cluster set up by following:
 #    https://cloud.google.com/kubernetes-engine/docs/quickstart

@@ -38,6 +38,9 @@ load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 # Then run:
 #
 # $ bazel run //examples/docker:push_hello_server
+#
+# Once pushed, this image can be used in kubernetes and will be named like:
+#    gcr.io/startup-os/hello-server:latest
 
 container_push(
    name = "push_hello_server",
