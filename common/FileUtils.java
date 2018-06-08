@@ -270,8 +270,8 @@ public class FileUtils {
     copyDirectoryToDirectory(source, destination, null);
   }
 
-  /** Deletes all files and folders in directory. */
-  public void deleteDirectoryContent(String path) throws IOException {
+  /** Deletes all files and folders in directory. Target directory is deleted. */
+  public void deleteDirectory(String path) throws IOException {
     final Path directory = fileSystem.getPath(expandHomeDirectory(path));
       Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
         @Override
@@ -292,24 +292,24 @@ public class FileUtils {
       });
   }
 
-  /** Deletes all files and folders in directory, rethrows exceptions as unchecked. */
-  public void deleteDirectoryContentUnchecked(String path){
+  /** Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as unchecked. */
+  public void deleteDirectoryUnchecked(String path){
     try {
-      deleteDirectoryContent(path);
+      deleteDirectory(path);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
   /** Deletes file or folder. */
-  public void deleteFileOrDirectoryIfExist(String path) throws IOException {
+  public void deleteFileOrDirectoryIfExists(String path) throws IOException {
     Files.deleteIfExists(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Deletes file or folder, rethrows exceptions as unchecked. */
-  public void deleteFileOrDirectoryIfExistUnchecked(String path){
+  public void deleteFileOrDirectoryIfExistsUnchecked(String path){
     try {
-      deleteFileOrDirectoryIfExist(path);
+      deleteFileOrDirectoryIfExists(path);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

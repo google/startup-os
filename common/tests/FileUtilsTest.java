@@ -593,12 +593,13 @@ public class FileUtilsTest {
     Files.createFile(fileSystem.getPath("/foo/first_file.txt"));
     Files.createFile(fileSystem.getPath("/foo/path/to/folder/second_file.txt"));
     Files.createFile(fileSystem.getPath("/foo/path/to/folder/third_file.txt"));
-    fileUtils.deleteDirectoryContent("/foo");
+    fileUtils.deleteDirectory("/foo");
     assertFalse(Files.isDirectory(fileSystem.getPath("/foo/empty_folder")));
     assertFalse(Files.isDirectory(fileSystem.getPath("/foo/path/to/folder")));
     assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/first_file.txt")));
     assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/path/to/folder/second_file.txt")));
     assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/path/to/folder/third_file.txt")));
+    assertFalse(Files.isDirectory(fileSystem.getPath("/foo")));
   }
 
   @Test(expected = RuntimeException.class)
@@ -606,7 +607,7 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       throw new RuntimeException();
     }
-    fileUtils.deleteDirectoryContentUnchecked("");
+    fileUtils.deleteDirectoryUnchecked("");
   }
 
   @Test
@@ -616,8 +617,8 @@ public class FileUtilsTest {
     }
     Files.createDirectories(fileSystem.getPath("/foo/folder"));
     Files.createFile(fileSystem.getPath("/foo/file.txt"));
-    fileUtils.deleteFileOrDirectoryIfExist("/foo/folder");
-    fileUtils.deleteFileOrDirectoryIfExist("/foo/file.txt");
+    fileUtils.deleteFileOrDirectoryIfExists("/foo/folder");
+    fileUtils.deleteFileOrDirectoryIfExists("/foo/file.txt");
     assertFalse(Files.isDirectory(fileSystem.getPath("/foo/folder")));
     assertFalse(Files.isRegularFile(fileSystem.getPath("/foo/file.txt")));
   }
@@ -627,6 +628,6 @@ public class FileUtilsTest {
     if (fileSystemName.equals("Windows")) {
       throw new RuntimeException();
     }
-    fileUtils.deleteFileOrDirectoryIfExistUnchecked("");
+    fileUtils.deleteFileOrDirectoryIfExistsUnchecked("");
   }
 }
