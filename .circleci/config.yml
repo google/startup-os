@@ -37,7 +37,8 @@ jobs:
       - checkout:
           <<: *post_checkout
       - run: './pre-commit.sh'
-      - run: 'buildifier -mode=check $(find . -type f \( -name BUILD.bazel -or -name BUILD \)) ||
+      - run: 'npm install'
+      - run: 'bazel run //tools:buildifier -- -mode=check $(find `pwd` -type f \( -name BUILD.bazel -or -name BUILD \) | grep -v node_modules) ||
               (echo "BUILD files not formatted. Please run ''yarn buildifier''" ; exit 1)'
 
   build:
