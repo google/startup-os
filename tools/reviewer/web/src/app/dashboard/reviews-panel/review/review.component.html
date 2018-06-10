@@ -136,61 +136,6 @@
   </div>
 
   <!-- Review Comments -->
-  <div>
-    <div fxLayout="column" fxLayoutAlign="space-around stretch">
-      <div class="review-title">
-        Discussion
-      </div>
-      <div class="review-sub-title bold-text">
-        General discussions (
-          {{ getTotalComments() }} comments, 
-          {{ getUnresolvedComments() }} unresolved)
-      </div>
-    </div>
-    <div class="expanded-thread" 	     
-      fxLayout="column" 	       
-      fxLayout.xs="column" 	       
-      fxLayoutGap.xs="10px" 	        
-      *ngFor="let thread of diff.threads; let i = index">	       
-      <div fxLayout="row" class="thread-header">     
-        <div fxFlex="50%" class="detail">         
-          {{ thread.filename }}	      
-        </div>	         
-        <div fxFlex="10%" class="line-number-label">	    
-          {{ thread.comments.length }} comments
-        </div>	
-        <!-- <div fxFlex="10%" class=""> 	
-          {{ thread.snapshot }}	
-        </div>	 -->
-        <div fxFlex="100px" class="line-number-label">	
-          Line number:	
-        </div>	
-        <div fxFlex="10%" class=""> 	
-          {{ thread.lineNumber }}	
-        </div>	
-      </div>	      
-      <div *ngFor="let comment of thread.comments" 	
-        class="thread-contents">	
-        <div class="comment">	
-          <div class="content"> 	
-            {{ comment.content }} 	
-          </div> 	
-          <div fxLayout="row" 	
-            fxLayoutGap="5px" 	
-            class="details">	
-            <div> 	
-              <span> by </span>	
-              {{ comment.createdBy }} 	
-            </div>	
-            <div> 	
-              <span> on </span> 	
-              {{ comment.timestamp |  	
-                date:'MMM dd, yyyy HH:mm a' : timezone }}	
-            </div>	
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <review-discussion [diff]="diff"></review-discussion>
   
 </div>
