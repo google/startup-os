@@ -97,7 +97,6 @@
     }
   }
   .thread {
-    border-radius: 3px;
     background: white;
     .comment-file {
       padding: 10px $pagePadding;
@@ -114,6 +113,20 @@
     .file-info {
       padding: 10px $pagePadding;
       border-bottom: 1px solid $borderColor;
+    }
+  }
+
+  .expanded-thread {
+    background: white;
+    padding: 10px $pagePadding;
+    border-bottom: 1px solid $borderColor;
+    .thread-header {
+      font-weight: 500;
+    }
+    .thread-contents {
+      margin-top: 10px;
+      background-color: #f8f7f7;
+      border-radius: 5px;
     }
   }
 }

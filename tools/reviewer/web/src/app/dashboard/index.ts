@@ -11,7 +11,8 @@ import {
   LineNumbersComponent,
   PersonListComponent,
   ReviewComponent,
-  ReviewsPanelComponent
+  ReviewsPanelComponent,
+  ReviewTitlebarComponent
 } from './reviews-panel/';
 
 export const DashboardComponents = [
@@ -24,7 +25,8 @@ export const DashboardComponents = [
   LineNumbersComponent,
   PersonListComponent,
   ReviewComponent,
-  ReviewsPanelComponent
+  ReviewsPanelComponent,
+  ReviewTitlebarComponent
 ];
 
 export const DashboardEntryComponents = [];
