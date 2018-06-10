@@ -43,11 +43,17 @@ public class TestTool {
       if (command.equals("switchBranch")) {
         String branch = args[1];
         repo.switchBranch(branch);
-      } if (command.equals("getCommits")) {
+      } else if (command.equals("getCommits")) {
         String branch = args[1];
         for (Commit commit : repo.getCommits(branch)) {
           System.out.println();
           System.out.println(commit);
+        }
+      } else if (command.equals("getFilesInCommit")) {
+        String commitId = args[1];
+        for (File file : repo.getFilesInCommit(commitId)) {
+          System.out.println();
+          System.out.println(file);
         }
       } else if (command.equals("getUncommittedFiles")) {
         for (File file : repo.getUncommittedFiles()) {

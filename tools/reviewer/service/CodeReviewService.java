@@ -236,9 +236,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 Repo repo = repoFactory.create(path);
-                // TODO: Uncomment once repo.getCommits() is implemented
-                //ImmutableList<Commit> commits = repo.getCommits(branch);
-                ImmutableList<Commit> commits = ImmutableList.of();
+                ImmutableList<Commit> commits = repo.getCommits(branch);
                 ImmutableList<File> uncommittedFiles = repo.getUncommittedFiles();
                 response.addBranchInfo(BranchInfo.newBuilder()
                     .setDiffId(request.getDiffId())
