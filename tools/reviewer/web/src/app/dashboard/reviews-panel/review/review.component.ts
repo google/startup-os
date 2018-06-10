@@ -100,4 +100,14 @@ export class ReviewComponent implements OnInit {
       }
     );
   }
+
+  getTotalComments(): number {
+    return this.diff.threads
+      .map(v => v.comments.length)
+      .reduce((a, b) => a + b, 0);
+  }
+
+  getUnresolvedComments(): number {
+    return this.diff.threads.filter(v => !v.isDone).length;
+  }
 }
