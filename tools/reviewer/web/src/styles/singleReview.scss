@@ -113,6 +113,9 @@
     .file-info {
       padding: 10px $pagePadding;
       border-bottom: 1px solid $borderColor;
+      a {
+        cursor: pointer;
+      }
     }
   }
 

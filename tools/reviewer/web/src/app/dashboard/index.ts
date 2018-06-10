@@ -12,6 +12,7 @@ import {
   PersonListComponent,
   ReviewComponent,
   ReviewDiscussionComponent,
+  ReviewFilesComponent,
   ReviewsPanelComponent,
   ReviewTitlebarComponent
 } from './reviews-panel/';
@@ -27,6 +28,7 @@ export const DashboardComponents = [
   PersonListComponent,
   ReviewComponent,
   ReviewDiscussionComponent,
+  ReviewFilesComponent,
   ReviewsPanelComponent,
   ReviewTitlebarComponent
 ];

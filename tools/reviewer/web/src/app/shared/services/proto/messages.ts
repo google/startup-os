@@ -25,7 +25,7 @@ export interface Diff {
   cc: string[];
 }
 
-interface Files {
+export interface Files {
   file: File[];
 }
 

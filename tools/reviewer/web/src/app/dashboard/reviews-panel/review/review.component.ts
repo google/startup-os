@@ -6,7 +6,7 @@ import {
   Status
 } from '@/shared';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-review',
@@ -26,7 +26,6 @@ export class ReviewComponent implements OnInit {
     private route: ActivatedRoute,
     private protoService: ProtoService,
     private firebaseService: FirebaseService,
-    private router: Router,
     private notificationService: NotificationService
   ) {}
 
@@ -53,16 +52,6 @@ export class ReviewComponent implements OnInit {
         // Permission Denied
       }
     );
-  }
-
-  // Upon click on a file open a single file review page showing
-  // code difference and comments
-  openFile(filePosition): void {
-    // Build a route path on the following format /diff/<diff number>/<path>?
-    // ls=<left snapshot number>&rs=<right snapshot number>
-    this.router.navigate(['diff/' + this.diffId + '/' + filePosition], {
-      queryParams: { ls: '1', rs: '3' }
-    });
   }
 
   // Save needAttentionOf list and update the Diff
