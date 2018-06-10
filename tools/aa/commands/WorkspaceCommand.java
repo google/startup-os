@@ -22,6 +22,8 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.aa.Protos.Config;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 
@@ -34,6 +36,9 @@ import javax.inject.Inject;
  *
  * To create and then switch to a workspace:
  * aa workspace -f <workspace name>
+ *
+ * To remove workspace (should exist and not be active):
+ * aa workspace -r <workspace name>
  */
 // TODO: If there's only one repo in the workspace, cd should enter into it.
 // TODO: If there's multiple repos in the workspace, and I'm currently in a repo in a workspace,
@@ -41,6 +46,9 @@ import javax.inject.Inject;
 public class WorkspaceCommand implements AaCommand {
   @FlagDesc(name = "force", description = "Create workspace if it doesn't exist")
   public static Flag<Boolean> force = Flag.create(false);
+
+  @FlagDesc(name = "remove", description = "Remove workspace if it exists")
+  public static Flag<Boolean> remove = Flag.create(false);
 
   private FileUtils fileUtils;
   private Config config;
@@ -83,6 +91,8 @@ public class WorkspaceCommand implements AaCommand {
     for (int i = 0; i < args.length; i++) {
       if (args[i].equals("-f")) {
         args[i] = "--force";
+      } else if (args[i].equals("-r")) {
+        args[i] = "--remove";
       }
     }
     if (args.length < 2) {
@@ -103,6 +113,10 @@ public class WorkspaceCommand implements AaCommand {
     String workspacePath = fileUtils.joinPaths(basePath, "ws", workspaceName);
 
     if (force.get()) {
+      if (remove.get()) {
+        System.err.println(RED_ERROR + "Conflicting options specified");
+        return false;
+      }
       if (fileUtils.folderExists(workspacePath)) {
         System.err.println(RED_ERROR + "Workspace already exists");
         return false;
@@ -120,6 +134,16 @@ public class WorkspaceCommand implements AaCommand {
       if (!fileUtils.folderExists(workspacePath)) {
         System.err.println(RED_ERROR + "Workspace does not exist");
         return false;
+      }
+
+      if (remove.get()) {
+        Path currentPath = Paths.get("").toAbsolutePath();
+        if (currentPath.startsWith(workspacePath)) {
+          System.err.println(RED_ERROR + "Trying to remove active workspace");
+          return false;
+        }
+        fileUtils.deleteDirectoryUnchecked(workspacePath);
+        return true;
       }
     }
     // System.out command will be run by calling script aa_tool.sh.
