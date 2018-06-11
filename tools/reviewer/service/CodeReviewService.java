@@ -50,7 +50,6 @@ import javax.inject.Singleton;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.common.collect.ImmutableList;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
