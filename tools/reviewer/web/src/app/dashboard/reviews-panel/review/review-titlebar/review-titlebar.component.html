@@ -1,5 +1,5 @@
-<div class="review-title">
-  <div>
+<div class="review-title" fxFlex>
+  <div fxFlex="200px">
     <span class="diffNumber"> Diff {{ diff.number }} </span> 
     by
     <span [ngClass]="{ 
@@ -22,7 +22,7 @@
       {{ diff.author }}
     </span>
   </div>
-  <div class="review-status" fxFlex>
+  <div class="review-status" fxFlex="100%">
     <ng-container [ngSwitch]="diff.status">
       <ng-container *ngSwitchCase="0">
         <span class="reviewNotStarted">
@@ -67,5 +67,16 @@
         </span>
       </ng-container>
     </ng-container>
+  </div>
+  <div class="actions" 
+    fxLayout="row"
+    fxLayoutGap="20px"
+    fxFlex="300px">
+    <div class="submit">
+      <button>Submit</button>
+    </div>
+    <div class="reply">
+      <button>Reply</button>
+    </div>
   </div>
 </div>

@@ -35,6 +35,23 @@
         }
       }
     }
+    .actions {
+      button {
+        padding: 0px 24px;
+        border: 1px solid #615b5b;
+        border-radius: 8px;
+        font-family: heebo;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .submit button {
+        background-color: #86d1ff;
+      }
+      .reply button {
+        background-color: #ffc84b;
+      }
+    }
   }
   .reviewer-name,
   .author-name {
