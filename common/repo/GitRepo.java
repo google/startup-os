@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
@@ -112,10 +111,11 @@ public class GitRepo implements Repo {
         if (rev.equals(divergenceCommit)) {
           break;
         }
-        result.add(Commit.newBuilder()
-            .setId(rev.getId().toString())
-            .addAllFile(getFilesInCommit(rev.getName()))
-            .build());
+        result.add(
+            Commit.newBuilder()
+                .setId(rev.getId().toString())
+                .addAllFile(getFilesInCommit(rev.getName()))
+                .build());
       }
       walk.dispose();
     } catch (IOException e) {
@@ -191,19 +191,18 @@ public class GitRepo implements Repo {
       CanonicalTreeParser parentTreeIter = new CanonicalTreeParser();
       parentTreeIter.reset(reader, commitParent);
 
-      List<DiffEntry> diffs = jGit.diff()
-          .setNewTree(commitTreeIter)
-          .setOldTree(parentTreeIter)
-          .call();
+      List<DiffEntry> diffs =
+          jGit.diff().setNewTree(commitTreeIter).setOldTree(parentTreeIter).call();
       for (DiffEntry entry : diffs) {
-        File file = File.newBuilder()
-            .setAction(getAction(entry.getChangeType()))
-            .setCommitId(commitId)
-            .setFilename(entry.getNewPath())
-            .build();
+        File file =
+            File.newBuilder()
+                .setAction(getAction(entry.getChangeType()))
+                .setCommitId(commitId)
+                .setFilename(entry.getNewPath())
+                .build();
         result.add(file);
       }
-    } catch (IOException|GitAPIException e) {
+    } catch (IOException | GitAPIException e) {
       throw new RuntimeException(e);
     }
     return result.build();
@@ -242,11 +241,16 @@ public class GitRepo implements Repo {
     }
   }
 
-  public boolean merge(String branch) {
+  public boolean merge(String branch, boolean remote) {
     try {
       Ref current = jGitRepo.exactRef(jGitRepo.getFullBranch());
+      Ref ref;
       boolean successfulMerge = true;
-      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
+      if (remote) {
+        ref = jGitRepo.exactRef("refs/remotes/origin/" + branch);
+      } else {
+        ref = jGitRepo.exactRef("refs/heads/" + branch);
+      }
       AddCommand addCommand = jGit.add();
       jGit.merge().include(ref).call();
       for (String conflictingFile : jGit.status().call().getConflicting()) {
@@ -262,6 +266,10 @@ public class GitRepo implements Repo {
     } catch (GitAPIException | IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public boolean merge(String branch) {
+    return merge(branch, false);
   }
 
   @Override
