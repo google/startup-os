@@ -1,12 +1,7 @@
-import {
-  Diff,
-  FirebaseService,
-  NotificationService,
-  ProtoService,
-  Status
-} from '@/shared';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { Diff, FirebaseService, NotificationService } from '@/shared';
 
 @Component({
   selector: 'app-review',
@@ -16,19 +11,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class ReviewComponent implements OnInit {
   diffId: string;
   diff: Diff;
+  diffView: Diff.AsObject;
 
   // Show editable button next to fields
   editable: boolean = true;
   // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
-  notEditableStatus: Array<number> = [Status.SUBMITTED, Status.REVERTED];
+  notEditableStatus: Array<number> = [
+    Diff.Status.SUBMITTED,
+    Diff.Status.REVERTED
+  ];
 
   constructor(
     private route: ActivatedRoute,
-    private protoService: ProtoService,
     private firebaseService: FirebaseService,
     private router: Router,
     private notificationService: NotificationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.diffId = this.route.snapshot.params['id'];
@@ -36,18 +34,15 @@ export class ReviewComponent implements OnInit {
     // Get a single review
     this.firebaseService.getDiff(this.diffId).subscribe(
       res => {
-        // Create Diff from proto
-        this.protoService.open.subscribe(error => {
-          if (error) {
-            throw error;
-          }
-          const review = res;
-          this.diff = this.protoService.createDiff(review);
-          this.diff.number = parseInt(this.diffId, 10);
-          // Render the fields un-editable if the current diff status
-          // is in the list of notEditableStatus
-          this.editable = !this.notEditableStatus.includes(this.diff.status);
-        });
+        this.diff = res;
+        this.diffView = this.diff.toObject();
+
+        this.diff.setNumber(parseInt(this.diffId, 10));
+        // Render the fields un-editable if the current diff status
+        // is in the list of notEditableStatus
+        this.editable = !this.notEditableStatus.includes(
+          this.diff.getStatus()
+        );
       },
       () => {
         // Permission Denied
@@ -67,26 +62,31 @@ export class ReviewComponent implements OnInit {
 
   // Save needAttentionOf list and update the Diff
   saveAttentionList(name: string): void {
-    if (this.diff.needAttentionOf.includes(name)) {
-      this.diff.needAttentionOf = this.diff.needAttentionOf.filter(
-        e => e !== name
-      );
+    if (this.diffView.needAttentionOfList.includes(name)) {
+      const filtheredNeedAttentionOfList = this.diff
+        .getNeedAttentionOfList()
+        .filter(e => e !== name);
+
+      this.diff.setNeedAttentionOfList(filtheredNeedAttentionOfList);
     } else {
-      this.diff.needAttentionOf.push(name);
+      this.diff.addNeedAttentionOf(name);
     }
     this.updateDiff(this.diff, 'Update Need Attention List');
   }
 
-  // Remove a property from Diff and update the Diff
+  // TODO: refactor this method
+  // Update whole diff, instead of sending a property to firebase
+  // NOTICE: do not use: object[property]
   removeProperty(property: string, message: string): void {
-    this.firebaseService
-      .removeProperty(this.diff, property)
-      .then(() => {
-        this.notificationService.success(message);
-      })
-      .catch(() => {
-        this.notificationService.error('Some error occured');
-      });
+    console.warn('Unsupported behavior');
+    // this.firebaseService
+    //   .removeProperty(this.diff, property)
+    //   .then(() => {
+    //     this.notificationService.success(message);
+    //   })
+    //   .catch(() => {
+    //     this.notificationService.error('Some error occured');
+    //   });
   }
 
   // Update the Diff in the DB
@@ -102,12 +102,12 @@ export class ReviewComponent implements OnInit {
   }
 
   getTotalComments(): number {
-    return this.diff.threads
-      .map(v => v.comments.length)
+    return this.diffView.threadsList
+      .map(v => v.commentsList.length)
       .reduce((a, b) => a + b, 0);
   }
 
   getUnresolvedComments(): number {
-    return this.diff.threads.filter(v => !v.isDone).length;
+    return this.diffView.threadsList.filter(v => !v.isDone).length;
   }
 }

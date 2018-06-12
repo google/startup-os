@@ -1,31 +1,34 @@
-<div *ngIf="diff" class="single-review">
+<!-- This html file is too big -->
+<!-- TODO: do something with that -->
+
+<div *ngIf="diffView" class="single-review">
   <!-- Title -->
   <div class="review-title">
     <div>
-      <span class="diffNumber"> Diff {{ diff.number }} </span> 
+      <span class="diffNumber"> Diff {{ diffView.number }} </span> 
       by
       <span [ngClass]="{ 
         'bold-text': 
-          diff.needAttentionOf.includes(diff.author),
+          diffView.needAttentionOfList.includes(diffView.author),
           'author-name': true
         }">
         <button mat-raised-button 
           class="add-to-list"
           *ngIf="editable"
-          (click)="saveAttentionList(diff.author);
+          (click)="saveAttentionList(diffView.author);
           $event.stopPropagation()"
           >
           {{ 
-            diff.needAttentionOf.indexOf(diff.author) > -1
+            diffView.needAttentionOfList.indexOf(diffView.author) > -1
             ? 'Remove from Needs Attention'
             : 'Add to Needs Attention'
           }}
         </button>
-        {{ diff.author }}
+        {{ diffView.author }}
       </span>
     </div>
     <div class="review-status" fxFlex>
-      <ng-container [ngSwitch]="diff.status">
+      <ng-container [ngSwitch]="diffView.status">
         <ng-container *ngSwitchCase="0">
           <span class="reviewNotStarted">
             <mat-icon>check_circle</mat-icon>
@@ -123,7 +126,7 @@
             Created:
           </div>
           <div fxFlex class="timestamp">
-            {{ diff.createdTimestamp | date:'medium' }}
+            {{ diffView.createdTimestamp | date:'medium' }}
           </div>
         </div>
   
@@ -138,7 +141,7 @@
           </div>
           <div fxFlex 
             class="timestamp">
-            {{ diff.modifiedTimestamp | date:'medium' }}
+            {{ diffView.modifiedTimestamp | date:'medium' }}
           </div>
         </div>
 
@@ -185,7 +188,7 @@
       <div fxLayout="row" 
         fxLayout.xs="column" 
         fxLayoutGap.xs="10px"
-        *ngFor="let file of diff.files; let i = index"
+        *ngFor="let file of diffView.filesList; let i = index"
         class="file-info">
         <div fxFlex fxLayout="row">
           <div fxFlex="60%">
@@ -215,13 +218,13 @@
       fxLayout="column" 
       fxLayout.xs="column" 
       fxLayoutGap.xs="10px" 
-      *ngFor="let thread of diff.threads; let i = index">
+      *ngFor="let thread of diffView.threadsList; let i = index">
       <div fxLayout="row" class="comment-file">
         <div fxFlex="50%" class=""> 
           {{ thread.filename }}
         </div>
         <div fxFlex="10%" class="line-number-label">
-          ( {{ thread.comments.length }} comments)
+          ( {{ thread.commentsList.length }} comments)
         </div>
       </div>
     </div>

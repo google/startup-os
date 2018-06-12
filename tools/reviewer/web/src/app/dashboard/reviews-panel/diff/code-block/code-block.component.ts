@@ -14,7 +14,7 @@ import { DiffService } from '../diff.service';
 export interface Line {
   code: string; // Original code of the line
   highlightedCode: string; // Code with html tags
-  hasPlaceholder: boolean;  // Does the line have a placeholder for comments?
+  hasPlaceholder: boolean; // Does the line have a placeholder for comments?
   isCommentsVisible: boolean; // Should comments be displayed?
   isChanged: boolean; // Should the line be highligted as modified?
   height: number; // Height of placeholder
@@ -37,7 +37,17 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   @Input() fileContent: string;
   @Input() isNewCode: boolean;
   @Input() changes: number[];
-  // TODO: Do not use Threads
+  // TODO: add supporting of deleting whole thread.
+  // if you delete a comment in firebase, the comment is deleted on the app too
+  // but if you delete a thread in firebase, it's still present
+  // on the app until refresh a page.
+
+  // Also notice, if you delete not last comment in a thread, then you need to
+  // restore range. e.g. 1,2,3,4... etc.
+  // You get an error if there're missed elements. e.g. 1,3,4,6
+
+  // Last thing: if all comments are deleted in a thread, it causes an error.
+  // You need to delete a thread, if it doesn't have a comment.
   @Input() threads: Thread[];
 
   lineHeightChangesSubscription: Subscription;
@@ -47,30 +57,36 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   constructor(
     private highlightService: HighlightService,
     private changeDetectorRef: ChangeDetectorRef,
-    private diffService: DiffService,
+    private diffService: DiffService
   ) {
     // Subscriptions on events
     this.lineHeightChangesSubscription = this.diffService
-      .lineHeightChanges.subscribe(param => {
-        // Height of a comment block is changed
-        this.lines[param.lineNumber].hasPlaceholder = true;
-        this.lines[param.lineNumber].height = param.height;
-        this.addPlaceholder(param.lineNumber);
-      });
-    this.closeCommentsChangesSubscription = this.diffService
-      .closeCommentsChanges.subscribe(lineNumber => {
-        // Request for closing a comment block
-        this.closeCommentsBlock(lineNumber);
-      });
-    this.openCommentsChangesSubscription = this.diffService
-      .openCommentsChanges.subscribe(lineNumber => {
-        // Request for opening a comment block
-        if (!this.isNewCode) {
-          // Open comments always on right side
-          return;
+      .lineHeightChanges.subscribe(
+        param => {
+          // Height of a comment block is changed
+          this.lines[param.lineNumber].hasPlaceholder = true;
+          this.lines[param.lineNumber].height = param.height;
+          this.addPlaceholder(param.lineNumber);
         }
-        this.openCommentsBlock(lineNumber);
-      });
+      );
+    this.closeCommentsChangesSubscription = this.diffService
+      .closeCommentsChanges.subscribe(
+        lineNumber => {
+          // Request for closing a comment block
+          this.closeCommentsBlock(lineNumber);
+        }
+      );
+    this.openCommentsChangesSubscription = this.diffService
+      .openCommentsChanges.subscribe(
+        lineNumber => {
+          // Request for opening a comment block
+          if (!this.isNewCode) {
+            // Open comments always on right side
+            return;
+          }
+          this.openCommentsBlock(lineNumber);
+        }
+      );
   }
 
   ngOnInit() {
@@ -114,7 +130,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
         highlightedCode: this.highlightedLines[i],
         comments: [],
         isChanged: false,
-        isCommentsVisible: false,
+        isCommentsVisible: false
       });
     });
   }
@@ -136,8 +152,8 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
       return;
     }
     for (const thread of threads) {
-      const i = thread.lineNumber;
-      this.lines[i].comments = thread.comments;
+      const i = thread.getLineNumber();
+      this.lines[i].comments = thread.getCommentsList();
       this.openCommentsBlock(i);
     }
   }
