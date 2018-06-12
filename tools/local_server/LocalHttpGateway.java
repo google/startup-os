@@ -203,10 +203,10 @@ public class LocalHttpGateway {
 
     private void printExampleEncodedBytes() {
       // Here's an example of a url that should work, based on the example below:
-      // http://localhost:7000/get_diff_files?request=Cg5nZXRfZGlmZl9maWxlcxAV
+      // http://localhost:7000/get_diff_files?request=ChxmaXhfZmlsZXNfaW5fc2VydmVyX3Jlc3BvbnNlEBw=
       final DiffFilesRequest request = DiffFilesRequest.newBuilder()
-          .setWorkspace("get_diff_files")
-          .setDiffId(21)
+          .setWorkspace("fix_files_in_server_response")
+          .setDiffId(28)
           .build();
       byte[] bytes = request.toByteArray();
       String encodedBytes = Base64.getEncoder().encodeToString(bytes);

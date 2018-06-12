@@ -21,16 +21,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.auto.factory.AutoFactory;
 import com.google.auto.factory.Provided;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
