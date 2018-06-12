@@ -43,10 +43,10 @@ load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 #    gcr.io/startup-os/hello-server:latest
 
 container_push(
-   name = "push_hello_server",
-   image = ":hello_server",
-   format = "Docker",
-   registry = "gcr.io",
-   repository = "startup-os/hello-server",
-   tag = "latest",
+    name = "push_hello_server",
+    format = "Docker",
+    image = ":hello_server",
+    registry = "gcr.io",
+    repository = "startup-os/hello-server",
+    tag = "latest",
 )

@@ -1,6 +1,7 @@
 # StartupOS
 
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
+[![CircleCI](https://circleci.com/gh/google/startup-os/tree/master.svg?style=svg)](https://circleci.com/gh/google/startup-os/tree/master)
 
 > Working examples for using Google's Open Source tools and deploying to the cloud.
 
