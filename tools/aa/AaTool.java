@@ -18,6 +18,7 @@ package com.google.startupos.tools.aa;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.commands.AaCommand;
+import com.google.startupos.tools.aa.commands.AddRepoCommand;
 import com.google.startupos.tools.aa.commands.DiffCommand;
 import com.google.startupos.tools.aa.commands.FixCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
@@ -46,7 +47,8 @@ public class AaTool {
       Lazy<FixCommand> fixCommand,
       Lazy<ReviewCommand> reviewCommand,
       Lazy<SnapshotCommand> snapshotCommand,
-      Lazy<SubmitCommand> submitCommand) {
+      Lazy<SubmitCommand> submitCommand,
+      Lazy<AddRepoCommand> addRepoCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
@@ -55,6 +57,7 @@ public class AaTool {
     commands.put("review", reviewCommand);
     commands.put("snapshot", snapshotCommand);
     commands.put("submit", submitCommand);
+    commands.put("add_repo", addRepoCommand);
   }
 
   private void printUsage() {
