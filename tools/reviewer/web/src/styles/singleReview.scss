@@ -3,6 +3,17 @@
 .single-review {
   background-color: #f3f3f3;
 
+  .actions {
+    button {
+      padding: 0px 24px;
+      border: 1px solid #615b5b;
+      border-radius: 8px;
+      font-family: heebo;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+  }
   .review-title {
     font-size: 24px;
     font-weight: 500;
@@ -36,15 +47,6 @@
       }
     }
     .actions {
-      button {
-        padding: 0px 24px;
-        border: 1px solid #615b5b;
-        border-radius: 8px;
-        font-family: heebo;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-      }
       .submit button {
         background-color: #86d1ff;
       }
@@ -123,6 +125,19 @@
   }
   .review-sub-title {
     padding: 10px $pagePadding;
+  }
+  .files-title {
+    background-color: #cdecff;
+    font-weight: 500;
+    padding: 5px $pagePadding;
+    .title {
+      font-size: 24px;
+    }
+    .actions {
+      button {
+        background-color: #86d1ff;
+      }
+    }
   }
   .files-info-container {
     background-color: white;
