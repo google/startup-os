@@ -55,8 +55,8 @@ export class PersonListComponent {
     // WARNING: Bad practice
     // Do not use: object[propertyName]
     // - It forces to use any.
-    // - It causes undeceted errors.
-    // - It's dificult to maintain the code.
+    // - It causes undetected errors.
+    // - It's difficult to maintain the code.
     // use instead: object.field
     // TODO: refactor this component ('switch' is not the best way too)
 

@@ -28,10 +28,6 @@ export class ReviewsPanelComponent implements OnInit {
         if (user) {
           const email = user.email;
           this.username = email.split('@')[0];
-          // TODO: Maybe to use email instead of username?
-          // Also, we could keep users in separate collection
-          // as a pair 'email - name', or something like that.
-          // And to get access to a name by email.
         }
       });
     }
