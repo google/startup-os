@@ -140,7 +140,7 @@ public class WorkspaceCommand implements AaCommand {
     Flags.parse(args, WorkspaceCommand.class.getPackage());
 
     if (force.get() && remove.get()) {
-      System.err.println(RED_ERROR + "Conflicting options specified");
+      System.err.println(RED_ERROR + "Cannot specify both force and remove flags");
       return false;
     }
 
@@ -186,15 +186,13 @@ public class WorkspaceCommand implements AaCommand {
     }
 
     if (mode == ActionMode.CREATE) {
-      if (!createWorkspace()) {
-        return false;
-      } else {
+      if (createWorkspace()) {
         switchWorkspace();
+      } else {
+        return false;
       }
     } else if (mode == ActionMode.REMOVE) {
-      if (!removeWorkspace()) {
-        return false;
-      }
+      return removeWorkspace();
     } else {
       switchWorkspace();
     }
