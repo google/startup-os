@@ -18,6 +18,7 @@ java_library(
     ],
     deps = [
         ":repo_java_proto",
+        "//common",
         "//common:auto_factory",
         "//common:auto_factory_plugin",
         "//common:dagger_with_annotation_processor",
