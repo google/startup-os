@@ -21,11 +21,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.auto.factory.AutoFactory;
 import com.google.auto.factory.Provided;
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 import java.io.IOException;
-import java.nio.file.FileSystem;
+import java.io.InputStream;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jgit.api.AddCommand;
@@ -48,14 +51,25 @@ import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 
 // TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
   private Git jGit;
   private Repository jGitRepo;
+  private String repoPath;
+  private List<String> gitCommandBase;
 
-  GitRepo(@Provided FileSystem fileSystem, String repoPath) {
+  GitRepo(@Provided FileUtils fileUtils, String repoPath) {
+
+    this.repoPath = repoPath;
+    gitCommandBase = Arrays.asList(
+        "git",
+        "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"),
+        "--work-tree=" + repoPath);
     FileRepositoryBuilder builder = new FileRepositoryBuilder();
     try {
       jGitRepo =
@@ -70,17 +84,52 @@ public class GitRepo implements Repo {
     }
   }
 
-  public void switchBranch(String branch) {
-    boolean createBranch = true;
-    try {
-      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
-      if (ref != null) {
-        createBranch = false;
-      }
-      jGit.checkout().setCreateBranch(createBranch).setName(branch).call();
-    } catch (IOException | GitAPIException e) {
-      throw new RuntimeException(e);
+  class CommandResult {
+    String command;
+    String stdout;
+    String stderr;
+  }
+
+  private String readLines(InputStream inputStream) throws IOException {
+    StringBuffer output = new StringBuffer();
+    BufferedReader reader =
+            new BufferedReader(new InputStreamReader(inputStream));
+    String line = "";
+    while ((line = reader.readLine()) != null) {
+      output.append(line + "\n");
     }
+    return output.toString();
+  }
+
+  private CommandResult runCommand(String... command) {
+    CommandResult result = new CommandResult();
+    try {
+      List<String> fullCommand = new ArrayList<>(gitCommandBase);
+      fullCommand.addAll(Arrays.asList(command));
+      String[] fullCommandArray = fullCommand.toArray(new String[0]);
+      result.command = String.join(" ", fullCommand);
+      Process process = Runtime.getRuntime().exec(fullCommandArray);
+      process.waitFor();
+      result.stdout = readLines(process.getInputStream());
+      result.stderr = readLines(process.getErrorStream());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    if (!result.stderr.isEmpty()) {
+      throw new RuntimeException(formatError(result));
+    }
+    return result;
+  }
+
+  private String formatError(CommandResult commandResult) {
+    return String.format(
+        "\n%s\n%s",
+        commandResult.command,
+        commandResult.stderr);
+  }
+
+  public void switchBranch(String branch) {
+    runCommand("checkout", "--quiet", "-B", branch);
   }
 
   public void tagHead(String name) {
@@ -305,22 +354,18 @@ public class GitRepo implements Repo {
 
   @Override
   public void removeBranch(String branch) {
-    try {
-      jGit.branchDelete().setBranchNames(branch).setForce(true).call();
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
-    }
+    runCommand("branch", "--quiet", "-D", branch);
   }
 
   @Override
   public ImmutableList<String> listBranches() {
+    CommandResult commandResult = runCommand("branch");
     ImmutableList.Builder<String> branches = new ImmutableList.Builder<>();
-    try {
-      jGit.branchList()
-          .call()
-          .forEach(ref -> branches.add(ref.getName().replace("refs/heads/", "")));
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
+    for (String branch : Arrays.asList(commandResult.stdout.split("\\r?\\n"))) {
+      if (!branch.isEmpty()) {
+        // Remove leading spaces and astrix
+        branches.add(branch.substring(2));
+      }
     }
     return branches.build();
   }
@@ -348,5 +393,9 @@ public class GitRepo implements Repo {
         objectReader.close();
       }
     }
+  }
+
+  public void init() {
+    CommandResult r = runCommand("init");
   }
 }
