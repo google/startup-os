@@ -26,12 +26,16 @@ import com.google.startupos.common.repo.Protos.File;
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Paths;
+import java.util.List;
+
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
@@ -40,7 +44,9 @@ import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 // TODO: Implement methods
@@ -83,10 +89,39 @@ public class GitRepo implements Repo {
     } catch (GitAPIException e) {
       throw new RuntimeException(e);
     }
-  }  
+  }
+
+  private RevCommit getCommonAncenstorCommit(String branch1, String branch2) throws IOException {
+    try (RevWalk walk = new RevWalk(jGitRepo)) {
+      walk.setRevFilter(RevFilter.MERGE_BASE);
+      ObjectId branchId = jGitRepo.resolve(branch1);
+      ObjectId masterId = jGitRepo.resolve(branch2);
+      walk.markStart(walk.parseCommit(branchId));
+      walk.markStart(walk.parseCommit(masterId));
+      return walk.next();
+    }
+  }
 
   public ImmutableList<Commit> getCommits(String branch) {
-    throw new UnsupportedOperationException("Not implemented");
+    ImmutableList.Builder<Commit> result = ImmutableList.builder();
+    try (RevWalk walk = new RevWalk(jGitRepo)) {
+      RevCommit divergenceCommit = getCommonAncenstorCommit(branch, "master");
+      RevCommit latestBranchCommit = walk.parseCommit(jGitRepo.resolve(branch));
+      walk.markStart(latestBranchCommit);
+      for (RevCommit rev : walk) {
+        if (rev.equals(divergenceCommit)) {
+          break;
+        }
+        result.add(Commit.newBuilder()
+            .setId(rev.getId().toString())
+            .addAllFile(getFilesInCommit(rev.getName()))
+            .build());
+      }
+      walk.dispose();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    return result.build();
   }
 
   public ImmutableList<File> getUncommittedFiles() {
@@ -129,9 +164,49 @@ public class GitRepo implements Repo {
     return files.build();
   }
 
+  private File.Action getAction(ChangeType changeType) {
+    switch (changeType) {
+      case ADD:
+        return File.Action.ADD;
+      case DELETE:
+        return File.Action.DELETE;
+      case RENAME:
+        return File.Action.RENAME;
+      case MODIFY:
+        return File.Action.MODIFY;
+      case COPY:
+        return File.Action.COPY;
+    }
+    throw new IllegalStateException("Unknown ChangeType " + changeType);
+  }
+
   public ImmutableList<File> getFilesInCommit(String commitId) {
-    // TODO: Implement
-    throw new UnsupportedOperationException("Not implemented");
+    ImmutableList.Builder<File> result = ImmutableList.builder();
+    try (ObjectReader reader = jGitRepo.newObjectReader()) {
+      ObjectId commitParent = jGitRepo.resolve(commitId + "^^{tree}");
+      ObjectId commit = jGitRepo.resolve(commitId + "^{tree}");
+
+      CanonicalTreeParser commitTreeIter = new CanonicalTreeParser();
+      commitTreeIter.reset(reader, commit);
+      CanonicalTreeParser parentTreeIter = new CanonicalTreeParser();
+      parentTreeIter.reset(reader, commitParent);
+
+      List<DiffEntry> diffs = jGit.diff()
+          .setNewTree(commitTreeIter)
+          .setOldTree(parentTreeIter)
+          .call();
+      for (DiffEntry entry : diffs) {
+        File file = File.newBuilder()
+            .setAction(getAction(entry.getChangeType()))
+            .setCommitId(commitId)
+            .setFilename(entry.getNewPath())
+            .build();
+        result.add(file);
+      }
+    } catch (IOException|GitAPIException e) {
+      throw new RuntimeException(e);
+    }
+    return result.build();
   }
 
   public Commit commit(ImmutableList<File> files, String message) {

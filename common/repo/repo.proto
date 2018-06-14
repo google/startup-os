@@ -28,6 +28,7 @@ option java_outer_classname = "Protos";
     DELETE = 1;
     RENAME = 2;
     MODIFY = 3;
+    COPY = 4;
   }
   // Includes the path + filename, relative to repo
   string filename = 1;

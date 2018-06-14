@@ -42,6 +42,8 @@ import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -221,6 +223,27 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onCompleted();
   }
 
+  private ImmutableList<File> addWorkspaceAndRepoToFiles(List<File> files, String workspace, String repoId) {
+    return ImmutableList.copyOf(files.stream().map(
+        file -> file.toBuilder()
+            .setWorkspace(workspace)
+            .setRepoId(repoId).build())
+        .collect(Collectors.toList()));
+  }
+
+  private ImmutableList<Commit> addWorkspaceAndRepoToCommits(ImmutableList<Commit> commits, String workspace, String repoId) {
+    ImmutableList.Builder<Commit> result = ImmutableList.builder();
+    for (Commit commit : commits) {
+      ImmutableList<File> files = addWorkspaceAndRepoToFiles(commit.getFileList(), workspace, repoId);
+      commit = commit.toBuilder()
+          .clearFile()
+          .addAllFile(files)
+              .build();
+      result.add(commit);
+    }
+    return result.build();
+  }
+
   @Override
   public void getDiffFiles(DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
     String workspacePath = fileUtils.joinPaths(basePath, "ws", request.getWorkspace());
@@ -236,10 +259,10 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 Repo repo = repoFactory.create(path);
-                // TODO: Uncomment once repo.getCommits() is implemented
-                //ImmutableList<Commit> commits = repo.getCommits(branch);
-                ImmutableList<Commit> commits = ImmutableList.of();
-                ImmutableList<File> uncommittedFiles = repo.getUncommittedFiles();
+                ImmutableList<Commit> commits = addWorkspaceAndRepoToCommits(
+                    repo.getCommits(branch), request.getWorkspace(), repoName);
+                ImmutableList<File> uncommittedFiles = addWorkspaceAndRepoToFiles(
+                    repo.getUncommittedFiles(), request.getWorkspace(), repoName);
                 response.addBranchInfo(BranchInfo.newBuilder()
                     .setDiffId(request.getDiffId())
                     .setRepoId(repoName)

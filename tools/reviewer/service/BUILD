@@ -41,13 +41,13 @@ java_library(
         "//common/repo",
         "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/flogger",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/local_server/service:auth_service",
         "@com_google_protobuf//:protobuf_java",
-        "//third_party/maven/com/google/guava",
     ],
 )
 

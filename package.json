@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "devDependencies": {
     "@bazel/typescript": "^0.14.0"
+  },
+  "scripts": {
+    "buildifier": "find `pwd` -type f \\( -name BUILD -or -name BUILD.bazel \\)  | grep -v node_modules | xargs bazel run //tools:buildifier --"
   }
 }
