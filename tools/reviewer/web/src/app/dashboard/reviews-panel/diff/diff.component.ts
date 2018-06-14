@@ -3,11 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
 import { Comment, Diff, Thread } from '@/shared';
-import {
-  DifferenceService,
-  FirebaseService,
-  ProtoService
-} from '@/shared/services';
+import { DifferenceService, FirebaseService } from '@/shared/services';
 import { DiffService } from './diff.service';
 
 // TODO: load files from server
@@ -21,27 +17,24 @@ import { files } from './mock-files';
 })
 export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
-  filePath: string;
+  filename: string;
   files: string[] = files;
   changes: number[];
-  threads: Thread[];
   snapshot: number;
+  localThreads: Thread[];
   diff: Diff;
   newCommentSubscription: Subscription;
-  diffId: string;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private differenceService: DifferenceService,
     private firebaseService: FirebaseService,
-    private diffService: DiffService,
-    private protoService: ProtoService
+    private diffService: DiffService
   ) {
     this.changes = this.differenceService.compare(files[0], files[1]);
 
     this.newCommentSubscription = this.diffService.newComment.subscribe(
       param => {
-        // New comment is added
         this.addComment(param.lineNumber, param.comments);
       }
     );
@@ -49,54 +42,43 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   addComment(lineNumber: number, comments: Comment[]): void {
     if (comments.length === 1) {
-      this.diff.threads.push({
-        snapshot: this.snapshot,
-        lineNumber: lineNumber,
-        filename: this.filePath,
-        comments: comments,
-        isDone: false
-      });
-      this.filtherThreads(this.diff.threads);
+      // Create a thread, if it's first comment
+      const newThread = new Thread();
+      newThread.setSnapshot(this.snapshot);
+      newThread.setLineNumber(lineNumber);
+      newThread.setFilename(this.filename);
+      newThread.setIsDone(false);
+      newThread.setCommentsList(comments);
+      this.diff.addThreads(newThread);
     }
 
-    this.protoService.open.subscribe(() => {
-      const protoDiff = this.protoService.createDiff(this.diff);
-      this.firebaseService.updateDiff(protoDiff).subscribe(
-        () => {
-          // Success
-        },
-        () => {
-          // Access denied
-        }
-      );
-    });
+    this.firebaseService.updateDiff(this.diff).subscribe();
   }
 
   ngOnInit() {
     // Get parameters from url
     const urlSnapshot = this.activatedRoute.snapshot;
-    this.filePath = urlSnapshot.url
+    this.filename = urlSnapshot.url
       .splice(1)
       .map(v => v.path)
       .join('/');
 
     this.snapshot = parseInt(urlSnapshot.queryParams['rs'], 10) || null;
 
-    this.diffId = urlSnapshot.url[0].path;
-    this.firebaseService.getDiff(this.diffId).subscribe(
+    const diffId = urlSnapshot.url[0].path;
+    this.firebaseService.getDiff(diffId).subscribe(
       diff => {
         this.diff = diff;
-        this.filtherThreads(diff.threads);
+        this.localThreads = this.diff
+          .getThreadsList()
+          .filter(v => v.getFilename() === this.filename);
+
         this.isLoading = false;
       },
       () => {
         // Access denied
       }
     );
-  }
-
-  filtherThreads(treads: Thread[]): void {
-    this.threads = treads.filter(v => v.filename === this.filePath);
   }
 
   ngOnDestroy() {
