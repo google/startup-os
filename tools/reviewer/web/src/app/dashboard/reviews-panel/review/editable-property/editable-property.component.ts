@@ -1,3 +1,6 @@
+// TODO: refactor this component
+// same issue as in person-list.component
+
 import { Diff } from '@/shared';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
@@ -26,12 +29,31 @@ export class EditablePropertyComponent {
 
   // Get property value from the Diff
   getPropertyValue(): void {
-    this.propertyValue = this.diff[this.property];
+    switch (this.property) {
+      case 'bug':
+        this.propertyValue = this.diff.getBug();
+        break;
+      case 'description':
+        this.propertyValue = this.diff.getDescription();
+        break;
+      default:
+        throw new Error('Unsupported property');
+    }
   }
 
   // Save the new value of property and update Diff
   savePropertyValue(): void {
-    this.diff[this.property] = this.propertyValue;
+    switch (this.property) {
+      case 'bug':
+        this.diff.setBug(this.propertyValue);
+        break;
+      case 'description':
+        this.diff.setDescription(this.propertyValue);
+        break;
+      default:
+        throw new Error('Unsupported property');
+    }
+
     this.onUpdateDiff.emit(this.diff);
   }
 }

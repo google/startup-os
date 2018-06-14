@@ -7,7 +7,9 @@
     (click)="diffService.openComments(i)"
   >
     <div class="icon">
-      <mat-icon *ngIf="diffService.hoverCheck(i, isNewCode) && !line.hasPlaceholder">add_box</mat-icon>
+      <mat-icon
+        *ngIf="diffService.hoverCheck(i, isNewCode) && !line.hasPlaceholder"
+      >add_box</mat-icon>
     </div>
     <div class="placeholder" [style.height.px]="line.height"></div>
   </div>
