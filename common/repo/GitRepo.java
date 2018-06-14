@@ -361,7 +361,7 @@ public class GitRepo implements Repo {
   public ImmutableList<String> listBranches() {
     CommandResult commandResult = runCommand("branch");
     ImmutableList.Builder<String> branches = new ImmutableList.Builder<>();
-    for (String branch : Arrays.asList(commandResult.stdout.split("\\r?\\n"))) {
+    for (String branch : commandResult.stdout.split("\\r?\\n")) {
       if (!branch.isEmpty()) {
         // Remove leading spaces and astrix
         branches.add(branch.substring(2));

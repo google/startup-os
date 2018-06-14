@@ -37,7 +37,6 @@ import javax.inject.Singleton;
 public class GitRepoTest {
   GitRepoFactory gitRepoFactory;
   Repo repo;
-  String repoFolder;
   FileUtils fileUtils;
 
   @Before
@@ -45,7 +44,7 @@ public class GitRepoTest {
     TestComponent component = DaggerGitRepoTest_TestComponent.create();
     gitRepoFactory = component.getFactory();
     fileUtils = component.getFileUtils();
-    repoFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
+    String repoFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
     GitRepo gitRepo = gitRepoFactory.create(repoFolder);
     gitRepo.init();
     repo = gitRepo;
