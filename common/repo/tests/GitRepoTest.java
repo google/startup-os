@@ -27,6 +27,8 @@ import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Repo;
 import dagger.Component;
 import org.junit.Before;
@@ -35,8 +37,15 @@ import org.junit.Test;
 import javax.inject.Singleton;
 
 public class GitRepoTest {
+  private static String TEST_BRANCH = "test_branch";
+  private static String TEST_FILE = "test_file.txt";
+  private static String TEST_FILE_CONTENTS = "Some test file contents";
+  private static String COMMIT_MESSAGE = "Some commit message";
+
   GitRepoFactory gitRepoFactory;
   Repo repo;
+  GitRepo gitRepo;
+  String repoFolder;
   FileUtils fileUtils;
 
   @Before
@@ -44,13 +53,12 @@ public class GitRepoTest {
     TestComponent component = DaggerGitRepoTest_TestComponent.create();
     gitRepoFactory = component.getFactory();
     fileUtils = component.getFileUtils();
-    String repoFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
-    GitRepo gitRepo = gitRepoFactory.create(repoFolder);
+    repoFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
+    gitRepo = gitRepoFactory.create(repoFolder);
     gitRepo.init();
     repo = gitRepo;
     // We need one commit to make the repo have a master branch.
-    fileUtils.writeStringUnchecked("some contents", repoFolder + "/some_file.txt");
-    repo.commit(repo.getUncommittedFiles(), "Some commit message");
+    repo.commit(repo.getUncommittedFiles(), "Initial commit");
   }
 
   @Singleton
@@ -67,21 +75,66 @@ public class GitRepoTest {
 
   @Test
   public void testAddBranch() {
-    repo.switchBranch("testBranch");
-    assertEquals(ImmutableList.of("master", "testBranch"), repo.listBranches());
+    repo.switchBranch(TEST_BRANCH);
+    assertEquals(ImmutableList.of("master", TEST_BRANCH), repo.listBranches());
   }
 
   @Test
   public void testRemoveBranch() {
-    repo.switchBranch("testBranch");
+    repo.switchBranch(TEST_BRANCH);
     // Switch to another branch otherwise deleting fails
     repo.switchBranch("master");
-    repo.removeBranch("testBranch");
+    repo.removeBranch(TEST_BRANCH);
     assertEquals(ImmutableList.of("master"), repo.listBranches());
   }
 
   @Test(expected = RuntimeException.class)
   public void testRemoveNonExistingBranch() {
-    repo.removeBranch("testBranch");
+    repo.removeBranch(TEST_BRANCH);
+  }
+
+  @Test
+  public void testGetCommitIds() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    assertEquals(1, gitRepo.getCommitIds(TEST_BRANCH).size());
+  }
+
+  @Test
+  public void testGetCommits() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(0);
+    assertEquals(
+        ImmutableList.of(
+            Commit.newBuilder().setId(commitId).addFile(
+                File.newBuilder().setAction(
+                    File.Action.ADD).setCommitId(commitId).setFilename(TEST_FILE).build()).build()),
+        repo.getCommits(TEST_BRANCH));
+  }
+
+  @Test
+  public void testGetMultipleCommits() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    fileUtils.writeStringUnchecked("More content", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    String commitId1 = gitRepo.getCommitIds(TEST_BRANCH).get(0);
+    String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(1);
+    assertEquals(
+        ImmutableList.of(
+            Commit.newBuilder().setId(commitId1).addFile(
+                File.newBuilder().setAction(File.Action.MODIFY)
+                    .setCommitId(commitId1)
+                    .setFilename(TEST_FILE)
+                    .build())
+                .build(),
+            Commit.newBuilder().setId(commitId2).addFile(
+                File.newBuilder().setAction(
+                    File.Action.ADD).setCommitId(commitId2).setFilename(TEST_FILE).build()).build()),
+        repo.getCommits(TEST_BRANCH));
   }
 }
