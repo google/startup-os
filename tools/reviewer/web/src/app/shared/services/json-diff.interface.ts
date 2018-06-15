@@ -1,4 +1,7 @@
-export enum Status {
+// TODO: delete the file, when binary from firebase will be available.
+// We still need this to support json data from firebase.
+
+enum Status {
   REVIEW_NOT_STARTED = 0,
   NEEDS_MORE_WORK = 1,
   UNDER_REVIEW = 2,
@@ -7,7 +10,7 @@ export enum Status {
   REVERTED = 5
 }
 
-export interface Diff {
+export interface JsonDiff {
   number: number;
   author: string;
   reviewers: string[];
@@ -17,16 +20,12 @@ export interface Diff {
   workspace: string;
   createdTimestamp: number;
   modifiedTimestamp: number;
-  files: File[];
-  snapshots: Snapshot[];
-  threads: Thread[];
+  files: JsonFile[];
+  snapshots: JsonSnapshot[];
+  threads: JsonThread[];
   pullRequestId: string;
   needAttentionOf: string[];
   cc: string[];
-}
-
-export interface Files {
-  file: File[];
 }
 
 enum FileAction {
@@ -36,19 +35,19 @@ enum FileAction {
   MODIFY = 3
 }
 
-interface File {
+export interface JsonFile {
   filePosition: string;
   fileAction: FileAction;
 }
 
-export interface Snapshot {
+export interface JsonSnapshot {
   timestamp: number;
   gitCommit: string;
   forReview: boolean;
   files: string[];
 }
 
-export interface Thread {
+export interface JsonThread {
   snapshot: number;
   filename: string;
   lineNumber: number;

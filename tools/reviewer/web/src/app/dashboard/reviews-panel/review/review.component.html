@@ -1,8 +1,8 @@
-<div *ngIf="diff" class="single-review">
+<div *ngIf="diffView" class="single-review">
   
   <!-- Title bar -->
   <review-titlebar 
-    [diff]="diff"
+    [diffView]="diff"
     [editable]="editable"
     (onAddToAttentionList)="saveAttentionList($event)"
     >
@@ -59,7 +59,7 @@
             Created:
           </div>
           <div fxFlex class="timestamp">
-            {{ diff.createdTimestamp | date:'medium' }}
+            {{ diffView.createdTimestamp | date:'medium' }}
           </div>
         </div>
   
@@ -74,7 +74,7 @@
           </div>
           <div fxFlex 
             class="timestamp">
-            {{ diff.modifiedTimestamp | date:'medium' }}
+            {{ diffView.modifiedTimestamp | date:'medium' }}
           </div>
         </div>
 
@@ -97,9 +97,9 @@
   </div>
 
   <!-- Files -->
-  <review-files [files]="diff.files" [diffId]="diffId"></review-files>
+  <review-files [files]="diffView.files" [diffId]="diffId"></review-files>
 
   <!-- Review Comments -->
-  <review-discussion [diff]="diff"></review-discussion>
+  <review-discussion [diff]="diffView"></review-discussion>
   
 </div>

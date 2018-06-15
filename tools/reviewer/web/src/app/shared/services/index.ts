@@ -1,19 +1,17 @@
 export * from './auth.service';
-export * from './differenceService/difference.service';
-export * from './firebaseService/firebase.service';
-export * from './proto/proto.service';
-export * from './proto/messages';
+export * from './difference.service';
+export * from './firebase.service';
 export * from './notification.service';
 export * from './highlight.service';
 export * from './selection.service';
 
 import { AuthGuard } from '@/shared/services/auth.guard';
 import { AuthService } from './auth.service';
-import { DifferenceService } from './differenceService/difference.service';
-import { FirebaseService } from './firebaseService/firebase.service';
+import { DifferenceService } from './difference.service';
+import { FirebaseJsonService } from './firebase-json.service';
+import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { NotificationService } from './notification.service';
-import { ProtoService } from './proto/proto.service';
 import { SelectionService } from './selection.service';
 
 export const Services = [
@@ -21,8 +19,8 @@ export const Services = [
   AuthService,
   DifferenceService,
   FirebaseService,
+  FirebaseJsonService,
   HighlightService,
   NotificationService,
-  ProtoService,
-  SelectionService,
+  SelectionService
 ];

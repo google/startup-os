@@ -1,6 +1,6 @@
-import { AuthService, FirebaseService, Lists, ProtoService } from '@/shared';
-import { Diff } from '@/shared/services/proto/messages';
-import { ApplicationRef, Component, NgZone, OnInit } from '@angular/core';
+import { AuthService, FirebaseService, Lists } from '@/shared';
+import { Diff } from '@/shared/shell/proto/code-review_pb';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,17 +9,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./reviews-panel.component.scss']
 })
 export class ReviewsPanelComponent implements OnInit {
-  diffs: Array<Array<Diff>> = [[], [], [], []];
+  diffs: Array<Array<Diff.AsObject>> = [[], [], [], []];
   subscribers: any = {};
   username: string;
   constructor(
     private firebaseService: FirebaseService,
-    private protoService: ProtoService,
-    private appRef: ApplicationRef,
     private router: Router,
-    private zone: NgZone,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Get username from url if there is no user.
@@ -40,48 +37,34 @@ export class ReviewsPanelComponent implements OnInit {
   // Get diff/reviews from Database
   getReviews() {
     this.firebaseService.getDiffs().subscribe(
-      res => {
-        // Got the diffs as res
-        this.subscribers.proto = this.protoService.open.subscribe(error => {
-          if (error) {
-            throw error;
+      protoDiffs => {
+        // Diffs are categorized in 4 different lists
+        this.diffs[Lists.NeedAttention] = [];
+        this.diffs[Lists.CcedOn] = [];
+        this.diffs[Lists.DraftReviews] = [];
+        this.diffs[Lists.SubmittedReviews] = [];
+
+        // Iterate over each object in res
+        // and create Diff from proto and categorize
+        // into a specific list.
+        for (const protoDiff of protoDiffs) {
+          const diff: Diff.AsObject = protoDiff.toObject();
+          if (diff.needAttentionOfList.includes(this.username)) {
+            // Need attention of user
+            this.diffs[Lists.NeedAttention].push(diff);
+          } else if (diff.ccList.includes(this.username)) {
+            // User is cc'ed on this
+            this.diffs[Lists.CcedOn].push(diff);
+          } else if (diff.author === this.username && diff.status === 0) {
+            // Draft Review
+            this.diffs[Lists.DraftReviews].push(diff);
+          } else if (diff.author === this.username && diff.status === 4) {
+            // Submitted Review
+            this.diffs[Lists.SubmittedReviews].push(diff);
           }
+        }
 
-          // Diffs are categorized in 4 different lists
-
-          this.diffs[Lists.NeedAttention] = [];
-          this.diffs[Lists.CcedOn] = [];
-          this.diffs[Lists.DraftReviews] = [];
-          this.diffs[Lists.SubmittedReviews] = [];
-
-          // Get diffIds from res; they are later used in routing
-          const diffIds = Object.getOwnPropertyNames(res);
-
-          // Iterate over each object in res
-          // and create Diff from proto and categorize
-          // into a specific list.
-
-          Object.keys(res).map((value, index) => {
-            res[value].number = diffIds[index];
-            const diff = this.protoService.createDiff(res[value]);
-            if (diff.needAttentionOf.includes(this.username)) {
-              // Need attention of user
-              this.diffs[Lists.NeedAttention].push(diff);
-            } else if (diff.cc.includes(this.username)) {
-              // User is cc'ed on this
-              this.diffs[Lists.CcedOn].push(diff);
-            } else if (diff.author === this.username && diff.status === 0) {
-              // Draft Review
-              this.diffs[Lists.DraftReviews].push(diff);
-            } else if (diff.author === this.username && diff.status === 4) {
-              // Submitted Review
-              this.diffs[Lists.SubmittedReviews].push(diff);
-            }
-            // Trigger angular's change detection
-            this.appRef.tick();
-          });
-          this.sortDiffs();
-        });
+        this.sortDiffs();
       },
       () => {
         // Permission Denied
@@ -98,10 +81,8 @@ export class ReviewsPanelComponent implements OnInit {
     }
   }
 
+  // Navigate to a Diff
   diffClicked(diffId: Diff): void {
-    // Navigate to display each Diff on another page
-    this.zone.run(() => {
-      this.router.navigate(['diff/', diffId]);
-    });
+    this.router.navigate(['diff/', diffId]);
   }
 }
