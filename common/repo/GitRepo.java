@@ -21,6 +21,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.google.auto.factory.AutoFactory;
 import com.google.auto.factory.Provided;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
@@ -37,8 +38,6 @@ import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.diff.DiffEntry.ChangeType;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
@@ -47,12 +46,11 @@ import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 
 // TODO: Implement methods
@@ -60,12 +58,10 @@ import java.io.InputStreamReader;
 public class GitRepo implements Repo {
   private Git jGit;
   private Repository jGitRepo;
-  private String repoPath;
   private List<String> gitCommandBase;
+  private List<CommandResult> commandLog = new ArrayList<>();
 
   GitRepo(@Provided FileUtils fileUtils, String repoPath) {
-
-    this.repoPath = repoPath;
     gitCommandBase = Arrays.asList(
         "git",
         "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"),
@@ -93,7 +89,7 @@ public class GitRepo implements Repo {
   private String readLines(InputStream inputStream) throws IOException {
     StringBuffer output = new StringBuffer();
     BufferedReader reader =
-            new BufferedReader(new InputStreamReader(inputStream));
+        new BufferedReader(new InputStreamReader(inputStream));
     String line = "";
     while ((line = reader.readLine()) != null) {
       output.append(line + "\n");
@@ -101,11 +97,11 @@ public class GitRepo implements Repo {
     return output.toString();
   }
 
-  private CommandResult runCommand(String... command) {
+  private CommandResult runCommand(String command) {
     CommandResult result = new CommandResult();
     try {
       List<String> fullCommand = new ArrayList<>(gitCommandBase);
-      fullCommand.addAll(Arrays.asList(command));
+      fullCommand.addAll(Arrays.asList(command.split(" ")));
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
@@ -118,18 +114,29 @@ public class GitRepo implements Repo {
     if (!result.stderr.isEmpty()) {
       throw new RuntimeException(formatError(result));
     }
+    commandLog.add(result);
     return result;
   }
 
   private String formatError(CommandResult commandResult) {
-    return String.format(
+    StringBuilder result = new StringBuilder();
+    result.append(String.format(
         "\n%s\n%s",
         commandResult.command,
-        commandResult.stderr);
+        commandResult.stderr));
+    if (commandLog.size() > 0) {
+      result.append("Previous git commands (most recent is on top):\n");
+      for (CommandResult previousCommand : Lists.reverse(commandLog)) {
+        result.append(
+            String.format("\n%s\nstdout: %s\nstderr: %s",
+                commandResult.command, commandResult.stdout, commandResult.stderr));
+      }
+    }
+    return result.toString();
   }
 
   public void switchBranch(String branch) {
-    runCommand("checkout", "--quiet", "-B", branch);
+    runCommand("checkout --quiet -B " + branch);
   }
 
   public void tagHead(String name) {
@@ -140,35 +147,26 @@ public class GitRepo implements Repo {
     }
   }
 
-  private RevCommit getCommonAncenstorCommit(String branch1, String branch2) throws IOException {
-    try (RevWalk walk = new RevWalk(jGitRepo)) {
-      walk.setRevFilter(RevFilter.MERGE_BASE);
-      ObjectId branchId = jGitRepo.resolve(branch1);
-      ObjectId masterId = jGitRepo.resolve(branch2);
-      walk.markStart(walk.parseCommit(branchId));
-      walk.markStart(walk.parseCommit(masterId));
-      return walk.next();
-    }
+  private ImmutableList<String> splitLines(String string) {
+    return ImmutableList.copyOf(
+        Arrays.stream(string.split("\\r?\\n"))
+            .filter(line -> !line.isEmpty())
+            .collect(Collectors.toList()));
+  }
+
+  public ImmutableList<String> getCommitIds(String branch) {
+    CommandResult commandResult = runCommand("log --pretty=%H master.." + branch);
+    return splitLines(commandResult.stdout);
   }
 
   public ImmutableList<Commit> getCommits(String branch) {
+    ImmutableList<String> commits = getCommitIds(branch);
     ImmutableList.Builder<Commit> result = ImmutableList.builder();
-    try (RevWalk walk = new RevWalk(jGitRepo)) {
-      RevCommit divergenceCommit = getCommonAncenstorCommit(branch, "master");
-      RevCommit latestBranchCommit = walk.parseCommit(jGitRepo.resolve(branch));
-      walk.markStart(latestBranchCommit);
-      for (RevCommit rev : walk) {
-        if (rev.equals(divergenceCommit)) {
-          break;
-        }
-        result.add(Commit.newBuilder()
-            .setId(rev.getId().toString())
-            .addAllFile(getFilesInCommit(rev.getName()))
-            .build());
-      }
-      walk.dispose();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    for (String commit : commits) {
+      result.add(Commit.newBuilder()
+          .setId(commit)
+          .addAllFile(getFilesInCommit(commit))
+          .build());
     }
     return result.build();
   }
@@ -213,47 +211,40 @@ public class GitRepo implements Repo {
     return files.build();
   }
 
-  private File.Action getAction(ChangeType changeType) {
+  private File.Action getAction(String changeType) {
     switch (changeType) {
-      case ADD:
+      case "A":
         return File.Action.ADD;
-      case DELETE:
+      case "D":
         return File.Action.DELETE;
-      case RENAME:
+      case "R":
         return File.Action.RENAME;
-      case MODIFY:
+      case "M":
         return File.Action.MODIFY;
-      case COPY:
+      case "C":
         return File.Action.COPY;
+      default:
+        throw new IllegalStateException("Unknown change type " + changeType);
     }
-    throw new IllegalStateException("Unknown ChangeType " + changeType);
   }
 
   public ImmutableList<File> getFilesInCommit(String commitId) {
+    CommandResult commandResult = runCommand(
+        "diff-tree --no-commit-id --name-status -r " + commitId);
     ImmutableList.Builder<File> result = ImmutableList.builder();
-    try (ObjectReader reader = jGitRepo.newObjectReader()) {
-      ObjectId commitParent = jGitRepo.resolve(commitId + "^^{tree}");
-      ObjectId commit = jGitRepo.resolve(commitId + "^{tree}");
-
-      CanonicalTreeParser commitTreeIter = new CanonicalTreeParser();
-      commitTreeIter.reset(reader, commit);
-      CanonicalTreeParser parentTreeIter = new CanonicalTreeParser();
-      parentTreeIter.reset(reader, commitParent);
-
-      List<DiffEntry> diffs = jGit.diff()
-          .setNewTree(commitTreeIter)
-          .setOldTree(parentTreeIter)
-          .call();
-      for (DiffEntry entry : diffs) {
+    try {
+      ImmutableList<String> lines = splitLines(commandResult.stdout);
+      for (String line : lines) {
+        String[] parts = line.split("\t");
         File file = File.newBuilder()
-            .setAction(getAction(entry.getChangeType()))
+            .setAction(getAction(parts[0].trim()))
             .setCommitId(commitId)
-            .setFilename(entry.getNewPath())
+            .setFilename(parts[1].trim())
             .build();
         result.add(file);
       }
-    } catch (IOException|GitAPIException e) {
-      throw new RuntimeException(e);
+    } catch (IllegalStateException e) {
+      throw new IllegalStateException("getFilesInCommit failed for commit " + commitId, e);
     }
     return result.build();
   }
@@ -354,20 +345,17 @@ public class GitRepo implements Repo {
 
   @Override
   public void removeBranch(String branch) {
-    runCommand("branch", "--quiet", "-D", branch);
+    runCommand("branch --quiet -D " + branch);
   }
 
   @Override
   public ImmutableList<String> listBranches() {
     CommandResult commandResult = runCommand("branch");
-    ImmutableList.Builder<String> branches = new ImmutableList.Builder<>();
-    for (String branch : commandResult.stdout.split("\\r?\\n")) {
-      if (!branch.isEmpty()) {
-        // Remove leading spaces and astrix
-        branches.add(branch.substring(2));
-      }
-    }
-    return branches.build();
+    return ImmutableList.copyOf(
+        splitLines(commandResult.stdout)
+            .stream()
+            .map(branch -> branch.substring(2))
+            .collect(Collectors.toList()));
   }
 
   public String getFileContents(String commitId, String path) {
@@ -396,6 +384,6 @@ public class GitRepo implements Repo {
   }
 
   public void init() {
-    CommandResult r = runCommand("init");
+    runCommand("init");
   }
 }
