@@ -129,7 +129,7 @@ public class GitRepo implements Repo {
       for (CommandResult previousCommand : Lists.reverse(commandLog)) {
         result.append(
             String.format("\n%s\nstdout: %s\nstderr: %s",
-                commandResult.command, commandResult.stdout, commandResult.stderr));
+                previousCommand.command, previousCommand.stdout, previousCommand.stderr));
       }
     }
     return result.toString();
