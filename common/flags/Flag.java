@@ -73,7 +73,7 @@ public abstract class Flag<T> {
 
     @Override
     String parse(@Nonnull String value) {
-      return String.valueOf(value);
+      return value;
     }
   }
 
@@ -186,12 +186,12 @@ public abstract class Flag<T> {
     }
   }
 
-  protected T defaultValue;
-  protected T value;
-  protected String name;
-  protected boolean required;
+  private T defaultValue;
+  private T value;
+  private String name;
+  private boolean required;
 
-  public Flag(T defaultValue) {
+  Flag(T defaultValue) {
     this.defaultValue = defaultValue;
   }
 
@@ -223,7 +223,7 @@ public abstract class Flag<T> {
       value = parse(Flags.getDefaultFlagValue(name));
     }
     Flags.setFlagValue(name, value.toString());
-    if (prevValue != null && !prevValue.equals(value)) {
+    if ((prevValue != null) && !prevValue.equals(value)) {
       log.atSevere()
               .log("Flag value has changed between get() calls. Previous value is %s and current is %s",
               prevValue,
