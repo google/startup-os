@@ -16,11 +16,12 @@
 
 package com.google.startupos.common.flags;
 
-import com.google.common.annotations.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.flogger.FluentLogger;
 
 /**
@@ -33,22 +34,22 @@ import com.google.common.flogger.FluentLogger;
  */
 class GflagsParser {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
-  private final List<String> arguments = new ArrayList<String>();
-  private final Map<String, FlagData> flags;
+  private final List<String> arguments = new ArrayList<>();
+  private final ImmutableMap<String, FlagData> flags;
   private State state = State.EXPECT_KEY;
   private FlagData lastFlag;
 
-  enum State {
+  private enum State {
     EXPECT_KEY,
     EXPECT_VALUE,
     EXPECT_BOTH
   }
 
-  public GflagsParser(@Nonnull Map<String, FlagData> flags) {
-    this.flags = flags;
+  GflagsParser(@Nonnull Map<String, FlagData> flags) {
+    this.flags = ImmutableMap.copyOf(flags);
   }
 
-  public ParseResult parse(String[] args) {
+  ParseResult parse(String[] args) {
     for (String arg : args) {
       handleArg(arg);
     }
@@ -58,7 +59,7 @@ class GflagsParser {
     return new ParseResult(flags, arguments);
   }
 
-  void handleArg(String arg) {
+  private void handleArg(String arg) {
     if (arg.startsWith("--")) {
       handleFlagArg(arg.substring(2), arg);
     } else if (arg.startsWith("-")) {
@@ -68,7 +69,7 @@ class GflagsParser {
     }
   }
 
-  void handleFlagArg(String flag, String arg) {
+  private void handleFlagArg(String flag, String arg) {
     String[] tokens = flag.split("=", 2);
     if (tokens.length == 1) {
       handleKeyArg(flag, arg);
@@ -79,7 +80,7 @@ class GflagsParser {
     }
   }
 
-  void handleKeyArg(String key, String arg) {
+  private void handleKeyArg(String key, String arg) {
     if (state == State.EXPECT_VALUE) {
       errorFlagHasNoValue();
     }
@@ -100,7 +101,7 @@ class GflagsParser {
     }
   }
 
-  void handleKeyAndValueArg(String key, String value, String arg) {
+  private void handleKeyAndValueArg(String key, String value, String arg) {
     if (state == State.EXPECT_VALUE) {
       errorFlagHasNoValue();
     }
@@ -113,7 +114,7 @@ class GflagsParser {
     }
   }
 
-  void processFlag(FlagData flag) {
+  private void processFlag(FlagData flag) {
     if (flag.getIsBooleanFlag()) {
       Flags.setFlagValue(flag.getName(), "true");
       flag = Flags.getFlag(flag.getName());
@@ -121,21 +122,20 @@ class GflagsParser {
     } else {
       state = State.EXPECT_VALUE;
     }
-    this.lastFlag = flag;
+    lastFlag = flag;
   }
 
-  void processFalseFlag(FlagData flag, String arg) {
+  private void processFalseFlag(FlagData flag, String arg) {
     if (flag.getIsBooleanFlag()) {
       Flags.setFlagValue(flag.getName(), "false");
-      flag = Flags.getFlag(flag.getName());
     } else {
       errorUnknownFlag(arg);
     }
   }
 
-  void processValue(String value) {
-    if (state == State.EXPECT_VALUE
-        || (state == State.EXPECT_BOTH && lastFlag.getIsBooleanFlag())) {
+  private void processValue(String value) {
+    if ((state == State.EXPECT_VALUE)
+        || ((state == State.EXPECT_BOTH) && lastFlag.getIsBooleanFlag())) {
       lastFlag = lastFlag.toBuilder().setValue(value).build();
       Flags.setFlagValue(lastFlag.getName(), value);
       state = State.EXPECT_KEY;
@@ -152,18 +152,13 @@ class GflagsParser {
     log.atSevere().log("Option %s has no value", lastFlag);
   }
 
-  @VisibleForTesting
-  void setState(State state) {
-    this.state = state;
-  }
+  class ParseResult {
+    final ImmutableMap<String, FlagData> flags;
+    final ImmutableList<String> unusedArgs;
 
-  public class ParseResult {
-    public Map<String, FlagData> flags;
-    public List<String> unusedArgs;
-
-    public ParseResult(Map<String, FlagData> flags, List<String> unusedArgs) {
-      this.flags = flags;
-      this.unusedArgs = unusedArgs;
+    ParseResult(Map<String, FlagData> flags, List<String> unusedArgs) {
+      this.flags = ImmutableMap.copyOf(flags);
+      this.unusedArgs = ImmutableList.copyOf(unusedArgs);
     }
   }
 }

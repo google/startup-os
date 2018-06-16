@@ -48,7 +48,7 @@ import javassist.bytecode.annotation.Annotation;
  * <p>This class also enforces the following: - No two flags have the same flag name. - Flag
  * variable names are camelCase. - Flag names are underscore_case.
  */
-public class ClassScanner {
+class ClassScanner {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
 
   private String resourceName(String packageName) {
@@ -61,8 +61,7 @@ public class ClassScanner {
 
   private ClassFile getClassFile(JarFile jarFile, ZipEntry zipEntry) {
     if (!zipEntry.isDirectory()) {
-      try {
-        InputStream inputStream = jarFile.getInputStream(zipEntry);
+      try (InputStream inputStream = jarFile.getInputStream(zipEntry)) {
         DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(inputStream));
         return new ClassFile(dataInputStream);
       } catch (IOException e) {
@@ -79,7 +78,7 @@ public class ClassScanner {
     return urlConnection.getJarFile();
   }
 
-  private ImmutableList<Field> getClassFields(Class clazz){
+  private ImmutableList<Field> getClassFields(Class clazz) {
     ImmutableList.Builder<Field> result = ImmutableList.builder();
     Field[] fields = clazz.getDeclaredFields();
     for(Field field: fields){
@@ -151,7 +150,7 @@ public class ClassScanner {
     scan(getPackageFields(packagePrefix), flags);
   }
 
-  private void scan(List<Field> fields, Map<String,FlagData> flags){
+  private void scan(List<Field> fields, Map<String,FlagData> flags) {
     for (Field field : fields) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
         throw new IllegalArgumentException(
