@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class ReviewFilesComponent {
   @Input() files: Files;
   @Input() diffId;
+
   constructor(private router: Router) {}
 
   // Upon click on a file open a single file review page showing
