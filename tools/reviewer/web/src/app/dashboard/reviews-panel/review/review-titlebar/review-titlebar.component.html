@@ -4,7 +4,7 @@
     by
     <span [ngClass]="{ 
       'bold-text': 
-        diff.needAttentionOf.includes(diff.author),
+        diff.needAttentionOfList.includes(diff.author),
         'author-name': true
       }">
       <button mat-raised-button 
@@ -14,7 +14,7 @@
         $event.stopPropagation()"
         >
         {{ 
-          diff.needAttentionOf.indexOf(diff.author) > -1
+          diff.needAttentionOfList.indexOf(diff.author) > -1
           ? 'Remove from Needs Attention'
           : 'Add to Needs Attention'
         }}
@@ -22,45 +22,46 @@
       {{ diff.author }}
     </span>
   </div>
+
   <div class="review-status" fxFlex="100%">
     <ng-container [ngSwitch]="diff.status">
-      <ng-container *ngSwitchCase="0">
+      <ng-container *ngSwitchCase="'REVIEW_NOT_STARTED'">
         <span class="reviewNotStarted">
           <mat-icon>check_circle</mat-icon>
           Review not started
         </span>
       </ng-container>
-      <ng-container *ngSwitchCase="1">
+      <ng-container *ngSwitchCase="'NEEDS_MORE_WORK'">
         <span class="needsMoreWork">
           <mat-icon>check_circle</mat-icon>
           Needs more work
         </span>
       </ng-container>
-      <ng-container *ngSwitchCase="2">
+      <ng-container *ngSwitchCase="'UNDER_REVIEW'">
         <span class="underReview">
           <mat-icon>check_circle</mat-icon>
           Under Review
         </span>
       </ng-container>
-      <ng-container *ngSwitchCase="3">
+      <ng-container *ngSwitchCase="'ACCEPTED'">
         <span class="accepted">
           <mat-icon>check_circle</mat-icon>
           Accepted
         </span>
       </ng-container>
-      <ng-container *ngSwitchCase="4">
+      <ng-container *ngSwitchCase="'SUBMITTED'">
         <span class="submitted">
           <mat-icon>check_circle</mat-icon>
           Submitted
         </span>
       </ng-container>
-      <ng-container *ngSwitchCase="5">
+      <ng-container *ngSwitchCase="'REVERTING'">
         <span class="reverting">
           <mat-icon>check_circle</mat-icon>
           Reverting
         </span>
       </ng-container>
-      <ng-container *ngSwitchCase="6">
+      <ng-container *ngSwitchCase="'REVERTED'">
         <span class="reverted">
           <mat-icon>check_circle</mat-icon>
           Reverted

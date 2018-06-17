@@ -1,4 +1,4 @@
-import { Files } from '@/shared/services';
+import { Files } from '@/shared';
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 

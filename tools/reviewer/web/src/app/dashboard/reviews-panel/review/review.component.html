@@ -2,7 +2,7 @@
   
   <!-- Title bar -->
   <review-titlebar 
-    [diffView]="diff"
+    [diff]="diffView"
     [editable]="editable"
     (onAddToAttentionList)="saveAttentionList($event)"
     >
@@ -97,7 +97,7 @@
   </div>
 
   <!-- Files -->
-  <review-files [files]="diffView.files" [diffId]="diffId"></review-files>
+  <review-files [files]="diffView.filesList" [diffId]="diffId"></review-files>
 
   <!-- Review Comments -->
   <review-discussion [diff]="diffView"></review-discussion>

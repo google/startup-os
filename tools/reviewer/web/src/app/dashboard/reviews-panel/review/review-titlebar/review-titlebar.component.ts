@@ -1,4 +1,4 @@
-import { Diff } from '@/shared/services';
+import { Diff } from '@/shared';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
@@ -7,7 +7,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./review-titlebar.component.scss']
 })
 export class ReviewTitlebarComponent {
-  @Input() diff: Diff;
+  @Input() diff: Diff.AsObject;
   @Input() editable;
   @Output() onAddToAttentionList = new EventEmitter<string>();
   // Save needAttentionOf list

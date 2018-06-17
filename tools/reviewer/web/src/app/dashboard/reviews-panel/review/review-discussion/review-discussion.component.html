@@ -23,17 +23,14 @@
     fxLayout="column" 	       
     fxLayout.xs="column" 	       
     fxLayoutGap.xs="10px" 	        
-    *ngFor="let thread of diff.threads; let i = index">	       
+    *ngFor="let thread of diff.threadsList; let i = index">	       
     <div fxLayout="row" class="thread-header">     
       <div fxFlex="50%" class="detail">         
         {{ thread.filename }}	      
       </div>	         
       <div fxFlex="10%" class="line-number-label">	    
-        {{ thread.comments.length }} comments
+        {{ thread.commentsList.length }} comments
       </div>	
-      <!-- <div fxFlex="10%" class=""> 	
-        {{ thread.snapshot }}	
-      </div>	 -->
       <div fxFlex="100px" class="line-number-label">	
         Line number:	
       </div>	
@@ -41,7 +38,7 @@
         {{ thread.lineNumber }}	
       </div>	
     </div>	      
-    <div *ngFor="let comment of thread.comments" 	
+    <div *ngFor="let comment of thread.commentsList" 	
       class="thread-contents">	
       <div class="comment">	
         <div class="content"> 	

@@ -1,4 +1,4 @@
-import { Diff } from '@/shared/services';
+import { Diff } from '@/shared';
 import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
@@ -7,15 +7,15 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./review-discussion.component.scss']
 })
 export class ReviewDiscussionComponent {
-  @Input() diff: Diff;
+  @Input() diff: Diff.AsObject;
 
   getTotalComments(): number {
-    return this.diff.threads
-      .map(v => v.comments.length)
+    return this.diff.threadsList
+      .map(v => v.commentsList.length)
       .reduce((a, b) => a + b, 0);
   }
 
   getUnresolvedComments(): number {
-    return this.diff.threads.filter(v => !v.isDone).length;
+    return this.diff.threadsList.filter(v => !v.isDone).length;
   }
 }
