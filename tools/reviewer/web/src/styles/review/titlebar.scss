@@ -1,0 +1,48 @@
+.review-title {
+  font-size: 24px;
+  font-weight: 500;
+  background-color: #cdecff;
+  padding: 5px $pagePadding;
+  div {
+    font-weight: 400;
+  }
+  .diffNumber {
+    font-weight: 500;
+  }
+  .review-status {
+    margin-left: 30px;
+
+    span {
+      display: flex;
+      align-items: center;
+      font-size: 22px;
+      font-weight: 500;
+    }
+    .mat-icon {
+      height: 24px;
+      width: 24px;
+      font-size: 24px;
+      margin-right: 10px;
+    }
+    .reviewNotStarted {
+      color: #031190;
+    }
+    .needsMoreWork {
+      color: #c9f506;
+    }
+    .underReview {
+      color: #baa12d;
+    }
+    .accepted {
+      color: #02ca23;
+    }
+  }
+  .actions {
+    .submit button {
+      background-color: #86d1ff;
+    }
+    .reply button {
+      background-color: #ffc84b;
+    }
+  }
+}

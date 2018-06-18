@@ -14,47 +14,6 @@
       cursor: pointer;
     }
   }
-  .review-title {
-    font-size: 24px;
-    font-weight: 500;
-    background-color: #cdecff;
-    padding: 5px $pagePadding;
-    div {
-      font-weight: 400;
-    }
-    .diffNumber {
-      font-weight: 500;
-    }
-    .review-status {
-      margin-left: 30px;
-
-      span {
-        display: flex;
-        align-items: center;
-        font-size: 22px;
-        font-weight: 500;
-      }
-      .mat-icon {
-        height: 24px;
-        width: 24px;
-        font-size: 24px;
-        margin-right: 10px;
-      }
-      .underReview {
-        .mat-icon {
-          color: #baa12d;
-        }
-      }
-    }
-    .actions {
-      .submit button {
-        background-color: #86d1ff;
-      }
-      .reply button {
-        background-color: #ffc84b;
-      }
-    }
-  }
   .reviewer-name,
   .author-name {
     font-weight: 500;

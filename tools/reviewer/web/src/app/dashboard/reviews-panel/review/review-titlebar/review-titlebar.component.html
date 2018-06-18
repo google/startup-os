@@ -26,44 +26,44 @@
   <div class="review-status" fxFlex="100%">
     <ng-container [ngSwitch]="diff.status">
       <ng-container *ngSwitchCase="'REVIEW_NOT_STARTED'">
-        <span class="reviewNotStarted">
-          <mat-icon>check_circle</mat-icon>
+        <span>
+          <mat-icon class="reviewNotStarted">trip_origin</mat-icon>
           Review not started
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'NEEDS_MORE_WORK'">
-        <span class="needsMoreWork">
-          <mat-icon>check_circle</mat-icon>
+        <span>
+          <mat-icon class="needsMoreWork">build</mat-icon>
           Needs more work
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'UNDER_REVIEW'">
         <span class="underReview">
-          <mat-icon>check_circle</mat-icon>
+          <mat-icon class="underReview">message</mat-icon>
           Under Review
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'ACCEPTED'">
-        <span class="accepted">
-          <mat-icon>check_circle</mat-icon>
+        <span>
+          <mat-icon class="accepted">thumb_up</mat-icon>
           Accepted
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'SUBMITTED'">
-        <span class="submitted">
-          <mat-icon>check_circle</mat-icon>
+        <span>
+          <mat-icon class="submitted">check_circle</mat-icon>
           Submitted
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'REVERTING'">
-        <span class="reverting">
-          <mat-icon>check_circle</mat-icon>
+        <span>
+          <mat-icon class="reverting">cancel</mat-icon>
           Reverting
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'REVERTED'">
-        <span class="reverted">
-          <mat-icon>check_circle</mat-icon>
+        <span>
+          <mat-icon class="reverted">cancel</mat-icon>
           Reverted
         </span>
       </ng-container>
