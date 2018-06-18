@@ -50,7 +50,7 @@ public class ProtoVsJsonTool {
     private static final Flag<String> jsonOutput =
             Flag.create("example.json");
 
-    FileUtils fileUtils;
+    private final FileUtils fileUtils;
 
     @Inject
     ProtoVsJsonTool(FileUtils fileUtils) {
@@ -75,7 +75,7 @@ public class ProtoVsJsonTool {
     }
 
     @Singleton
-    @Component(modules = { CommonModule.class })
+    @Component(modules = CommonModule.class)
     public interface MainComponent {
         ProtoVsJsonTool getTool();
     }
