@@ -51,7 +51,7 @@ public interface Repo {
   /** Merges branch to master, preferring the changes in other branch * Returns true on success. */
   default boolean mergeTheirs(String branch) {
     return merge(branch);
-  };
+  }
   /** Is branch merged to master */
   boolean isMerged(String branch);
   /*

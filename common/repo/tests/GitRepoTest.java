@@ -37,16 +37,16 @@ import org.junit.Test;
 import javax.inject.Singleton;
 
 public class GitRepoTest {
-  private static String TEST_BRANCH = "test_branch";
-  private static String TEST_FILE = "test_file.txt";
-  private static String TEST_FILE_CONTENTS = "Some test file contents";
-  private static String COMMIT_MESSAGE = "Some commit message";
+  private static final String TEST_BRANCH = "test_branch";
+  private static final String TEST_FILE = "test_file.txt";
+  private static final String TEST_FILE_CONTENTS = "Some test file contents";
+  private static final String COMMIT_MESSAGE = "Some commit message";
 
-  GitRepoFactory gitRepoFactory;
-  Repo repo;
-  GitRepo gitRepo;
-  String repoFolder;
-  FileUtils fileUtils;
+  private GitRepoFactory gitRepoFactory;
+  private Repo repo;
+  private GitRepo gitRepo;
+  private String repoFolder;
+  private FileUtils fileUtils;
 
   @Before
   public void setup() throws IOException {
@@ -62,8 +62,8 @@ public class GitRepoTest {
   }
 
   @Singleton
-  @Component(modules = {CommonModule.class})
-  public interface TestComponent {
+  @Component(modules = CommonModule.class)
+  interface TestComponent {
     GitRepoFactory getFactory();
     FileUtils getFileUtils();
   }
