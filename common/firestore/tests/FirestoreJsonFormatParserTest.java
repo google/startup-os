@@ -36,7 +36,7 @@ public class FirestoreJsonFormatParserTest extends FirestoreJsonFormatTestBase {
             .setDoubleField1(12.34)
             .setFloatField1(56.78f)
             .setIntField1(123)
-            .setLongField1(456)
+            .setLongField1(456L)
             .setBooleanField1(true)
             .setStringField1("Some string")
             .setBytesField1(ByteString.copyFrom("abcd", UTF_8))
