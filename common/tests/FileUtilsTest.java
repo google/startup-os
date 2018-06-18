@@ -17,7 +17,9 @@
 package com.google.startupos.common;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.*;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
