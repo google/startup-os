@@ -58,6 +58,8 @@ public class LocalHttpGateway {
   private static final String GET_FILE_PATH = "/get_file";
   private static final String GET_TEXT_DIFF_PATH = "/get_text_diff";
   private static final String GET_DIFF_FILES_PATH = "/get_diff_files";
+  private static final int HTTP_STATUS_CODE_OK = 200;
+  private static final int HTTP_STATUS_CODE_NOT_FOUND = 404;
 
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
   public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
@@ -87,7 +89,7 @@ public class LocalHttpGateway {
 
   /* Handler for receiving Firestore token */
   static class FirestoreTokenHandler implements HttpHandler {
-    private LocalHttpGatewayGrpcClient client;
+    private final LocalHttpGatewayGrpcClient client;
 
     FirestoreTokenHandler(LocalHttpGatewayGrpcClient client) {
       this.client = client;
@@ -105,13 +107,13 @@ public class LocalHttpGateway {
             json.getString("jwtToken"),
             json.getString("refreshToken"));
       }
-      httpExchange.sendResponseHeaders(200, -1);
+      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, -1);
     }
   }
 
   /* Handler for serving /get_file/<file path>, <file path> is a relative path */
   static class GetFileHandler implements HttpHandler {
-    private LocalHttpGatewayGrpcClient client;
+    private final LocalHttpGatewayGrpcClient client;
 
     GetFileHandler(LocalHttpGatewayGrpcClient client) {
       this.client = client;
@@ -127,7 +129,7 @@ public class LocalHttpGateway {
       String fileContents = client.getFile(relativeFilePath);
 
       if (fileContents == null) {
-        httpExchange.sendResponseHeaders(404, 0);
+        httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_NOT_FOUND, 0);
         try (OutputStream stream = httpExchange.getResponseBody()) {
           stream.write(
             String.format("{\"error\": \"No file at path '%s'\"}", relativeFilePath).getBytes());
@@ -137,7 +139,7 @@ public class LocalHttpGateway {
 
       byte[] response = fileContents.getBytes();
 
-      httpExchange.sendResponseHeaders(200, response.length);
+      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);
       }
@@ -148,7 +150,7 @@ public class LocalHttpGateway {
    * The response is a protobin of the response proto.
    */
   static class GetTextDiffHandler implements HttpHandler {
-    private LocalHttpGatewayGrpcClient client;
+    private final LocalHttpGatewayGrpcClient client;
 
     GetTextDiffHandler(LocalHttpGatewayGrpcClient client) {
       this.client = client;
@@ -184,7 +186,7 @@ public class LocalHttpGateway {
       logger.atInfo().log("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
       byte[] response = Base64.getEncoder().encode(
           client.getCodeReviewStub().getTextDiff(request).toByteArray());
-      httpExchange.sendResponseHeaders(200, response.length);
+      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);
       }
@@ -195,7 +197,7 @@ public class LocalHttpGateway {
    * The response is a protobin of the response proto.
    */
   static class GetDiffFilesHandler implements HttpHandler {
-    private LocalHttpGatewayGrpcClient client;
+    private final LocalHttpGatewayGrpcClient client;
 
     GetDiffFilesHandler(LocalHttpGatewayGrpcClient client) {
       this.client = client;
@@ -226,16 +228,17 @@ public class LocalHttpGateway {
       logger.atInfo().log("Handling " + GET_DIFF_FILES_PATH + " request:\n" + request);
       byte[] response = Base64.getEncoder().encode(
           client.getCodeReviewStub().getDiffFiles(request).toByteArray());
-      httpExchange.sendResponseHeaders(200, response.length);
+      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);
       }
     }
   }
 
-  static String getPostParamsString(HttpExchange httpExchange){
-    BufferedReader reader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), UTF_8));
-    return reader.lines().collect(Collectors.joining());
+  static String getPostParamsString(HttpExchange httpExchange) throws IOException {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), UTF_8))) {
+      return reader.lines().collect(Collectors.joining());
+    }
   }
 
   static ImmutableMap<String, String> paramsToMap(String query){
