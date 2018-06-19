@@ -63,11 +63,11 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   private static final String DOCUMENT_FOR_LAST_DIFF_NUMBER = "data";
 
-  private AuthService authService;
-  private FileUtils fileUtils;
-  private GitRepoFactory repoFactory;
-  private String basePath;
-  private TextDifferencer textDifferencer;
+  private final AuthService authService;
+  private final FileUtils fileUtils;
+  private final GitRepoFactory repoFactory;
+  private final String basePath;
+  private final TextDifferencer textDifferencer;
 
   @Inject
   public CodeReviewService(
@@ -130,16 +130,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
         }
       }
     }
-  }
-
-  private String getAbsolutePath(String relativePath) throws SecurityException {
-    // normalize() resolves "../", to help prevent returning files outside rootPath
-    String absolutePath = Paths.get(basePath, relativePath).normalize().toString();
-    if (!absolutePath.startsWith(basePath)) {
-      throw new SecurityException("Resulting path is not under root");
-    }
-
-    return absolutePath;
   }
 
   @Override
@@ -254,7 +244,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           .listContents(workspacePath)
           .stream()
           .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
@@ -274,8 +264,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       e.printStackTrace();
     }
 
-    logger.atInfo().log("DiffFiles request\n" + request.toString());
+    logger.atInfo().log("DiffFiles request\n%s", request);
     responseObserver.onNext(response.build());
     responseObserver.onCompleted();
-  } 
+  }
 }
