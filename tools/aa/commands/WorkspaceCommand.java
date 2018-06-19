@@ -46,8 +46,8 @@ public class WorkspaceCommand implements AaCommand {
   @FlagDesc(name = "remove", description = "Remove workspace if it exists")
   public static Flag<Boolean> remove = Flag.create(false);
 
-  private FileUtils fileUtils;
-  private Config config;
+  private final FileUtils fileUtils;
+  private final Config config;
 
   // set by processArgs
   private ActionMode mode;
@@ -60,7 +60,7 @@ public class WorkspaceCommand implements AaCommand {
     this.config = config;
   }
 
-  enum ActionMode {
+  private enum ActionMode {
     CREATE, // aaw -f ws_name
     SWITCH, // aaw ws_name
     REMOVE // aaw -r ws_name

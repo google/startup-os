@@ -16,7 +16,6 @@
 
 package com.google.startupos.tools.aa.commands.tests;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -32,15 +31,10 @@ import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
 import dagger.Provides;
 import java.io.ByteArrayOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.FileSystem;
-import java.util.Arrays;
-import java.util.List;
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.inject.Singleton;
 import org.junit.After;
 import org.junit.Before;
@@ -50,15 +44,15 @@ import org.junit.Test;
 public class WorkspaceCommandTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
-  public interface TestComponent {
+  interface TestComponent {
       WorkspaceCommand getCommand();
       FileUtils getFileUtils();
   }
 
-  AaCommand workspaceCommand;
-  FileUtils fileUtils;
-  ByteArrayOutputStream outContent;
-  ByteArrayOutputStream errContent;
+  private AaCommand workspaceCommand;
+  private FileUtils fileUtils;
+  private ByteArrayOutputStream outContent;
+  private ByteArrayOutputStream errContent;
 
   @Before
   public void setup() throws IOException {
@@ -105,7 +99,7 @@ public class WorkspaceCommandTest {
   }
 
   @Test
-  public void testWorkspaceCommandWhenNoWorkspaceParam() throws Exception {
+  public void testWorkspaceCommandWhenNoWorkspaceParam() {
     String[] args = {"workspace"};
     workspaceCommand.run(args);
     assertEquals("", outContent.toString());
@@ -113,7 +107,7 @@ public class WorkspaceCommandTest {
   }
 
   @Test
-  public void testWorkspaceCommandWhenNotExists() throws Exception {
+  public void testWorkspaceCommandWhenNotExists() {
     String[] args = {"workspace", "workspace_name"};
     workspaceCommand.run(args);
     assertEquals("", outContent.toString());
@@ -121,7 +115,7 @@ public class WorkspaceCommandTest {
   }
 
   @Test
-  public void testWorkspaceCommandWhenExists() throws Exception {
+  public void testWorkspaceCommandWhenExists() {
     fileUtils.mkdirs("/base/ws/workspace_name/repo_name");
     String[] args = {"workspace", "workspace_name"};
     workspaceCommand.run(args);
