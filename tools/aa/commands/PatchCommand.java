@@ -33,7 +33,7 @@ public class PatchCommand implements AaCommand {
   private GitRepoFactory gitRepoFactory;
   private String workspacePath;
 
-  @FlagDesc(name = "diff_number", description = "Diff number to apply patch from")
+  @FlagDesc(name = "diff_number", description = "Diff number to apply patch from", required = true)
   public static Flag<Integer> diffNumber = Flag.create(-1);
 
   @Inject
@@ -67,7 +67,15 @@ public class PatchCommand implements AaCommand {
           .forEach(
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
-                repo.merge(branchName, true);
+                String currentBranchName = repo.currentBranch().trim();
+                if (!currentBranchName.startsWith("D")) {
+                  System.err.println(
+                      String.format(
+                          "Currently (%s) not on a diff branch, unable to apply changes from %s",
+                          ANSI_YELLOW + ANSI_BOLD + currentBranchName + ANSI_RESET, branchName));
+                } else {
+                  repo.merge(branchName, true);
+                }
               });
     } catch (IOException e) {
       e.printStackTrace();
