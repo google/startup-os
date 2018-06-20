@@ -2,8 +2,8 @@
   <!-- User comments -->
   <div class="comments" *ngIf="comments.length">
     <div class="comment" *ngFor="let comment of comments">
-      <div class="username text">{{comment.createdBy}}</div>
-      <pre class="message text">{{comment.content}}</pre>
+      <div class="username text">{{comment.getCreatedBy()}}</div>
+      <pre class="message text">{{comment.getContent()}}</pre>
     </div>
   </div>
 

@@ -18,11 +18,11 @@
         fxLayoutAlign="start center">
         <!-- Print out list if length is more than zero -->
         <span
-          *ngFor="let person of diff[property]; 
+          *ngFor="let person of persons; 
           let last = last"
           [ngClass]="{ 
             'bold-text': 
-              diff.needAttentionOf.includes(person),
+             diff.getNeedAttentionOfList().includes(person),
             'reviewer-name': true
             }"
           >
@@ -37,7 +37,7 @@
           {{ last ? person : person + ',&nbsp;' }}
         </span>
         <!-- If no persons are present -->
-        <span *ngIf="diff[property].length === 0">&nbsp;</span>
+        <span *ngIf="persons.length === 0">&nbsp;</span>
         <button
           class="edit-button" 
           mat-icon-button
