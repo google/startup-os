@@ -19,22 +19,40 @@
       font-weight: 500;
     }
     .mat-icon {
-      height: 24px;
-      width: 24px;
-      font-size: 24px;
+      height: 26px;
+      width: 26px;
+      font-size: 26px;
       margin-right: 10px;
     }
     .reviewNotStarted {
-      color: #031190;
+      color: #0016dd;
     }
-    .needsMoreWork {
-      color: #c9f506;
-    }
-    .underReview {
-      color: #baa12d;
+    .needsMoreWork,
+    .underReview,
+    .accepted {
+      height: 26px; 
+      min-width: 26px;
+      border-radius: 13px;
+      margin-right: 10px;
+      background-color: #c9f506;
+      .mat-icon {
+        display: flex; 
+        align-self: center;
+        margin: 0 auto;
+        color: #fff;
+        height: 18px;
+        width: 18px;
+        font-size: 18px;
+      }
     }
     .accepted {
-      color: #02ca23;
+      background-color: #02ca23;
+    }
+    .submitted {
+      color: #a2a2a2;
+    }
+    .reverted {
+      color: #ea3d3d;
     }
   }
   .actions {

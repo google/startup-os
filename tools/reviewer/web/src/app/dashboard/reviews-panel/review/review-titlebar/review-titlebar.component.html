@@ -1,5 +1,5 @@
 <div class="review-title" fxFlex>
-  <div fxFlex="200px">
+  <div fxFlex="270px">
     <span class="diffNumber"> Diff {{ diff.number }} </span> 
     by
     <span [ngClass]="{ 
@@ -33,20 +33,32 @@
       </ng-container>
       <ng-container *ngSwitchCase="'NEEDS_MORE_WORK'">
         <span>
-          <mat-icon class="needsMoreWork">build</mat-icon>
+          <span class="needsMoreWork">
+            <mat-icon class="smaller-icon">build</mat-icon>
+          </span>
           Needs more work
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'UNDER_REVIEW'">
-        <span class="underReview">
-          <mat-icon class="underReview">message</mat-icon>
+        <span>
+          <span class="underReview">
+            <mat-icon class="smaller-icon">message</mat-icon>
+          </span>
           Under Review
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'ACCEPTED'">
         <span>
-          <mat-icon class="accepted">thumb_up</mat-icon>
+          <span class="accepted">
+            <mat-icon class="smaller-icon">thumb_up</mat-icon>
+          </span>
           Accepted
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'SUBMITTING'">
+        <span>
+          <mat-icon class="submitted">check_circle</mat-icon>
+          Submitting
         </span>
       </ng-container>
       <ng-container *ngSwitchCase="'SUBMITTED'">
