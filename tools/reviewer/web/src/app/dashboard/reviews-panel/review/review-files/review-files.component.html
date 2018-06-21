@@ -1,0 +1,46 @@
+<div>
+  <div fxLayout="column" fxLayoutAlign="space-around stretch">
+    <div class="files-title" fxLayout="row">
+      <div class="title" fxFlex="100%">
+        Files
+      </div>
+      <div class="actions" 
+        fxFlex="212px"
+        fxLayoutAlign="end center">
+        <div class="expand">
+          <button>Expand</button>
+        </div>
+      </div>
+    </div>
+    <div class="review-sub-title">
+      <div fxFlex="60%">
+        File
+      </div>
+      <div fxFlex="13%" fxFlex.xs="">
+        Comments
+      </div>
+      <div fxFlex="13%" fxFlex.xs="">
+        Modified
+      </div>
+      <div fxFlex="13%" fxFlex.xs="">
+        Delta
+      </div>
+    </div>
+  </div>
+  <div class="files-info-container">
+    <div fxLayout="row" 
+      fxLayout.xs="column" 
+      fxLayoutGap.xs="10px"
+      *ngFor="let file of files; let i = index"
+      class="file-info">
+      <div fxFlex fxLayout="row">
+        <div fxFlex="60%">
+          <a class="link" 
+            (click)="openFile(file.filePosition)"> 
+            {{ file.filePosition }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
