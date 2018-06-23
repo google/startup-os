@@ -40,6 +40,8 @@ jobs:
       - run: 'npm install'
       - run: 'bazel run //tools:buildifier -- -mode=check $(find `pwd` -type f \( -name BUILD.bazel -or -name BUILD \) | grep -v node_modules) ||
               (echo "BUILD files not formatted. Please run ''yarn buildifier''" ; exit 1)'
+      - run: 'bazel run //tools/simple_formatter:simple_formatter -- --path $(pwd) --dry_run --java --python --proto --cpp ||
+              (echo "Source files not formatted. Please run ''bazel run //tools/simple_formatter:simple_formatter -- --path $(pwd) --java --python --proto --cpp''" ; exit 1)'
 
   build:
     <<: *job_defaults
