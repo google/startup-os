@@ -4,7 +4,7 @@ version: 2
 # We use a docker image as the basis for our build, so that all the toolchains we use
 # are already installed and the build can start running right away. It also guarantees
 # the environment is portable and reproducible on your local machine.
-var_1: &docker_image angular/ngcontainer:0.3.0
+var_1: &docker_image angular/ngcontainer:0.3.2
 
 # CircleCI lets us pick the key for storing one or more caches, to speed up subsequent builds.
 # We can use this to avoid re-fetching our dependencies from npm on every build.
@@ -13,7 +13,7 @@ var_1: &docker_image angular/ngcontainer:0.3.0
 # - the branch we are on, which really shouldn't be needed since the yarn lock file should be hermetic
 # - the docker image tag, working around an issue we saw where changing docker images causes permission
 #   errors when restoring the cache, like when the user we run as changes
-var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.3.0
+var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.3.2
 
 # Each job will inherit these defaults
 anchor_1: &job_defaults
@@ -37,11 +37,7 @@ jobs:
       - checkout:
           <<: *post_checkout
       - run: './pre-commit.sh'
-      - run: 'npm install'
-      - run: 'bazel run //tools:buildifier -- -mode=check $(find `pwd` -type f \( -name BUILD.bazel -or -name BUILD \) | grep -v node_modules) ||
-              (echo "BUILD files not formatted. Please run ''yarn buildifier''" ; exit 1)'
-      - run: 'bazel run -s --verbose_failures //tools/simple_formatter:simple_formatter -- --path $(pwd) --dry_run --java --python --proto --cpp ||
-              (echo "Source files not formatted. Please run ''bazel run //tools/simple_formatter:simple_formatter -- --path $(pwd) --java --python --proto --cpp''" ; exit 1)'
+      - run: './check-formatting.sh'
 
   build:
     <<: *job_defaults
