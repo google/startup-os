@@ -90,7 +90,12 @@
       <button>Submit</button>
     </div>
     <div class="reply">
-      <button>Reply</button>
+      <button (click)="showReplyDialog = !showReplyDialog">Reply</button>
+    </div>
+    <div *ngIf="showReplyDialog" class="up-arrow">
+      <div class="reply-form">
+        Button with Up Arrow
+      </div>
     </div>
   </div>
 </div>

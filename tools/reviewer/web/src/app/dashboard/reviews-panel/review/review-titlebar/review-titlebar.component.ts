@@ -10,6 +10,7 @@ export class ReviewTitlebarComponent {
   @Input() diff: Diff.AsObject;
   @Input() editable;
   @Output() onAddToAttentionList = new EventEmitter<string>();
+  showReplyDialog = false;
 
   // Save needAttentionOf list
   saveAttentionList(name: string): void {
