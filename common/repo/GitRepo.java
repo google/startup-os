@@ -389,6 +389,6 @@ public class GitRepo implements Repo {
   }
 
   public String currentBranch() {
-    return runCommand("rev-parse --abbrev-ref HEAD").stdout;
+    return runCommand("rev-parse --abbrev-ref HEAD").stdout.trim();
   }
 }

@@ -67,7 +67,7 @@ public class PatchCommand implements AaCommand {
           .forEach(
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
-                String currentBranchName = repo.currentBranch().trim();
+                String currentBranchName = repo.currentBranch();
                 if (!currentBranchName.startsWith("D")) {
                   System.err.println(
                       String.format(
