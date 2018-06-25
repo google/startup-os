@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import java.nio.file.Paths;
 import org.eclipse.jgit.api.Git;
 
-/** A command to init a base folder.
+/* A command to init a base folder.
  *
  * Usage:
  * bazel run //tools/aa:aa_tool -- init --base_path </path/to/base/folder>
