@@ -10,13 +10,6 @@ git_repository(
     remote = "https://github.com/vmax/bazel-deps-deploy",
 )
 
-# deployed version of //tools:simple_formatter
-git_repository(
-    name = "simple_formatter",
-    commit = "2034166aab69ed754f9bcbb27589d74e2b0a7300",
-    remote = "https://github.com/vmax/simple-formatter-deploy",
-)
-
 load("//third_party/maven:workspace.bzl", "maven_dependencies")
 
 maven_dependencies()

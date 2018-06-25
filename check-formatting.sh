@@ -18,7 +18,7 @@ bazel run //tools:buildifier -- -mode=check $BUILD_FILES &>/dev/null || (
 	exit 1
 )
 
-bazel run @simple_formatter//:simple_formatter_tool -- --path $(pwd) --java --python --proto --cpp --ignore_directories $(pwd)/node_modules/,$(pwd)/tools/local_server/web_login/node_modules/ &>/dev/null
+bazel run //tools/simple_formatter:simple_formatter -- --path $(pwd) --java --python --proto --cpp --ignore_directories $(pwd)/node_modules/,$(pwd)/tools/local_server/web_login/node_modules/ &>/dev/null
 if [[ ! -z $(git status -s) ]]; then
 	echo "$RED[!] Source files are not formatted$RESET";
 	echo "Please run ''./fix-formatting.sh'' to fix it"

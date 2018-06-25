@@ -15,4 +15,4 @@ echo "$RED[:] Formatting BUILD files$RESET";
 bazel run //tools:buildifier -- -mode=fix $BUILD_FILES &>/dev/null
 
 echo "$RED[:] Formatting source files$RESET";
-bazel run @simple_formatter//:simple_formatter_tool -- --path $(pwd) --java --python --proto --cpp --ignore_directories $(pwd)/node_modules/,$(pwd)/tools/local_server/web_login/node_modules/ &>/dev/null
+bazel run //tools/simple_formatter:simple_formatter -- --path $(pwd) --java --python --proto --cpp --ignore_directories $(pwd)/node_modules/,$(pwd)/tools/local_server/web_login/node_modules/ &>/dev/null
