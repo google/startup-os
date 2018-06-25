@@ -32,7 +32,7 @@ public class TextDifferencerTest {
   private TextDifferencer differencer;
 
   /** package */
-  TextChange.Builder newTextChange(int leftIndex, int rightIndex, String difference, Type type) {
+  private TextChange.Builder newTextChange(int leftIndex, int rightIndex, String difference, Type type) {
     return TextChange.newBuilder()
         .setFirstStringIndex(leftIndex)
         .setSecondStringIndex(rightIndex)
@@ -52,28 +52,28 @@ public class TextDifferencerTest {
   }
 
   @Test
-  public void testOnlyAdditions() throws Exception {
+  public void testOnlyAdditions() {
     assertEquals(
         ImmutableList.of(newTextChange(0, 0, "Addition.", Type.ADD).build()),
         differencer.getAllTextChanges("", "Addition."));
   }
 
   @Test
-  public void testOnlyDeletions() throws Exception {
+  public void testOnlyDeletions() {
     assertEquals(
         ImmutableList.of(newTextChange(0, 0, "Deletion.", Type.DELETE).build()),
         differencer.getAllTextChanges("Deletion.", ""));
   }
 
   @Test
-  public void testOnlyNoChanges() throws Exception {
+  public void testOnlyNoChanges() {
     assertEquals(
         ImmutableList.of(newTextChange(0, 0, "No Change.", Type.NO_CHANGE).build()),
         differencer.getAllTextChanges("No Change.", "No Change."));
   }
 
   @Test
-  public void testMixedChangesAtTheBeginning() throws Exception {
+  public void testMixedChangesAtTheBeginning() {
     assertEquals(
         ImmutableList.of(
             newTextChange(0, 0, "No", Type.DELETE).build(),
@@ -83,7 +83,7 @@ public class TextDifferencerTest {
   }
 
   @Test
-  public void testMixedChangesAtTheMiddle() throws Exception {
+  public void testMixedChangesAtTheMiddle() {
     assertEquals(
         ImmutableList.of(
             newTextChange(0, 0, "With ", Type.NO_CHANGE).build(),
@@ -93,7 +93,7 @@ public class TextDifferencerTest {
   }
 
   @Test
-  public void testMixedChangesAtTheEnd() throws Exception {
+  public void testMixedChangesAtTheEnd() {
     assertEquals(
         ImmutableList.of(
             newTextChange(0, 0, "No Change", Type.NO_CHANGE).build(),

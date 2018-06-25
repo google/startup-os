@@ -18,8 +18,8 @@ package com.google.startupos.common.repo.tests;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.repo.Protos;
-import com.google.startupos.common.repo.Repo;
 import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Repo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -30,7 +30,7 @@ import java.util.Map;
  * A memory repo used for testing.
  */
 public class MemoryRepo implements Repo {
-  public enum ActionOverride {
+  private enum ActionOverride {
     NONE,
     SUCCESS,
     FAIL
@@ -43,7 +43,7 @@ public class MemoryRepo implements Repo {
       this.files = files;
     }
 
-    String id;
+    final String id;
     String message;
     boolean isPushed;
     List<File> files = new ArrayList<>();
@@ -59,12 +59,12 @@ public class MemoryRepo implements Repo {
     LinkedHashMap<String, Commit> commits = new LinkedHashMap<>();
   }
 
-  Map<String, Branch> branches = new HashMap<String, Branch>();
-  String currentBranch;
-  int nextId;
-  ActionOverride nextPull;
-  ActionOverride nextPush;
-  ActionOverride nextMerge;
+  private Map<String, Branch> branches = new HashMap<>();
+  private String currentBranch;
+  private int nextId;
+  private ActionOverride nextPull;
+  private ActionOverride nextPush;
+  private ActionOverride nextMerge;
 
   public MemoryRepo() {
     currentBranch = "master";
@@ -83,7 +83,7 @@ public class MemoryRepo implements Repo {
   }
 
   public ImmutableList<Protos.Commit> getCommits(String branch) {
-    ImmutableList.Builder<Protos.Commit> result = new ImmutableList.Builder<Protos.Commit>();
+    ImmutableList.Builder<Protos.Commit> result = new ImmutableList.Builder<>();
     for (Commit commit : branches.get(branch).commits.values()) {
       result.add(Protos.Commit.newBuilder().setId(commit.id).addAllFile(commit.files).build());
     }
@@ -119,10 +119,7 @@ public class MemoryRepo implements Repo {
   }
 
   public boolean merge(String branch) {
-    if (nextMerge == ActionOverride.FAIL) {
-      return false;
-    }
-    return true;
+    return nextMerge != ActionOverride.FAIL;
   }
 
   public boolean isMerged(String branch) {
@@ -170,5 +167,9 @@ public class MemoryRepo implements Repo {
 
   public String getFileContents(String commitId, String path) {
     return "File contents";
+  }
+
+  public String currentBranch() {
+    return currentBranch;
   }
 }

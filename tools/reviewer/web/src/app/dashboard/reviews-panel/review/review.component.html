@@ -1,81 +1,12 @@
-<!--
-  This html file is too big.
-  TODO: do something with that.
--->
-
 <div *ngIf="diffView" class="single-review">
-  <!-- Title -->
-  <div class="review-title">
-    <div>
-      <span class="diffNumber"> Diff {{ diffView.number }} </span> 
-      by
-      <span [ngClass]="{ 
-        'bold-text': 
-          diffView.needAttentionOfList.includes(diffView.author),
-          'author-name': true
-        }">
-        <button mat-raised-button 
-          class="add-to-list"
-          *ngIf="editable"
-          (click)="saveAttentionList(diffView.author);
-          $event.stopPropagation()"
-          >
-          {{ 
-            diffView.needAttentionOfList.indexOf(diffView.author) > -1
-            ? 'Remove from Needs Attention'
-            : 'Add to Needs Attention'
-          }}
-        </button>
-        {{ diffView.author }}
-      </span>
-    </div>
-    <div class="review-status" fxFlex>
-      <ng-container [ngSwitch]="diffView.status">
-        <ng-container *ngSwitchCase="0">
-          <span class="reviewNotStarted">
-            <mat-icon>check_circle</mat-icon>
-            Review not started
-          </span>
-        </ng-container>
-        <ng-container *ngSwitchCase="1">
-          <span class="needsMoreWork">
-            <mat-icon>check_circle</mat-icon>
-            Needs more work
-          </span>
-        </ng-container>
-        <ng-container *ngSwitchCase="2">
-          <span class="underReview">
-            <mat-icon>check_circle</mat-icon>
-            Under Review
-          </span>
-        </ng-container>
-        <ng-container *ngSwitchCase="3">
-          <span class="accepted">
-            <mat-icon>check_circle</mat-icon>
-            Accepted
-          </span>
-        </ng-container>
-        <ng-container *ngSwitchCase="4">
-          <span class="submitted">
-            <mat-icon>check_circle</mat-icon>
-            Submitted
-          </span>
-        </ng-container>
-        <ng-container *ngSwitchCase="5">
-          <span class="reverting">
-            <mat-icon>check_circle</mat-icon>
-            Reverting
-          </span>
-        </ng-container>
-        <ng-container *ngSwitchCase="6">
-          <span class="reverted">
-            <mat-icon>check_circle</mat-icon>
-            Reverted
-          </span>
-        </ng-container>
-      </ng-container>
-    </div>
-  </div>
+  
+  <!-- Title bar -->
+  <review-titlebar 
+    [diff]="diffView"
+    [editable]="editable"
+    (onAddToAttentionList)="saveAttentionList($event)"
+    >
+  </review-titlebar>
 
   <!-- Details of the review -->
   <div class="review-details">
@@ -166,69 +97,9 @@
   </div>
 
   <!-- Files -->
-  <div>
-    <div fxLayout="column" fxLayoutAlign="space-around stretch">
-      <div class="review-title">
-        Files
-      </div>
-      <div class="review-sub-title">
-        <div fxFlex="60%">
-          File
-        </div>
-        <div fxFlex="13%" fxFlex.xs="">
-          Comments
-        </div>
-        <div fxFlex="13%" fxFlex.xs="">
-          Modified
-        </div>
-        <div fxFlex="13%" fxFlex.xs="">
-          Delta
-        </div>
-      </div>
-    </div>
-    <div class="files-info-container">
-      <div fxLayout="row" 
-        fxLayout.xs="column" 
-        fxLayoutGap.xs="10px"
-        *ngFor="let file of diffView.filesList; let i = index"
-        class="file-info">
-        <div fxFlex fxLayout="row">
-          <div fxFlex="60%">
-            <a class="link" 
-              (click)="openFile(file.filePosition)"> 
-              {{ file.filePosition }}
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <review-files [files]="diffView.filesList" [diffId]="diffId"></review-files>
 
   <!-- Review Comments -->
-  <div>
-    <div fxLayout="column" fxLayoutAlign="space-around stretch">
-      <div class="review-title">
-        Discussion
-      </div>
-      <div class="review-sub-title bold-text">
-        General discussions (
-          {{ getTotalComments() }} comments, 
-          {{ getUnresolvedComments() }} unresolved)
-      </div>
-    </div>
-    <div class="thread" 
-      fxLayout="column" 
-      fxLayout.xs="column" 
-      fxLayoutGap.xs="10px" 
-      *ngFor="let thread of diffView.threadsList; let i = index">
-      <div fxLayout="row" class="comment-file">
-        <div fxFlex="50%" class=""> 
-          {{ thread.filename }}
-        </div>
-        <div fxFlex="10%" class="line-number-label">
-          ( {{ thread.commentsList.length }} comments)
-        </div>
-      </div>
-    </div>
-  </div>
+  <review-discussion [diff]="diffView"></review-discussion>
+  
 </div>
