@@ -37,7 +37,7 @@ jobs:
       - checkout:
           <<: *post_checkout
       - restore_cache:
-          key: "bazel_cache"
+          key: "v1-bazel_cache"
       - run: './pre-commit.sh'
       - run: './check-formatting.sh'
 
@@ -54,7 +54,7 @@ jobs:
           key: "android_sdk"
 
       - restore_cache:
-          key: "bazel_cache"
+          key: "v1-bazel_cache"
 
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
@@ -73,7 +73,7 @@ jobs:
           key: "android_sdk"
           paths:
             - "/home/circleci/android_sdk"
-          key: "bazel_cache"
+          key: "v1-bazel_cache"
           paths:
             - "/home/circleci/.cache/bazel/"
 
