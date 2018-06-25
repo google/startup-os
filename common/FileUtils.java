@@ -270,24 +270,8 @@ public class FileUtils {
 
   /** Deletes all files and folders in directory. Target directory is deleted. */
   public void deleteDirectory(String path) throws IOException {
-    final Path directory = fileSystem.getPath(expandHomeDirectory(path));
-      Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Files.delete(file);
-          return FileVisitResult.CONTINUE;
-        }
+    deleteDirectoryContents(path, true);
 
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-          if (exception == null) {
-            Files.delete(dir);
-            return FileVisitResult.CONTINUE;
-          } else {
-            throw exception;
-          }
-        }
-      });
   }
 
   /** Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as unchecked. */
@@ -315,6 +299,20 @@ public class FileUtils {
 
   /** Deletes all files and folders inside directory. Target directory is not deleted. */
   public void clearDirectory(String path) throws IOException {
+    deleteDirectoryContents(path, false);
+  }
+
+  /** Deletes all files and folders inside directory. Target directory is not deleted.
+   * Rethrows exceptions as unchecked. */
+  public void clearDirectoryUnchecked(String path) {
+    try {
+      clearDirectory(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void deleteDirectoryContents(String path, boolean isTargetDirectoryRemoved) throws IOException {
     final Path folderForCleaning = fileSystem.getPath(expandHomeDirectory(path));
     Files.walkFileTree(folderForCleaning, new SimpleFileVisitor<Path>() {
       @Override
@@ -326,8 +324,12 @@ public class FileUtils {
       @Override
       public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
         if (exception == null) {
-          if(dir != folderForCleaning) {
+          if(isTargetDirectoryRemoved) {
             Files.delete(dir);
+          } else {
+            if(dir != folderForCleaning){
+              Files.delete(dir);
+            }
           }
           return FileVisitResult.CONTINUE;
         } else {
@@ -335,15 +337,5 @@ public class FileUtils {
         }
       }
     });
-  }
-
-  /** Deletes all files and folders inside directory. Target directory is not deleted.
-   * Rethrows exceptions as unchecked. */
-  public void clearDirectoryUnchecked(String path) {
-    try {
-      clearDirectory(path);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
