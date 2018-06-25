@@ -20,7 +20,8 @@ import dagger.Lazy;
 import javax.inject.Inject;
 
 class Class3 {
-  private final Lazy<Class1Interface> lazyClass1Object; // Create a possibly costly Class1 only when we use it.
+  private final Lazy<Class1Interface>
+      lazyClass1Object; // Create a possibly costly Class1 only when we use it.
   private final Class2Interface class2Object;
 
   @Inject
@@ -39,3 +40,4 @@ class Class3 {
     class2Object.printClass1ObjectStatus();
   }
 }
+

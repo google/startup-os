@@ -22,7 +22,7 @@ option java_outer_classname = "Protos";
  * The distinction between the above, is based on the fields, e.g user being
  * empty or not.
  */
- message File {
+message File {
   enum Action {
     ADD = 0;
     DELETE = 1;

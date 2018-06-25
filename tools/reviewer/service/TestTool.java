@@ -27,7 +27,6 @@ import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
 
-
 /** Test tool for CodeReviewService. */
 public class TestTool {
   private final ManagedChannel channel;
@@ -62,10 +61,8 @@ public class TestTool {
   }
 
   private TextDiffResponse getTextDiff(File leftFile, File rightFile) {
-    final TextDiffRequest request = TextDiffRequest.newBuilder()
-        .setLeftFile(leftFile)
-        .setRightFile(rightFile)
-        .build();
+    final TextDiffRequest request =
+        TextDiffRequest.newBuilder().setLeftFile(leftFile).setRightFile(rightFile).build();
     try {
       return blockingStub.getTextDiff(request);
     } catch (StatusRuntimeException e) {
@@ -75,16 +72,18 @@ public class TestTool {
   }
 
   public void runGetTextDiff() {
-    File leftFile = File.newBuilder()
-        .setRepoId("startup-os")
-        .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
-        .setFilename("WORKSPACE")
-        .build();
-    File rightFile = File.newBuilder()
-        .setRepoId("startup-os")
-        .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
-        .setFilename("WORKSPACE")
-        .build();
+    File leftFile =
+        File.newBuilder()
+            .setRepoId("startup-os")
+            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setFilename("WORKSPACE")
+            .build();
+    File rightFile =
+        File.newBuilder()
+            .setRepoId("startup-os")
+            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setFilename("WORKSPACE")
+            .build();
     System.out.println(getTextDiff(leftFile, rightFile));
   }
 
@@ -97,3 +96,4 @@ public class TestTool {
     tool.runGetTextDiff();
   }
 }
+

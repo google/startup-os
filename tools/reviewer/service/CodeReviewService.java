@@ -162,8 +162,11 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
     String diffPath = fileUtils.joinPaths(firestoreReviewRoot.get(), "data/diff");
-    Diff diff = req.getDiff().toBuilder()
-        .setAuthor(Author.newBuilder().setName(authService.getUserName()).build()).build();
+    Diff diff =
+        req.getDiff()
+            .toBuilder()
+            .setAuthor(Author.newBuilder().setName(authService.getUserName()).build())
+            .build();
     client.createDocument(diffPath, String.valueOf(diff.getNumber()), diff);
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
@@ -223,29 +226,30 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onCompleted();
   }
 
-  private ImmutableList<File> addWorkspaceAndRepoToFiles(List<File> files, String workspace, String repoId) {
-    return ImmutableList.copyOf(files.stream().map(
-        file -> file.toBuilder()
-            .setWorkspace(workspace)
-            .setRepoId(repoId).build())
-        .collect(Collectors.toList()));
+  private ImmutableList<File> addWorkspaceAndRepoToFiles(
+      List<File> files, String workspace, String repoId) {
+    return ImmutableList.copyOf(
+        files
+            .stream()
+            .map(file -> file.toBuilder().setWorkspace(workspace).setRepoId(repoId).build())
+            .collect(Collectors.toList()));
   }
 
-  private ImmutableList<Commit> addWorkspaceAndRepoToCommits(ImmutableList<Commit> commits, String workspace, String repoId) {
+  private ImmutableList<Commit> addWorkspaceAndRepoToCommits(
+      ImmutableList<Commit> commits, String workspace, String repoId) {
     ImmutableList.Builder<Commit> result = ImmutableList.builder();
     for (Commit commit : commits) {
-      ImmutableList<File> files = addWorkspaceAndRepoToFiles(commit.getFileList(), workspace, repoId);
-      commit = commit.toBuilder()
-          .clearFile()
-          .addAllFile(files)
-              .build();
+      ImmutableList<File> files =
+          addWorkspaceAndRepoToFiles(commit.getFileList(), workspace, repoId);
+      commit = commit.toBuilder().clearFile().addAllFile(files).build();
       result.add(commit);
     }
     return result.build();
   }
 
   @Override
-  public void getDiffFiles(DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
+  public void getDiffFiles(
+      DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
     String workspacePath = fileUtils.joinPaths(basePath, "ws", request.getWorkspace());
     String branch = "D" + request.getDiffId();
     DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
@@ -259,16 +263,19 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 Repo repo = repoFactory.create(path);
-                ImmutableList<Commit> commits = addWorkspaceAndRepoToCommits(
-                    repo.getCommits(branch), request.getWorkspace(), repoName);
-                ImmutableList<File> uncommittedFiles = addWorkspaceAndRepoToFiles(
-                    repo.getUncommittedFiles(), request.getWorkspace(), repoName);
-                response.addBranchInfo(BranchInfo.newBuilder()
-                    .setDiffId(request.getDiffId())
-                    .setRepoId(repoName)
-                    .addAllCommit(commits)
-                    .addAllUncommittedFile(uncommittedFiles)
-                    .build());
+                ImmutableList<Commit> commits =
+                    addWorkspaceAndRepoToCommits(
+                        repo.getCommits(branch), request.getWorkspace(), repoName);
+                ImmutableList<File> uncommittedFiles =
+                    addWorkspaceAndRepoToFiles(
+                        repo.getUncommittedFiles(), request.getWorkspace(), repoName);
+                response.addBranchInfo(
+                    BranchInfo.newBuilder()
+                        .setDiffId(request.getDiffId())
+                        .setRepoId(repoName)
+                        .addAllCommit(commits)
+                        .addAllUncommittedFile(uncommittedFiles)
+                        .build());
               });
     } catch (IOException e) {
       e.printStackTrace();
@@ -277,5 +284,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     logger.atInfo().log("DiffFiles request\n" + request.toString());
     responseObserver.onNext(response.build());
     responseObserver.onCompleted();
-  } 
+  }
 }
+
