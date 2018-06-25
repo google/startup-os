@@ -66,4 +66,6 @@ public interface Repo {
   ImmutableList<String> listBranches();
 
   String getFileContents(String commitId, String path);
+  /* Get current branch name */
+  String currentBranch();
 }

@@ -1,0 +1,96 @@
+<div class="review-title" fxFlex>
+  <div fxFlex="270px">
+    <span class="diffNumber"> Diff {{ diff.number }} </span> 
+    by
+    <span [ngClass]="{ 
+      'bold-text': 
+        diff.needAttentionOfList.includes(diff.author),
+        'author-name': true
+      }">
+      <button mat-raised-button 
+        class="add-to-list"
+        *ngIf="editable"
+        (click)="saveAttentionList(diff.author);
+        $event.stopPropagation()"
+        >
+        {{ 
+          diff.needAttentionOfList.indexOf(diff.author) > -1
+          ? 'Remove from Needs Attention'
+          : 'Add to Needs Attention'
+        }}
+      </button>
+      {{ diff.author }}
+    </span>
+  </div>
+
+  <div class="review-status" fxFlex="100%">
+    <ng-container [ngSwitch]="diff.status">
+      <ng-container *ngSwitchCase="'REVIEW_NOT_STARTED'">
+        <span>
+          <mat-icon class="reviewNotStarted">trip_origin</mat-icon>
+          Review not started
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'NEEDS_MORE_WORK'">
+        <span>
+          <span class="needsMoreWork">
+            <mat-icon class="smaller-icon">build</mat-icon>
+          </span>
+          Needs more work
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'UNDER_REVIEW'">
+        <span>
+          <span class="underReview">
+            <mat-icon class="smaller-icon">message</mat-icon>
+          </span>
+          Under Review
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'ACCEPTED'">
+        <span>
+          <span class="accepted">
+            <mat-icon class="smaller-icon">thumb_up</mat-icon>
+          </span>
+          Accepted
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'SUBMITTING'">
+        <span>
+          <mat-icon class="submitted">check_circle</mat-icon>
+          Submitting
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'SUBMITTED'">
+        <span>
+          <mat-icon class="submitted">check_circle</mat-icon>
+          Submitted
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'REVERTING'">
+        <span>
+          <mat-icon class="reverting">cancel</mat-icon>
+          Reverting
+        </span>
+      </ng-container>
+      <ng-container *ngSwitchCase="'REVERTED'">
+        <span>
+          <mat-icon class="reverted">cancel</mat-icon>
+          Reverted
+        </span>
+      </ng-container>
+    </ng-container>
+  </div>
+  <div class="action-buttons" 
+    fxLayout="row"
+    fxLayoutGap="20px"
+    fxFlex="212px"
+    fxLayoutAlign="end end">
+    <div class="submit">
+      <button>Submit</button>
+    </div>
+    <div class="reply">
+      <button>Reply</button>
+    </div>
+  </div>
+</div>
