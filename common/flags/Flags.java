@@ -64,7 +64,7 @@ public class Flags {
    */
   public static String[] parse(String[] args, String... packages) {
     instance().scanPackages(Arrays.asList(packages));
-    return _parse(args);
+    return instance._parse(args);
   }
 
   /**
@@ -75,7 +75,7 @@ public class Flags {
    */
   public static String[] parse(String[] args, Class clazz) {
     instance().scanClass(clazz);
-    return _parse(args);
+    return instance._parse(args);
   }
 
   /** Prints user-readable usage help for all flags in a given package */
@@ -94,8 +94,8 @@ public class Flags {
     if (flagData == null) {
       throw new IllegalArgumentException(
           String.format(
-              // TODO flagData is always null. Think of a more informative message
-              "Flag data '%s' is null; did you forget to call FlagData.parse()?", flagData));
+              "Flag data '%s' is null; did you forget to call FlagData.parse() or add the package for the flag?",
+              name));
     }
     if (!flagData.getHasValue()) {
       return null;
@@ -105,7 +105,7 @@ public class Flags {
 
   @VisibleForTesting
   static FlagData getFlag(String name) {
-    return getFlags().get(name);
+    return instance().flags.get(name);
   }
 
   @VisibleForTesting
@@ -119,7 +119,7 @@ public class Flags {
     } else {
       builder.setValue(value);
     }
-    getFlags().put(name, builder.setHasValue(true).build());
+    instance().flags.put(name, builder.setHasValue(true).build());
   }
 
   @VisibleForTesting
@@ -130,7 +130,7 @@ public class Flags {
   private void scanPackages(Iterable<String> packages) {
     for (String packageName : packages) {
       try {
-        classScanner.scanPackage(packageName, getFlags());
+        classScanner.scanPackage(packageName, flags);
       } catch (IOException e) {
         throw new RuntimeException("Package cannot be scanned: " + packageName, e);
       }
@@ -138,7 +138,7 @@ public class Flags {
   }
 
   private void scanClass(Class clazz) {
-    classScanner.scanClass(clazz, getFlags());
+    classScanner.scanClass(clazz, flags);
   }
 
   private static Flags instance() {
@@ -154,8 +154,8 @@ public class Flags {
     instance = new Flags(new ClassScanner(), new HashMap<>());
   }
 
-  private static String[] _parse(String[] args) {
-    GflagsParser parser = new GflagsParser(getFlags());
+  private String[] _parse(String[] args) {
+    GflagsParser parser = new GflagsParser(flags);
     return parser.parse(args).unusedArgs.toArray(new String[0]);
   }
 

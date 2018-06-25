@@ -111,7 +111,7 @@ public class TextDifferencer {
    * Generate matching text changes for the given range. The implementation assumes that all the
    * characters within the given range are equal.
    *
-   * // TODO Check params description
+   * // TODO Check params description in Javadoc matches actual method params
    * @param contentFirst The contents of the first string.
    * @param beginFirst The beginning index of the matching character range of the first string.
    * @param beginSecond The beginning index of the matching character range of the second string.
@@ -135,7 +135,7 @@ public class TextDifferencer {
    * Generate non matching text changes for the given range. Non matching text changes are changes
    * which contains at least one change between the given strings.
    *
-   * // TODO Check params description
+   * // TODO Check params description in Javadoc matches actual method params
    * @param contentFirst The contents of the first string.
    * @param beginFirst The beginning index of the matching character range of the first string.
    * @param beginSecond The beginning index of the matching character range of the second string.

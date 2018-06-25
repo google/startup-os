@@ -21,7 +21,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
@@ -134,16 +133,14 @@ public class FlagsTest {
   }
 
   @Test
-  public void printUsageTest() throws IOException {
+  public void printUsageTest() {
     PrintStream stdout = System.out;
-    String result;
-    try (ByteArrayOutputStream catchStream = new ByteArrayOutputStream()) {
-      System.setOut(new PrintStream(catchStream));
+    ByteArrayOutputStream catchStream = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(catchStream));
 
-      Flags.parse(new String[0], TESTFLAGS_PACKAGE);
-      Flags.printUsage();
-      result = new String(catchStream.toByteArray());
-    }
+    Flags.parse(new String[0], TESTFLAGS_PACKAGE);
+    Flags.printUsage();
+    String result = new String(catchStream.toByteArray());
 
     System.setOut(stdout);
     System.out.print(result);
