@@ -291,7 +291,7 @@ public class FileUtils {
   }
 
   /** Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as unchecked. */
-  public void deleteDirectoryUnchecked(String path){
+  public void deleteDirectoryUnchecked(String path) {
     try {
       deleteDirectory(path);
     } catch (IOException e) {
@@ -305,9 +305,43 @@ public class FileUtils {
   }
 
   /** Deletes file or folder, rethrows exceptions as unchecked. */
-  public void deleteFileOrDirectoryIfExistsUnchecked(String path){
+  public void deleteFileOrDirectoryIfExistsUnchecked(String path) {
     try {
       deleteFileOrDirectoryIfExists(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Deletes all files and folders inside directory. Target directory is not deleted. */
+  public void clearDirectory(String path) throws IOException {
+    final Path folderForCleaning = fileSystem.getPath(expandHomeDirectory(path));
+    Files.walkFileTree(folderForCleaning, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Files.delete(file);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
+        if (exception == null) {
+          if(dir != folderForCleaning) {
+            Files.delete(dir);
+          }
+          return FileVisitResult.CONTINUE;
+        } else {
+          throw exception;
+        }
+      }
+    });
+  }
+
+  /** Deletes all files and folders inside directory. Target directory is not deleted.
+   * Rethrows exceptions as unchecked. */
+  public void clearDirectoryUnchecked(String path) {
+    try {
+      clearDirectory(path);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
