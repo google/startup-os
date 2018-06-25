@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package com.google.startupos.common;
+package com.google.startupos.common;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
@@ -25,7 +25,7 @@ import java.io.IOException;
 
 /** Git utils */
 public class Git {
-  private org.eclipse.jgit.api.Git git;
+  private final org.eclipse.jgit.api.Git git;
 
   public Git(String repoPath) {
     FileRepositoryBuilder builder = new FileRepositoryBuilder();
@@ -83,4 +83,3 @@ public class Git {
     }
   }
 }
-

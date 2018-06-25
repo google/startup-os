@@ -66,13 +66,12 @@ public class FirestoreClient {
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
       connection.setRequestProperty("Authorization", "Bearer " + token);
-      BufferedReader reader =
-          new BufferedReader(new InputStreamReader(connection.getInputStream()));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        result.append(line);
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          result.append(line);
+        }
       }
-      reader.close();
       if (connection.getResponseCode() != HTTP_OK) {
         throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
       }
@@ -91,7 +90,7 @@ public class FirestoreClient {
     try {
       URL url = new URL(getCreateDocumentUrl(path, documentId));
 
-      String prototxt = JsonFormat.printer().print(proto);
+      JsonFormat.printer().print(proto);
       String json = FirestoreJsonFormat.printer().print(proto);
       byte[] postDataBytes = json.getBytes("UTF-8");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -116,9 +115,11 @@ public class FirestoreClient {
         stream = connection.getInputStream();
       }
 
-      Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-
-      for (int c; (c = in.read()) >= 0; ) System.out.print((char) c);
+      try (Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"))) {
+        for (int c; (c = in.read()) >= 0; ) {
+          System.out.print((char) c);
+        }
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

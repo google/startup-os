@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 import { Diff, FirebaseService, NotificationService } from '@/shared';
 
@@ -24,7 +24,6 @@ export class ReviewComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private firebaseService: FirebaseService,
-    private router: Router,
     private notificationService: NotificationService
   ) { }
 
@@ -48,16 +47,6 @@ export class ReviewComponent implements OnInit {
         // Permission Denied
       }
     );
-  }
-
-  // Upon click on a file open a single file review page showing
-  // code difference and comments
-  openFile(filePosition): void {
-    // Build a route path on the following format /diff/<diff number>/<path>?
-    // ls=<left snapshot number>&rs=<right snapshot number>
-    this.router.navigate(['diff/' + this.diffId + '/' + filePosition], {
-      queryParams: { ls: '1', rs: '3' }
-    });
   }
 
   // Save needAttentionOf list and update the Diff
@@ -99,15 +88,5 @@ export class ReviewComponent implements OnInit {
         this.notificationService.error('Some error occured');
       }
     );
-  }
-
-  getTotalComments(): number {
-    return this.diffView.threadsList
-      .map(v => v.commentsList.length)
-      .reduce((a, b) => a + b, 0);
-  }
-
-  getUnresolvedComments(): number {
-    return this.diffView.threadsList.filter(v => !v.isDone).length;
   }
 }
