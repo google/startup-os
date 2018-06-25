@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 class SimpleFormatterTool {
 
-  static String readAllFile(Path path) throws IOException {
+  static String readFile(Path path) throws IOException {
     return String.join(System.lineSeparator(), Files.readAllLines(path));
   }
 
@@ -63,7 +63,7 @@ class SimpleFormatterTool {
         Path tempFilePath = Paths.get(tempFile.getAbsolutePath());
         // write formatted text to temporary file first
         Files.write(
-            tempFilePath, Collections.singleton(javaFormatter.formatSource(readAllFile(path))));
+            tempFilePath, Collections.singleton(javaFormatter.formatSource(readFile(path))));
         // move temporary file to original
         Files.move(tempFilePath, path, StandardCopyOption.REPLACE_EXISTING);
       } catch (FormatterException e) {
