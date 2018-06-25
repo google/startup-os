@@ -163,7 +163,6 @@ class SimpleFormatterTool {
   public static void main(String[] args) {
     Flags.parse(args, SimpleFormatterTool.class.getPackage());
 
-    int exit_code = 0;
     Set<Path> ignoredDirectories =
         Stream.of(ignoreDirectories.get().split(","))
             .map(path -> Paths.get(path))
@@ -178,7 +177,6 @@ class SimpleFormatterTool {
             if (dryRun.get()) {
               System.out.println(
                   String.format("Intending to format: %s", path.toAbsolutePath().toString()));
-              exit_code = 1;
             } else {
               System.out.println(String.format("Formatting: %s", path.toAbsolutePath().toString()));
               formatters.get(getExtension(path)).format(path);
@@ -192,7 +190,5 @@ class SimpleFormatterTool {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
-    System.exit(exit_code);
   }
 }
