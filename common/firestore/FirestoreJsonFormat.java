@@ -117,11 +117,11 @@ public class FirestoreJsonFormat {
 
     private JsonObject wrapJsonPrimitive(JsonElement json, JavaType type) {
       JsonObject wrapper = new JsonObject();
-      if (type == JavaType.STRING || type == JavaType.BYTE_STRING) {
+      if ((type == JavaType.STRING) || (type == JavaType.BYTE_STRING)) {
         wrapper.addProperty("stringValue", json.getAsString());
-      } else if (type == JavaType.ENUM || type == JavaType.INT || type == JavaType.LONG) {
+      } else if ((type == JavaType.ENUM) || (type == JavaType.INT) || (type == JavaType.LONG)) {
         wrapper.addProperty("integerValue", json.getAsLong());
-      } else if (type == JavaType.FLOAT || type == JavaType.DOUBLE) {
+      } else if ((type == JavaType.FLOAT) || (type == JavaType.DOUBLE)) {
         wrapper.addProperty("doubleValue", json.getAsDouble());
       } else if (type == JavaType.BOOLEAN) {
         wrapper.addProperty("booleanValue", json.getAsBoolean());
@@ -153,12 +153,11 @@ public class FirestoreJsonFormat {
   /** A Parser parses Firestore JSON to protobuf message. */
   public static class Parser {
 
-    private static String[] PRIMITIVE_KEYS =
-        new String[] {"doubleValue", "integerValue", "booleanValue", "stringValue"};
-    private static String MAP_KEY = "mapValue";
-    private static String MAP_FIELDS_KEY = "fields";
-    private static String ARRAY_KEY = "arrayValue";
-    private static String ARRAY_VALUES_KEY = "values";
+    private static final String[] PRIMITIVE_KEYS = {"doubleValue", "integerValue", "booleanValue", "stringValue"};
+    private static final String MAP_KEY = "mapValue";
+    private static final String MAP_FIELDS_KEY = "fields";
+    private static final String ARRAY_KEY = "arrayValue";
+    private static final String ARRAY_VALUES_KEY = "values";
 
     private Parser() {}
 

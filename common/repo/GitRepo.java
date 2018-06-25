@@ -54,10 +54,10 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 // TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
-  private Git jGit;
-  private Repository jGitRepo;
-  private List<String> gitCommandBase;
-  private List<CommandResult> commandLog = new ArrayList<>();
+  private final Git jGit;
+  private final Repository jGitRepo;
+  private final List<String> gitCommandBase;
+  private final List<CommandResult> commandLog = new ArrayList<>();
 
   GitRepo(@Provided FileUtils fileUtils, String repoPath) {
     gitCommandBase =
@@ -77,18 +77,19 @@ public class GitRepo implements Repo {
     }
   }
 
-  class CommandResult {
-    String command;
-    String stdout;
-    String stderr;
+  private class CommandResult {
+    private String command;
+    private String stdout;
+    private String stderr;
   }
 
   private String readLines(InputStream inputStream) throws IOException {
     StringBuffer output = new StringBuffer();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-    String line = "";
-    while ((line = reader.readLine()) != null) {
-      output.append(line + "\n");
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        output.append(line).append('\n');
+      }
     }
     return output.toString();
   }
@@ -116,8 +117,11 @@ public class GitRepo implements Repo {
 
   private String formatError(CommandResult commandResult) {
     StringBuilder result = new StringBuilder();
-    result.append(String.format("\n%s\n%s", commandResult.command, commandResult.stderr));
-    if (commandLog.size() > 0) {
+    result.append(String.format(
+        "\n%s\n%s",
+        commandResult.command,
+        commandResult.stderr));
+    if (!commandLog.isEmpty()) {
       result.append("Previous git commands (most recent is on top):\n");
       for (CommandResult previousCommand : Lists.reverse(commandLog)) {
         result.append(
@@ -360,27 +364,23 @@ public class GitRepo implements Repo {
   }
 
   public String getFileContents(String commitId, String path) {
-    ObjectReader objectReader = null;
-    try {
+    try (ObjectReader objectReader = jGitRepo.newObjectReader();
+         RevWalk revWalk = new RevWalk(objectReader)) {
       final ObjectId objectId = jGitRepo.resolve(commitId);
-      objectReader = jGitRepo.newObjectReader();
-      RevWalk revWalk = new RevWalk(objectReader);
       RevCommit revCommit = revWalk.parseCommit(objectId);
       RevTree revTree = revCommit.getTree();
-      TreeWalk treeWalk = TreeWalk.forPath(objectReader, path, revTree);
-      if (treeWalk == null) {
-        throw new IllegalStateException(
-            String.format("TreeWalk is null for commitId %s and path %s".format(commitId, path)));
+      byte[] data;
+      try (TreeWalk treeWalk = TreeWalk.forPath(objectReader, path, revTree)) {
+        if (treeWalk == null) {
+          throw new IllegalStateException(
+              String.format("TreeWalk is null for commitId %s and path %s", commitId, path));
+        }
+        // Index 0 should have file data
+        data = objectReader.open(treeWalk.getObjectId(0)).getBytes();
       }
-      // Index 0 should have file data
-      byte[] data = objectReader.open(treeWalk.getObjectId(0)).getBytes();
       return new String(data, UTF_8);
     } catch (Exception e) {
       throw new RuntimeException(e);
-    } finally {
-      if (objectReader != null) {
-        objectReader.close();
-      }
     }
   }
 

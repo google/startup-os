@@ -41,7 +41,7 @@ import javax.inject.Inject;
 @Singleton
 public class FileUtils {
   private final String userHome;
-  private FileSystem fileSystem;
+  private final FileSystem fileSystem;
 
   @Inject
   FileUtils(FileSystem fileSystem, @Named("Home folder") String userHome) {
@@ -180,9 +180,7 @@ public class FileUtils {
         100000, // Folder depth
         (unused, unused2) -> true)) {
       return ImmutableList.sortedCopyOf(
-          paths.map(
-              absolutePath -> absolutePath.toString())
-              .collect(Collectors.toList()));
+          paths.map(Path::toString).collect(Collectors.toList()));
     }
 }
 
