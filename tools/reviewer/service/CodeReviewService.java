@@ -38,6 +38,7 @@ import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
 import com.google.startupos.tools.reviewer.service.Protos.DiffFilesResponse;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
+import com.google.startupos.tools.reviewer.service.Protos.PongResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -283,6 +284,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
     logger.atInfo().log("DiffFiles request\n" + request.toString());
     responseObserver.onNext(response.build());
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
+    responseObserver.onNext(PongResponse.newBuilder().setMsg("pong").build());
     responseObserver.onCompleted();
   }
 }

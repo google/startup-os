@@ -227,3 +227,9 @@ load(
 )
 
 _java_image_repos()
+
+http_jar(
+    name = "grpc_polyglot",
+    sha256 = "c2a453921632c0c3559f9df92e1699b69c784181f36a316f9927b70f52e5a7d5",
+    url = "https://github.com/grpc-ecosystem/polyglot/releases/download/v1.6.0/polyglot.jar"
+)
