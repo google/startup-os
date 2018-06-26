@@ -14,7 +14,7 @@ import {
   ReviewDiscussionComponent,
   ReviewFilesComponent,
   ReviewsPanelComponent,
-  ReviewTitlebarComponent
+  ReviewTitlebarComponent,
 } from './reviews-panel/';
 
 export const DashboardComponents = [

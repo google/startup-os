@@ -1,7 +1,8 @@
-import { AuthService, FirebaseService, Lists } from '@/shared';
-import { Diff } from '@/shared/shell/proto/code-review_pb';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { AuthService, FirebaseService, Lists } from '@/shared';
+import { Diff, Reviewer } from '@/shared/shell/proto/code-review_pb';
 
 @Component({
   selector: 'app-reviews-panel',
@@ -9,62 +10,58 @@ import { Router } from '@angular/router';
   styleUrls: ['./reviews-panel.component.scss']
 })
 export class ReviewsPanelComponent implements OnInit {
-  diffs: Array<Array<Diff.AsObject>> = [[], [], [], []];
-  subscribers: any = {};
-  username: string;
+  isLoading: boolean = true;
+  diffGroups: Array<Array<Diff.AsObject>> = [[], [], [], []];
+
   constructor(
     private firebaseService: FirebaseService,
+    private authService: AuthService,
     private router: Router,
-    private authService: AuthService
   ) { }
 
   ngOnInit() {
     // Get username from url if there is no user.
     // Get the loggedIn username from its email.
-    this.username = this.router.parseUrl(this.router.url).queryParams['user'];
-    if (!this.username) {
-      // Get user from AuthService
-      this.authService.getUser().subscribe(user => {
-        if (user) {
-          const email = user.email;
-          this.username = email.split('@')[0];
-        }
-      });
-    }
     this.getReviews();
   }
 
   // Get diff/reviews from Database
   getReviews() {
     this.firebaseService.getDiffs().subscribe(
-      protoDiffs => {
+      diffs => {
         // Diffs are categorized in 4 different lists
-        this.diffs[Lists.NeedAttention] = [];
-        this.diffs[Lists.CcedOn] = [];
-        this.diffs[Lists.DraftReviews] = [];
-        this.diffs[Lists.SubmittedReviews] = [];
+        this.diffGroups[Lists.NeedAttention] = [];
+        this.diffGroups[Lists.CcedOn] = [];
+        this.diffGroups[Lists.DraftReviews] = [];
+        this.diffGroups[Lists.SubmittedReviews] = [];
 
         // Iterate over each object in res
         // and create Diff from proto and categorize
         // into a specific list.
-        for (const protoDiff of protoDiffs) {
-          const diff: Diff.AsObject = protoDiff.toObject();
-          if (diff.needAttentionOfList.includes(this.username)) {
-            // Need attention of user
-            this.diffs[Lists.NeedAttention].push(diff);
-          } else if (diff.ccList.includes(this.username)) {
-            // User is cc'ed on this
-            this.diffs[Lists.CcedOn].push(diff);
-          } else if (diff.author === this.username && diff.status === 0) {
-            // Draft Review
-            this.diffs[Lists.DraftReviews].push(diff);
-          } else if (diff.author === this.username && diff.status === 4) {
-            // Submitted Review
-            this.diffs[Lists.SubmittedReviews].push(diff);
+        for (const diff of diffs) {
+          for (const reviewer of diff.getReviewerList()) {
+            if (reviewer.getEmail() === this.authService.userEmail) {
+              if (reviewer.getNeedsattention()) {
+                // Need attention of user
+                this.diffGroups[Lists.NeedAttention].push(diff.toObject());
+              } else {
+                // User is cc'ed on this
+                this.diffGroups[Lists.CcedOn].push(diff.toObject());
+              }
+            } else if (reviewer.getEmail() === this.authService.userEmail) {
+              if (diff.getStatus() === Diff.Status.REVIEW_NOT_STARTED) {
+                // Draft Review
+                this.diffGroups[Lists.NeedAttention].push(diff.toObject());
+              } else if (diff.getStatus() === Diff.Status.SUBMITTED) {
+                // Submitted Review
+                this.diffGroups[Lists.CcedOn].push(diff.toObject());
+              }
+            }
           }
         }
 
         this.sortDiffs();
+        this.isLoading = false;
       },
       () => {
         // Permission Denied
@@ -74,15 +71,21 @@ export class ReviewsPanelComponent implements OnInit {
 
   // Sort the diffs based on their date modified
   sortDiffs(): void {
-    for (const list of this.diffs) {
-      list.sort((a, b) => {
+    for (const diffList of this.diffGroups) {
+      diffList.sort((a, b) => {
         return Math.sign(b.modifiedTimestamp - a.modifiedTimestamp);
       });
     }
   }
 
   // Navigate to a Diff
-  diffClicked(diffId: Diff): void {
+  diffClicked(diffId: number): void {
     this.router.navigate(['diff/', diffId]);
+  }
+
+  getUsernames(reviewerList: Reviewer.AsObject[]): string {
+    return reviewerList
+      .map(reviewer => this.authService.getUsername(reviewer.email))
+      .join(', ');
   }
 }

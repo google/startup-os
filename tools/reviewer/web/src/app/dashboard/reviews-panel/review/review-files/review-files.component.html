@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="!isLoading">
   <div fxLayout="column" fxLayoutAlign="space-around stretch">
     <div class="files-title" fxLayout="row">
       <div class="title" fxFlex="100%">
@@ -31,13 +31,13 @@
     <div fxLayout="row" 
       fxLayout.xs="column" 
       fxLayoutGap.xs="10px"
-      *ngFor="let file of files; let i = index"
+      *ngFor="let file of fileList; let i = index"
       class="file-info">
       <div fxFlex fxLayout="row">
         <div fxFlex="60%">
           <a class="link" 
-            (click)="openFile(file.filePosition)"> 
-            {{ file.filePosition }}
+            (click)="openFile(file.getFilename())"> 
+            {{ file.getFilename() }}
           </a>
         </div>
       </div>

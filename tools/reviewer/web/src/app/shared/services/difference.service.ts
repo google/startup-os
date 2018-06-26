@@ -6,15 +6,16 @@ export class DifferenceService {
     const changes: number[] = [];
     const oldLines: string[] = oldCode.split('\n');
     const newLines: string[] = newCode.split('\n');
-    if (oldLines.length !== newLines.length) {
-      // TODO: add multiline changes supporting
-      throw new Error('Multiline changes are not supported.');
-    }
-    oldLines.forEach((v, i) => {
+
+    // TODO: Use localserver response instead.
+
+    const minLength: number = Math.min(oldLines.length, newLines.length);
+    for (let i = 0; i < minLength; i++) {
       if (oldLines[i] !== newLines[i]) {
         changes.push(i);
       }
-    });
+    }
+
     return changes;
   }
 }

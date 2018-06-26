@@ -5,9 +5,6 @@
 @import 'global';
 @import 'reviewsPanel';
 @import 'login';
-
-@import 'review/singleReview';
-@import 'review/titlebar';
-
+@import 'review.component.scss';
 @import 'layout/notification';
 @import 'layout/toolbar';

@@ -1,21 +1,23 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
-import { User } from 'firebase/app';
-import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class AuthService {
-  user: string;
+  isOnline: boolean;
+  userEmail: string;
 
   constructor(public angularFireAuth: AngularFireAuth) {
     this.angularFireAuth.authState.subscribe(userData => {
-      this.user = userData ? userData.email.split('@')[0] : undefined;
+      this.isOnline = !!userData;
+      if (userData) {
+        this.userEmail = userData.email;
+      }
     });
   }
 
-  getUser(): Observable<User> {
-    return this.angularFireAuth.authState;
+  getUsername(userEmail: string): string {
+    return userEmail.split('@')[0];
   }
 
   loginWithGoogle() {

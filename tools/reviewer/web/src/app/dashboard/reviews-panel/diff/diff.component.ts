@@ -1,13 +1,25 @@
+// NOTICE: it's actually not a diff, it's a two files changes
+// TODO: rename the component and linked files
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Http } from '@angular/http';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Comment, Diff, Thread } from '@/shared';
-import { DifferenceService, FirebaseService } from '@/shared/services';
+import {
+  Comment,
+  Diff,
+  File,
+  TextDiffRequest,
+  TextDiffResponse,
+  Thread
+} from '@/shared';
+import {
+  DifferenceService,
+  EncodingService,
+  FirebaseService,
+  NotificationService,
+} from '@/shared/services';
 import { DiffService } from './diff.service';
-
-// TODO: load files from server
-import { files } from './mock-files';
 
 // The component implements a diff
 @Component({
@@ -17,22 +29,22 @@ import { files } from './mock-files';
 })
 export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
-  filename: string;
-  files: string[] = files;
+  textDiffResponse: TextDiffResponse;
   changes: number[];
-  snapshot: number;
   localThreads: Thread[];
   diff: Diff;
   newCommentSubscription: Subscription;
+  filename: string;
 
   constructor(
     private activatedRoute: ActivatedRoute,
     private differenceService: DifferenceService,
     private firebaseService: FirebaseService,
-    private diffService: DiffService
+    private diffService: DiffService,
+    private encodingService: EncodingService,
+    private notificationService: NotificationService,
+    private http: Http,
   ) {
-    this.changes = this.differenceService.compare(files[0], files[1]);
-
     this.newCommentSubscription = this.diffService.newComment.subscribe(
       param => {
         this.addComment(param.lineNumber, param.comments);
@@ -40,19 +52,46 @@ export class DiffComponent implements OnInit, OnDestroy {
     );
   }
 
-  addComment(lineNumber: number, comments: Comment[]): void {
-    if (comments.length === 1) {
-      // Create a thread, if it's first comment
-      const newThread = new Thread();
-      newThread.setSnapshot(this.snapshot);
-      newThread.setLineNumber(lineNumber);
-      newThread.setFilename(this.filename);
-      newThread.setIsDone(false);
-      newThread.setCommentsList(comments);
-      this.diff.addThreads(newThread);
-    }
+  getFileChanges(): void {
+    const textDiffRequest = new TextDiffRequest();
 
-    this.firebaseService.updateDiff(this.diff).subscribe();
+    // Temperoally hardcoded data
+    // TODO: take the data from somewhere else (url?)
+    const leftFile = new File();
+    leftFile.setFilename('tools/reviewer/service/TestTool.java');
+    leftFile.setRepoId('startup-os');
+    leftFile.setCommitId('9cd8786e852f8a2992d3b53f5d2daa4399622051');
+    const rightFile = new File();
+    rightFile.setFilename('tools/reviewer/service/TestTool.java');
+    rightFile.setRepoId('startup-os');
+    rightFile.setCommitId('6dadc371ec040664c1491813e7548bfd0cca4434');
+
+    textDiffRequest.setLeftFile(leftFile);
+    textDiffRequest.setRightFile(rightFile);
+
+    const requestBinary = textDiffRequest.serializeBinary();
+    const requestBase64 = this.encodingService
+      .encodeUint8ArrayToBase64String(requestBinary);
+
+    this.http
+      .get('http://localhost:7000/get_text_diff?request=' + requestBase64)
+      .map(response => response.text())
+      .subscribe(textDiffResponse => {
+        const responsBinary = this.encodingService
+          .decodeBase64StringToUint8Array(textDiffResponse);
+        this.textDiffResponse = TextDiffResponse
+          .deserializeBinary(responsBinary);
+
+        // TODO: use textDiffResponse.getChangesList() instead
+        this.changes = this.differenceService.compare(
+          this.textDiffResponse.getLeftFileContents(),
+          this.textDiffResponse.getRightFileContents(),
+        );
+
+        this.isLoading = false;
+      }, () => {
+        this.notificationService.error('Local server error');
+      });
   }
 
   ngOnInit() {
@@ -63,22 +102,49 @@ export class DiffComponent implements OnInit, OnDestroy {
       .map(v => v.path)
       .join('/');
 
-    this.snapshot = parseInt(urlSnapshot.queryParams['rs'], 10) || null;
-
     const diffId = urlSnapshot.url[0].path;
     this.firebaseService.getDiff(diffId).subscribe(
       diff => {
         this.diff = diff;
         this.localThreads = this.diff
-          .getThreadsList()
-          .filter(v => v.getFilename() === this.filename);
+          .getThreadList()
+          .filter(v => v.getFile().getFilename() === this.filename);
 
-        this.isLoading = false;
+        this.getFileChanges();
       },
       () => {
         // Access denied
       }
     );
+  }
+
+  addComment(lineNumber: number, comments: Comment[]): void {
+    if (comments.length === 1) {
+      // Create new thread
+      const newThread: Thread = this.createNewThread(lineNumber, comments);
+      this.diff.addThread(newThread);
+    }
+
+    this.firebaseService.updateDiff(this.diff).subscribe();
+  }
+
+  createNewThread(lineNumber: number, comments: Comment[]): Thread {
+    const newThread = new Thread();
+    newThread.setLineNumber(lineNumber);
+    newThread.setIsDone(false);
+    newThread.setCommentList(comments);
+
+    // Temperoally hardcoded data
+    // TODO: take the data from localserver response
+    newThread.setRepoId('startup-os');
+    newThread.setCommitId('hardcoded-id');
+    const file = new File();
+    file.setFilename(this.filename);
+    file.setRepoId(newThread.getRepoId());
+    file.setWorkspace(this.diff.getWorkspace());
+    newThread.setFile(file);
+
+    return newThread;
   }
 
   ngOnDestroy() {

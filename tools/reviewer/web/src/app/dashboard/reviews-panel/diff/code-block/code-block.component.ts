@@ -1,3 +1,5 @@
+// There's a bug. Lines with more than 100 chars cross borders of code block.
+// TODO: fix the bug
 import {
   ChangeDetectorRef,
   Component,
@@ -114,7 +116,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   // Bootstrap method.
   initLines(fileContent: string): void {
     // TODO: detect language
-    const language = 'python';
+    const language = 'java';
     const highlightedCode = this.highlightService.highlight(
       fileContent,
       language
@@ -153,7 +155,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     }
     for (const thread of threads) {
       const i = thread.getLineNumber();
-      this.lines[i].comments = thread.getCommentsList();
+      this.lines[i].comments = thread.getCommentList();
       this.openCommentsBlock(i);
     }
   }

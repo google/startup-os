@@ -1,6 +1,7 @@
-import { Files } from '@/shared';
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { File } from '@/shared/shell';
 
 @Component({
   selector: 'review-files',
@@ -8,18 +9,19 @@ import { Router } from '@angular/router';
   styleUrls: ['./review-files.component.scss']
 })
 export class ReviewFilesComponent {
-  @Input() files: Files;
-  @Input() diffId;
+  isLoading: boolean = true;
+  @Input() fileList: File[];
+  @Input() diffId: number;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
+
+  ngOnInit() {
+    this.isLoading = false;
+  }
 
   // Upon click on a file open a single file review page showing
   // code difference and comments
-  openFile(filePosition): void {
-    // Build a route path on the following format /diff/<diff number>/<path>?
-    // ls=<left snapshot number>&rs=<right snapshot number>
-    this.router.navigate(['diff/' + this.diffId + '/' + filePosition], {
-      queryParams: { ls: '1', rs: '3' }
-    });
+  openFile(filename: string): void {
+    this.router.navigate(['diff/' + this.diffId + '/' + filename]);
   }
 }

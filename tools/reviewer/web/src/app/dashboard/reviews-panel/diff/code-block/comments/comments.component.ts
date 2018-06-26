@@ -91,7 +91,7 @@ export class CommentsComponent implements OnInit {
   addComment(): void {
     const comment = new Comment();
     comment.setContent(this.textareaControl.value);
-    comment.setCreatedBy(this.authService.user);
+    comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());
 
     this.comments.push(comment);

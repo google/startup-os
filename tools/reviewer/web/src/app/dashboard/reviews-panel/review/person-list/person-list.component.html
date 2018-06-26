@@ -7,7 +7,7 @@
   <div fxFlex="150px" fxFlex.xs="" 
     fxLayoutAlign="start center" 
     class="property">
-    {{ property | titlecase }}
+    {{ title }}
   </div>
   <div fxFlex class="detail">
     
@@ -18,26 +18,25 @@
         fxLayoutAlign="start center">
         <!-- Print out list if length is more than zero -->
         <span
-          *ngFor="let person of persons; 
+          *ngFor="let reviewer of diff.getReviewerList(); 
           let last = last"
           [ngClass]="{ 
-            'bold-text': 
-             diff.getNeedAttentionOfList().includes(person),
+            'bold-text': reviewer.getNeedsattention(),
             'reviewer-name': true
             }"
           >
           <button mat-raised-button 
             class="add-to-list"
             *ngIf="editable && enableAddToAttention"
-            (click)="saveAttentionList(person);
+            (click)="saveAttentionList();
             $event.stopPropagation()"
             >
-            {{ getNeedAttentionText(person) }}
+            {{ getNeedAttentionText(reviewer) }}
           </button>
-          {{ last ? person : person + ',&nbsp;' }}
+          {{ last ? reviewer.getEmail() : reviewer.getEmail() + ',&nbsp;' }}
         </span>
         <!-- If no persons are present -->
-        <span *ngIf="persons.length === 0">&nbsp;</span>
+        <span *ngIf="reviewers.length === 0">&nbsp;</span>
         <button
           class="edit-button" 
           mat-icon-button
@@ -52,10 +51,10 @@
         *ngIf="showEditableProperty">
         <mat-form-field fxFlex>
           <input matInput placeholder="" 
-            [(ngModel)]="propertyValue"
+            [(ngModel)]="reviewerEmails"
             (keyup.enter)=
             "showEditableProperty = false; 
-            savePropertyValue()"
+            saveAttentionList()"
             >
         </mat-form-field>
         <div
@@ -78,7 +77,7 @@
               mat-icon-button 
               color="primary"
               (click)="showEditableProperty = false; 
-              savePropertyValue()"
+              saveAttentionList()"
               >
               <mat-icon>done</mat-icon>
             </button>
