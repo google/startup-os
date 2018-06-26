@@ -7,8 +7,8 @@ import { Diff } from '@/shared/shell';
   selector: 'app-editable-property',
   templateUrl: './editable-property.component.html',
   styleUrls: ['./editable-property.component.scss']
-}
-)export class EditablePropertyComponent {
+})
+export class EditablePropertyComponent {
   @Input() diff: Diff;
   // Property name in Diff, e.g 'bug' or 'description'.
   // The property value is stored in propertyValue
