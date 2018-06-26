@@ -16,7 +16,6 @@
 
 package com.google.startupos.common.repo.tests;
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -65,6 +64,7 @@ public class GitRepoTest {
   @Component(modules = CommonModule.class)
   interface TestComponent {
     GitRepoFactory getFactory();
+
     FileUtils getFileUtils();
   }
 
@@ -109,9 +109,15 @@ public class GitRepoTest {
     String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(0);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder().setId(commitId).addFile(
-                File.newBuilder().setAction(
-                    File.Action.ADD).setCommitId(commitId).setFilename(TEST_FILE).build()).build()),
+            Commit.newBuilder()
+                .setId(commitId)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.ADD)
+                        .setCommitId(commitId)
+                        .setFilename(TEST_FILE)
+                        .build())
+                .build()),
         repo.getCommits(TEST_BRANCH));
   }
 
@@ -126,15 +132,25 @@ public class GitRepoTest {
     String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(1);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder().setId(commitId1).addFile(
-                File.newBuilder().setAction(File.Action.MODIFY)
-                    .setCommitId(commitId1)
-                    .setFilename(TEST_FILE)
-                    .build())
+            Commit.newBuilder()
+                .setId(commitId1)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.MODIFY)
+                        .setCommitId(commitId1)
+                        .setFilename(TEST_FILE)
+                        .build())
                 .build(),
-            Commit.newBuilder().setId(commitId2).addFile(
-                File.newBuilder().setAction(
-                    File.Action.ADD).setCommitId(commitId2).setFilename(TEST_FILE).build()).build()),
+            Commit.newBuilder()
+                .setId(commitId2)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.ADD)
+                        .setCommitId(commitId2)
+                        .setFilename(TEST_FILE)
+                        .build())
+                .build()),
         repo.getCommits(TEST_BRANCH));
   }
 }
+

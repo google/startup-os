@@ -117,10 +117,7 @@ public class GitRepo implements Repo {
 
   private String formatError(CommandResult commandResult) {
     StringBuilder result = new StringBuilder();
-    result.append(String.format(
-        "\n%s\n%s",
-        commandResult.command,
-        commandResult.stderr));
+    result.append(String.format("\n%s\n%s", commandResult.command, commandResult.stderr));
     if (!commandLog.isEmpty()) {
       result.append("Previous git commands (most recent is on top):\n");
       for (CommandResult previousCommand : Lists.reverse(commandLog)) {
@@ -365,7 +362,7 @@ public class GitRepo implements Repo {
 
   public String getFileContents(String commitId, String path) {
     try (ObjectReader objectReader = jGitRepo.newObjectReader();
-         RevWalk revWalk = new RevWalk(objectReader)) {
+        RevWalk revWalk = new RevWalk(objectReader)) {
       final ObjectId objectId = jGitRepo.resolve(commitId);
       RevCommit revCommit = revWalk.parseCommit(objectId);
       RevTree revTree = revCommit.getTree();
@@ -392,3 +389,4 @@ public class GitRepo implements Repo {
     return runCommand("rev-parse --abbrev-ref HEAD").stdout.trim();
   }
 }
+

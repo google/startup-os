@@ -8,9 +8,9 @@
 // Clang JSON compilation database is a way to tell tools that operate on C++
 // how what flags and paths they need in order to parse it.
 
+#include <cstdlib>
 #include <fstream>
 #include <string>
-#include <cstdlib>
 
 #include <unistd.h>
 
@@ -61,14 +61,14 @@ int main(int argc, char **argv) {
   // Path to the current sandbox. This path is not valid after the extra action
   // completes.
 
-  #ifdef _GNU_SOURCE
+#ifdef _GNU_SOURCE
   root["directory"] = get_current_dir_name();
-  #else
+#else
   size_t directory_buffer_size = sizeof(char) * 1024;
-  char *directory_buffer = (char*) malloc(directory_buffer_size);
+  char *directory_buffer = (char *)malloc(directory_buffer_size);
   getcwd(directory_buffer, directory_buffer_size);
   root["directory"] = directory_buffer;
-  #endif
+#endif
 
   Json::Value arguments;
   arguments.resize(cpp_info.compiler_option_size());

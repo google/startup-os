@@ -24,3 +24,4 @@ import javax.inject.Singleton;
 public interface CommonComponent {
   FileUtils getFileUtils();
 }
+

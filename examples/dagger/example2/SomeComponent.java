@@ -20,7 +20,8 @@ import dagger.Component;
 import javax.inject.Singleton;
 
 @Singleton
-@Component(modules = { Class2Module.class })
+@Component(modules = {Class2Module.class})
 public interface SomeComponent {
   Class3 getClass3Object();
 }
+

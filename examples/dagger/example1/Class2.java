@@ -31,3 +31,4 @@ class Class2 {
     class1Object.setFalse();
   }
 }
+

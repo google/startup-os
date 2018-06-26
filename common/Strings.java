@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package com.google.startupos.common;
+package com.google.startupos.common;
 
 import org.apache.commons.lang3.StringUtils;
 

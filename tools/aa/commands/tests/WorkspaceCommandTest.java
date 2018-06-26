@@ -46,13 +46,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class WorkspaceCommandTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   public interface TestComponent {
-      WorkspaceCommand getCommand();
-      FileUtils getFileUtils();
+    WorkspaceCommand getCommand();
+
+    FileUtils getFileUtils();
   }
 
   AaCommand workspaceCommand;
@@ -64,17 +64,28 @@ public class WorkspaceCommandTest {
   public void setup() throws IOException {
     // XXX parametrize test
     FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix());
-    TestComponent component = DaggerWorkspaceCommandTest_TestComponent.builder()
-        .commonModule(new CommonModule() {
-          @Override @Provides @Singleton public FileSystem provideDefaultFileSystem() {
-            return fileSystem;
-          }
-        })
-        .aaModule(new AaModule() {
-          @Override @Provides @Singleton @Named("Base path") public String provideBasePath(FileUtils fileUtils) {
-            return "/base";
-          }
-        }).build();
+    TestComponent component =
+        DaggerWorkspaceCommandTest_TestComponent.builder()
+            .commonModule(
+                new CommonModule() {
+                  @Override
+                  @Provides
+                  @Singleton
+                  public FileSystem provideDefaultFileSystem() {
+                    return fileSystem;
+                  }
+                })
+            .aaModule(
+                new AaModule() {
+                  @Override
+                  @Provides
+                  @Singleton
+                  @Named("Base path")
+                  public String provideBasePath(FileUtils fileUtils) {
+                    return "/base";
+                  }
+                })
+            .build();
     fileUtils = component.getFileUtils();
     initEmptyWorkspace();
     workspaceCommand = component.getCommand();
@@ -85,7 +96,7 @@ public class WorkspaceCommandTest {
     Flags.resetForTesting();
     WorkspaceCommand.force.resetValueForTesting();
   }
-  
+
   @After
   public void restoreStream() {
     System.setErr(System.err);
@@ -93,11 +104,8 @@ public class WorkspaceCommandTest {
   }
 
   private void initEmptyWorkspace() throws IOException {
-    ImmutableList<String> paths = ImmutableList.of(
-        "/base/head",
-        "/base/local",
-        "/base/logs",
-        "/base/ws");
+    ImmutableList<String> paths =
+        ImmutableList.of("/base/head", "/base/local", "/base/logs", "/base/ws");
     for (String path : paths) {
       fileUtils.mkdirs(path);
     }
@@ -143,3 +151,4 @@ public class WorkspaceCommandTest {
     // assertEquals("cd /base/ws/workspace_name\n", outContent.toString());
   }
 }
+
