@@ -41,14 +41,14 @@ import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class InitCommandTest {
 
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   public interface TestComponent {
-      InitCommand getCommand();
-      FileUtils getFileUtils();
+    InitCommand getCommand();
+
+    FileUtils getFileUtils();
   }
 
   AaCommand initCommand;
@@ -58,12 +58,18 @@ public class InitCommandTest {
   public void setup() {
     // XXX parametrize test
     FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix());
-    TestComponent component = DaggerInitCommandTest_TestComponent.builder()
-        .commonModule(new CommonModule() {
-          @Provides @Singleton @Override public FileSystem provideDefaultFileSystem() {
-            return fileSystem;
-          }
-        }).build();
+    TestComponent component =
+        DaggerInitCommandTest_TestComponent.builder()
+            .commonModule(
+                new CommonModule() {
+                  @Provides
+                  @Singleton
+                  @Override
+                  public FileSystem provideDefaultFileSystem() {
+                    return fileSystem;
+                  }
+                })
+            .build();
     initCommand = component.getCommand();
     fileUtils = component.getFileUtils();
   }
@@ -71,9 +77,10 @@ public class InitCommandTest {
   @Test
   public void initCommandTest() throws Exception {
     String[] args = {
-        "--base_path","/path/to/base",
-        "--startupos_repo","",
-        "--user", "bob"};
+      "--base_path", "/path/to/base",
+      "--startupos_repo", "",
+      "--user", "bob"
+    };
     initCommand.run(args);
     ImmutableList<String> paths = fileUtils.listContentsRecursively("/");
     assertEquals(
@@ -88,6 +95,7 @@ public class InitCommandTest {
             "/path/to/base/logs",
             "/path/to/base/ws",
             "/work"),
-        paths);    
+        paths);
   }
 }
+

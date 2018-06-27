@@ -6,13 +6,13 @@ option java_package = "com.google.startupos.common.tests";
 option java_outer_classname = "Protos";
 
 message TestMessage {
-    enum BooleanEnum {
-        UNKNOWN = 0;
-        YES = 1;
-        NO = 2;
-    }
-    int32 int32_field = 1;
-    string string_field = 2;
-    map<string, int32> map_field = 3;
-    BooleanEnum enum_field = 4;
+  enum BooleanEnum {
+    UNKNOWN = 0;
+    YES = 1;
+    NO = 2;
+  }
+  int32 int32_field = 1;
+  string string_field = 2;
+  map<string, int32> map_field = 3;
+  BooleanEnum enum_field = 4;
 }

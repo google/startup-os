@@ -27,3 +27,4 @@ public class DummyCheck implements FixCommandCheck {
     return "dummy";
   }
 }
+

@@ -24,3 +24,4 @@ abstract class Class2Module {
   @Binds
   abstract Class2Interface provideClass2Interface(Class2Impl class2Object);
 }
+

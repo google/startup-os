@@ -83,7 +83,7 @@ public class LocalServer {
   }
 
   @Singleton
-  @Component(modules = { CommonModule.class, AaModule.class })
+  @Component(modules = {CommonModule.class, AaModule.class})
   public interface LocalServerComponent {
     LocalServer getLocalServer();
   }
@@ -95,3 +95,4 @@ public class LocalServer {
     server.blockUntilShutdown();
   }
 }
+

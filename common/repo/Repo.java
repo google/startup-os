@@ -69,3 +69,4 @@ public interface Repo {
   /* Get current branch name */
   String currentBranch();
 }
+

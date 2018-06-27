@@ -70,7 +70,8 @@ message Diff {
 
   int64 firestore_id = 1;
   int64 number = 2;
-  // The main author of the diff, though certain snapshots can be made by others.
+  // The main author of the diff, though certain snapshots can be made by
+  // others.
   Author author = 3;
   repeated Reviewer reviewer = 4;
   string description = 5;
