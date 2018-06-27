@@ -22,7 +22,10 @@ import javax.inject.Singleton;
 
 @Module
 class Class1Module {
-  @Provides @Singleton Class1Interface provideAImpl() {
+  @Provides
+  @Singleton
+  Class1Interface provideAImpl() {
     return new Class1Impl();
   }
 }
+

@@ -66,7 +66,8 @@ public class FirestoreClient {
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
       connection.setRequestProperty("Authorization", "Bearer " + token);
-      try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+      try (BufferedReader reader =
+          new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
         String line;
         while ((line = reader.readLine()) != null) {
           result.append(line);
@@ -125,3 +126,4 @@ public class FirestoreClient {
     }
   }
 }
+

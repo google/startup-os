@@ -128,9 +128,7 @@ public abstract class Flag<T> {
 
     @Override
     List<String> parse(@Nonnull String value) {
-      return Arrays.stream(value.split(","))
-          .map(String::valueOf)
-          .collect(Collectors.toList());
+      return Arrays.stream(value.split(",")).map(String::valueOf).collect(Collectors.toList());
     }
   }
 
@@ -141,9 +139,7 @@ public abstract class Flag<T> {
 
     @Override
     List<Boolean> parse(@Nonnull String value) {
-      return Arrays.stream(value.split(","))
-          .map(Boolean::valueOf)
-          .collect(Collectors.toList());
+      return Arrays.stream(value.split(",")).map(Boolean::valueOf).collect(Collectors.toList());
     }
   }
 
@@ -154,9 +150,7 @@ public abstract class Flag<T> {
 
     @Override
     List<Integer> parse(@Nonnull String value) {
-      return Arrays.stream(value.split(","))
-          .map(Integer::valueOf)
-          .collect(Collectors.toList());
+      return Arrays.stream(value.split(",")).map(Integer::valueOf).collect(Collectors.toList());
     }
   }
 
@@ -167,9 +161,7 @@ public abstract class Flag<T> {
 
     @Override
     List<Long> parse(@Nonnull String value) {
-      return Arrays.stream(value.split(","))
-          .map(Long::valueOf)
-          .collect(Collectors.toList());
+      return Arrays.stream(value.split(",")).map(Long::valueOf).collect(Collectors.toList());
     }
   }
 
@@ -180,9 +172,7 @@ public abstract class Flag<T> {
 
     @Override
     List<Double> parse(@Nonnull String value) {
-      return Arrays.stream(value.split(","))
-          .map(Double::valueOf)
-          .collect(Collectors.toList());
+      return Arrays.stream(value.split(",")).map(Double::valueOf).collect(Collectors.toList());
     }
   }
 
@@ -225,9 +215,9 @@ public abstract class Flag<T> {
     Flags.setFlagValue(name, value.toString());
     if ((prevValue != null) && !prevValue.equals(value)) {
       log.atSevere()
-              .log("Flag value has changed between get() calls. Previous value is %s and current is %s",
-              prevValue,
-              value);
+          .log(
+              "Flag value has changed between get() calls. Previous value is %s and current is %s",
+              prevValue, value);
     }
     if (required && value.equals(Flags.getDefaultFlagValue(name))) {
       throw new IllegalArgumentException(
@@ -236,3 +226,4 @@ public abstract class Flag<T> {
     return value;
   }
 }
+

@@ -28,6 +28,9 @@ class Class2Impl implements Class2Interface {
 
   @Override
   public void printClass1ObjectStatus() {
-    System.out.println("Class2Impl.printClass1ObjectStatus(): Class1Object's booleanValue is " + class1Object.getBooleanValue());
+    System.out.println(
+        "Class2Impl.printClass1ObjectStatus(): Class1Object's booleanValue is "
+            + class1Object.getBooleanValue());
   }
 }
+

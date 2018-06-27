@@ -60,14 +60,14 @@ public class LocalHttpGatewayGrpcClient {
     }
   }
 
-  public void postAuthData(String projectId, String apiKey, String jwtToken,
-      String refreshToken) {
-    final AuthDataRequest request = AuthDataRequest.newBuilder()
-        .setProjectId(projectId)
-        .setApiKey(apiKey)
-        .setJwtToken(jwtToken)
-        .setRefreshToken(refreshToken)
-        .build();
+  public void postAuthData(String projectId, String apiKey, String jwtToken, String refreshToken) {
+    final AuthDataRequest request =
+        AuthDataRequest.newBuilder()
+            .setProjectId(projectId)
+            .setApiKey(apiKey)
+            .setJwtToken(jwtToken)
+            .setRefreshToken(refreshToken)
+            .build();
     try {
       authBlockingStub.postAuthData(request);
     } catch (StatusRuntimeException e) {
@@ -79,3 +79,4 @@ public class LocalHttpGatewayGrpcClient {
     return codeReviewBlockingStub;
   }
 }
+
