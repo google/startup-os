@@ -78,9 +78,10 @@ public class DiffCommand implements AaCommand {
   }
 
   private ImmutableList<Reviewer> getReviewers(String reviewersInput) {
-    return ImmutableList.copyOf(Arrays.stream(reviewersInput.split(",")).map(
-        reviewer -> Reviewer.newBuilder().setName(reviewer.trim()).build())
-        .collect(Collectors.toList()));
+    return ImmutableList.copyOf(
+        Arrays.stream(reviewersInput.split(","))
+            .map(reviewer -> Reviewer.newBuilder().setName(reviewer.trim()).build())
+            .collect(Collectors.toList()));
   }
 
   private Diff createDiff() {
@@ -163,3 +164,4 @@ public class DiffCommand implements AaCommand {
     return true;
   }
 }
+

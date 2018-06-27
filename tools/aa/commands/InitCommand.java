@@ -24,13 +24,13 @@ import javax.inject.Inject;
 import java.nio.file.Paths;
 import org.eclipse.jgit.api.Git;
 
-/** A command to init a base folder.
+/* A command to init a base folder.
  *
  * Usage:
  * bazel run //tools/aa:aa_tool -- init --base_path </path/to/base/folder>
  * or, if aa is already set up:
  * aa init --base_path </path/to/base/folder>
-*/
+ */
 // TODO: Make aa init work without --base_path, i.e `aa init <base_path>`
 public class InitCommand implements AaCommand {
   public static final String BASE_FILENAME = "BASE";
@@ -39,7 +39,8 @@ public class InitCommand implements AaCommand {
   public static Flag<String> basePath = Flag.create("");
 
   @FlagDesc(name = "startupos_repo", description = "StartupOS git repo")
-  public static Flag<String> startuposRepo = Flag.create("https://github.com/google/startup-os.git");
+  public static Flag<String> startuposRepo =
+      Flag.create("https://github.com/google/startup-os.git");
 
   private FileUtils fileUtils;
 
@@ -91,3 +92,4 @@ public class InitCommand implements AaCommand {
     return true;
   }
 }
+

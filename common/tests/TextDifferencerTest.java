@@ -32,7 +32,8 @@ public class TextDifferencerTest {
   private TextDifferencer differencer;
 
   /** package */
-  private TextChange.Builder newTextChange(int leftIndex, int rightIndex, String difference, Type type) {
+  private TextChange.Builder newTextChange(
+      int leftIndex, int rightIndex, String difference, Type type) {
     return TextChange.newBuilder()
         .setFirstStringIndex(leftIndex)
         .setSecondStringIndex(rightIndex)
@@ -79,7 +80,7 @@ public class TextDifferencerTest {
             newTextChange(0, 0, "No", Type.DELETE).build(),
             newTextChange(1, 0, "With", Type.ADD).build(),
             newTextChange(2, 4, " Change.", Type.NO_CHANGE).build()),
-            differencer.getAllTextChanges("No Change.", "With Change."));
+        differencer.getAllTextChanges("No Change.", "With Change."));
   }
 
   @Test
@@ -89,7 +90,7 @@ public class TextDifferencerTest {
             newTextChange(0, 0, "With ", Type.NO_CHANGE).build(),
             newTextChange(5, 5, "a ", Type.ADD).build(),
             newTextChange(5, 7, "Change.", Type.NO_CHANGE).build()),
-            differencer.getAllTextChanges("With Change.", "With a Change."));
+        differencer.getAllTextChanges("With Change.", "With a Change."));
   }
 
   @Test
@@ -99,6 +100,7 @@ public class TextDifferencerTest {
             newTextChange(0, 0, "No Change", Type.NO_CHANGE).build(),
             newTextChange(9, 9, ".", Type.DELETE).build(),
             newTextChange(9, 9, "!", Type.ADD).build()),
-            differencer.getAllTextChanges("No Change.", "No Change!"));
+        differencer.getAllTextChanges("No Change.", "No Change!"));
   }
 }
+

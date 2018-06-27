@@ -84,7 +84,7 @@ public class FirestoreJsonFormat {
             json.add(key, wrapJsonPrimitive(value, JavaType.STRING));
           } else {
             json.add(key, wrapJsonPrimitive(value, protoField.getJavaType()));
-          }          
+          }
         } else {
           throw new UnsupportedOperationException("No support yet for JsonNull");
         }
@@ -153,7 +153,9 @@ public class FirestoreJsonFormat {
   /** A Parser parses Firestore JSON to protobuf message. */
   public static class Parser {
 
-    private static final String[] PRIMITIVE_KEYS = {"doubleValue", "integerValue", "booleanValue", "stringValue"};
+    private static final String[] PRIMITIVE_KEYS = {
+      "doubleValue", "integerValue", "booleanValue", "stringValue"
+    };
     private static final String MAP_KEY = "mapValue";
     private static final String MAP_FIELDS_KEY = "fields";
     private static final String ARRAY_KEY = "arrayValue";
@@ -210,9 +212,7 @@ public class FirestoreJsonFormat {
           result.add(key, primitive);
         } else if (value.has(MAP_KEY)) {
           if (value.getAsJsonObject(MAP_KEY).entrySet().isEmpty()) {
-            result.add(
-              key,
-              value.getAsJsonObject(MAP_KEY));
+            result.add(key, value.getAsJsonObject(MAP_KEY));
           } else {
             result.add(
                 key,
@@ -245,3 +245,4 @@ public class FirestoreJsonFormat {
     }
   }
 }
+

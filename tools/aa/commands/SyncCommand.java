@@ -110,3 +110,4 @@ public class SyncCommand implements AaCommand {
     return true;
   }
 }
+

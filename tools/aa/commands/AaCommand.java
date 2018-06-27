@@ -28,3 +28,4 @@ public interface AaCommand {
   // TODO: implement ability to interrupt commands
   // with leaving workspace in defined state
 }
+

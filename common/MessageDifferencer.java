@@ -458,7 +458,8 @@ public final class MessageDifferencer {
 
   private static IgnoreCriteria ignoringFields(
       final ImmutableCollection<FieldDescriptor> fieldDescriptors) {
-    return (message1, message2, fieldDescriptor, fieldPath) -> fieldDescriptors.contains(fieldDescriptor);
+    return (message1, message2, fieldDescriptor, fieldPath) ->
+        fieldDescriptors.contains(fieldDescriptor);
   }
 
   static IgnoreCriteria mergeCriteria(final Iterable<IgnoreCriteria> criteria) {
@@ -1601,3 +1602,4 @@ public final class MessageDifferencer {
     }
   }
 }
+

@@ -38,7 +38,6 @@ import java.util.Base64;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
 
-
 /*
  * LocalHttpGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
  * client (which in turn communicates to gRPC server and responds) and returns responses
@@ -68,10 +67,12 @@ public class LocalHttpGateway {
   public static final Flag<Integer> localServerPort = Flag.create(8001);
 
   private LocalHttpGateway(int httpGatewayPort, int localServerPort) throws Exception {
-    logger.atInfo().log(String.format(
-        "Starting gateway at port %d (local server at port %d)",
-        httpGatewayPort,
-        localServerPort));
+    logger
+        .atInfo()
+        .log(
+            String.format(
+                "Starting gateway at port %d (local server at port %d)",
+                httpGatewayPort, localServerPort));
     httpServer = HttpServer.create(new InetSocketAddress(httpGatewayPort), 0);
     LocalHttpGatewayGrpcClient client =
         new LocalHttpGatewayGrpcClient("localhost", localServerPort);
@@ -97,12 +98,14 @@ public class LocalHttpGateway {
 
     public void handle(HttpExchange httpExchange) throws IOException {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
-          "Origin, X-Requested-With, Content-Type, Accept");
+      httpExchange
+          .getResponseHeaders()
+          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.atInfo().log("Handling token post request");
         JSONObject json = new JSONObject(getPostParamsString(httpExchange));
-        client.postAuthData(json.getString("projectId"),
+        client.postAuthData(
+            json.getString("projectId"),
             json.getString("apiKey"),
             json.getString("jwtToken"),
             json.getString("refreshToken"));
@@ -121,8 +124,9 @@ public class LocalHttpGateway {
 
     public void handle(HttpExchange httpExchange) throws IOException {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
-          "Origin, X-Requested-With, Content-Type, Accept");
+      httpExchange
+          .getResponseHeaders()
+          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       String requestPath = httpExchange.getRequestURI().getPath();
       String relativeFilePath = requestPath.substring(GET_FILE_PATH.length());
       logger.atInfo().log("Handling get_file request for " + relativeFilePath);
@@ -132,8 +136,8 @@ public class LocalHttpGateway {
         httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_NOT_FOUND, 0);
         try (OutputStream stream = httpExchange.getResponseBody()) {
           stream.write(
-            String.format("{\"error\": \"No file at path '%s'\"}", relativeFilePath).getBytes());
-        }        
+              String.format("{\"error\": \"No file at path '%s'\"}", relativeFilePath).getBytes());
+        }
         return;
       }
 
@@ -159,15 +163,14 @@ public class LocalHttpGateway {
     private void printExampleEncodedBytes() {
       // Here's an example of a url that should work, based on the example below:
       // http://localhost:7000/get_text_diff?request=CkEKCVJFQURNRS5tZCIKc3RhcnR1cC1vcyooMTEyZGEyN2IzMjFlZDZhYTJlYzFiYzkxZjM5MThlYjQxZDhhOTM4YxJBCglSRUFETUUubWQiCnN0YXJ0dXAtb3MqKDExMmRhMjdiMzIxZWQ2YWEyZWMxYmM5MWYzOTE4ZWI0MWQ4YTkzOGM=
-      File file = File.newBuilder()
-          .setRepoId("startup-os")
-          .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
-          .setFilename("README.md")
-          .build();
-      final TextDiffRequest request = TextDiffRequest.newBuilder()
-          .setLeftFile(file)
-          .setRightFile(file)
-          .build();
+      File file =
+          File.newBuilder()
+              .setRepoId("startup-os")
+              .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+              .setFilename("README.md")
+              .build();
+      final TextDiffRequest request =
+          TextDiffRequest.newBuilder().setLeftFile(file).setRightFile(file).build();
       byte[] bytes = request.toByteArray();
       String encodedBytes = Base64.getEncoder().encodeToString(bytes);
       System.out.println("encodedBytes");
@@ -176,16 +179,18 @@ public class LocalHttpGateway {
 
     public void handle(HttpExchange httpExchange) throws IOException {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
-          "Origin, X-Requested-With, Content-Type, Accept");
+      httpExchange
+          .getResponseHeaders()
+          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       // TODO: Remove printExampleEncodedBytes() once integration is working
       printExampleEncodedBytes();
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
       String requestString = params.get("request");
-      TextDiffRequest request = TextDiffRequest.parseFrom(Base64.getDecoder().decode(requestString));
+      TextDiffRequest request =
+          TextDiffRequest.parseFrom(Base64.getDecoder().decode(requestString));
       logger.atInfo().log("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
-      byte[] response = Base64.getEncoder().encode(
-          client.getCodeReviewStub().getTextDiff(request).toByteArray());
+      byte[] response = 
+          Base64.getEncoder().encode(client.getCodeReviewStub().getTextDiff(request).toByteArray());
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);
@@ -206,10 +211,11 @@ public class LocalHttpGateway {
     private void printExampleEncodedBytes() {
       // Here's an example of a url that should work, based on the example below:
       // http://localhost:7000/get_diff_files?request=ChxmaXhfZmlsZXNfaW5fc2VydmVyX3Jlc3BvbnNlEBw=
-      final DiffFilesRequest request = DiffFilesRequest.newBuilder()
-          .setWorkspace("fix_files_in_server_response")
-          .setDiffId(28)
-          .build();
+      final DiffFilesRequest request =
+          DiffFilesRequest.newBuilder()
+              .setWorkspace("fix_files_in_server_response")
+              .setDiffId(28)
+              .build();
       byte[] bytes = request.toByteArray();
       String encodedBytes = Base64.getEncoder().encodeToString(bytes);
       System.out.println("encodedBytes");
@@ -218,16 +224,19 @@ public class LocalHttpGateway {
 
     public void handle(HttpExchange httpExchange) throws IOException {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Headers",
-          "Origin, X-Requested-With, Content-Type, Accept");
+      httpExchange
+          .getResponseHeaders()
+          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       // TODO: Remove printExampleEncodedBytes() once integration is working
       printExampleEncodedBytes();
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
       String requestString = params.get("request");
-      DiffFilesRequest request = DiffFilesRequest.parseFrom(Base64.getDecoder().decode(requestString));
+      DiffFilesRequest request =
+          DiffFilesRequest.parseFrom(Base64.getDecoder().decode(requestString));
       logger.atInfo().log("Handling " + GET_DIFF_FILES_PATH + " request:\n" + request);
-      byte[] response = Base64.getEncoder().encode(
-          client.getCodeReviewStub().getDiffFiles(request).toByteArray());
+      byte[] response = 
+          Base64.getEncoder()
+              .encode(client.getCodeReviewStub().getDiffFiles(request).toByteArray());
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);
@@ -241,7 +250,7 @@ public class LocalHttpGateway {
     }
   }
 
-  static ImmutableMap<String, String> paramsToMap(String query){
+  static ImmutableMap<String, String> paramsToMap(String query) {
     ImmutableMap.Builder<String, String> result = new ImmutableMap.Builder<>();
     if (query != null) {
       for (String param : query.split("&")) {
@@ -270,3 +279,4 @@ public class LocalHttpGateway {
     new LocalHttpGateway(httpGatewayPort.get(), localServerPort.get()).serve();
   }
 }
+
