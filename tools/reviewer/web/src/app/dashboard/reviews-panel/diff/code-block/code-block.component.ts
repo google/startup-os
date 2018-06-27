@@ -1,5 +1,6 @@
-// There's a bug. Lines with more than 100 chars cross borders of code block.
-// TODO: fix the bug
+// NOTICE: Lines with more than 100 chars create a horizontal scroll.
+// TODO: add supporting of line wrap
+
 import {
   ChangeDetectorRef,
   Component,

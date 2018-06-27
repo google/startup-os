@@ -4,6 +4,7 @@
   <review-titlebar 
     [diff]="diff"
     [editable]="isEditable"
+    (submit)="submit()"
   ></review-titlebar>
 
   <!-- Details of the review -->
@@ -14,21 +15,19 @@
   
         <!-- Person List based on Reviewer in the Diff -->
         <div>
-          <app-person-list 
+          <app-person-list
+            title="Reviewers"
             [diff]="diff"
-            [isNeedAttention]="true"
-            [enableAddToAttention]="true"
             [editable]="isEditable"
           ></app-person-list>
         </div>
   
         <!-- Person List based on CC in the Diff -->
         <div>
-          <app-person-list 
-            [diff]="diff"
-            [isNeedAttention]="false"
+          <app-person-list
+            title="CC"
+            [diff]="diff" 
             [editable]="isEditable"
-            [enableAddToAttention]="false"
           ></app-person-list>
         </div>
   

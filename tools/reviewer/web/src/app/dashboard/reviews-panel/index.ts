@@ -6,3 +6,4 @@ export * from './review/review-titlebar/review-titlebar.component';
 export * from './review/review-discussion/review-discussion.component';
 export * from './review/review-files/review-files.component';
 export * from './review/review.component';
+export * from './review/review.service';

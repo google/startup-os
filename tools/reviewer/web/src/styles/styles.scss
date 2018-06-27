@@ -5,6 +5,8 @@
 @import 'global';
 @import 'reviewsPanel';
 @import 'login';
-@import 'review.component.scss';
 @import 'layout/notification';
 @import 'layout/toolbar';
+
+// Style for review.component and its children
+@import '../app/dashboard/reviews-panel/review/review';

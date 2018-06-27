@@ -7,6 +7,8 @@
   width: 837px; // ~100 chars on a code line
   position: relative;
   display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
   >.code {
     position: relative;
     width: 100%;

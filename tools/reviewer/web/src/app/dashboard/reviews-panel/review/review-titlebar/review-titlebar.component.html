@@ -23,7 +23,10 @@
   </div>
 
   <div class="review-status" fxFlex="100%">
-    <span>{{ statusList[diff.getStatus()] }}</span>
+    <span>
+      <mat-icon>{{ statusList[diff.getStatus()].icon }}</mat-icon>
+      {{ statusList[diff.getStatus()].label }}
+    </span>
   </div>
 
   <div class="action-buttons" 
@@ -33,7 +36,7 @@
     fxLayoutAlign="end end">
     <!-- TODO: add some action for the buttons -->
     <div class="submit">
-      <button>Submit</button>
+      <button (click)="submit.emit()">Submit</button>
     </div>
     <div class="reply">
       <button>Reply</button>

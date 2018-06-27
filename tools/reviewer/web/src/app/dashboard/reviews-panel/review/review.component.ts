@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { FirebaseService } from '@/shared/services';
+import { FirebaseService, NotificationService } from '@/shared/services';
 import { Diff, File } from '@/shared/shell';
+import { ReviewService } from './review.service';
 
 @Component({
   selector: 'app-review',
   templateUrl: './review.component.html',
-  styleUrls: ['./review.component.scss']
+  styleUrls: ['./review.component.scss'],
 })
 export class ReviewComponent implements OnInit {
   isLoading: boolean = true;
@@ -19,7 +20,13 @@ export class ReviewComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private firebaseService: FirebaseService,
-  ) { }
+    private notificationService: NotificationService,
+    private reviewService: ReviewService,
+  ) {
+    this.reviewService.diffChanges.subscribe(diff => {
+      this.diff = diff;
+    });
+  }
 
   ngOnInit() {
     const diffId: string = this.route.snapshot.params['id'];
@@ -66,5 +73,13 @@ export class ReviewComponent implements OnInit {
       Diff.Status.REVERTED
     ];
     return !statuses.includes(status);
+  }
+
+  submit(): void {
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success('Diff is saved');
+    }, () => {
+      this.notificationService.error("Diff can't be saved");
+    });
   }
 }

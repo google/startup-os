@@ -18,7 +18,7 @@
         fxLayoutAlign="start center">
         <!-- Print out list if length is more than zero -->
         <span
-          *ngFor="let reviewer of diff.getReviewerList(); 
+          *ngFor="let reviewer of reviewers; 
           let last = last"
           [ngClass]="{ 
             'bold-text': reviewer.getNeedsattention(),
@@ -27,8 +27,8 @@
           >
           <button mat-raised-button 
             class="add-to-list"
-            *ngIf="editable && enableAddToAttention"
-            (click)="saveAttentionList();
+            *ngIf="editable"
+            (click)="changeAttentionOfReviewer(reviewer);
             $event.stopPropagation()"
             >
             {{ getNeedAttentionText(reviewer) }}

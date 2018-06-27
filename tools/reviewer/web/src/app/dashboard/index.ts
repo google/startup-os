@@ -13,6 +13,7 @@ import {
   ReviewComponent,
   ReviewDiscussionComponent,
   ReviewFilesComponent,
+  ReviewService,
   ReviewsPanelComponent,
   ReviewTitlebarComponent,
 } from './reviews-panel/';
@@ -30,9 +31,9 @@ export const DashboardComponents = [
   ReviewDiscussionComponent,
   ReviewFilesComponent,
   ReviewsPanelComponent,
-  ReviewTitlebarComponent
+  ReviewTitlebarComponent,
 ];
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [DiffService];
+export const DashboardProviders = [DiffService, ReviewService];

@@ -1,11 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+
+import { ReviewService } from '../review.service';
 
 import {
-  AuthService,
-  FirebaseService,
-  NotificationService
+  AuthService
 } from '@/shared/services';
 import { Diff } from '@/shared/shell';
+import { statusList } from './status-ui';
 
 @Component({
   selector: 'review-titlebar',
@@ -13,24 +14,17 @@ import { Diff } from '@/shared/shell';
   styleUrls: ['./review-titlebar.component.scss']
 })
 export class ReviewTitlebarComponent implements OnInit {
-  statusList = [
-    'Review Not Started',
-    'Needs More Work',
-    'Under Review',
-    'Accepted',
-    'Submitting',
-    'Submitted',
-    'Reverting',
-    'Reverted',
-  ];
+  statusList = statusList;
   isLoading: boolean = true;
   @Input() diff: Diff;
   @Input() editable;
 
+  // Ask review.component to send diff to firebase
+  @Output() submit = new EventEmitter();
+
   constructor(
     public authService: AuthService,
-    private firebaseService: FirebaseService,
-    private notificationService: NotificationService,
+    private reviewService: ReviewService,
   ) { }
 
   ngOnInit() {
@@ -43,11 +37,6 @@ export class ReviewTitlebarComponent implements OnInit {
     author.setNeedsattention(!author.getNeedsattention());
     this.diff.setAuthor(author);
 
-    // Send updated diff to firebase
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.notificationService.success('Attention is updated');
-    }, () => {
-      this.notificationService.error('Error');
-    });
+    this.reviewService.saveLocalDiff(this.diff);
   }
 }

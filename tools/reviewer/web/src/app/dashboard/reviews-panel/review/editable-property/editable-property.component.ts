@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
-import { FirebaseService, NotificationService } from '@/shared/services';
 import { Diff } from '@/shared/shell';
+import { ReviewService } from '../review.service';
 
 @Component({
   selector: 'app-editable-property',
@@ -21,10 +21,7 @@ export class EditablePropertyComponent {
   // Following variable is used in editing the fields
   propertyValue: string = '';
 
-  constructor(
-    private firebaseService: FirebaseService,
-    private notificationService: NotificationService,
-  ) { }
+  constructor(private reviewService: ReviewService) { }
 
   ngOnChanges() {
     this.getPropertyValue();
@@ -57,10 +54,6 @@ export class EditablePropertyComponent {
         throw new Error('Unsupported property');
     }
 
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.notificationService.success('Saved');
-    }, () => {
-      this.notificationService.error('Error');
-    });
+    this.reviewService.saveLocalDiff(this.diff);
   }
 }
