@@ -289,7 +289,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
-    responseObserver.onNext(PongResponse.newBuilder().setMsg("pong").build());
+    responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
     responseObserver.onCompleted();
   }
 }

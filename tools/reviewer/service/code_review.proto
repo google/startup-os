@@ -53,7 +53,7 @@ message DiffFilesResponse {
 
 message DiffRequest { int64 diff_id = 1; }
 
-message PongResponse { string msg = 1; }
+message PongResponse { string message = 1; }
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues
