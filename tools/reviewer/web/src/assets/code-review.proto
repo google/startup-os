@@ -1,3 +1,7 @@
+// The file was copied from
+// https://github.com/google/startup-os/blob/master/tools/reviewer/service/code_review.proto
+// Original proto contains import and it doesn't work with protoc for some reason.
+
 syntax = "proto3";
 
 message File {
@@ -135,14 +139,15 @@ message Diff {
   // The main author of the diff, though certain snapshots can be made by others.
   Author author = 2;
   repeated Reviewer reviewer = 3;
-  string description = 4;
-  string bug = 5;
-  Status status = 6;
+  repeated string cc = 4; // email list
+  string description = 5;
+  string bug = 6;
+  Status status = 7;
 
-  string workspace = 7;
-  int64 created_timestamp = 8;
-  int64 modified_timestamp = 9;
-  repeated Thread thread = 10;
+  string workspace = 8;
+  int64 created_timestamp = 9;
+  int64 modified_timestamp = 10;
+  repeated Thread thread = 11;
 }
 
 message Reviewer {

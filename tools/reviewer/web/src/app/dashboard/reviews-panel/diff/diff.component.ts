@@ -1,5 +1,7 @@
 // NOTICE: it's actually not a diff, it's a two files changes
 // TODO: rename the component and linked files
+// e.g. FileChangeComponent
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Http } from '@angular/http';
 import { ActivatedRoute } from '@angular/router';
@@ -55,7 +57,7 @@ export class DiffComponent implements OnInit, OnDestroy {
   getFileChanges(): void {
     const textDiffRequest = new TextDiffRequest();
 
-    // Temperoally hardcoded data
+    // Temporarily hardcoded data
     // TODO: take the data from somewhere else (url?)
     const leftFile = new File();
     leftFile.setFilename('tools/reviewer/service/TestTool.java');

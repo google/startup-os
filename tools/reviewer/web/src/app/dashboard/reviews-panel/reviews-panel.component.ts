@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService, FirebaseService, Lists } from '@/shared';
@@ -9,19 +9,15 @@ import { Diff, Reviewer } from '@/shared/shell/proto/code-review_pb';
   templateUrl: './reviews-panel.component.html',
   styleUrls: ['./reviews-panel.component.scss']
 })
-export class ReviewsPanelComponent implements OnInit {
+export class ReviewsPanelComponent {
   isLoading: boolean = true;
-  diffGroups: Array<Array<Diff.AsObject>> = [[], [], [], []];
+  diffGroups: Diff[][] = [];
 
   constructor(
     private firebaseService: FirebaseService,
     private authService: AuthService,
     private router: Router,
-  ) { }
-
-  ngOnInit() {
-    // Get username from url if there is no user.
-    // Get the loggedIn username from its email.
+  ) {
     this.getReviews();
   }
 
@@ -39,23 +35,34 @@ export class ReviewsPanelComponent implements OnInit {
         // and create Diff from proto and categorize
         // into a specific list.
         for (const diff of diffs) {
-          for (const reviewer of diff.getReviewerList()) {
-            if (reviewer.getEmail() === this.authService.userEmail) {
-              if (reviewer.getNeedsattention()) {
-                // Need attention of user
-                this.diffGroups[Lists.NeedAttention].push(diff.toObject());
-              } else {
-                // User is cc'ed on this
-                this.diffGroups[Lists.CcedOn].push(diff.toObject());
-              }
-            } else if (reviewer.getEmail() === this.authService.userEmail) {
-              if (diff.getStatus() === Diff.Status.REVIEW_NOT_STARTED) {
+          diff.getDescription();
+          ///
+          const you: string = this.authService.userEmail;
+          // needAttentionOfList = author and all reviewers,
+          // where attention is requested
+          const needAttentionOfList: string[] = diff.getReviewerList()
+            .filter(reviewer => reviewer.getNeedsattention())
+            .map(reviewer => reviewer.getEmail());
+          if (diff.getAuthor().getNeedsattention()) {
+            needAttentionOfList.concat(diff.getAuthor().getEmail());
+          }
+
+          if (needAttentionOfList.includes(you)) {
+            // Need attention of user
+            this.diffGroups[Lists.NeedAttention].push(diff);
+          } else if (diff.getCcList().includes(you)) {
+            // User is cc'ed on this
+            this.diffGroups[Lists.CcedOn].push(diff);
+          } else if (diff.getAuthor().getEmail() === you) {
+            switch (diff.getStatus()) {
+              case Diff.Status.REVIEW_NOT_STARTED:
                 // Draft Review
-                this.diffGroups[Lists.NeedAttention].push(diff.toObject());
-              } else if (diff.getStatus() === Diff.Status.SUBMITTED) {
+                this.diffGroups[Lists.NeedAttention].push(diff);
+                break;
+              case Diff.Status.SUBMITTED:
                 // Submitted Review
-                this.diffGroups[Lists.CcedOn].push(diff.toObject());
-              }
+                this.diffGroups[Lists.CcedOn].push(diff);
+                break;
             }
           }
         }
@@ -73,7 +80,7 @@ export class ReviewsPanelComponent implements OnInit {
   sortDiffs(): void {
     for (const diffList of this.diffGroups) {
       diffList.sort((a, b) => {
-        return Math.sign(b.modifiedTimestamp - a.modifiedTimestamp);
+        return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
       });
     }
   }
@@ -83,9 +90,9 @@ export class ReviewsPanelComponent implements OnInit {
     this.router.navigate(['diff/', diffId]);
   }
 
-  getUsernames(reviewerList: Reviewer.AsObject[]): string {
+  getUsernames(reviewerList: Reviewer[]): string {
     return reviewerList
-      .map(reviewer => this.authService.getUsername(reviewer.email))
+      .map(reviewer => this.authService.getUsername(reviewer.getEmail()))
       .join(', ');
   }
 }

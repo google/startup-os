@@ -4,7 +4,6 @@
   <review-titlebar 
     [diff]="diff"
     [editable]="isEditable"
-    (submit)="submit()"
   ></review-titlebar>
 
   <!-- Details of the review -->
@@ -13,23 +12,11 @@
     <div fxLayout="row" fxLayoutGap="10%">
       <div fxLayout="column" fxLayoutGap="20px" fxFlex="45%">
   
-        <!-- Person List based on Reviewer in the Diff -->
-        <div>
-          <app-person-list
-            title="Reviewers"
-            [diff]="diff"
-            [editable]="isEditable"
-          ></app-person-list>
-        </div>
+        <!-- Reviewers -->
+        <reviewer-list [diff]="diff" [editable]="isEditable"></reviewer-list>
   
-        <!-- Person List based on CC in the Diff -->
-        <div>
-          <app-person-list
-            title="CC"
-            [diff]="diff" 
-            [editable]="isEditable"
-          ></app-person-list>
-        </div>
+        <!-- CC list -->
+        <cc-list [diff]="diff"></cc-list>
   
         <!-- Bug property of Diff that is a link to related Github Issue -->
         <div>

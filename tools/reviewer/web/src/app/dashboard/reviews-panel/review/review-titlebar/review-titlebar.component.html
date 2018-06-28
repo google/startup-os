@@ -10,12 +10,12 @@
     ><button mat-raised-button 
         class="add-to-list"
         *ngIf="editable"
-        (click)="updateAuthor()"
+        (click)="changeAttentionOfAuthor()"
       >
         {{ 
-          diff.getAuthor().getNeedsattention()
-          ? 'Ask for attention'
-          : 'Attention is not needed anymore'
+          diff.getAuthor().getNeedsattention() ?
+            'Attention is not needed anymore':
+            'Ask for attention'
         }}
       </button>
       {{ authService.getUsername(diff.getAuthor().getEmail()) }}
@@ -24,7 +24,11 @@
 
   <div class="review-status" fxFlex="100%">
     <span>
-      <mat-icon>{{ statusList[diff.getStatus()].icon }}</mat-icon>
+      <span [ngClass]="statusList[diff.getStatus()].spanClass">
+        <mat-icon [ngClass]="statusList[diff.getStatus()].iconClass">
+          {{ statusList[diff.getStatus()].icon }}
+        </mat-icon>
+      </span>
       {{ statusList[diff.getStatus()].label }}
     </span>
   </div>
@@ -36,7 +40,7 @@
     fxLayoutAlign="end end">
     <!-- TODO: add some action for the buttons -->
     <div class="submit">
-      <button (click)="submit.emit()">Submit</button>
+      <button>Submit</button>
     </div>
     <div class="reply">
       <button>Reply</button>

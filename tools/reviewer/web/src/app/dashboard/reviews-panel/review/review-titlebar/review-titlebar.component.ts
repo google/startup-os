@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { ReviewService } from '../review.service';
+import { FirebaseService, NotificationService } from '@/shared/services';
 
 import {
   AuthService
@@ -24,19 +24,27 @@ export class ReviewTitlebarComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
-    private reviewService: ReviewService,
+    private firebaseService: FirebaseService,
+    private notificationService: NotificationService,
   ) { }
 
   ngOnInit() {
     this.isLoading = false;
   }
 
-  updateAuthor(): void {
-    // Update need attention of the author in the diff
+  // Request or cancel attention of the author
+ changeAttentionOfAuthor(): void {
     const author = this.diff.getAuthor();
     author.setNeedsattention(!author.getNeedsattention());
     this.diff.setAuthor(author);
 
-    this.reviewService.saveLocalDiff(this.diff);
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      const message = this.diff.getAuthor().getNeedsattention() ?
+        'Attention of author is requested' :
+        'Attention of author is canceled';
+      this.notificationService.success(message);
+    }, () => {
+      this.notificationService.error('Error');
+    });
   }
 }

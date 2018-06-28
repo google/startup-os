@@ -7,19 +7,19 @@
   <div fxFlex="150px" fxFlex.xs="" 
     fxLayoutAlign="start center" 
     class="property">
-    {{ title }}
+    Reviewers:
   </div>
   <div fxFlex class="detail">
     
+    <!-- BUG: more than 10 reviewers break the template -->
     <ng-container>
       <div
         class="reviewer-detail"
-        *ngIf="!showEditableProperty"
+        *ngIf="!isEditing"
         fxLayoutAlign="start center">
         <!-- Print out list if length is more than zero -->
         <span
-          *ngFor="let reviewer of reviewers; 
-          let last = last"
+          *ngFor="let reviewer of diff.getReviewerList(); let last = last"
           [ngClass]="{ 
             'bold-text': reviewer.getNeedsattention(),
             'reviewer-name': true
@@ -31,16 +31,19 @@
             (click)="changeAttentionOfReviewer(reviewer);
             $event.stopPropagation()"
             >
-            {{ getNeedAttentionText(reviewer) }}
+            {{
+              reviewer.getNeedsattention() ?
+                'Attention is not needed anymore':
+                'Ask for attention'
+            }}
           </button>
-          {{ last ? reviewer.getEmail() : reviewer.getEmail() + ',&nbsp;' }}
+          {{ authService.getUsername(reviewer.getEmail()) }}
         </span>
         <!-- If no persons are present -->
-        <span *ngIf="reviewers.length === 0">&nbsp;</span>
         <button
           class="edit-button" 
           mat-icon-button
-          (click)="showEditableProperty = true"
+          (click)="isEditing = true"
           *ngIf="editable"
           >
           <mat-icon>edit</mat-icon>
@@ -48,14 +51,12 @@
       </div>
       <div 
         class="editableInput"
-        *ngIf="showEditableProperty">
+        *ngIf="isEditing">
         <mat-form-field fxFlex>
-          <input matInput placeholder="" 
-            [(ngModel)]="reviewerEmails"
-            (keyup.enter)=
-            "showEditableProperty = false; 
-            saveAttentionList()"
-            >
+          <input
+            matInput
+            [(ngModel)]="usernames"
+          >
         </mat-form-field>
         <div
           class="actions"
@@ -66,8 +67,7 @@
             <button 
               mat-icon-button
               color="warn"
-              (click)="showEditableProperty = false; 
-              getPropertyValue()"
+              (click)="isEditing = false; getReviewerEmails()"
               >
               <mat-icon>close</mat-icon>
             </button>
@@ -76,9 +76,8 @@
             <button 
               mat-icon-button 
               color="primary"
-              (click)="showEditableProperty = false; 
-              saveAttentionList()"
-              >
+              (click)="isEditing = false; saveReviewers()"
+            >
               <mat-icon>done</mat-icon>
             </button>
           </span>

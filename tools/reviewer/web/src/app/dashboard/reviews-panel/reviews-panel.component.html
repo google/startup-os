@@ -33,14 +33,14 @@
         <!-- Iterate over each item in a list and print it out -->
         <mat-list-item
           *ngFor="let diff of list; let i = index; let last = last"
-          (click)="diffClicked(diff.id)"
+          (click)="diffClicked(diff.getId())"
           [class.last-item]="last">
-          <div fxFlex="7%">{{ diff.id }}</div>
+          <div fxFlex="7%">{{ diff.getId() }}</div>
           <div fxFlex="10%">
-            {{ authService.getUsername(diff.author.email) }}
+            {{ authService.getUsername(diff.getAuthor().getEmail()) }}
           </div>
           <div fxFlex="18%">
-            <ng-container [ngSwitch]="diff.status">
+            <ng-container [ngSwitch]="diff.getStatus()">
               <span *ngSwitchCase="'0'">Review Not Started</span>
               <span *ngSwitchCase="'1'">Needs More Work</span>
               <span *ngSwitchCase="2">Under Review</span>
@@ -50,24 +50,26 @@
             </ng-container>
           </div>
           <div fxFlex="20%">
-            {{ diff.modifiedTimestamp | date: 'mediumDate' }}
+            {{ diff.getModifiedTimestamp() | date: 'mediumDate' }}
           </div>
           <div fxFlex="20%">
             <!-- Print out reviewer's list -->
             <a>
-              {{ getUsernames(diff.reviewerList) }}
+              {{ getUsernames(diff.getReviewerList()) }}
             </a>
             <!-- If no reviewers are present -->
-            <ng-container *ngIf="diff.reviewerList.length === 0">
+            <ng-container *ngIf="diff.getReviewerList().length === 0">
               <span>
                 Not available
               </span>
             </ng-container>
           </div>
           <!-- If description doesn't exist print out 'Not Available' -->
-          <div class="description" fxFlex="25%">
-            {{ diff.description ? diff.description : 'Not available' }}
-          </div>
+          <div class="description" fxFlex="25%">{{
+            diff.getDescription() ?
+              diff.getDescription() :
+              'Not available'
+          }}</div>
         </mat-list-item>
       </mat-list>
     </div>
