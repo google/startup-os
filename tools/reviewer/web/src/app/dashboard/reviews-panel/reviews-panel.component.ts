@@ -35,10 +35,8 @@ export class ReviewsPanelComponent {
         // and create Diff from proto and categorize
         // into a specific list.
         for (const diff of diffs) {
-          diff.getDescription();
-          ///
           const you: string = this.authService.userEmail;
-          // needAttentionOfList = author and all reviewers,
+          // needAttentionOfList is list of author and all reviewers,
           // where attention is requested
           const needAttentionOfList: string[] = diff.getReviewerList()
             .filter(reviewer => reviewer.getNeedsattention())
