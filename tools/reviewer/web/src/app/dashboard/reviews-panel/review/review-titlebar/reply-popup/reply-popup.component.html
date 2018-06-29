@@ -1,0 +1,15 @@
+<div class="reply-form" fxLayout="column">
+  <div class="reply-title">Reply</div>
+  <textarea 
+    [(ngModel)]="propertyValue">
+  </textarea>
+  <div class="action-required">
+    <input type="checkbox" value="Action Required"> Action Required
+  </div>
+  <div class="reply-actions" fxLayout="row" fxLayoutAlign="end center">
+    <div>
+      <input type="checkbox" value="Action Required"> Approved
+    </div>
+    <button>Reply</button>
+  </div>
+</div>

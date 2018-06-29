@@ -92,9 +92,9 @@
     <div class="reply">
       <button (click)="showReplyDialog = !showReplyDialog">Reply</button>
     </div>
-    <div *ngIf="showReplyDialog" class="up-arrow">
-      <div class="reply-form">
-        Button with Up Arrow
+    <div *ngIf="showReplyDialog" class="reply-popup">
+      <div>
+        <cr-reply-popup></cr-reply-popup>
       </div>
     </div>
   </div>

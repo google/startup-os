@@ -50,7 +50,8 @@ class="bug">
       <mat-form-field fxFlex 
         *ngIf="property === 'description'">
         <textarea matInput placeholder=""
-          matTextareaAutosize 
+          matTextareaAutosize
+          matAutosizeMaxRows="8" 
           matAutosizeMinRows="8" 
           [(ngModel)]="propertyValue">
         </textarea>

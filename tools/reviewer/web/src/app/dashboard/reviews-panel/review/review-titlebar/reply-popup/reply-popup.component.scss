@@ -1,0 +1,30 @@
+.reply-form {
+  padding: 12px;
+  .reply-title {
+    font-size: 18px;
+    font-weight: 500;
+  }
+  textarea {
+    resize: none;
+    height: 120px;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  .action-required {
+    font-size: 14px;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+  .reply-actions {
+    margin-top: 20px;
+    font-size: 16px;
+    div {
+      font-weight: 500;
+      margin-right: 10px;
+    }
+    button {
+      background-color: #ffc84b;
+    }
+  }
+}
