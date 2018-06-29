@@ -19,9 +19,6 @@ export class ReviewTitlebarComponent implements OnInit {
   @Input() diff: Diff;
   @Input() editable;
 
-  // Ask review.component to send diff to firebase
-  @Output() submit = new EventEmitter();
-
   constructor(
     public authService: AuthService,
     private firebaseService: FirebaseService,
