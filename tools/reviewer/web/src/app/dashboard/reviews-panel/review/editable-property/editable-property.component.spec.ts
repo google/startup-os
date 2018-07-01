@@ -8,7 +8,7 @@ describe('EditablePropertyComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [EditablePropertyComponent]
+      declarations: [EditablePropertyComponent],
     })
       .compileComponents();
   }));

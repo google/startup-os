@@ -63,7 +63,7 @@ export class ReviewComponent implements OnInit {
     // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
     const statuses = [
       Diff.Status.SUBMITTED,
-      Diff.Status.REVERTED
+      Diff.Status.REVERTED,
     ];
     return !statuses.includes(status);
   }

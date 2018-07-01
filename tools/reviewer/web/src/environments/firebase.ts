@@ -4,5 +4,5 @@ export const config = {
   databaseURL: 'https://aa-storage.firebaseio.com',
   projectId: 'aa-storage',
   storageBucket: 'aa-storage.appspot.com',
-  messagingSenderId: '12109533178'
+  messagingSenderId: '12109533178',
 };

@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { FirebaseService, NotificationService } from '@/shared/services';
 
 import {
-  AuthService
+  AuthService,
 } from '@/shared/services';
 import { Diff } from '@/shared/shell';
 import { statusList } from './status-ui';
@@ -11,7 +11,7 @@ import { statusList } from './status-ui';
 @Component({
   selector: 'review-titlebar',
   templateUrl: './review-titlebar.component.html',
-  styleUrls: ['./review-titlebar.component.scss']
+  styleUrls: ['./review-titlebar.component.scss'],
 })
 export class ReviewTitlebarComponent implements OnInit {
   statusList = statusList;

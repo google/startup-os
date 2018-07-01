@@ -13,7 +13,7 @@ import {
   File,
   TextDiffRequest,
   TextDiffResponse,
-  Thread
+  Thread,
 } from '@/shared';
 import {
   DifferenceService,
@@ -27,7 +27,7 @@ import { DiffService } from './diff.service';
 @Component({
   selector: 'app-diff',
   templateUrl: './diff.component.html',
-  styleUrls: ['./diff.component.scss']
+  styleUrls: ['./diff.component.scss'],
 })
 export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
@@ -50,7 +50,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     this.newCommentSubscription = this.diffService.newComment.subscribe(
       param => {
         this.addComment(param.lineNumber, param.comments);
-      }
+      },
     );
   }
 
@@ -116,7 +116,7 @@ export class DiffComponent implements OnInit, OnDestroy {
       },
       () => {
         // Access denied
-      }
+      },
     );
   }
 

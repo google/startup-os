@@ -7,7 +7,7 @@ import { Diff, Reviewer } from '@/shared/shell/proto/code-review_pb';
 @Component({
   selector: 'app-reviews-panel',
   templateUrl: './reviews-panel.component.html',
-  styleUrls: ['./reviews-panel.component.scss']
+  styleUrls: ['./reviews-panel.component.scss'],
 })
 export class ReviewsPanelComponent {
   isLoading: boolean = true;
@@ -70,7 +70,7 @@ export class ReviewsPanelComponent {
       },
       () => {
         // Permission Denied
-      }
+      },
     );
   }
 

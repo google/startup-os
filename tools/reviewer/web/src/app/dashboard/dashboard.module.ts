@@ -11,7 +11,7 @@ import { DashboardRoutes } from './dashboard.routing';
 import {
   DashboardComponents,
   DashboardEntryComponents,
-  DashboardProviders
+  DashboardProviders,
 } from './';
 
 @NgModule({
@@ -21,12 +21,12 @@ import {
     DashboardRoutes,
     FormsModule,
     ReactiveFormsModule,
-    SharedModule
+    SharedModule,
   ],
   exports: [RouterModule],
   declarations: [...DashboardComponents, Directives],
   entryComponents: DashboardEntryComponents,
-  providers: DashboardProviders
+  providers: DashboardProviders,
 })
 export class DashboardModule {}
 

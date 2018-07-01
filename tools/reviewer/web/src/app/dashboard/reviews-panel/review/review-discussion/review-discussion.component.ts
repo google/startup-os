@@ -6,7 +6,7 @@ import { Diff } from '@/shared/shell';
 @Component({
   selector: 'review-discussion',
   templateUrl: './review-discussion.component.html',
-  styleUrls: ['./review-discussion.component.scss']
+  styleUrls: ['./review-discussion.component.scss'],
 })
 export class ReviewDiscussionComponent {
   @Input() diff: Diff;

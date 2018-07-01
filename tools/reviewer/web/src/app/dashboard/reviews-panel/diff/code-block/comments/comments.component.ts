@@ -3,7 +3,7 @@ import {
   ElementRef,
   Input,
   OnInit,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -16,7 +16,7 @@ import { DiffService } from '../../diff.service';
 @Component({
   selector: 'line-comments',
   templateUrl: './comments.component.html',
-  styleUrls: ['./comments.component.scss']
+  styleUrls: ['./comments.component.scss'],
 })
 export class CommentsComponent implements OnInit {
   textareaControl = new FormControl();
@@ -30,7 +30,7 @@ export class CommentsComponent implements OnInit {
 
   constructor(
     private diffService: DiffService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     // Detect view changes and send height of the component
     this.componentHeightChanges.pipe(distinctUntilChanged()).subscribe(() => {
@@ -80,7 +80,7 @@ export class CommentsComponent implements OnInit {
   sendHeight(): void {
     this.diffService.setLineHeight({
       height: this.getHeight(),
-      lineNumber: this.lineNumber
+      lineNumber: this.lineNumber,
     });
   }
 
@@ -97,7 +97,7 @@ export class CommentsComponent implements OnInit {
     this.comments.push(comment);
     this.diffService.addComment({
       comments: this.comments,
-      lineNumber: this.lineNumber
+      lineNumber: this.lineNumber,
     });
 
     this.textareaControl.reset();

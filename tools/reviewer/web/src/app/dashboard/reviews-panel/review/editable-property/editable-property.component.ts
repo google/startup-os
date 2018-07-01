@@ -6,7 +6,7 @@ import { Diff } from '@/shared/shell';
 @Component({
   selector: 'app-editable-property',
   templateUrl: './editable-property.component.html',
-  styleUrls: ['./editable-property.component.scss']
+  styleUrls: ['./editable-property.component.scss'],
 })
 export class EditablePropertyComponent {
   @Input() diff: Diff;

@@ -21,13 +21,13 @@ import { AppComponents, Services } from './';
     AngularFireAuthModule,
     AppRoutes,
     BrowserAnimationsModule,
-    LayoutModule
+    LayoutModule,
   ],
   providers: [
     AngularFireDatabase,
     AngularFireAuth,
     ...Services,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

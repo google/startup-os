@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   AngularFirestore,
-  AngularFirestoreCollection
+  AngularFirestoreCollection,
 } from 'angularfire2/firestore';
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
@@ -59,7 +59,7 @@ export class FirebaseService {
 
   private convertDiffToFirebaseElement(diff: Diff): FirebaseElement {
     return {
-      proto: firebase.firestore.Blob.fromUint8Array(diff.serializeBinary())
+      proto: firebase.firestore.Blob.fromUint8Array(diff.serializeBinary()),
     };
   }
 

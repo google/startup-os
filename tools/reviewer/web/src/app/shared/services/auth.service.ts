@@ -22,7 +22,7 @@ export class AuthService {
 
   loginWithGoogle() {
     return this.angularFireAuth.auth.signInWithPopup(
-      new firebase.auth.GoogleAuthProvider()
+      new firebase.auth.GoogleAuthProvider(),
     );
   }
 

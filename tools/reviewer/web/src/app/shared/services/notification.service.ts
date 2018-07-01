@@ -5,7 +5,7 @@ export enum NotifierStatus {
   success = 'cr-snack-success',
   info = 'cr-snack-info',
   warning = 'cr-snack-warning',
-  error = 'cr-snack-error'
+  error = 'cr-snack-error',
 }
 
 @Injectable()
@@ -20,7 +20,7 @@ export class NotificationService {
     message: string,
     action = '',
     duration = null,
-    status: NotifierStatus
+    status: NotifierStatus,
   ): void {
     if (!message) {
       return;
@@ -28,7 +28,7 @@ export class NotificationService {
 
     this.snackbar.open(message, action, {
       duration: duration ? duration : this.duration,
-      panelClass: [status]
+      panelClass: [status],
     });
   }
 

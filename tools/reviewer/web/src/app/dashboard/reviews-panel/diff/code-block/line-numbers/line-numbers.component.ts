@@ -15,6 +15,6 @@ export class LineNumbersComponent {
   @Input() isNewCode: boolean;
 
   constructor(
-    public codeBlockViewService: CodeBlockViewService
+    public codeBlockViewService: CodeBlockViewService,
   ) { }
 }

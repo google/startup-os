@@ -6,7 +6,7 @@ import { File } from '@/shared/shell';
 @Component({
   selector: 'review-files',
   templateUrl: './review-files.component.html',
-  styleUrls: ['./review-files.component.scss']
+  styleUrls: ['./review-files.component.scss'],
 })
 export class ReviewFilesComponent {
   isLoading: boolean = true;
