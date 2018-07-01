@@ -21,7 +21,7 @@ export class ReviewFilesComponent {
 
   // Upon click on a file open a single file review page showing
   // code difference and comments
-  openFile(filename: string): void {
-    this.router.navigate(['diff/' + this.diffId + '/' + filename]);
+  openFile(file: File): void {
+    this.router.navigate(['diff/' + this.diffId + '/' + file.getFilename()]);
   }
 }

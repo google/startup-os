@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 
 import {
   AuthService,
@@ -80,5 +80,13 @@ export class CCListComponent implements OnInit {
         return email;
       }
     }
+  }
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.isMouseHovered = true;
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.isMouseHovered = false;
   }
 }

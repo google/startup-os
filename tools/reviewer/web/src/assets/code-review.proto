@@ -152,6 +152,9 @@ message Diff {
 
 message Reviewer {
   string email = 1;
+  // TODO: s/needsAttention/needs_attention
+  // NOTICE: it will influence dependent code.
+  // e.g. getNeedsattention() -> getNeedsAttention()
   bool needsAttention = 2;
   bool approved = 3;
 }

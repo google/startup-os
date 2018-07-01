@@ -7,8 +7,7 @@
 <!-- It can't be edited -->
 <div
   class="cc cc-list"
-  (mouseenter)="isMouseHovered = true"
-  (mouseleave)="isMouseHovered = false"
+  fxFlex
   *ngIf="!isEditing"
 >
   <div class="username" *ngFor="let username of usernames">{{username}}</div>
@@ -23,8 +22,7 @@
 <!-- Input where user can edit CC -->
 <div
   class="cc cc-input"
-  (mouseenter)="isMouseHovered = true"
-  (mouseleave)="isMouseHovered = false"
+  fxFlex
   *ngIf="isEditing"
 >
   <mat-form-field fxFlex>
