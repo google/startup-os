@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package com.google.startupos.common;
+package com.google.startupos.common;
 
 import static java.lang.Math.toIntExact;
 import static java.time.temporal.ChronoUnit.DAYS;

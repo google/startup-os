@@ -48,9 +48,11 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final String REFRESH_TOKEN = "https://securetoken.googleapis.com/v1/token?key=%s";
 
   @FlagDesc(
-      name = "debug_token_mode",
-      description = "Make it easy to debug by storing and reading the token from disk")
+    name = "debug_token_mode",
+    description = "Make it easy to debug by storing and reading the token from disk"
+  )
   private static final Flag<Boolean> debugTokenMode = Flag.create(false);
+
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
 
   private ScheduledExecutorService tokenRefreshScheduler = Executors.newScheduledThreadPool(1);
@@ -68,8 +70,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   AuthService(FileUtils fileUtils) {
     this.fileUtils = fileUtils;
     if (debugTokenMode.get() && fileUtils.fileExists(DEBUGGING_TOKEN_PATH)) {
-      AuthDataRequest req = (AuthDataRequest)fileUtils.readProtoBinaryUnchecked(
-          DEBUGGING_TOKEN_PATH, AuthDataRequest.newBuilder());
+      AuthDataRequest req =
+          (AuthDataRequest)
+              fileUtils.readProtoBinaryUnchecked(
+                  DEBUGGING_TOKEN_PATH, AuthDataRequest.newBuilder());
       projectId = req.getProjectId();
       apiKey = req.getApiKey();
       jwtToken = req.getJwtToken();
@@ -97,27 +101,28 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       }
     } catch (SecurityException e) {
       responseObserver.onError(
-          Status.UNKNOWN
-              .withDescription("Cannot get token from request")
-              .asException());
+          Status.UNKNOWN.withDescription("Cannot get token from request").asException());
       logger.atInfo().log("Cannot get token from request");
     }
   }
 
   private void setTokenRefreshScheduler() {
     // Wait until 10 seconds before token expiration to refresh.
-    long delay = tokenExpiration - System.currentTimeMillis()/1000 - 10;
-    tokenRefreshScheduler.schedule(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          refreshToken();
-          setTokenRefreshScheduler();
-        } catch (RuntimeException e) {
-          e.printStackTrace();
-        }
-      }
-    }, delay , TimeUnit.SECONDS);
+    long delay = tokenExpiration - System.currentTimeMillis() / 1000 - 10;
+    tokenRefreshScheduler.schedule(
+        new Runnable() {
+          @Override
+          public void run() {
+            try {
+              refreshToken();
+              setTokenRefreshScheduler();
+            } catch (RuntimeException e) {
+              e.printStackTrace();
+            }
+          }
+        },
+        delay,
+        TimeUnit.SECONDS);
   }
 
   // Sets some fields such as userName, userEmail from the token.
@@ -127,12 +132,13 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       if (parts.length < 2) {
         throw new IllegalStateException("Expected 2 or more parts in token, found " + parts.length);
       }
-      JSONObject json = new JSONObject(
-          new String(Base64.getUrlDecoder().decode(parts[1].getBytes("UTF-8")), "UTF-8"));
+      JSONObject json =
+          new JSONObject(
+              new String(Base64.getUrlDecoder().decode(parts[1].getBytes("UTF-8")), "UTF-8"));
       userName = json.getString("name");
       userEmail = json.getString("email");
       tokenExpiration = json.getLong("exp");
-    } catch(Exception e) {
+    } catch (Exception e) {
       throw new RuntimeException("Cannot decode JWT token", e);
     }
   }
@@ -156,8 +162,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       } else {
         stream = connection.getErrorStream();
       }
-      String response = new BufferedReader(
-          new InputStreamReader(stream)).lines().collect(Collectors.joining("\n"));
+      String response =
+          new BufferedReader(new InputStreamReader(stream))
+              .lines()
+              .collect(Collectors.joining("\n"));
       if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
         JSONObject json = new JSONObject(response);
         jwtToken = json.getString("access_token");
@@ -183,3 +191,4 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
     return userName;
   }
 }
+

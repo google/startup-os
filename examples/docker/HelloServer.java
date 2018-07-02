@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
-
 public class HelloServer {
   public static String DOCKERENV_FILE = "/.dockerenv";
 
@@ -36,7 +35,8 @@ public class HelloServer {
       if (Files.exists(Paths.get(DOCKERENV_FILE))) {
         response = String.format("Hello, I am *inside* the container! (%s exists)", DOCKERENV_FILE);
       } else {
-        response = String.format("Hello from outside of container (%s does not exist)", DOCKERENV_FILE);
+        response =
+            String.format("Hello from outside of container (%s does not exist)", DOCKERENV_FILE);
       }
 
       t.sendResponseHeaders(200, response.length());
@@ -53,3 +53,4 @@ public class HelloServer {
     server.start();
   }
 }
+

@@ -32,3 +32,4 @@ public @interface FlagDesc {
 
   boolean required() default false;
 }
+

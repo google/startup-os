@@ -47,6 +47,7 @@ Working examples of:
 Here are some other repos with examples of Bazel, gRPC and other related technologies:
 * Go, C++, Java: https://github.com/lucperkins/colossus
 * Go: https://github.com/Staffjoy/v2
+* Java and also some C++ and Python: https://github.com/apache/incubator-heron
 
 ## Feedback
 If you're interested in StartupOS, please let us know!

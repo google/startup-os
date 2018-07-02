@@ -22,3 +22,4 @@ public class App {
     someComponent.getClass3Object().run();
   }
 }
+

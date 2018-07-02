@@ -5,7 +5,7 @@ option java_outer_classname = "Protos";
 
 package com.google.startupos.tools.localserver.service;
 
-service AuthService { 
+service AuthService {
   rpc postAuthData(AuthDataRequest) returns (AuthDataResponse);
 }
 
@@ -16,5 +16,6 @@ message AuthDataRequest {
   string refreshToken = 4;
 }
 
-// TODO: Use Empty: https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto
-message AuthDataResponse { }
+// TODO: Use Empty:
+// https://github.com/google/protobuf/blob/master/src/google/protobuf/empty.proto
+message AuthDataResponse {}

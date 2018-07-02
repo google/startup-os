@@ -58,8 +58,10 @@ public class ReviewCommand implements AaCommand {
           RED_ERROR + "Workspace has no diff to review (git branch has no D# branch)");
       return false;
     }
-    Diff.Builder diffBuilder = codeReviewBlockingStub.getDiff(
-        DiffRequest.newBuilder().setDiffId(currentDiffNumber).build()).toBuilder();
+    Diff.Builder diffBuilder =
+        codeReviewBlockingStub
+            .getDiff(DiffRequest.newBuilder().setDiffId(currentDiffNumber).build())
+            .toBuilder();
     if (diffBuilder.getReviewerCount() == 0) {
       System.out.println(String.format("D%d has no reviewers", currentDiffNumber));
       return false;
@@ -74,3 +76,4 @@ public class ReviewCommand implements AaCommand {
     return true;
   }
 }
+

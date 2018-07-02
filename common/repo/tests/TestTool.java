@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 
-
 /** Test tool for GitRepo. */
 @Singleton
 public class TestTool {
@@ -41,19 +40,21 @@ public class TestTool {
       String command = args[0];
       Repo repo = repoFactory.create(System.getenv("BUILD_WORKSPACE_DIRECTORY"));
       switch (command) {
-        case "switchBranch": {
-          String branch = args[1];
-          repo.switchBranch(branch);
-          break;
-        }
-        case "getCommits": {
-          String branch = args[1];
-          for (Commit commit : repo.getCommits(branch)) {
-            System.out.println();
-            System.out.println(commit);
+        case "switchBranch":
+          {
+            String branch = args[1];
+            repo.switchBranch(branch);
+            break;
           }
-          break;
-        }
+        case "getCommits":
+          {
+            String branch = args[1];
+            for (Commit commit : repo.getCommits(branch)) {
+              System.out.println();
+              System.out.println(commit);
+            }
+            break;
+          }
         case "getFilesInCommit":
           String commitId = args[1];
           for (File file : repo.getFilesInCommit(commitId)) {
@@ -66,26 +67,30 @@ public class TestTool {
             System.out.println(file);
           }
           break;
-        case "merge": {
-          String branch = args[1];
-          repo.merge(branch);
-          break;
-        }
-        case "mergeTheirs": {
-          String branch = args[1];
-          repo.mergeTheirs(branch);
-          break;
-        }
-        case "isMerged": {
-          String branch = args[1];
-          repo.isMerged(branch);
-          break;
-        }
-        case "removeBranch": {
-          String branch = args[1];
-          repo.removeBranch(branch);
-          break;
-        }
+        case "merge":
+          {
+            String branch = args[1];
+            repo.merge(branch);
+            break;
+          }
+        case "mergeTheirs":
+          {
+            String branch = args[1];
+            repo.mergeTheirs(branch);
+            break;
+          }
+        case "isMerged":
+          {
+            String branch = args[1];
+            repo.isMerged(branch);
+            break;
+          }
+        case "removeBranch":
+          {
+            String branch = args[1];
+            repo.removeBranch(branch);
+            break;
+          }
         case "listBranches":
           for (String branch : repo.listBranches()) {
             System.out.println(branch);
@@ -110,3 +115,4 @@ public class TestTool {
     DaggerTestTool_TestToolComponent.create().getTestTool().run(args);
   }
 }
+
