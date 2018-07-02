@@ -44,23 +44,23 @@ export class ReviewsPanelComponent {
             needAttentionOfList.concat(diff.getAuthor().getEmail());
           }
 
-          if (needAttentionOfList.includes(userEmail)) {
+          if (diff.getAuthor().getEmail() === userEmail) {
+            switch (diff.getStatus()) {
+              case Diff.Status.SUBMITTED:
+                // Submitted Review
+                this.diffGroups[Lists.SubmittedReviews].push(diff);
+                break;
+              case Diff.Status.REVIEW_NOT_STARTED:
+                // Draft Review
+                this.diffGroups[Lists.DraftReviews].push(diff);
+                break;
+            }
+          } else if (needAttentionOfList.includes(userEmail)) {
             // Need attention of user
             this.diffGroups[Lists.NeedAttention].push(diff);
           } else if (diff.getCcList().includes(userEmail)) {
             // User is cc'ed on this
             this.diffGroups[Lists.CcedOn].push(diff);
-          } else if (diff.getAuthor().getEmail() === userEmail) {
-            switch (diff.getStatus()) {
-              case Diff.Status.REVIEW_NOT_STARTED:
-                // Draft Review
-                this.diffGroups[Lists.DraftReviews].push(diff);
-                break;
-              case Diff.Status.SUBMITTED:
-                // Submitted Review
-                this.diffGroups[Lists.SubmittedReviews].push(diff);
-                break;
-            }
           }
         }
 
