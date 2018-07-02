@@ -1,25 +1,29 @@
-<div fxLayout="column" fxLayoutGap="5%">
+<div class="loading" *ngIf="isLoading">
+  <mat-spinner></mat-spinner>
+</div>
+
+<div fxLayout="column" fxLayoutGap="5%" *ngIf="!isLoading">
   <!-- Container for each list -->
-  <ng-container *ngFor="let list of diffs;let listIndex = index;">
+  <ng-container *ngFor="let list of diffGroups; let listIndex = index;">
     <div fxFlex>
       <mat-list class="diff-list">
         <!-- Select list title based on the index of list -->
         <ng-container [ngSwitch]="listIndex">
           <h3 mat-subheader *ngSwitchCase="0">
-            Need Attention - {{ diffs[0].length }}
+            Need Attention - {{ diffGroups[0].length }}
           </h3>
           <h3 mat-subheader *ngSwitchCase="1">
-            CC'ed on - {{ diffs[1].length }}
+            CC'ed on - {{ diffGroups[1].length }}
           </h3>
           <h3 mat-subheader *ngSwitchCase="2">
-            Draft Reviews - {{ diffs[2].length }}
+            Draft Reviews - {{ diffGroups[2].length }}
           </h3>
           <h3 mat-subheader *ngSwitchCase="3">
-            Submitted Reviews - {{ diffs[3].length }}
+            Submitted Reviews - {{ diffGroups[3].length }}
           </h3>
         </ng-container>
         <mat-list-item class="header-row">
-          <div fxFlex="7%">Diff</div>
+          <div fxFlex="7%">Diff id</div>
           <div fxFlex="10%">Author</div>
           <div fxFlex="18%">Status</div>
           <div fxFlex="20%">Last Action</div>
@@ -29,14 +33,14 @@
         <!-- Iterate over each item in a list and print it out -->
         <mat-list-item
           *ngFor="let diff of list; let i = index; let last = last"
-          (click)="diffClicked(diff.number)"
+          (click)="diffClicked(diff.getId())"
           [class.last-item]="last">
-          <div fxFlex="7%">{{ diff.number }}</div>
+          <div fxFlex="7%">{{ diff.getId() }}</div>
           <div fxFlex="10%">
-            {{ diff.author ? diff.author : 'Not available' }}
+            {{ authService.getUsername(diff.getAuthor().getEmail()) }}
           </div>
           <div fxFlex="18%">
-            <ng-container [ngSwitch]="diff.status">
+            <ng-container [ngSwitch]="diff.getStatus()">
               <span *ngSwitchCase="'0'">Review Not Started</span>
               <span *ngSwitchCase="'1'">Needs More Work</span>
               <span *ngSwitchCase="2">Under Review</span>
@@ -46,31 +50,26 @@
             </ng-container>
           </div>
           <div fxFlex="20%">
-            {{ diff.modifiedTimestamp | date: 'mediumDate' }}
+            {{ diff.getModifiedTimestamp() | date: 'mediumDate' }}
           </div>
           <div fxFlex="20%">
-            <!-- Print out reviewer's list if length is more than zero -->
-            <ng-container *ngIf="diff.reviewersList.length === 1">
-              <a>
-                {{ diff.reviewersList[0] }}
-              </a>
-            </ng-container>
-            <ng-container *ngIf="diff.reviewersList.length > 1">
-              <a *ngFor="let reviewer of diff.reviewersList; let last = last">
-                {{ last ? reviewer : reviewer + ',' }}
-              </a>
-            </ng-container>
+            <!-- Print out reviewer's list -->
+            <a>
+              {{ getUsernames(diff.getReviewerList()) }}
+            </a>
             <!-- If no reviewers are present -->
-            <ng-container *ngIf="diff.reviewersList.length === 0">
+            <ng-container *ngIf="diff.getReviewerList().length === 0">
               <span>
                 Not available
               </span>
             </ng-container>
           </div>
           <!-- If description doesn't exist print out 'Not Available' -->
-          <div class="description" fxFlex="25%">
-            {{ diff.description ? diff.description : 'Not available' }}
-          </div>
+          <div class="description" fxFlex="25%">{{
+            diff.getDescription() ?
+              diff.getDescription() :
+              'Not available'
+          }}</div>
         </mat-list-item>
       </mat-list>
     </div>
