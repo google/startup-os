@@ -89,7 +89,7 @@ dependencies:
   io.grpc:
     grpc:
       lang: java
-      modules: [ "netty", "protobuf", "stub" ]
+      modules: [ "netty", "protobuf", "stub", "services" ]
       version: "1.12.0"
   
   javax.annotation:

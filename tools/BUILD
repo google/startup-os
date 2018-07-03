@@ -26,3 +26,9 @@ sh_binary(
         "@unused_deps_osx//file",
     ],
 )
+
+java_binary(
+    name = "grpc_polyglot",
+    main_class = "me.dinowernli.grpc.polyglot.Main",
+    runtime_deps = ["@grpc_polyglot//jar"],
+)
