@@ -1,92 +1,53 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { Diff, FirebaseService, NotificationService } from '@/shared';
+import { FirebaseService } from '@/shared/services';
+import { Diff, File } from '@/shared/shell';
+import { MockServerService } from '../diff/mock-server.service';
 
 @Component({
   selector: 'app-review',
   templateUrl: './review.component.html',
-  styleUrls: ['./review.component.scss']
+  styleUrls: ['./review.component.scss'],
+  providers: [MockServerService],
 })
 export class ReviewComponent implements OnInit {
-  diffId: string;
+  isLoading: boolean = true;
   diff: Diff;
-  diffView: Diff.AsObject;
-
+  fileList: File[];
   // Show editable button next to fields
-  editable: boolean = true;
-  // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
-  notEditableStatus: Array<number> = [
-    Diff.Status.SUBMITTED,
-    Diff.Status.REVERTED
-  ];
+  isEditable: boolean = true;
 
   constructor(
     private route: ActivatedRoute,
     private firebaseService: FirebaseService,
-    private notificationService: NotificationService
+    private mockServerService: MockServerService,
   ) { }
 
   ngOnInit() {
-    this.diffId = this.route.snapshot.params['id'];
+    const diffId: string = this.route.snapshot.params['id'];
 
     // Get a single review
-    this.firebaseService.getDiff(this.diffId).subscribe(
-      res => {
-        this.diff = res;
-        this.diffView = this.diff.toObject();
-
-        this.diff.setNumber(parseInt(this.diffId, 10));
-        // Render the fields un-editable if the current diff status
-        // is in the list of notEditableStatus
-        this.editable = !this.notEditableStatus.includes(
-          this.diff.getStatus()
-        );
-      },
-      () => {
-        // Permission Denied
-      }
-    );
+    this.firebaseService.getDiff(diffId).subscribe(diff => {
+      this.diff = diff;
+      this.fileList = this.mockServerService.getMockFiles(
+        this.diff.getWorkspace(),
+      );
+      this.isEditable = this.getIsEditable(this.diff.getStatus());
+      this.isLoading = false;
+    }, () => {
+      // Permission Denied
+    });
   }
 
-  // Save needAttentionOf list and update the Diff
-  saveAttentionList(name: string): void {
-    if (this.diffView.needAttentionOfList.includes(name)) {
-      const filtheredNeedAttentionOfList = this.diff
-        .getNeedAttentionOfList()
-        .filter(e => e !== name);
-
-      this.diff.setNeedAttentionOfList(filtheredNeedAttentionOfList);
-    } else {
-      this.diff.addNeedAttentionOf(name);
-    }
-    this.updateDiff(this.diff, 'Update Need Attention List');
-  }
-
-  // TODO: refactor this method
-  // Update whole diff, instead of sending a property to firebase
-  // NOTICE: do not use: object[property]
-  removeProperty(property: string, message: string): void {
-    console.warn('Unsupported behavior');
-    // this.firebaseService
-    //   .removeProperty(this.diff, property)
-    //   .then(() => {
-    //     this.notificationService.success(message);
-    //   })
-    //   .catch(() => {
-    //     this.notificationService.error('Some error occured');
-    //   });
-  }
-
-  // Update the Diff in the DB
-  updateDiff(diff: Diff, message: string): void {
-    this.firebaseService.updateDiff(diff).subscribe(
-      () => {
-        this.notificationService.success(message);
-      },
-      () => {
-        this.notificationService.error('Some error occured');
-      }
-    );
+  getIsEditable(status: Diff.Status): boolean {
+    // Render the fields un-editable if the current diff status
+    // is in the list of notEditableStatus
+    // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
+    const statuses = [
+      Diff.Status.SUBMITTED,
+      Diff.Status.REVERTED,
+    ];
+    return !statuses.includes(status);
   }
 }

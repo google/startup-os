@@ -1,5 +1,5 @@
 <div class="file-header" *ngIf="!isLoading">
-  <div><a routerLink="/diff/{{ diff.getNumber() }}">Back</a></div>
+  <div><a routerLink="/diff/{{ diff.getId() }}">Back</a></div>
   <div><span>{{filePath}}</span></div>
 </div>
 
@@ -9,14 +9,14 @@
 <div class="split-code" *ngIf="!isLoading">
   <!-- Old code (left) -->
   <code-block
-    [fileContent]="files[0]"
+    [fileContent]="textDiffResponse.getLeftFileContents()"
     [isNewCode]="false"
     [changes]="changes"
   ></code-block>
 
   <!-- New code (right) -->
   <code-block
-    [fileContent]="files[1]"
+    [fileContent]="textDiffResponse.getRightFileContents()"
     [isNewCode]="true"
     [changes]="changes"
     [threads]="localThreads"

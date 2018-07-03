@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
 import { Comment } from '@/shared';
-import { SelectionService } from '@/shared/services';
 
 interface HeightResponse {
   height: number;
@@ -35,7 +34,6 @@ export class DiffService {
   }
   openComments(lineNumber: number): void {
     this.openCommentsChanges.next(lineNumber);
-    this.selectionService.clear();
   }
   closeComments(lineNumber: number): void {
     this.closeCommentsChanges.next(lineNumber);
@@ -43,8 +41,6 @@ export class DiffService {
   addComment(param: AddCommentResponse): void {
     this.newComment.next(param);
   }
-
-  constructor(private selectionService: SelectionService) {}
 
   // Lines detect mouse hover by the method
   mouseHover(i: number, isNewCode: boolean): void {

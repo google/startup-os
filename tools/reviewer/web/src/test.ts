@@ -4,7 +4,7 @@
 import { getTestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting
+  platformBrowserDynamicTesting,
 } from '@angular/platform-browser-dynamic/testing';
 import 'zone.js/dist/async-test';
 import 'zone.js/dist/fake-async-test';
@@ -24,7 +24,7 @@ __karma__.loaded = function() {};
 // First, initialize the Angular testing environment.
 getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
-  platformBrowserDynamicTesting()
+  platformBrowserDynamicTesting(),
 );
 // Then we find all the tests.
 const context = require.context('./', true, /\.spec\.ts$/);

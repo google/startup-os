@@ -1,9 +1,12 @@
+// NOTICE: Lines with more than 100 chars create a horizontal scroll.
+// TODO: add supporting of line wrap
+
 import {
   ChangeDetectorRef,
   Component,
   Input,
   OnDestroy,
-  OnInit
+  OnInit,
 } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -26,7 +29,7 @@ export interface Line {
 @Component({
   selector: 'code-block',
   templateUrl: './code-block.component.html',
-  styleUrls: ['./code-block.component.scss']
+  styleUrls: ['./code-block.component.scss'],
 })
 export class CodeBlockComponent implements OnInit, OnDestroy {
   isComponentInit: boolean = false;
@@ -57,7 +60,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   constructor(
     private highlightService: HighlightService,
     private changeDetectorRef: ChangeDetectorRef,
-    private diffService: DiffService
+    private diffService: DiffService,
   ) {
     // Subscriptions on events
     this.lineHeightChangesSubscription = this.diffService
@@ -67,14 +70,14 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
           this.lines[param.lineNumber].hasPlaceholder = true;
           this.lines[param.lineNumber].height = param.height;
           this.addPlaceholder(param.lineNumber);
-        }
+        },
       );
     this.closeCommentsChangesSubscription = this.diffService
       .closeCommentsChanges.subscribe(
         lineNumber => {
           // Request for closing a comment block
           this.closeCommentsBlock(lineNumber);
-        }
+        },
       );
     this.openCommentsChangesSubscription = this.diffService
       .openCommentsChanges.subscribe(
@@ -85,7 +88,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
             return;
           }
           this.openCommentsBlock(lineNumber);
-        }
+        },
       );
   }
 
@@ -114,10 +117,10 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   // Bootstrap method.
   initLines(fileContent: string): void {
     // TODO: detect language
-    const language = 'python';
+    const language = 'java';
     const highlightedCode = this.highlightService.highlight(
       fileContent,
-      language
+      language,
     );
 
     const FileLines = fileContent.split('\n');
@@ -130,7 +133,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
         highlightedCode: this.highlightedLines[i],
         comments: [],
         isChanged: false,
-        isCommentsVisible: false
+        isCommentsVisible: false,
       });
     });
   }
@@ -153,7 +156,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     }
     for (const thread of threads) {
       const i = thread.getLineNumber();
-      this.lines[i].comments = thread.getCommentsList();
+      this.lines[i].comments = thread.getCommentList();
       this.openCommentsBlock(i);
     }
   }
