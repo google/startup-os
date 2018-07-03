@@ -74,7 +74,7 @@ dependencies:
     protobuf-java:
       lang: java
       modules: [ "", "util" ]
-      version: "3.5.1"
+      version: "3.6.0"
   
   com.jcraft:
     jsch:

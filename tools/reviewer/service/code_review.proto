@@ -7,20 +7,20 @@ option java_outer_classname = "Protos";
 
 import "common/repo/repo.proto";
 import "common/text_difference.proto";
-import "google/protobuf/empty.proto";
 
 service CodeReviewService {
   // Get a text file's contents
   rpc getFile(FileRequest) returns (FileResponse);
-  rpc createDiff(CreateDiffRequest) returns (.google.protobuf.Empty);
+  rpc createDiff(CreateDiffRequest) returns (Empty);
   rpc getTextDiff(TextDiffRequest) returns (TextDiffResponse);
   // returns available diff number and increments stored value by one
-  rpc getAvailableDiffNumber(.google.protobuf.Empty)
-      returns (DiffNumberResponse);
+  rpc getAvailableDiffNumber(Empty) returns (DiffNumberResponse);
   rpc getDiff(DiffRequest) returns (Diff);
   rpc getDiffFiles(DiffFilesRequest) returns (DiffFilesResponse);
-  rpc ping(.google.protobuf.Empty) returns (PongResponse);
+  rpc ping(Empty) returns (PongResponse);
 }
+
+message Empty {}
 
 message FileRequest { string filename = 1; }
 

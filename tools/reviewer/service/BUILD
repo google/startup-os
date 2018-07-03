@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@io_grpc_grpc_java//:java_grpc_library.bzl", "java_grpc_library")
+load("//third_party:java_grpc_library.bzl", "java_grpc_library")
 
 proto_library(
     name = "code_review_proto",
@@ -8,7 +8,6 @@ proto_library(
     deps = [
         "//common:text_difference_proto",
         "//common/repo:repo_proto",
-        "@com_google_protobuf//:empty_proto",
     ],
 )
 
@@ -42,12 +41,12 @@ java_library(
         "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/local_server/service:auth_service",
-        "@com_google_protobuf//:protobuf_java",
     ],
 )
 
