@@ -27,8 +27,8 @@ import javax.inject.Named;
 
 public class SyncCommand implements AaCommand {
 
-  private FileUtils fileUtils;
-  private Config config;
+  private final FileUtils fileUtils;
+  private final Config config;
   private GitRepoFactory repoFactory;
   private String currentWorkspaceName;
 
@@ -54,7 +54,7 @@ public class SyncCommand implements AaCommand {
           .listContents(headPath)
           .stream()
           .map(path -> fileUtils.joinPaths(headPath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 System.out.println(String.format("[HEAD]: Performing sync: %s", path));
@@ -70,7 +70,7 @@ public class SyncCommand implements AaCommand {
           .listContents(workspacePath)
           .stream()
           .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();

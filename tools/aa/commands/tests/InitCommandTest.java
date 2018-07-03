@@ -16,9 +16,7 @@
 
 package com.google.startupos.tools.aa.commands.tests;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
@@ -30,13 +28,7 @@ import com.google.startupos.tools.aa.commands.AaCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import dagger.Component;
 import dagger.Provides;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.nio.file.FileSystem;
-import java.util.Arrays;
-import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,14 +37,13 @@ public class InitCommandTest {
 
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
-  public interface TestComponent {
-    InitCommand getCommand();
-
-    FileUtils getFileUtils();
+  interface TestComponent {
+      InitCommand getCommand();
+      FileUtils getFileUtils();
   }
 
-  AaCommand initCommand;
-  FileUtils fileUtils;
+  private AaCommand initCommand;
+  private FileUtils fileUtils;
 
   @Before
   public void setup() {
