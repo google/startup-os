@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class HelloServer {
-  public static String DOCKERENV_FILE = "/.dockerenv";
+  private static final String DOCKERENV_FILE = "/.dockerenv";
 
   static class SayHelloHandler implements HttpHandler {
     @Override
@@ -40,9 +40,9 @@ public class HelloServer {
       }
 
       t.sendResponseHeaders(200, response.length());
-      OutputStream os = t.getResponseBody();
-      os.write(response.getBytes());
-      os.close();
+      try (OutputStream os = t.getResponseBody()) {
+        os.write(response.getBytes());
+      }
     }
   }
 

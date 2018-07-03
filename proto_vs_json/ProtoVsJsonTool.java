@@ -41,7 +41,7 @@ public class ProtoVsJsonTool {
   @FlagDesc(name = "json_output", description = "Path to json output file")
   private static final Flag<String> jsonOutput = Flag.create("example.json");
 
-  FileUtils fileUtils;
+  private final FileUtils fileUtils;
 
   @Inject
   ProtoVsJsonTool(FileUtils fileUtils) {
@@ -79,4 +79,3 @@ public class ProtoVsJsonTool {
     DaggerProtoVsJsonTool_MainComponent.create().getTool().run();
   }
 }
-
