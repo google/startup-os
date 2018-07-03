@@ -19,6 +19,7 @@ service CodeReviewService {
       returns (DiffNumberResponse);
   rpc getDiff(DiffRequest) returns (Diff);
   rpc getDiffFiles(DiffFilesRequest) returns (DiffFilesResponse);
+  rpc ping(.google.protobuf.Empty) returns (PongResponse);
 }
 
 message FileRequest { string filename = 1; }
@@ -51,6 +52,8 @@ message DiffFilesResponse {
 }
 
 message DiffRequest { int64 diff_id = 1; }
+
+message PongResponse { string message = 1; }
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues

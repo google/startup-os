@@ -27,6 +27,7 @@ import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import dagger.Component;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -53,6 +54,7 @@ public class LocalServer {
         ServerBuilder.forPort(localServerPort.get())
             .addService(authService)
             .addService(codeReviewService)
+            .addService(ProtoReflectionService.newInstance())
             .build();
   }
 

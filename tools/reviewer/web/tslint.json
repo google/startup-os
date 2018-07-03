@@ -99,7 +99,6 @@
     "no-sparse-arrays": true,
     "no-use-before-declare": false,
     "radix": true,
-    "typeof-compare": true,
     "use-default-type-parameter": true,
     "no-default-export": true,
     "no-mergeable-namespace": true,
@@ -108,6 +107,7 @@
     "new-parens": true,
     "no-consecutive-blank-lines": true,
     "no-unnecessary-qualifier": true,
-    "one-line": [true, "check-catch", "check-finally", "check-else"]
+    "one-line": [true, "check-catch", "check-finally", "check-else"],
+    "trailing-comma": [true, {"multiline": "always", "singleline": "never"}]
   }
 }
