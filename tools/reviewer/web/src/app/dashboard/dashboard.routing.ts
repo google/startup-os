@@ -8,18 +8,18 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'diffs' },
       {
         path: 'diffs',
-        component: ReviewsPanelComponent
+        component: ReviewsPanelComponent,
       },
       {
         path: 'diff/:id',
-        component: ReviewComponent
+        component: ReviewComponent,
       },
       {
         path: 'diff',
-        children: [{ path: '**', component: DiffComponent }]
-      }
-    ]
-  }
+        children: [{ path: '**', component: DiffComponent }],
+      },
+    ],
+  },
 ];
 
 export const DashboardRoutes = RouterModule.forChild(routes);

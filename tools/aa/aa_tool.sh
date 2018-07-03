@@ -7,6 +7,11 @@
 # If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
 
 
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+RESET=$(tput sgr0)
+
+
 function _aa_completions()
 {
     local cur_word prev_word type_list
@@ -61,6 +66,56 @@ function find_base_folder {
   return 0
 }
 
+function start_local_server {
+    # starts local_server if it is not running yet
+    # server is started by tools/local_server/run.sh
+    # to check whether it is running already we try
+    # to communicate with it by gRPC via polyglot
+    # for additional output, set LOCAL_SERVER_POLYGLOT_DEBUG env variable
+
+    find_base_folder
+    if [[ -z "$AA_BASE" ]]; then
+      echo "BASE file not found in path until root"
+      return 1
+    fi
+
+    STARTUP_OS=$AA_BASE/head/startup-os
+
+    # store stderr to debug
+    POLYGLOT_STDERR_DEBUG_FILE=$(mktemp)
+    # call `ping` method via gRPC and store result (ignored for now)
+    OUTPUT=$(echo {} | $STARTUP_OS/bazel-bin/tools/grpc_polyglot \
+      --command=call \
+      --endpoint=localhost:8001 \
+      --full_method=com.google.startupos.tools.reviewer.service.CodeReviewService/ping \
+      2>$POLYGLOT_STDERR_DEBUG_FILE)
+
+    POLYGLOT_EXIT_CODE=$?
+    # if polyglot cannot reach gRPC server it exits with nonzero code
+    # then we need to run server
+    if [ $POLYGLOT_EXIT_CODE -ne 0 ]; then
+        if [ ! -z "$LOCAL_SERVER_POLYGLOT_DEBUG" ]; then
+          echo "$RED[DEBUG]: Polyglot exit code was $POLYGLOT_EXIT_CODE$RESET"
+          echo "$RED[DEBUG]: Polyglot output was $RESET$OUTPUT"
+          echo "$RED[DEBUG]: Polyglot stderr is stored at $RESET$POLYGLOT_STDERR_DEBUG_FILE"
+        fi
+        echo "$GREEN""Local server did not respond, starting it...$RESET"
+        echo "$GREEN""Server PID is:$RESET" # will be printed by bash
+        # nohup detaches the command from terminal it was executed on
+        nohup bash $AA_BASE/head/startup-os/tools/local_server/run.sh </dev/null >/dev/null 2>&1 &
+        echo "$RED""Visit$RESET http://localhost:8000$RED to log in$RESET"
+        return 1
+    else
+       # polyglot reached gRPC server so it is running already
+       if [ ! -z "$LOCAL_SERVER_POLYGLOT_DEBUG" ]; then
+          echo "$GREEN[DEBUG]: Server is already running, nothing to do$RESET"
+          echo "$RED[DEBUG]: Polyglot exit code was $POLYGLOT_EXIT_CODE$RESET"
+          echo "$RED[DEBUG]: Polyglot output was $RESET$OUTPUT"
+          echo "$RED[DEBUG]: Polyglot stderr is stored at $RESET$POLYGLOT_STDERR_DEBUG_FILE"
+       fi
+    fi
+}
+
 function aa {
   CWD=`pwd`
   find_base_folder
@@ -68,6 +123,13 @@ function aa {
     echo "BASE file not found in path until root"
     return 1
   fi
+
+  start_local_server
+  if [ ! $? -eq 0 ]; then
+    echo "$GREEN""Please execute the same command (shorthand: $RESET!!$GREEN) after server starts$RESET";
+    return 1
+  fi
+
   STARTUP_OS=$AA_BASE/head/startup-os
 
   # Uncomment to override StartupOS repo:

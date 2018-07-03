@@ -17,7 +17,7 @@ if [ "$(uname)" = "Darwin" ] || [ "$(uname)" = "Linux" ]; then
   # Mac & Linux
   pkill -f 'tools/local_server/local_http_gateway'
   pkill -f 'tools/local_server/local_server'
-  fuser -k 8000/tcp # For Angular
+  kill $(lsof -t -i:8000) # For Angular
 # else
 #   # Windows
 #   # TODO: kill local_http_gateway & local_server
