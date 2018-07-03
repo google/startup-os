@@ -35,8 +35,8 @@ import javax.inject.Named;
 
 public class SubmitCommand implements AaCommand {
 
-  private FileUtils fileUtils;
-  private GitRepoFactory gitRepoFactory;
+  private final FileUtils fileUtils;
+  private final GitRepoFactory gitRepoFactory;
   private String workspacePath;
   private Integer currentDiffNumber;
 
@@ -93,7 +93,7 @@ public class SubmitCommand implements AaCommand {
           .listContents(workspacePath)
           .stream()
           .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();

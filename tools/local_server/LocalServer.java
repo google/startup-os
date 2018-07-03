@@ -46,7 +46,7 @@ public class LocalServer {
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
   private static final Flag<Integer> localServerPort = Flag.create(8001);
 
-  private Server server;
+  private final Server server;
 
   @Inject
   LocalServer(AuthService authService, CodeReviewService codeReviewService) {
@@ -67,7 +67,7 @@ public class LocalServer {
                 () -> {
                   // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                   System.err.println("Shutting down gRPC server since JVM is shutting down");
-                  LocalServer.this.stop();
+                  this.stop();
                   System.err.println("Server shut down");
                 }));
   }
