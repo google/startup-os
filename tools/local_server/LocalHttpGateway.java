@@ -189,7 +189,7 @@ public class LocalHttpGateway {
       TextDiffRequest request =
           TextDiffRequest.parseFrom(Base64.getDecoder().decode(requestString));
       logger.atInfo().log("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
-      byte[] response = 
+      byte[] response =
           Base64.getEncoder().encode(client.getCodeReviewStub().getTextDiff(request).toByteArray());
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
@@ -234,7 +234,7 @@ public class LocalHttpGateway {
       DiffFilesRequest request =
           DiffFilesRequest.parseFrom(Base64.getDecoder().decode(requestString));
       logger.atInfo().log("Handling " + GET_DIFF_FILES_PATH + " request:\n" + request);
-      byte[] response = 
+      byte[] response =
           Base64.getEncoder()
               .encode(client.getCodeReviewStub().getDiffFiles(request).toByteArray());
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
@@ -245,7 +245,8 @@ public class LocalHttpGateway {
   }
 
   static String getPostParamsString(HttpExchange httpExchange) throws IOException {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), UTF_8))) {
+    try (BufferedReader reader =
+        new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), UTF_8))) {
       return reader.lines().collect(Collectors.joining());
     }
   }

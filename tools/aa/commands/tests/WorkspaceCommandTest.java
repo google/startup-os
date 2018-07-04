@@ -44,8 +44,9 @@ public class WorkspaceCommandTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   interface TestComponent {
-      WorkspaceCommand getCommand();
-      FileUtils getFileUtils();
+    WorkspaceCommand getCommand();
+
+    FileUtils getFileUtils();
   }
 
   private AaCommand workspaceCommand;
@@ -144,3 +145,4 @@ public class WorkspaceCommandTest {
     // assertEquals("cd /base/ws/workspace_name\n", outContent.toString());
   }
 }
+
