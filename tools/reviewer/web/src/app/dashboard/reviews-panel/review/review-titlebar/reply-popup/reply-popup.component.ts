@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Diff } from '@/shared';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'cr-reply-popup',
@@ -6,7 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./reply-popup.component.scss']
 })
 export class ReplyPopupComponent implements OnInit {
-
+  @Input() diff: Diff.AsObject;
+  actionRequired = false;
+  approved = false;
   constructor() { }
 
   ngOnInit() {

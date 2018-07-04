@@ -4,12 +4,13 @@
     [(ngModel)]="propertyValue">
   </textarea>
   <div class="action-required">
-    <input type="checkbox" value="Action Required"> Action Required
+    <input type="checkbox" [(ngModel)]="actionRequired" value="Action Required"> 
+    <span (click)="actionRequired = !actionRequired"> Action Required </span>
   </div>
   <div class="reply-actions" fxLayout="row" fxLayoutAlign="end center">
     <div>
-      <input type="checkbox" value="Action Required"> Approved
+      <input type="checkbox"  [(ngModel)]="approved" value="Action Required"> Approved
     </div>
-    <button>Reply</button>
+    <button (click)="reply()">Reply</button>
   </div>
 </div>
