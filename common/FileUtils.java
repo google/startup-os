@@ -313,9 +313,9 @@ public class FileUtils {
     }
   }
 
-  private void deleteDirectoryContents(String path, boolean isTargetDirectoryRemoved) throws IOException {
-    final Path folderForCleaning = fileSystem.getPath(expandHomeDirectory(path));
-    Files.walkFileTree(folderForCleaning, new SimpleFileVisitor<Path>() {
+  private void deleteDirectoryContents(String path, boolean deleteTargetDirectory) throws IOException {
+    final Path targetDirectory = fileSystem.getPath(expandHomeDirectory(path));
+    Files.walkFileTree(targetDirectory, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         Files.delete(file);
@@ -325,12 +325,10 @@ public class FileUtils {
       @Override
       public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
         if (exception == null) {
-          if(isTargetDirectoryRemoved) {
-            Files.delete(dir);
+          if (!deleteTargetDirectory && (targetDirectory == dir)) {
+            // Do nothing
           } else {
-            if(dir != folderForCleaning){
-              Files.delete(dir);
-            }
+            Files.delete(dir);
           }
           return FileVisitResult.CONTINUE;
         } else {
