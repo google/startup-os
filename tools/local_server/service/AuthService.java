@@ -56,7 +56,8 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
 
   private final FileUtils fileUtils;
-  private final ScheduledExecutorService tokenRefreshScheduler = Executors.newScheduledThreadPool(1);
+  private final ScheduledExecutorService tokenRefreshScheduler =
+      Executors.newScheduledThreadPool(1);
   private String projectId;
   private String apiKey;
   private String jwtToken;
@@ -70,8 +71,8 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   AuthService(FileUtils fileUtils) {
     this.fileUtils = fileUtils;
     if (debugTokenMode.get() && fileUtils.fileExists(DEBUGGING_TOKEN_PATH)) {
-      AuthDataRequest req = 
-          (AuthDataRequest) 
+      AuthDataRequest req =
+          (AuthDataRequest)
               fileUtils.readProtoBinaryUnchecked(
                   DEBUGGING_TOKEN_PATH, AuthDataRequest.newBuilder());
       projectId = req.getProjectId();
@@ -109,14 +110,17 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private void setTokenRefreshScheduler() {
     // Wait until 10 seconds before token expiration to refresh.
     long delay = tokenExpiration - (System.currentTimeMillis() / 1000) - 10;
-    tokenRefreshScheduler.schedule(() -> {
-      try {
-        refreshToken();
-        setTokenRefreshScheduler();
-      } catch (RuntimeException e) {
-        e.printStackTrace();
-      }
-    }, delay, TimeUnit.SECONDS);
+    tokenRefreshScheduler.schedule(
+        () -> {
+          try {
+            refreshToken();
+            setTokenRefreshScheduler();
+          } catch (RuntimeException e) {
+            e.printStackTrace();
+          }
+        },
+        delay,
+        TimeUnit.SECONDS);
   }
 
   // Sets some fields such as userName, userEmail from the token.
@@ -150,10 +154,11 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       connection.setDoOutput(true);
       connection.getOutputStream().write(postDataBytes);
 
-      try (InputStream stream = (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
-               ? connection.getInputStream()
-               : connection.getErrorStream();
-           BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream))) {
+      try (InputStream stream =
+              (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
+                  ? connection.getInputStream()
+                  : connection.getErrorStream();
+          BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream))) {
 
         String response = bufferedReader.lines().collect(Collectors.joining("\n"));
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {

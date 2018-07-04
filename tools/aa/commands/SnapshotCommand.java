@@ -79,13 +79,10 @@ public class SnapshotCommand implements AaCommand {
                   System.out.println(String.format("[%s]: No files to update", repoName));
                   return; // Only skips this iteration
                 }
-                String message = 
-                    branchName 
-                    + ":\n" 
-                    + files
-                        .stream()
-                        .map(File::getFilename)
-                        .collect(Collectors.joining("\n"));
+                String message =
+                    branchName
+                        + ":\n"
+                        + files.stream().map(File::getFilename).collect(Collectors.joining("\n"));
                 repo.commit(files, String.format(message, branchName));
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });
@@ -95,3 +92,4 @@ public class SnapshotCommand implements AaCommand {
     return true;
   }
 }
+

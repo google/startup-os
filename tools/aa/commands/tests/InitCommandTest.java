@@ -38,8 +38,9 @@ public class InitCommandTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   interface TestComponent {
-      InitCommand getCommand();
-      FileUtils getFileUtils();
+    InitCommand getCommand();
+
+    FileUtils getFileUtils();
   }
 
   private AaCommand initCommand;

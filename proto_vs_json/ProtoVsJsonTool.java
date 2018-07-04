@@ -79,3 +79,4 @@ public class ProtoVsJsonTool {
     DaggerProtoVsJsonTool_MainComponent.create().getTool().run();
   }
 }
+
