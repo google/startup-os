@@ -35,7 +35,7 @@ statusList[Diff.Status.ACCEPTED] = {
 statusList[Diff.Status.SUBMITTING] = {
   label: 'Submitting',
   icon: 'check_circle',
-  iconClass: 'submitted',
+  iconClass: 'submitting',
 };
 statusList[Diff.Status.SUBMITTED] = {
   label: 'Submitted',
