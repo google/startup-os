@@ -60,7 +60,7 @@ export class ReviewerListComponent implements OnInit {
 
           // Default values:
           reviewer.setApproved(false);
-          reviewer.setNeedsattention(true);
+          reviewer.setNeedsAttention(true);
         }
         reviewers.push(reviewer);
       });
@@ -87,11 +87,11 @@ export class ReviewerListComponent implements OnInit {
 
   // Request or cancel attention of the reviewer
   changeAttentionOfReviewer(reviewer: Reviewer): void {
-    reviewer.setNeedsattention(!reviewer.getNeedsattention());
+    reviewer.setNeedsAttention(!reviewer.getNeedsAttention());
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
       const username = this.authService.getUsername(reviewer.getEmail());
-      const message = reviewer.getNeedsattention() ?
+      const message = reviewer.getNeedsAttention() ?
         `Attention of ${username} is requested` :
         `Attention of ${username} is canceled`;
       this.notificationService.success(message);

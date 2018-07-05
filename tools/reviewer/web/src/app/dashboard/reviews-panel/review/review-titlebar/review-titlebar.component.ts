@@ -32,11 +32,11 @@ export class ReviewTitlebarComponent implements OnInit {
   // Request or cancel attention of the author
  changeAttentionOfAuthor(): void {
     const author = this.diff.getAuthor();
-    author.setNeedsattention(!author.getNeedsattention());
+    author.setNeedsAttention(!author.getNeedsAttention());
     this.diff.setAuthor(author);
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      const message = this.diff.getAuthor().getNeedsattention() ?
+      const message = this.diff.getAuthor().getNeedsAttention() ?
         'Attention of author is requested' :
         'Attention of author is canceled';
       this.notificationService.success(message);
