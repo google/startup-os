@@ -2,36 +2,34 @@ const path = require('path');
 const fs = require('fs-extra');  
 const gulp = require('gulp');
 const clean = require('gulp-clean');
-const mv = require('mv');
 const { exec } = require('child_process');
 
-const tempPath = './temp';
-const shellPath = './src/app/shared/shell/proto';
-const codeReviewProtoPathRelative = 'tools/reviewer/service/code_review.proto';
+const protoPath = './src/app/shared/shell/proto';
+const codeReviewProtoRelativePath = 'tools/reviewer/service/code_review.proto';
 // from 'startup-os/tools/reviewer/web' to 'startup-os'
 const startuposPath = path.resolve('../../../');
 
 gulp.task('default', ['protoc']);
 
 gulp.task('protoc', () => {
-  // Create temporary folder
-  if (!fs.existsSync(tempPath)) {
-    fs.mkdirSync(tempPath);
+  // Create a proto folder
+  if (!fs.existsSync(protoPath)) {
+    fs.mkdirSync(protoPath);
   }
 
-  // Copy all packages to the temporary folder
+  // Copy all packages to the proto folder
   const codeReviewProtoPath = path.join(
     startuposPath,
-    codeReviewProtoPathRelative
+    codeReviewProtoRelativePath
   );
   var protoImportList = [];
-  const codeReviewFilename = path.parse(codeReviewProtoPathRelative).base;
+  const codeReviewFilename = path.parse(codeReviewProtoRelativePath).base;
   protoImportList.push(codeReviewFilename);
-  const newCodeReviewPath = path.join(tempPath, codeReviewFilename);
+  const newCodeReviewPath = path.join(protoPath, codeReviewFilename);
   fs.copySync(codeReviewProtoPath, newCodeReviewPath);
   const codeReviewContent = fs.readFileSync(newCodeReviewPath, 'utf8');
   const codeReviewLines = codeReviewContent.split('\n');
-  for(let line of codeReviewLines) {
+  for (let line of codeReviewLines) {
     // Get children paths from imports in code_review.proto
     if (line.startsWith('import')) {
       // Everything between quotes
@@ -49,20 +47,20 @@ gulp.task('protoc', () => {
       if (!fs.existsSync(packagePath)) {
         throw new Error('Package not found: ' + importPath);
       }
-      const newPackagePath = path.join(tempPath, importPath);
+      const newPackagePath = path.join(protoPath, importPath);
       fs.copySync(packagePath, newPackagePath);
       protoImportList.push(importPath);
     }
   }
 
-  // Create proto functions from the packages in the temporary folder
+  // Create proto functions from the packages in the proto folder
   const protoImport = protoImportList.join(' ');
   exec(
     'protoc ' +
-      `--proto_path=${tempPath} ` +
-      `--js_out=import_style=commonjs,binary:${tempPath} ` +
+      `--proto_path=${protoPath} ` +
+      `--js_out=import_style=commonjs,binary:${protoPath} ` +
       '--plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts ' +
-      `--ts_out=${tempPath} ` +
+      `--ts_out=${protoPath} ` +
       protoImport,
     protocOnLoad
   );
@@ -73,8 +71,8 @@ gulp.task('protoc', () => {
       throw error;
     }
 
-    // Remove all *.proto files
-    gulp.src(path.join(tempPath, '**/*.proto'))
+    // Remove all *.proto files from the proto folder
+    gulp.src(path.join(protoPath, '**/*.proto'))
       .pipe(clean())
       .on('data', () => {})
       .on('end', removingOnLoad);
@@ -82,15 +80,6 @@ gulp.task('protoc', () => {
 
   // When all *.proto files are removed
   function removingOnLoad() {
-    // Move generated proto functions inside angular
-    mv(tempPath, shellPath, movingOnLoad)
-  }
-
-  // When all proto function are moved inside angular
-  function movingOnLoad(error) {
-    if (error) {
-      throw error;
-    }
     console.log('Proto functions is successfully created.');
   }
 });

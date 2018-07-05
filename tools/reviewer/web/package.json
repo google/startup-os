@@ -52,7 +52,6 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "karma-phantomjs-launcher": "^1.0.4",
     "lodash": "^4.17.5",
-    "mv": "^2.1.1",
     "phantomjs-prebuilt": "^2.1.16",
     "protractor": "^5.3.0",
     "rxjs": "^5.5.6",
