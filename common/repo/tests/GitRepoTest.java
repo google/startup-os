@@ -16,7 +16,6 @@
 
 package com.google.startupos.common.repo.tests;
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -37,16 +36,16 @@ import org.junit.Test;
 import javax.inject.Singleton;
 
 public class GitRepoTest {
-  private static String TEST_BRANCH = "test_branch";
-  private static String TEST_FILE = "test_file.txt";
-  private static String TEST_FILE_CONTENTS = "Some test file contents";
-  private static String COMMIT_MESSAGE = "Some commit message";
+  private static final String TEST_BRANCH = "test_branch";
+  private static final String TEST_FILE = "test_file.txt";
+  private static final String TEST_FILE_CONTENTS = "Some test file contents";
+  private static final String COMMIT_MESSAGE = "Some commit message";
 
-  GitRepoFactory gitRepoFactory;
-  Repo repo;
-  GitRepo gitRepo;
-  String repoFolder;
-  FileUtils fileUtils;
+  private GitRepoFactory gitRepoFactory;
+  private Repo repo;
+  private GitRepo gitRepo;
+  private String repoFolder;
+  private FileUtils fileUtils;
 
   @Before
   public void setup() throws IOException {
@@ -62,9 +61,10 @@ public class GitRepoTest {
   }
 
   @Singleton
-  @Component(modules = {CommonModule.class})
-  public interface TestComponent {
+  @Component(modules = CommonModule.class)
+  interface TestComponent {
     GitRepoFactory getFactory();
+
     FileUtils getFileUtils();
   }
 
@@ -109,9 +109,15 @@ public class GitRepoTest {
     String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(0);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder().setId(commitId).addFile(
-                File.newBuilder().setAction(
-                    File.Action.ADD).setCommitId(commitId).setFilename(TEST_FILE).build()).build()),
+            Commit.newBuilder()
+                .setId(commitId)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.ADD)
+                        .setCommitId(commitId)
+                        .setFilename(TEST_FILE)
+                        .build())
+                .build()),
         repo.getCommits(TEST_BRANCH));
   }
 
@@ -126,15 +132,25 @@ public class GitRepoTest {
     String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(1);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder().setId(commitId1).addFile(
-                File.newBuilder().setAction(File.Action.MODIFY)
-                    .setCommitId(commitId1)
-                    .setFilename(TEST_FILE)
-                    .build())
+            Commit.newBuilder()
+                .setId(commitId1)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.MODIFY)
+                        .setCommitId(commitId1)
+                        .setFilename(TEST_FILE)
+                        .build())
                 .build(),
-            Commit.newBuilder().setId(commitId2).addFile(
-                File.newBuilder().setAction(
-                    File.Action.ADD).setCommitId(commitId2).setFilename(TEST_FILE).build()).build()),
+            Commit.newBuilder()
+                .setId(commitId2)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.ADD)
+                        .setCommitId(commitId2)
+                        .setFilename(TEST_FILE)
+                        .build())
+                .build()),
         repo.getCommits(TEST_BRANCH));
   }
 }
+

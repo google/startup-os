@@ -22,3 +22,4 @@ public interface FixCommandCheck {
 
   String name();
 }
+

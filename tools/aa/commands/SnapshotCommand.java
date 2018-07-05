@@ -16,40 +16,27 @@
 package com.google.startupos.tools.aa.commands;
 
 import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.service.Protos.Author;
-import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.stream.Collectors;
 
 public class SnapshotCommand implements AaCommand {
-  private FileUtils fileUtils;
-  private Config config;
-  private GitRepoFactory gitRepoFactory;
-  private String currentWorkspaceName;
+  private final FileUtils fileUtils;
+  private final GitRepoFactory gitRepoFactory;
   private String workspacePath;
   private Integer diffNumber;
 
   private static final Integer GRPC_PORT = 8001;
-
-  private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
   @Inject
   public SnapshotCommand(
@@ -59,16 +46,15 @@ public class SnapshotCommand implements AaCommand {
       @Named("Current workspace name") String currentWorkspaceName,
       @Named("Current diff number") Integer diffNumber) {
     this.fileUtils = fileUtils;
-    this.config = config;
     this.gitRepoFactory = repoFactory;
-    this.currentWorkspaceName = currentWorkspaceName;
     this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
     this.diffNumber = diffNumber;
 
     ManagedChannel channel =
         ManagedChannelBuilder.forAddress("localhost", GRPC_PORT).usePlaintext().build();
-    codeReviewBlockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
+    CodeReviewServiceGrpc.newBlockingStub(channel);
   }
+
   @Override
   public boolean run(String[] args) {
     if (diffNumber == -1) {
@@ -82,7 +68,7 @@ public class SnapshotCommand implements AaCommand {
           .listContents(workspacePath)
           .stream()
           .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
@@ -90,13 +76,14 @@ public class SnapshotCommand implements AaCommand {
                 repo.switchBranch(branchName);
                 ImmutableList<File> files = repo.getUncommittedFiles();
                 if (files.isEmpty()) {
-                  System.out.println(
-                      String.format("[%s]: No files to update", repoName));
+                  System.out.println(String.format("[%s]: No files to update", repoName));
                   return; // Only skips this iteration
                 }
-                String message = branchName + ":\n" +
-                    files.stream().map(f -> f.getFilename()).collect(Collectors.joining("\n"));
-                Commit commit = repo.commit(files, String.format(message, branchName));
+                String message =
+                    branchName
+                        + ":\n"
+                        + files.stream().map(File::getFilename).collect(Collectors.joining("\n"));
+                repo.commit(files, String.format(message, branchName));
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });
     } catch (IOException e) {
@@ -105,3 +92,4 @@ public class SnapshotCommand implements AaCommand {
     return true;
   }
 }
+

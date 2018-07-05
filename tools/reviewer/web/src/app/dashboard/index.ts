@@ -2,6 +2,7 @@ export * from './reviews-panel/';
 
 import {
   AddCommentButtonsComponent,
+  CCListComponent,
   ChangesHighlightingComponent,
   CodeBlockComponent,
   CommentsComponent,
@@ -9,13 +10,13 @@ import {
   DiffService,
   EditablePropertyComponent,
   LineNumbersComponent,
-  PersonListComponent,
   ReplyPopupComponent,
   ReviewComponent,
   ReviewDiscussionComponent,
+  ReviewerListComponent,
   ReviewFilesComponent,
   ReviewsPanelComponent,
-  ReviewTitlebarComponent
+  ReviewTitlebarComponent,
 } from './reviews-panel/';
 
 export const DashboardComponents = [
@@ -26,13 +27,14 @@ export const DashboardComponents = [
   DiffComponent,
   EditablePropertyComponent,
   LineNumbersComponent,
-  PersonListComponent,
   ReplyPopupComponent,
+  ReviewerListComponent,
+  CCListComponent,
   ReviewComponent,
   ReviewDiscussionComponent,
   ReviewFilesComponent,
   ReviewsPanelComponent,
-  ReviewTitlebarComponent
+  ReviewTitlebarComponent,
 ];
 
 export const DashboardEntryComponents = [];

@@ -23,13 +23,11 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
-import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
@@ -42,9 +40,8 @@ import javax.inject.Named;
 import java.util.stream.Collectors;
 
 public class DiffCommand implements AaCommand {
-  private FileUtils fileUtils;
-  private Config config;
-  private GitRepoFactory gitRepoFactory;
+  private final FileUtils fileUtils;
+  private final GitRepoFactory gitRepoFactory;
   private String currentWorkspaceName;
   private String workspacePath;
   private Integer currentDiffNumber;
@@ -70,7 +67,6 @@ public class DiffCommand implements AaCommand {
       @Named("Current workspace name") String currentWorkspaceName,
       @Named("Current diff number") Integer currentDiffNumber) {
     this.fileUtils = utils;
-    this.config = config;
     this.gitRepoFactory = repoFactory;
     this.currentWorkspaceName = currentWorkspaceName;
     this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
@@ -82,9 +78,10 @@ public class DiffCommand implements AaCommand {
   }
 
   private ImmutableList<Reviewer> getReviewers(String reviewersInput) {
-    return ImmutableList.copyOf(Arrays.asList(reviewersInput.split(",")).stream().map(
-        reviewer -> Reviewer.newBuilder().setName(reviewer.trim()).build())
-        .collect(Collectors.toList()));
+    return ImmutableList.copyOf(
+        Arrays.stream(reviewersInput.split(","))
+            .map(reviewer -> Reviewer.newBuilder().setName(reviewer.trim()).build())
+            .collect(Collectors.toList()));
   }
 
   private Diff createDiff() {
@@ -106,7 +103,7 @@ public class DiffCommand implements AaCommand {
           .listContents(workspacePath)
           .stream()
           .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
@@ -134,8 +131,6 @@ public class DiffCommand implements AaCommand {
    */
   private Diff updateDiff(Integer diffNumber) {
     System.out.println(String.format("Updating D%d", diffNumber));
-
-    String branchName = String.format("D%d", diffNumber);
 
     Diff.Builder diffBuilder =
         codeReviewBlockingStub
@@ -169,3 +164,4 @@ public class DiffCommand implements AaCommand {
     return true;
   }
 }
+

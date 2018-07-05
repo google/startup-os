@@ -7,7 +7,7 @@ option java_outer_classname = "Protos";
 message Book {
   string name = 1;
   string author = 2;
-}  
+}
 
 message Person {
   enum PizzaTopping {
@@ -21,7 +21,7 @@ message Person {
     GREEN_PEPPERS = 7;
     PINEAPPLE = 8;
   }
-  
+
   string name = 1;
   string favorite_beatles_song = 2;
   int32 lucky_number = 3;

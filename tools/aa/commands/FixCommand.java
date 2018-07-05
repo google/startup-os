@@ -24,7 +24,7 @@ import javax.inject.Inject;
 
 public class FixCommand implements AaCommand {
 
-  public ImmutableList<FixCommandCheck> checks =
+  ImmutableList<FixCommandCheck> checks =
       ImmutableList.of(new DummyCheck(), new FailingDummyCheck());
 
   @Inject
@@ -42,3 +42,4 @@ public class FixCommand implements AaCommand {
     return true;
   }
 }
+

@@ -58,7 +58,7 @@ public class TextDifferencer {
     return unifyTextChanges(allChanges);
   }
 
-  /** Unifies TextChanges from chars into strings  */
+  /** Unifies TextChanges from chars into strings */
   private static ImmutableList<TextChange> unifyTextChanges(List<TextChange> changes) {
     ImmutableList.Builder<TextChange> result = new ImmutableList.Builder<>();
     TextChange.Builder unified = null;
@@ -77,7 +77,7 @@ public class TextDifferencer {
       }
       previous = current;
     }
-    if (unified != null && (previous.getType() == unified.getType())) {
+    if ((unified != null) && (previous.getType() == unified.getType())) {
       // Should add last part
       result.add(unified.build());
     }
@@ -87,7 +87,7 @@ public class TextDifferencer {
   /** Count the number of equal characters from the beginning of the given two strings. */
   private static int getHeaderMatchingCharactersLength(final char[] first, final char[] second) {
     int count = 0;
-    for (; count < first.length && count < second.length; count++) {
+    for (; (count < first.length) && (count < second.length); count++) {
       if (first[count] != second[count]) {
         return count;
       }
@@ -99,7 +99,7 @@ public class TextDifferencer {
   private static int getFooterMatchingCharactersLength(
       int offset, final char[] first, final char[] second) {
     int count = 0;
-    for (; count < first.length - offset && count < second.length - offset; count++) {
+    for (; (count < (first.length - offset)) && (count < (second.length - offset)); count++) {
       if (first[first.length - count - 1] != second[second.length - count - 1]) {
         return count;
       }
@@ -110,6 +110,8 @@ public class TextDifferencer {
   /**
    * Generate matching text changes for the given range. The implementation assumes that all the
    * characters within the given range are equal.
+   *
+   * <p>// TODO Check params description in Javadoc matches actual method params
    *
    * @param contentFirst The contents of the first string.
    * @param beginFirst The beginning index of the matching character range of the first string.
@@ -133,6 +135,8 @@ public class TextDifferencer {
   /**
    * Generate non matching text changes for the given range. Non matching text changes are changes
    * which contains at least one change between the given strings.
+   *
+   * <p>// TODO Check params description in Javadoc matches actual method params
    *
    * @param contentFirst The contents of the first string.
    * @param beginFirst The beginning index of the matching character range of the first string.
@@ -164,8 +168,8 @@ public class TextDifferencer {
    */
   private static int[][] computeLCSMatrix(final Segment first, final Segment second) {
     final int[][] lcsMatrix = createEmptyLCSMatrix(first.length() + 1, second.length() + 1);
-    for (int i = 1; i < first.length() + 1; i++) {
-      for (int j = 1; j < second.length() + 1; j++) {
+    for (int i = 1; i < (first.length() + 1); i++) {
+      for (int j = 1; j < (second.length() + 1); j++) {
         if (first.charAt(i - 1) == second.charAt(j - 1)) {
           lcsMatrix[i][j] = lcsMatrix[i - 1][j - 1] + 1;
         } else {
@@ -190,30 +194,30 @@ public class TextDifferencer {
     List<TextChange> changes = new ArrayList<>();
     int i = first.length();
     int j = second.length();
-    while (i >= 0 || j >= 0) {
-      if (i > 0 && j > 0 && first.charAt(i - 1) == second.charAt(j - 1)) {
+    while ((i >= 0) || (j >= 0)) {
+      if ((i > 0) && (j > 0) && (first.charAt(i - 1) == second.charAt(j - 1))) {
         changes.add(
             TextChange.newBuilder()
-                .setFirstStringIndex(first.getBeginIndex() + i - 1)
-                .setSecondStringIndex(second.getBeginIndex() + j - 1)
+                .setFirstStringIndex((first.getBeginIndex() + i) - 1)
+                .setSecondStringIndex((second.getBeginIndex() + j) - 1)
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(Type.NO_CHANGE)
                 .build());
         i--;
         j--;
-      } else if (j > 0 && (i == 0 || lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j])) {
+      } else if ((j > 0) && ((i == 0) || (lcsMatrix[i][j - 1] >= lcsMatrix[i - 1][j]))) {
         changes.add(
             TextChange.newBuilder()
                 .setFirstStringIndex(first.getBeginIndex() + Math.max(0, i - 1))
-                .setSecondStringIndex(second.getBeginIndex() + j - 1)
+                .setSecondStringIndex((second.getBeginIndex() + j) - 1)
                 .setDifference(Character.toString(second.charAt(j - 1)))
                 .setType(Type.ADD)
                 .build());
         j--;
-      } else if (i > 0 && (j == 0 || lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j])) {
+      } else if ((i > 0) && ((j == 0) || (lcsMatrix[i][j - 1] < lcsMatrix[i - 1][j]))) {
         changes.add(
             TextChange.newBuilder()
-                .setFirstStringIndex(first.getBeginIndex() + i - 1)
+                .setFirstStringIndex((first.getBeginIndex() + i) - 1)
                 .setSecondStringIndex(second.getBeginIndex() + Math.max(0, j - 1))
                 .setDifference(Character.toString(first.charAt(i - 1)))
                 .setType(Type.DELETE)

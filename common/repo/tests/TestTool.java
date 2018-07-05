@@ -25,58 +25,80 @@ import javax.inject.Singleton;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 
-
 /** Test tool for GitRepo. */
 @Singleton
 public class TestTool {
-  private GitRepoFactory repoFactory;
+  private final GitRepoFactory repoFactory;
 
   @Inject
   TestTool(GitRepoFactory repoFactory) {
     this.repoFactory = repoFactory;
   }
 
-  public void run(String[] args) {
+  void run(String[] args) {
     if (args.length > 0) {
       String command = args[0];
       Repo repo = repoFactory.create(System.getenv("BUILD_WORKSPACE_DIRECTORY"));
-      if (command.equals("switchBranch")) {
-        String branch = args[1];
-        repo.switchBranch(branch);
-      } else if (command.equals("getCommits")) {
-        String branch = args[1];
-        for (Commit commit : repo.getCommits(branch)) {
-          System.out.println();
-          System.out.println(commit);
-        }
-      } else if (command.equals("getFilesInCommit")) {
-        String commitId = args[1];
-        for (File file : repo.getFilesInCommit(commitId)) {
-          System.out.println();
-          System.out.println(file);
-        }
-      } else if (command.equals("getUncommittedFiles")) {
-        for (File file : repo.getUncommittedFiles()) {
-          System.out.println(file);
-        }
-      } else if (command.equals("merge")) {
-        String branch = args[1];
-        repo.merge(branch);
-      } else if (command.equals("mergeTheirs")) {
-        String branch = args[1];
-        repo.mergeTheirs(branch);
-      } else if (command.equals("isMerged")) {
-        String branch = args[1];
-        repo.isMerged(branch);
-      } else if (command.equals("removeBranch")) {
-        String branch = args[1];
-        repo.removeBranch(branch);
-      } else if (command.equals("listBranches")) {
-        for (String branch : repo.listBranches()) {
-          System.out.println(branch);
-        }
-      } else {
-        System.out.println("Unknown command");
+      switch (command) {
+        case "switchBranch":
+          {
+            String branch = args[1];
+            repo.switchBranch(branch);
+            break;
+          }
+        case "getCommits":
+          {
+            String branch = args[1];
+            for (Commit commit : repo.getCommits(branch)) {
+              System.out.println();
+              System.out.println(commit);
+            }
+            break;
+          }
+        case "getFilesInCommit":
+          String commitId = args[1];
+          for (File file : repo.getFilesInCommit(commitId)) {
+            System.out.println();
+            System.out.println(file);
+          }
+          break;
+        case "getUncommittedFiles":
+          for (File file : repo.getUncommittedFiles()) {
+            System.out.println(file);
+          }
+          break;
+        case "merge":
+          {
+            String branch = args[1];
+            repo.merge(branch);
+            break;
+          }
+        case "mergeTheirs":
+          {
+            String branch = args[1];
+            repo.mergeTheirs(branch);
+            break;
+          }
+        case "isMerged":
+          {
+            String branch = args[1];
+            repo.isMerged(branch);
+            break;
+          }
+        case "removeBranch":
+          {
+            String branch = args[1];
+            repo.removeBranch(branch);
+            break;
+          }
+        case "listBranches":
+          for (String branch : repo.listBranches()) {
+            System.out.println(branch);
+          }
+          break;
+        default:
+          System.out.println("Unknown command");
+          break;
       }
     } else {
       System.out.println("Please specify command");
@@ -84,8 +106,8 @@ public class TestTool {
   }
 
   @Singleton
-  @Component(modules = { CommonModule.class })
-  public interface TestToolComponent {
+  @Component(modules = CommonModule.class)
+  interface TestToolComponent {
     TestTool getTestTool();
   }
 
@@ -93,3 +115,4 @@ public class TestTool {
     DaggerTestTool_TestToolComponent.create().getTestTool().run(args);
   }
 }
+

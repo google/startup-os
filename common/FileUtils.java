@@ -16,7 +16,6 @@
 
 package com.google.startupos.common;
 
-
 import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
@@ -41,7 +40,7 @@ import javax.inject.Inject;
 @Singleton
 public class FileUtils {
   private final String userHome;
-  private FileSystem fileSystem;
+  private final FileSystem fileSystem;
 
   @Inject
   FileUtils(FileSystem fileSystem, @Named("Home folder") String userHome) {
@@ -118,7 +117,7 @@ public class FileUtils {
   /** Checks if folder or folder exists. */
   public boolean fileOrFolderExists(String path) {
     return Files.isRegularFile(fileSystem.getPath(expandHomeDirectory(path)))
-            || Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
+        || Files.isDirectory(fileSystem.getPath(expandHomeDirectory(path)));
   }
 
   /** Checks if folder is empty or doesn't exist. Returns false for files. */
@@ -164,27 +163,25 @@ public class FileUtils {
   public ImmutableList<String> listContents(String path) throws IOException {
     try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {
       return ImmutableList.sortedCopyOf(
-          paths.map(
-              absolutePath -> absolutePath.getFileName().toString())
+          paths
+              .map(absolutePath -> absolutePath.getFileName().toString())
               .collect(Collectors.toList()));
     }
   }
 
   /**
-   * Gets file and folder absolute paths recursively.
-   * Throws NoSuchFileException if directory doesn't exist
+   * Gets file and folder absolute paths recursively. Throws NoSuchFileException if directory
+   * doesn't exist
    */
   public ImmutableList<String> listContentsRecursively(String path) throws IOException {
-    try (Stream<Path> paths = Files.find(
-        fileSystem.getPath(expandHomeDirectory(path)),
-        100000, // Folder depth
-        (unused, unused2) -> true)) {
-      return ImmutableList.sortedCopyOf(
-          paths.map(
-              absolutePath -> absolutePath.toString())
-              .collect(Collectors.toList()));
+    try (Stream<Path> paths =
+        Files.find(
+            fileSystem.getPath(expandHomeDirectory(path)),
+            100000, // Folder depth
+            (unused, unused2) -> true)) {
+      return ImmutableList.sortedCopyOf(paths.map(Path::toString).collect(Collectors.toList()));
     }
-}
+  }
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
@@ -273,27 +270,34 @@ public class FileUtils {
   /** Deletes all files and folders in directory. Target directory is deleted. */
   public void deleteDirectory(String path) throws IOException {
     final Path directory = fileSystem.getPath(expandHomeDirectory(path));
-      Files.walkFileTree(directory, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Files.delete(file);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-          if (exception == null) {
-            Files.delete(dir);
+    Files.walkFileTree(
+        directory,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+              throws IOException {
+            Files.delete(file);
             return FileVisitResult.CONTINUE;
-          } else {
-            throw exception;
           }
-        }
-      });
+
+          @Override
+          public FileVisitResult postVisitDirectory(Path dir, IOException exception)
+              throws IOException {
+            if (exception == null) {
+              Files.delete(dir);
+              return FileVisitResult.CONTINUE;
+            } else {
+              throw exception;
+            }
+          }
+        });
   }
 
-  /** Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as unchecked. */
-  public void deleteDirectoryUnchecked(String path){
+  /**
+   * Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as
+   * unchecked.
+   */
+  public void deleteDirectoryUnchecked(String path) {
     try {
       deleteDirectory(path);
     } catch (IOException e) {
@@ -307,7 +311,7 @@ public class FileUtils {
   }
 
   /** Deletes file or folder, rethrows exceptions as unchecked. */
-  public void deleteFileOrDirectoryIfExistsUnchecked(String path){
+  public void deleteFileOrDirectoryIfExistsUnchecked(String path) {
     try {
       deleteFileOrDirectoryIfExists(path);
     } catch (IOException e) {
@@ -315,3 +319,4 @@ public class FileUtils {
     }
   }
 }
+

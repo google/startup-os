@@ -20,7 +20,6 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.Protos.Config;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,15 +30,13 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class AddRepoCommand implements AaCommand {
 
-  private FileUtils fileUtils;
-  private Config config;
-  private GitRepoFactory repoFactory;
+  private final FileUtils fileUtils;
+  private final Config config;
 
   @Inject
-  public AddRepoCommand(FileUtils utils, GitRepoFactory repoFactory, Config config) {
+  public AddRepoCommand(FileUtils utils, Config config) {
     this.fileUtils = utils;
     this.config = config;
-    this.repoFactory = repoFactory;
   }
 
   @FlagDesc(name = "url", description = "Repository URL to add", required = true)
@@ -87,3 +84,4 @@ public class AddRepoCommand implements AaCommand {
     return true;
   }
 }
+

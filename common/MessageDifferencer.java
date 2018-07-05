@@ -458,33 +458,18 @@ public final class MessageDifferencer {
 
   private static IgnoreCriteria ignoringFields(
       final ImmutableCollection<FieldDescriptor> fieldDescriptors) {
-    return new IgnoreCriteria() {
-      @Override
-      public boolean isIgnored(
-          Message message1,
-          Message message2,
-          FieldDescriptor fieldDescriptor,
-          List<SpecificField> fieldPath) {
-        return fieldDescriptors.contains(fieldDescriptor);
-      }
-    };
+    return (message1, message2, fieldDescriptor, fieldPath) ->
+        fieldDescriptors.contains(fieldDescriptor);
   }
 
   static IgnoreCriteria mergeCriteria(final Iterable<IgnoreCriteria> criteria) {
-    return new IgnoreCriteria() {
-      @Override
-      public boolean isIgnored(
-          Message message1,
-          Message message2,
-          FieldDescriptor fieldDescriptor,
-          List<SpecificField> fieldPath) {
-        for (IgnoreCriteria criterion : criteria) {
-          if (criterion.isIgnored(message1, message2, fieldDescriptor, fieldPath)) {
-            return true;
-          }
+    return (message1, message2, fieldDescriptor, fieldPath) -> {
+      for (IgnoreCriteria criterion : criteria) {
+        if (criterion.isIgnored(message1, message2, fieldDescriptor, fieldPath)) {
+          return true;
         }
-        return false;
       }
+      return false;
     };
   }
 
@@ -796,7 +781,7 @@ public final class MessageDifferencer {
   private boolean compare(
       Message message1, Message message2, @Nullable Reporter reporter, List<SpecificField> stack) {
     checkSameDescriptor(message1, message2);
-    if (message1 == message2 && (reporter == null || !reportMatches)) {
+    if ((message1 == message2) && ((reporter == null) || !reportMatches)) {
       return true;
     }
     boolean unknownCompareResult = true;
@@ -875,7 +860,7 @@ public final class MessageDifferencer {
       return true;
     }
     boolean identical = unknownFieldSet1.equals(unknownFieldSet2);
-    if (identical && (reporter == null || !reportMatches)) {
+    if (identical && ((reporter == null) || !reportMatches)) {
       return true;
     }
     Set<Integer> numbers1 = unknownFieldSet1.asMap().keySet();
@@ -906,7 +891,7 @@ public final class MessageDifferencer {
           ReportType reportType = ReportType.MATCHED;
           SpecificField unknownField = SpecificField.forUnknownDescriptor(unknownDesc, i);
           if (ignoreCriteria.isIgnored(message1, message2, null, immutable(stack, unknownField))) {
-            if (reporter == null || !reportMatches) {
+            if ((reporter == null) || !reportMatches) {
               continue;
             }
             reportType = ReportType.IGNORED;
@@ -935,7 +920,7 @@ public final class MessageDifferencer {
           }
 
           if (reporter != null) {
-            if (reportType != ReportType.MATCHED || reportMatches) {
+            if ((reportType != ReportType.MATCHED) || reportMatches) {
               reporter.report(reportType, message1, message2, immutable(stack, unknownField));
             }
           } else if (!match) {
@@ -1003,7 +988,7 @@ public final class MessageDifferencer {
     // Loop while there are any fields in either message.
     FieldDescriptor field1 = it1.next();
     FieldDescriptor field2 = it2.next();
-    while (field1 != null || field2 != null) {
+    while ((field1 != null) || (field2 != null)) {
       // Check for differences in the field itself.
       if (fieldBefore(field1, field2)) {
         // Field 1 is not in the field list for message 2.
@@ -1047,7 +1032,7 @@ public final class MessageDifferencer {
 
       // By this point, field1 and field2 are guaranteed to point to the same
       // field, so we can now compare the values.
-      boolean fieldDifferent = false;
+      boolean fieldDifferent;
       if (ignoreCriteria.isIgnored(
           message1, message2, field1, Collections.unmodifiableList(stack))) {
         if (reporter != null) {
@@ -1076,7 +1061,7 @@ public final class MessageDifferencer {
           // If the field was at any point found to be different, mark to
           // return this difference once the loop has completed.
           isDifferent = true;
-        } else if (reportMatches && reporter != null) {
+        } else if (reportMatches && (reporter != null)) {
           reporter.report(ReportType.MATCHED, message1, message2, immutable(stack, specificField));
         }
       }
@@ -1170,7 +1155,7 @@ public final class MessageDifferencer {
     // If the field is not treated as subset and no detailed reports is needed,
     // we do a quick check on the number of the elements to avoid unnecessary
     // comparison.
-    if (count1 != count2 && reporter == null && !treatedAsSubset) {
+    if ((count1 != count2) && (reporter == null) && !treatedAsSubset) {
       return false;
     }
 
@@ -1182,7 +1167,7 @@ public final class MessageDifferencer {
     // Try to match indices of the repeated fields. Return false if match fails
     // and there's no detailed report needed.
     if (!matchRepeatedFieldIndices(message1, message2, repeatedField, matchList1, matchList2, stack)
-        && reporter == null) {
+        && (reporter == null)) {
       return false;
     }
 
@@ -1266,7 +1251,7 @@ public final class MessageDifferencer {
       int[] matchList2,
       List<SpecificField> stack) {
     MapKeyComparator keyComparator = mapKeyComparatorMap.get(repeatedField);
-    if (repeatedField.isMapField() && keyComparator == null) {
+    if (repeatedField.isMapField() && (keyComparator == null)) {
       keyComparator = PROTO_MAP_KEY_COMPARATOR;
     }
     int count1 = matchList1.length;
@@ -1276,7 +1261,7 @@ public final class MessageDifferencer {
 
     boolean success = true;
     // Find potential match if this is a special repeated field.
-    if (keyComparator != null || isTreatedAsSet(repeatedField)) {
+    if ((keyComparator != null) || isTreatedAsSet(repeatedField)) {
       for (int i = 0; i < count1; i++) {
         // Indicates any matched elements for this repeated field.
         boolean match = false;
@@ -1297,7 +1282,7 @@ public final class MessageDifferencer {
       }
     } else {
       // If this field should be treated as list, just label the match_list.
-      for (int i = 0; i < count1 && i < count2; i++) {
+      for (int i = 0; (i < count1) && (i < count2); i++) {
         matchList1[i] = matchList2[i] = i;
       }
     }
@@ -1329,7 +1314,7 @@ public final class MessageDifferencer {
   }
 
   private boolean isTreatedAsSubset(FieldDescriptor field) {
-    return isTreatedAsSet(field) && scope == Scope.PARTIAL;
+    return isTreatedAsSet(field) && (scope == Scope.PARTIAL);
   }
 
   private boolean isTreatedAsSet(FieldDescriptor field) {
@@ -1389,7 +1374,7 @@ public final class MessageDifferencer {
         Message message2,
         ImmutableList<SpecificField> fieldPath) {
       try {
-        if (type == ReportType.MODIFIED && !reportModifiedAggregates) {
+        if ((type == ReportType.MODIFIED) && !reportModifiedAggregates) {
           SpecificField specificField = Iterables.getLast(fieldPath);
           if (specificField.getField() == null) {
             if (specificField.getUnknown().getFieldType() == UnknownFieldType.GROUP) {
@@ -1477,10 +1462,10 @@ public final class MessageDifferencer {
         } else {
           output.append(String.valueOf(specificField.getUnknown().getFieldNumber()));
         }
-        if (leftSide && specificField.getIndex() >= 0) {
+        if (leftSide && (specificField.getIndex() >= 0)) {
           output.append("[").append(String.valueOf(specificField.getIndex())).append("]");
         }
-        if (!leftSide && specificField.getNewIndex() >= 0) {
+        if (!leftSide && (specificField.getNewIndex() >= 0)) {
           output.append("[").append(String.valueOf(specificField.getNewIndex())).append("]");
         }
         if (it.hasNext()) {
@@ -1530,7 +1515,7 @@ public final class MessageDifferencer {
 
   // Wraps a message debug string in curly braces.
   private static String wrapDebugString(String debugString) {
-    return debugString.isEmpty() ? "{ }" : "{ " + debugString + " }";
+    return debugString.isEmpty() ? "{ }" : ("{ " + debugString + " }");
   }
 
   /** Basic implementation of FieldComparator. */
@@ -1545,13 +1530,13 @@ public final class MessageDifferencer {
     /** Port of C++ MathUtil::AlmostEquals, with STD_ERR of 1e-5f * 32. */
     @VisibleForTesting
     static boolean almostEquals(float x, float y) {
-      return almostEquals(x, y, 1e-5f * 32);
+      return almostEquals(x, y, 1.0e-5f * 32);
     }
 
     /** Port of C++ MathUtil::AlmostEquals, with STD_ERR of 1e-9d * 32. */
     @VisibleForTesting
     static boolean almostEquals(double x, double y) {
-      return almostEquals(x, y, 1e-9d * 32);
+      return almostEquals(x, y, 1.0e-9d * 32);
     }
 
     private static boolean almostEquals(double x, double y, double stdErr) {
@@ -1567,10 +1552,10 @@ public final class MessageDifferencer {
       if (Double.isInfinite(x) || Double.isInfinite(y)) {
         return false;
       }
-      if (Math.abs(x) <= stdErr && Math.abs(y) <= stdErr) {
+      if ((Math.abs(x) <= stdErr) && (Math.abs(y) <= stdErr)) {
         return true;
       }
-      double absDiff = (x > y) ? x - y : y - x;
+      double absDiff = (x > y) ? (x - y) : (y - x);
       return absDiff <= Math.max(stdErr, stdErr * Math.max(Math.abs(x), Math.abs(y)));
     }
 

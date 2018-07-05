@@ -41,14 +41,13 @@ import javassist.bytecode.FieldInfo;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 
-
 /**
  * Scans for {@code Flag} fields using reflection and saves their data.
  *
  * <p>This class also enforces the following: - No two flags have the same flag name. - Flag
  * variable names are camelCase. - Flag names are underscore_case.
  */
-public class ClassScanner {
+class ClassScanner {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
 
   private String resourceName(String packageName) {
@@ -61,8 +60,7 @@ public class ClassScanner {
 
   private ClassFile getClassFile(JarFile jarFile, ZipEntry zipEntry) {
     if (!zipEntry.isDirectory()) {
-      try {
-        InputStream inputStream = jarFile.getInputStream(zipEntry);
+      try (InputStream inputStream = jarFile.getInputStream(zipEntry)) {
         DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(inputStream));
         return new ClassFile(dataInputStream);
       } catch (IOException e) {
@@ -74,16 +72,16 @@ public class ClassScanner {
   }
 
   private JarFile getJarFile(URL url) throws IOException {
-    JarURLConnection urlConnection = (JarURLConnection)url.openConnection();
+    JarURLConnection urlConnection = (JarURLConnection) url.openConnection();
     urlConnection.setUseCaches(false);
     return urlConnection.getJarFile();
   }
 
-  private ImmutableList<Field> getClassFields(Class clazz){
+  private ImmutableList<Field> getClassFields(Class clazz) {
     ImmutableList.Builder<Field> result = ImmutableList.builder();
     Field[] fields = clazz.getDeclaredFields();
-    for(Field field: fields){
-      FlagDesc flagDesc =  field.getAnnotation(FlagDesc.class);
+    for (Field field : fields) {
+      FlagDesc flagDesc = field.getAnnotation(FlagDesc.class);
       if (flagDesc != null) {
         if (Flag.class.isAssignableFrom(field.getType())) {
           result.add(field);
@@ -92,7 +90,7 @@ public class ClassScanner {
               "Field annotated with FlagDesc does not inherit from Flag " + field);
         }
       }
-   }
+    }
     return result.build();
   }
 
@@ -116,7 +114,7 @@ public class ClassScanner {
         }
 
         for (Object fieldInfoObject : classFile.getFields()) {
-          FieldInfo fieldInfo = (FieldInfo)fieldInfoObject;
+          FieldInfo fieldInfo = (FieldInfo) fieldInfoObject;
           AnnotationsAttribute annotationsAttribute =
               (AnnotationsAttribute) fieldInfo.getAttribute(AnnotationsAttribute.visibleTag);
           if (annotationsAttribute != null) {
@@ -143,7 +141,7 @@ public class ClassScanner {
     return result.build();
   }
 
-  void scanClass(Class clazz, Map<String,FlagData> flags) {
+  void scanClass(Class clazz, Map<String, FlagData> flags) {
     scan(getClassFields(clazz), flags);
   }
 
@@ -151,11 +149,10 @@ public class ClassScanner {
     scan(getPackageFields(packagePrefix), flags);
   }
 
-  private void scan(List<Field> fields, Map<String,FlagData> flags){
+  private void scan(List<Field> fields, Map<String, FlagData> flags) {
     for (Field field : fields) {
       if ((field.getModifiers() & Modifier.STATIC) == 0) {
-        throw new IllegalArgumentException(
-            "Flag '" + field + "' should be static but is not.");
+        throw new IllegalArgumentException("Flag '" + field + "' should be static but is not.");
       }
       Class<?> declaringClass = field.getDeclaringClass();
       Flag<?> flag = getFlagMember(declaringClass, field);
@@ -209,11 +206,9 @@ public class ClassScanner {
             .setDescription(desc.description())
             .setRequired(desc.required());
     if (flag.getDefault() != null) {
-      if (result.getIsListFlag()){
-        result.setDefault(flag.getDefault().toString()
-            .replace("[", "")
-            .replace("]", "")
-            .replaceAll(", ", ","));
+      if (result.getIsListFlag()) {
+        result.setDefault(
+            flag.getDefault().toString().replace("[", "").replace("]", "").replaceAll(", ", ","));
       } else {
         result.setDefault(flag.getDefault().toString());
       }
@@ -226,17 +221,16 @@ public class ClassScanner {
       ParameterizedType flagType = (ParameterizedType) field.getGenericType();
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
-        log.atWarning().log(
-            "Cannot check if flag '%s' is of boolean type. It has %s inner types instead of 1.",
-                field,
-                innerTypes.length);
+        log.atWarning()
+            .log(
+                "Cannot check if flag '%s' is of boolean type. It has %s inner types instead of 1.",
+                field, innerTypes.length);
       } else if (innerTypes[0].getTypeName().equals("java.lang.Boolean")) {
         return true;
       }
     } else {
-      log.atWarning().log(
-          "Cannot check if flag '%s' is of boolean type. It's not a ParameterizedType",
-              field);
+      log.atWarning()
+          .log("Cannot check if flag '%s' is of boolean type. It's not a ParameterizedType", field);
     }
     return false;
   }
@@ -246,17 +240,16 @@ public class ClassScanner {
       ParameterizedType flagType = (ParameterizedType) field.getGenericType();
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
-        log.atWarning().log(
-            "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
-                field,
-                innerTypes.length);
+        log.atWarning()
+            .log(
+                "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
+                field, innerTypes.length);
       } else if (innerTypes[0].getTypeName().startsWith("java.util.List")) {
         return true;
       }
     } else {
-      log.atWarning().log(
-          "Cannot check if flag '%s' is of list type. It's not a ParameterizedType",
-              field);
+      log.atWarning()
+          .log("Cannot check if flag '%s' is of list type. It's not a ParameterizedType", field);
     }
     return false;
   }
@@ -283,3 +276,4 @@ public class ClassScanner {
     }
   }
 }
+

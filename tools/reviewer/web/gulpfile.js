@@ -19,7 +19,7 @@ gulp.task('protoc', () => {
         'protoc ' +
           '--js_out=import_style=commonjs,binary:./ ' +
           '--plugin=protoc-gen-ts=%CD%/node_modules/.bin/protoc-gen-ts.cmd ' +
-          '--ts_out=service=true:./ ' +
+          '--ts_out=./ ' +
           protoPath,
         protocOnLoad
       );
@@ -31,7 +31,7 @@ gulp.task('protoc', () => {
         'protoc ' +
           '--js_out=import_style=commonjs,binary:./ ' +
           '--plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts ' +
-          '--ts_out=service=true:./ ' +
+          '--ts_out=./ ' +
           protoPath,
         protocOnLoad
       );

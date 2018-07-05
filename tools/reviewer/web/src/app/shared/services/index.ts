@@ -4,11 +4,12 @@ export * from './firebase.service';
 export * from './notification.service';
 export * from './highlight.service';
 export * from './selection.service';
+export * from './encoding.service';
 
 import { AuthGuard } from '@/shared/services/auth.guard';
 import { AuthService } from './auth.service';
 import { DifferenceService } from './difference.service';
-import { FirebaseJsonService } from './firebase-json.service';
+import { EncodingService } from './encoding.service';
 import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { NotificationService } from './notification.service';
@@ -19,8 +20,8 @@ export const Services = [
   AuthService,
   DifferenceService,
   FirebaseService,
-  FirebaseJsonService,
   HighlightService,
   NotificationService,
-  SelectionService
+  SelectionService,
+  EncodingService,
 ];

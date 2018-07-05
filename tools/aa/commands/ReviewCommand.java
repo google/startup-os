@@ -16,24 +16,13 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Empty;
-import com.google.startupos.common.repo.GitRepo;
-import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.Diff.Status;
-import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
-import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -41,7 +30,7 @@ public class ReviewCommand implements AaCommand {
   private static final Integer GRPC_PORT = 8001;
 
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
-  private Integer currentDiffNumber;
+  private final Integer currentDiffNumber;
 
   @Inject
   public ReviewCommand(@Named("Current diff number") Integer currentDiffNumber) {
@@ -58,8 +47,10 @@ public class ReviewCommand implements AaCommand {
           RED_ERROR + "Workspace has no diff to review (git branch has no D# branch)");
       return false;
     }
-    Diff.Builder diffBuilder = codeReviewBlockingStub.getDiff(
-        DiffRequest.newBuilder().setDiffId(currentDiffNumber).build()).toBuilder();
+    Diff.Builder diffBuilder =
+        codeReviewBlockingStub
+            .getDiff(DiffRequest.newBuilder().setDiffId(currentDiffNumber).build())
+            .toBuilder();
     if (diffBuilder.getReviewerCount() == 0) {
       System.out.println(String.format("D%d has no reviewers", currentDiffNumber));
       return false;
@@ -74,3 +65,4 @@ public class ReviewCommand implements AaCommand {
     return true;
   }
 }
+

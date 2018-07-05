@@ -27,6 +27,7 @@ import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import dagger.Component;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -45,7 +46,7 @@ public class LocalServer {
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
   private static final Flag<Integer> localServerPort = Flag.create(8001);
 
-  private Server server;
+  private final Server server;
 
   @Inject
   LocalServer(AuthService authService, CodeReviewService codeReviewService) {
@@ -53,6 +54,7 @@ public class LocalServer {
         ServerBuilder.forPort(localServerPort.get())
             .addService(authService)
             .addService(codeReviewService)
+            .addService(ProtoReflectionService.newInstance())
             .build();
   }
 
@@ -65,7 +67,7 @@ public class LocalServer {
                 () -> {
                   // Use stderr here since the logger may have been reset by its JVM shutdown hook.
                   System.err.println("Shutting down gRPC server since JVM is shutting down");
-                  LocalServer.this.stop();
+                  this.stop();
                   System.err.println("Server shut down");
                 }));
   }
@@ -83,7 +85,7 @@ public class LocalServer {
   }
 
   @Singleton
-  @Component(modules = { CommonModule.class, AaModule.class })
+  @Component(modules = {CommonModule.class, AaModule.class})
   public interface LocalServerComponent {
     LocalServer getLocalServer();
   }
@@ -95,3 +97,4 @@ public class LocalServer {
     server.blockUntilShutdown();
   }
 }
+
