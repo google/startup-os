@@ -20,10 +20,13 @@ export class ReviewsPanelComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    const email = this.router.parseUrl(this.router.url).queryParams['email'];
-    if (email) {
+    const urlEmail: string = this.router
+      .parseUrl(this.router.url)
+      .queryParams['email'];
+
+    if (urlEmail) {
       // Show the page from a view of the user from url.
-      this.getReviews(email);
+      this.getReviews(urlEmail);
     } else {
       // Show the page from current login view.
       this.getReviews(this.authService.userEmail);
