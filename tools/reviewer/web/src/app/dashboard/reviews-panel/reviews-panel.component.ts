@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService, FirebaseService, Lists } from '@/shared';
@@ -9,7 +9,7 @@ import { Diff, Reviewer } from '@/shared/shell';
   templateUrl: './reviews-panel.component.html',
   styleUrls: ['./reviews-panel.component.scss'],
 })
-export class ReviewsPanelComponent {
+export class ReviewsPanelComponent implements OnInit {
   isLoading: boolean = true;
   diffGroups: Diff[][] = [];
 
