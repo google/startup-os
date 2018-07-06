@@ -17,8 +17,17 @@ export class ReviewsPanelComponent {
     private firebaseService: FirebaseService,
     private authService: AuthService,
     private router: Router,
-  ) {
-    this.getReviews(this.authService.userEmail);
+  ) { }
+
+  ngOnInit() {
+    const email = this.router.parseUrl(this.router.url).queryParams['email'];
+    if (email) {
+      // Show the page from a view of the user from url.
+      this.getReviews(email);
+    } else {
+      // Show the page from current login view.
+      this.getReviews(this.authService.userEmail);
+    }
   }
 
   // Get diff/reviews from Database
