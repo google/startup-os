@@ -11,6 +11,19 @@ const startuposPath = path.resolve('../../../');
 
 gulp.task('default', ['protoc']);
 
+/*
+  Why we need gulp to generate proto functions?
+  1. We have to know all paths to *.proto files, before running protoc.
+    To not set manually all the paths and to not be dependent on them,
+    we get children paths from code_review.proto.
+  2. We can't use a parent path with protoc. Such as '../../../'.
+    So to keep all manipulation with web app inside the web app project, we
+    use gulp.
+  3. Proto definitions have imports with exact paths.
+    e.g. 'common/repo/repo.proto'
+    If we don't want to edit proto files, then we have to keep that structure.
+    It's much easier to do it with gulp.
+*/
 gulp.task('protoc', () => {
   // Create a proto folder
   if (!fs.existsSync(protoPath)) {
