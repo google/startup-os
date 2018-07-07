@@ -86,7 +86,7 @@ public class SubmitCommand implements AaCommand {
     codeReviewBlockingStub.createDiff(
         CreateDiffRequest.newBuilder().setDiff(diffBuilder.setStatus(Status.SUBMITTING)).build());
 
-    final String diffBranchName = String.format("D%s", diffBuilder.getNumber());
+    final String diffBranchName = String.format("D%s", diffBuilder.getId());
 
     try {
       fileUtils

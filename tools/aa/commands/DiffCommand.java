@@ -80,7 +80,7 @@ public class DiffCommand implements AaCommand {
   private ImmutableList<Reviewer> getReviewers(String reviewersInput) {
     return ImmutableList.copyOf(
         Arrays.stream(reviewersInput.split(","))
-            .map(reviewer -> Reviewer.newBuilder().setName(reviewer.trim()).build())
+            .map(reviewer -> Reviewer.newBuilder().setEmail(reviewer.trim()).build())
             .collect(Collectors.toList()));
   }
 
@@ -96,7 +96,7 @@ public class DiffCommand implements AaCommand {
             .setDescription(description.get())
             .setBug(buglink.get())
             .addAllReviewer(getReviewers(reviewers.get()))
-            .setNumber(response.getLastDiffId());
+            .setId(response.getLastDiffId());
 
     try {
       fileUtils
