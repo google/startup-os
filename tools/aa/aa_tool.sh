@@ -79,18 +79,21 @@ function start_local_server {
       return 1
     fi
 
-    STARTUP_OS=$AA_BASE/head/startup-os
+    export STARTUP_OS=$AA_BASE/head/startup-os
 
     # store stderr to debug
     POLYGLOT_STDERR_DEBUG_FILE=$(mktemp)
+    SERVER_LOG_FILE=$(mktemp)
     # call `ping` method via gRPC and store result (ignored for now)
-    OUTPUT=$(echo {} | $STARTUP_OS/bazel-bin/tools/grpc_polyglot \
+    pushd $STARTUP_OS >/dev/null
+    OUTPUT=$(echo {} | bazel run //tools:grpc_polyglot -- \
       --command=call \
       --endpoint=localhost:8001 \
       --full_method=com.google.startupos.tools.reviewer.service.CodeReviewService/ping \
       2>$POLYGLOT_STDERR_DEBUG_FILE)
-
     POLYGLOT_EXIT_CODE=$?
+    popd >/dev/null
+
     # if polyglot cannot reach gRPC server it exits with nonzero code
     # then we need to run server
     if [ $POLYGLOT_EXIT_CODE -ne 0 ]; then
@@ -102,7 +105,8 @@ function start_local_server {
         echo "$GREEN""Local server did not respond, starting it...$RESET"
         echo "$GREEN""Server PID is:$RESET" # will be printed by bash
         # nohup detaches the command from terminal it was executed on
-        nohup bash $AA_BASE/head/startup-os/tools/local_server/run.sh </dev/null >/dev/null 2>&1 &
+        echo "$GREEN""Server log is $SERVER_LOG_FILE"
+        nohup bash $AA_BASE/head/startup-os/tools/local_server/run.sh </dev/null >$SERVER_LOG_FILE 2>&1 &
         echo "$RED""Visit$RESET http://localhost:8000$RED to log in$RESET"
         return 1
     else

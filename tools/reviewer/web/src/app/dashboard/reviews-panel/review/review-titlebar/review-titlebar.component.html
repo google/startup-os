@@ -1,11 +1,11 @@
 <div class="review-title" fxFlex *ngIf="!isLoading">
-  <div fxFlex="270px">
+  <div fxFlex="400px">
     <span class="diffNumber"> Diff {{ diff.getId() }} </span>
     by
     <span
       [ngClass]="{ 
         'author-name': true,
-        'bold-text': diff.getAuthor().getNeedsattention()
+        'bold-text': diff.getAuthor().getNeedsAttention()
       }"
     ><button mat-raised-button 
         class="add-to-list"
@@ -13,7 +13,7 @@
         (click)="changeAttentionOfAuthor()"
       >
         {{ 
-          diff.getAuthor().getNeedsattention() ?
+          diff.getAuthor().getNeedsAttention() ?
             'Attention not needed':
             'Ask for attention'
         }}

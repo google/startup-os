@@ -156,9 +156,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     Diff diff =
         req.getDiff()
             .toBuilder()
-            .setAuthor(Author.newBuilder().setName(authService.getUserName()).build())
+            .setAuthor(Author.newBuilder().setEmail(authService.getUserEmail()).build())
             .build();
-    client.createDocument(diffPath, String.valueOf(diff.getNumber()), diff);
+    client.createDocument(diffPath, String.valueOf(diff.getId()), diff);
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }

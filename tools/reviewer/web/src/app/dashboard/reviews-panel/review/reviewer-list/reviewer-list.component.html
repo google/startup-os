@@ -21,7 +21,7 @@
         <span
           *ngFor="let reviewer of diff.getReviewerList(); let last = last"
           [ngClass]="{ 
-            'bold-text': reviewer.getNeedsattention(),
+            'bold-text': reviewer.getNeedsAttention(),
             'reviewer-name': true
             }"
           >
@@ -32,7 +32,7 @@
             $event.stopPropagation()"
             >
             {{
-              reviewer.getNeedsattention() ?
+              reviewer.getNeedsAttention() ?
                 'Attention not needed':
                 'Ask for attention'
             }}
