@@ -4,12 +4,27 @@
     [(ngModel)]="propertyValue">
   </textarea>
   <div class="action-required">
-    <input type="checkbox" [(ngModel)]="actionRequired" value="Action Required"> 
-    <span (click)="actionRequired = !actionRequired"> Action Required </span>
+    <input 
+      type="checkbox" 
+      [(ngModel)]="actionRequired"
+      value="Action Required"> 
+    <span 
+      (click)="actionRequired = !actionRequired"> 
+      Action Required 
+    </span>
   </div>
-  <div class="reply-actions" fxLayout="row" fxLayoutAlign="end center">
-    <div>
-      <input type="checkbox"  [(ngModel)]="approved" value="Action Required"> Approved
+  <div 
+    class="reply-actions" 
+    fxLayout="row" 
+    fxLayoutAlign="end center">
+    <!-- Hide Approved checkbox when Author is the current user -->
+    <div 
+      *ngIf="authService.userEmail != diff.getAuthor().getEmail()">
+      <input 
+        type="checkbox" 
+        [(ngModel)]="approved" 
+        value="Action Required"> 
+        Approved
     </div>
     <button (click)="reply()">Reply</button>
   </div>

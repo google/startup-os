@@ -38,7 +38,6 @@
     fxLayoutGap="20px"
     fxFlex="212px"
     fxLayoutAlign="end end">
-    <!-- TODO: add some action for the buttons -->
     <div class="submit">
       <button>Submit</button>
     </div>
@@ -47,7 +46,7 @@
     </div>
     <div *ngIf="showReplyDialog" class="reply-popup">
       <div>
-        <cr-reply-popup></cr-reply-popup>
+        <cr-reply-popup [diff]="diff"></cr-reply-popup>
       </div>
     </div>
   </div>
