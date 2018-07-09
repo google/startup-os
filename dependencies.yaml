@@ -152,8 +152,3 @@ dependencies:
     objenesis:
       lang: java
       version: "2.6"
-
-  org.slf4j:
-    slf4j-simple:
-      lang: java
-      version: "1.7.25"

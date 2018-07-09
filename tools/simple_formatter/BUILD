@@ -9,6 +9,5 @@ java_binary(
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/googlejavaformat:google_java_format",
         "//third_party/maven/com/google/guava",
-        "//third_party/maven/org/slf4j:slf4j_simple",
     ],
 )
