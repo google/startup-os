@@ -4,12 +4,11 @@
     [(ngModel)]="propertyValue">
   </textarea>
   <div class="action-required">
+    <!-- TODO functionality for Action Required checkbox -->
     <input 
       type="checkbox" 
-      [(ngModel)]="actionRequired"
       value="Action Required"> 
-    <span 
-      (click)="actionRequired = !actionRequired"> 
+    <span> 
       Action Required 
     </span>
   </div>
@@ -23,8 +22,11 @@
       <input 
         type="checkbox" 
         [(ngModel)]="approved" 
-        value="Action Required"> 
-        Approved
+        value="Action Required">
+        <span
+          (click)="approved = !approved">
+          Approved
+        </span>
     </div>
     <button (click)="reply()">Reply</button>
   </div>

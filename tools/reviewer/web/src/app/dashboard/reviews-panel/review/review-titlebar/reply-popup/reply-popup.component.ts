@@ -23,50 +23,55 @@ export class ReplyPopupComponent implements OnInit {
     private notificationService: NotificationService,
   ) { }
 
-  ngOnInit() {
-    console.log(this.diff);
-    console.log(this.authService.userEmail);
-    console.log(this.diff.getAuthor().getEmail());
-  }
-
   reply() {
-    console.log(this.diff);
     if (this.authService.userEmail === this.diff.getAuthor().getEmail()) {
       // current user is the author
       const author = this.diff.getAuthor();
-      author.setNeedsattention(false);
+      author.setNeedsAttention(false);
 
       // Set attention of all reviewers
       for (const reviewer of this.diff.getReviewerList()) {
-        reviewer.setNeedsattention(true);
+        reviewer.setNeedsAttention(true);
       }
     } else {
-      // Current user is a reviewer
       // Set attention of author
       const author = this.diff.getAuthor();
-      author.setNeedsattention(true);
+      author.setNeedsAttention(true);
 
       // Get reviewer from userEmail
       const username = this.authService
         .getUsername(this.authService.userEmail);
-      const reviewer = this.getReviewerWithTheUsername(username);
-      if (reviewer) {
-        reviewer.setNeedsattention(false);
+      let reviewer = this.getReviewerWithTheUsername(username);
+
+      if (!reviewer) {
+        // Current user is not a reviewer; add the current user to reviewers
+        // If reviewer not found, create new one.
+        reviewer = new Reviewer();
+        reviewer.setEmail(username + '@gmail.com');
+
+        // Default values:
+        reviewer.setApproved(false);
+        reviewer.setNeedsAttention(false);
+
+        const reviewers = this.diff.getReviewerList();
+        reviewers.push(reviewer);
+        // Is there a better way for just Adding a reviewer to Reviewer list?
+        this.diff.setReviewerList(reviewers);
       }
+      // If Approved checkbox was checked
       if (this.approved) {
         reviewer.setApproved(true);
       }
     }
 
-    console.log(this.diff);
-
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.notificationService.success('Reviewers saved');
+      this.notificationService.success('Reply Submitted');
     }, () => {
-      this.notificationService.error("Reviewers can't be saved");
+      this.notificationService.error("Reply couldn't be submitted");
     });
   }
 
+  // TODO ask Vadim about making a utility function for this
   getReviewerWithTheUsername(username: string): Reviewer {
     for (const reviewer of this.diff.getReviewerList()) {
       const reviewerUsername = this.authService
