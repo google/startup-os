@@ -1,13 +1,12 @@
-// TODO: refactor this component
-// same issue as in person-list.component
+import { Component, Input } from '@angular/core';
 
-import { Diff } from '@/shared';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FirebaseService, NotificationService } from '@/shared/services';
+import { Diff } from '@/shared/shell';
 
 @Component({
   selector: 'app-editable-property',
   templateUrl: './editable-property.component.html',
-  styleUrls: ['./editable-property.component.scss']
+  styleUrls: ['./editable-property.component.scss'],
 })
 export class EditablePropertyComponent {
   @Input() diff: Diff;
@@ -15,13 +14,17 @@ export class EditablePropertyComponent {
   // The property value is stored in propertyValue
   @Input() property: string;
   @Input() editable: boolean = true;
-  @Output() onUpdateDiff = new EventEmitter<Diff>();
 
   // To show editable fields
   showEditableProperty = false;
 
   // Following variable is used in editing the fields
   propertyValue: string = '';
+
+  constructor(
+    private firebaseService: FirebaseService,
+    private notificationService: NotificationService,
+  ) { }
 
   ngOnChanges() {
     this.getPropertyValue();
@@ -54,6 +57,10 @@ export class EditablePropertyComponent {
         throw new Error('Unsupported property');
     }
 
-    this.onUpdateDiff.emit(this.diff);
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success(this.property + ' saved');
+    }, () => {
+      this.notificationService.error(this.property + "can't be saved");
+    });
   }
 }

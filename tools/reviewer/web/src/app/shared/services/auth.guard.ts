@@ -4,25 +4,29 @@ import {
   ActivatedRouteSnapshot,
   CanActivate,
   Router,
-  RouterStateSnapshot
+  RouterStateSnapshot,
 } from '@angular/router';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
+    state: RouterStateSnapshot,
   ): Observable<boolean> {
+    // There is a bug.
+    // If you open the app without internet connection,
+    // you don't see any loadings or error message.
+    // You see nothing, just white screen forever.
+    // TODO: do something with that
     return this.authService.angularFireAuth.authState.map(user => {
-      if (user !== null) {
-        return true;
-      } else {
+      const isAuthorized: boolean = !!user;
+      if (!isAuthorized) {
         this.router.navigate(['/login']);
-        return false;
       }
+      return isAuthorized;
     });
   }
 }

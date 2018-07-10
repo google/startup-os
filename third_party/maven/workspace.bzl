@@ -47,6 +47,7 @@ def list_dependencies():
 # - com.google.flogger:flogger:0.1 wanted version 3.0.1
 # - com.google.guava:guava:24.0-android wanted version 1.3.9
 # - com.google.http-client:google-http-client:1.23.0 wanted version 1.3.9
+# - com.google.instrumentation:instrumentation-api:0.4.3 wanted version 3.0.0
 # - io.grpc:grpc-core:1.12.0 wanted version 3.0.0
     {"artifact": "com.google.code.findbugs:jsr305:3.0.1", "lang": "java", "sha1": "f7be08ec23c21485b9b5a1cf1654c2ec8c58168d", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_code_findbugs_jsr305", "actual": "@com_google_code_findbugs_jsr305//jar", "bind": "jar/com/google/code/findbugs/jsr305"},
 # duplicates in com.google.code.gson:gson fixed to 2.8.2
@@ -87,6 +88,7 @@ def list_dependencies():
     {"artifact": "com.google.http-client:google-http-client-jackson2:1.23.0", "lang": "java", "sha1": "fd6761f4046a8cb0455e6fa5f58e12b061e9826e", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_jackson2", "actual": "@com_google_http_client_google_http_client_jackson2//jar", "bind": "jar/com/google/http_client/google_http_client_jackson2"},
     {"artifact": "com.google.http-client:google-http-client-jackson:1.23.0", "lang": "java", "sha1": "a72ea3a197937ef63a893e73df312dac0d813663", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_jackson", "actual": "@com_google_http_client_google_http_client_jackson//jar", "bind": "jar/com/google/http_client/google_http_client_jackson"},
     {"artifact": "com.google.http-client:google-http-client:1.23.0", "lang": "java", "sha1": "8e86c84ff3c98eca6423e97780325b299133d858", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client", "actual": "@com_google_http_client_google_http_client//jar", "bind": "jar/com/google/http_client/google_http_client"},
+    {"artifact": "com.google.instrumentation:instrumentation-api:0.4.3", "lang": "java", "sha1": "41614af3429573dc02645d541638929d877945a2", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_instrumentation_instrumentation_api", "actual": "@com_google_instrumentation_instrumentation_api//jar", "bind": "jar/com/google/instrumentation/instrumentation_api"},
     {"artifact": "com.google.j2objc:j2objc-annotations:1.1", "lang": "java", "sha1": "ed28ded51a8b1c6b112568def5f4b455e6809019", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_j2objc_j2objc_annotations", "actual": "@com_google_j2objc_j2objc_annotations//jar", "bind": "jar/com/google/j2objc/j2objc_annotations"},
     {"artifact": "com.google.jimfs:jimfs:1.1", "lang": "java", "sha1": "8fbd0579dc68aba6186935cc1bee21d2f3e7ec1c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_jimfs_jimfs", "actual": "@com_google_jimfs_jimfs//jar", "bind": "jar/com/google/jimfs/jimfs"},
     {"artifact": "com.google.oauth-client:google-oauth-client:1.23.0", "lang": "java", "sha1": "e57ea1e2220bda5a2bd24ff17860212861f3c5cf", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_oauth_client_google_oauth_client", "actual": "@com_google_oauth_client_google_oauth_client//jar", "bind": "jar/com/google/oauth_client/google_oauth_client"},
@@ -108,7 +110,14 @@ def list_dependencies():
     {"artifact": "io.grpc:grpc-core:1.12.0", "lang": "java", "sha1": "541a5c68ce85c03190e29bc9e0ec611d2b75ff24", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_core", "actual": "@io_grpc_grpc_core//jar", "bind": "jar/io/grpc/grpc_core"},
     {"artifact": "io.grpc:grpc-netty:1.12.0", "lang": "java", "sha1": "a4dfc839dae9206c0d1f8b53657c2a8e4a81ad41", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_netty", "actual": "@io_grpc_grpc_netty//jar", "bind": "jar/io/grpc/grpc_netty"},
     {"artifact": "io.grpc:grpc-protobuf-lite:1.12.0", "lang": "java", "sha1": "f5bebfbd5e93b8bbb58888a5cfaa9f490fb7b455", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_protobuf_lite", "actual": "@io_grpc_grpc_protobuf_lite//jar", "bind": "jar/io/grpc/grpc_protobuf_lite"},
+# duplicates in io.grpc:grpc-protobuf fixed to 1.12.0
+# - com.google.cloud:google-cloud-core-grpc:1.15.0 wanted version 1.9.0
+# - io.grpc:grpc-services:1.12.0 wanted version 1.12.0
     {"artifact": "io.grpc:grpc-protobuf:1.12.0", "lang": "java", "sha1": "fbee015b681b5342e72fe40f88eae9dd6cbce206", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_protobuf", "actual": "@io_grpc_grpc_protobuf//jar", "bind": "jar/io/grpc/grpc_protobuf"},
+    {"artifact": "io.grpc:grpc-services:1.12.0", "lang": "java", "sha1": "6af24bde0df8bbaf89fcaef33bf9ebba76c11b83", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_services", "actual": "@io_grpc_grpc_services//jar", "bind": "jar/io/grpc/grpc_services"},
+# duplicates in io.grpc:grpc-stub fixed to 1.12.0
+# - com.google.cloud:google-cloud-firestore:0.33.0-beta wanted version 1.9.0
+# - io.grpc:grpc-services:1.12.0 wanted version 1.12.0
     {"artifact": "io.grpc:grpc-stub:1.12.0", "lang": "java", "sha1": "fbd2bafe09a89442ab3d7a8d8b3e8bafbd59b4e0", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_stub", "actual": "@io_grpc_grpc_stub//jar", "bind": "jar/io/grpc/grpc_stub"},
     {"artifact": "io.netty:netty-buffer:4.1.22.Final", "lang": "java", "sha1": "15e964a2095031364f534a6e21977f5ee9ca32a9", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_netty_netty_buffer", "actual": "@io_netty_netty_buffer//jar", "bind": "jar/io/netty/netty_buffer"},
     {"artifact": "io.netty:netty-codec-http2:4.1.22.Final", "lang": "java", "sha1": "6d01daf652551a3219cc07122b765d4c4924dcf8", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_netty_netty_codec_http2", "actual": "@io_netty_netty_codec_http2//jar", "bind": "jar/io/netty/netty_codec_http2"},

@@ -1,91 +1,44 @@
-<div class="review-title" fxFlex>
-  <div fxFlex="270px">
-    <span class="diffNumber"> Diff {{ diff.number }} </span> 
+<div class="review-title" fxFlex *ngIf="!isLoading">
+  <div fxFlex="400px">
+    <span class="diffNumber"> Diff {{ diff.getId() }} </span>
     by
-    <span [ngClass]="{ 
-      'bold-text': 
-        diff.needAttentionOfList.includes(diff.author),
-        'author-name': true
-      }">
-      <button mat-raised-button 
+    <span
+      [ngClass]="{ 
+        'author-name': true,
+        'bold-text': diff.getAuthor().getNeedsAttention()
+      }"
+    ><button mat-raised-button 
         class="add-to-list"
         *ngIf="editable"
-        (click)="saveAttentionList(diff.author);
-        $event.stopPropagation()"
-        >
+        (click)="changeAttentionOfAuthor()"
+      >
         {{ 
-          diff.needAttentionOfList.indexOf(diff.author) > -1
-          ? 'Remove from Needs Attention'
-          : 'Add to Needs Attention'
+          diff.getAuthor().getNeedsAttention() ?
+            'Attention not needed':
+            'Ask for attention'
         }}
       </button>
-      {{ diff.author }}
+      {{ authService.getUsername(diff.getAuthor().getEmail()) }}
     </span>
   </div>
 
   <div class="review-status" fxFlex="100%">
-    <ng-container [ngSwitch]="diff.status">
-      <ng-container *ngSwitchCase="'REVIEW_NOT_STARTED'">
-        <span>
-          <mat-icon class="reviewNotStarted">trip_origin</mat-icon>
-          Review not started
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'NEEDS_MORE_WORK'">
-        <span>
-          <span class="needsMoreWork">
-            <mat-icon class="smaller-icon">build</mat-icon>
-          </span>
-          Needs more work
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'UNDER_REVIEW'">
-        <span>
-          <span class="underReview">
-            <mat-icon class="smaller-icon">message</mat-icon>
-          </span>
-          Under Review
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'ACCEPTED'">
-        <span>
-          <span class="accepted">
-            <mat-icon class="smaller-icon">thumb_up</mat-icon>
-          </span>
-          Accepted
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'SUBMITTING'">
-        <span>
-          <mat-icon class="submitted">check_circle</mat-icon>
-          Submitting
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'SUBMITTED'">
-        <span>
-          <mat-icon class="submitted">check_circle</mat-icon>
-          Submitted
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'REVERTING'">
-        <span>
-          <mat-icon class="reverting">cancel</mat-icon>
-          Reverting
-        </span>
-      </ng-container>
-      <ng-container *ngSwitchCase="'REVERTED'">
-        <span>
-          <mat-icon class="reverted">cancel</mat-icon>
-          Reverted
-        </span>
-      </ng-container>
-    </ng-container>
+    <span>
+      <span [ngClass]="statusList[diff.getStatus()].spanClass">
+        <mat-icon [ngClass]="statusList[diff.getStatus()].iconClass">
+          {{ statusList[diff.getStatus()].icon }}
+        </mat-icon>
+      </span>
+      {{ statusList[diff.getStatus()].label }}
+    </span>
   </div>
+
   <div class="action-buttons" 
     fxLayout="row"
     fxLayoutGap="20px"
     fxFlex="212px"
     fxLayoutAlign="end end">
+    <!-- TODO: add some action for the buttons -->
     <div class="submit">
       <button>Submit</button>
     </div>

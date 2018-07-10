@@ -2,6 +2,12 @@
 # Usage:
 # run.sh --root_path <root_path>
 
+#
+# Debugging gRPC server:
+# kill $(lsof -tnP -i:8001 -sTCP:LISTEN)
+# bazel build //tools/local_server:local_server; bazel-bin/tools/local_server/local_server --debug_token_mode
+
+cd $STARTUP_OS
 # Build and exit on fail:
 bazel build //tools/local_server:local_http_gateway
 if [ $? -ne 0 ]; then
@@ -15,9 +21,13 @@ fi
 # Kill previous:
 if [ "$(uname)" = "Darwin" ] || [ "$(uname)" = "Linux" ]; then
   # Mac & Linux
-  pkill -f 'tools/local_server/local_http_gateway'
-  pkill -f 'tools/local_server/local_server'
-  fuser -k 8000/tcp # For Angular
+  # kill HTTP gateway (port 7000), gRPC server (port 8001) and Angular server (8000)
+  # -t makes `lsof` output only PIDs so output can be piped to `kill`
+  # -n and -P prevent `lsof` from resolving addresses and ports, therefore
+  # making execution faster
+  # we filter for processes that listen on port in order to kill only
+  # servers (i.e. Angular) instead of clients (i.e. Chrome)
+  kill $(lsof -tnP -i:7000 -i:8000 -i:8001 -sTCP:LISTEN)
 # else
 #   # Windows
 #   # TODO: kill local_http_gateway & local_server

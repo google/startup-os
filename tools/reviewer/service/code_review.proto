@@ -19,6 +19,7 @@ service CodeReviewService {
       returns (DiffNumberResponse);
   rpc getDiff(DiffRequest) returns (Diff);
   rpc getDiffFiles(DiffFilesRequest) returns (DiffFilesResponse);
+  rpc ping(.google.protobuf.Empty) returns (PongResponse);
 }
 
 message FileRequest { string filename = 1; }
@@ -52,6 +53,8 @@ message DiffFilesResponse {
 
 message DiffRequest { int64 diff_id = 1; }
 
+message PongResponse { string message = 1; }
+
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues
 //   when attempted (couldn't import another proto) but maybe they've since been
@@ -68,8 +71,7 @@ message Diff {
     REVERTED = 7;
   }
 
-  int64 firestore_id = 1;
-  int64 number = 2;
+  int64 id = 1;
   // The main author of the diff, though certain snapshots can be made by
   // others.
   Author author = 3;
@@ -82,17 +84,18 @@ message Diff {
   int64 created_timestamp = 9;
   int64 modified_timestamp = 10;
   repeated Thread thread = 13;
+  repeated string cc = 14;
 }
 
 message Reviewer {
-  string name = 1;
-  bool needsAttention = 2;
+  string email = 1;
+  bool needs_attention = 2;
   bool approved = 3;
 }
 
 message Author {
-  string name = 1;
-  bool needsAttention = 2;
+  string email = 1;
+  bool needs_attention = 2;
 }
 
 message Thread {

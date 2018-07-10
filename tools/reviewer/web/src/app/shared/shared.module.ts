@@ -9,7 +9,7 @@ import {
   MatListModule,
   MatProgressSpinnerModule,
   MatSnackBarModule,
-  MatToolbarModule
+  MatToolbarModule,
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
@@ -23,12 +23,12 @@ const SHARED_MODULES = [
   MatListModule,
   MatProgressSpinnerModule,
   MatSnackBarModule,
-  MatToolbarModule
+  MatToolbarModule,
 ];
 
 @NgModule({
   imports: [RouterModule, ...SHARED_MODULES],
   exports: SHARED_MODULES,
-  providers: []
+  providers: [],
 })
 export class SharedModule {}

@@ -31,13 +31,14 @@ import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import dagger.Component;
 import dagger.Lazy;
 import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /** aa tool. */
 @Singleton
 public class AaTool {
-  private HashMap<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
+  private Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
 
   @Inject
   AaTool(

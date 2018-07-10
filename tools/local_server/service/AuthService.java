@@ -55,7 +55,9 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
 
-  private ScheduledExecutorService tokenRefreshScheduler = Executors.newScheduledThreadPool(1);
+  private final FileUtils fileUtils;
+  private final ScheduledExecutorService tokenRefreshScheduler =
+      Executors.newScheduledThreadPool(1);
   private String projectId;
   private String apiKey;
   private String jwtToken;
@@ -64,7 +66,6 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private String refreshToken;
   private String userName;
   private String userEmail;
-  private FileUtils fileUtils;
 
   @Inject
   AuthService(FileUtils fileUtils) {
@@ -108,17 +109,14 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   private void setTokenRefreshScheduler() {
     // Wait until 10 seconds before token expiration to refresh.
-    long delay = tokenExpiration - System.currentTimeMillis() / 1000 - 10;
+    long delay = tokenExpiration - (System.currentTimeMillis() / 1000) - 10;
     tokenRefreshScheduler.schedule(
-        new Runnable() {
-          @Override
-          public void run() {
-            try {
-              refreshToken();
-              setTokenRefreshScheduler();
-            } catch (RuntimeException e) {
-              e.printStackTrace();
-            }
+        () -> {
+          try {
+            refreshToken();
+            setTokenRefreshScheduler();
+          } catch (RuntimeException e) {
+            e.printStackTrace();
           }
         },
         delay,
@@ -156,23 +154,21 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       connection.setDoOutput(true);
       connection.getOutputStream().write(postDataBytes);
 
-      InputStream stream;
-      if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-        stream = connection.getInputStream();
-      } else {
-        stream = connection.getErrorStream();
-      }
-      String response =
-          new BufferedReader(new InputStreamReader(stream))
-              .lines()
-              .collect(Collectors.joining("\n"));
-      if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-        JSONObject json = new JSONObject(response);
-        jwtToken = json.getString("access_token");
-        decodeJwtToken();
-        logger.atInfo().log("Token refreshed. New expiration is %d", tokenExpiration);
-      } else {
-        throw new RuntimeException("Error on token refresh:\n" + response);
+      try (InputStream stream =
+              (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
+                  ? connection.getInputStream()
+                  : connection.getErrorStream();
+          BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream))) {
+
+        String response = bufferedReader.lines().collect(Collectors.joining("\n"));
+        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+          JSONObject json = new JSONObject(response);
+          jwtToken = json.getString("access_token");
+          decodeJwtToken();
+          logger.atInfo().log("Token refreshed. New expiration is %d", tokenExpiration);
+        } else {
+          throw new RuntimeException("Error on token refresh:\n" + response);
+        }
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -189,6 +185,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   public String getUserName() {
     return userName;
+  }
+
+  public String getUserEmail() {
+    return userEmail;
   }
 }
 

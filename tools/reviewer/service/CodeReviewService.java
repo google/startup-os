@@ -38,6 +38,7 @@ import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
 import com.google.startupos.tools.reviewer.service.Protos.DiffFilesResponse;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
+import com.google.startupos.tools.reviewer.service.Protos.PongResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -63,11 +64,11 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   private static final String DOCUMENT_FOR_LAST_DIFF_NUMBER = "data";
 
-  private AuthService authService;
-  private FileUtils fileUtils;
-  private GitRepoFactory repoFactory;
-  private String basePath;
-  private TextDifferencer textDifferencer;
+  private final AuthService authService;
+  private final FileUtils fileUtils;
+  private final GitRepoFactory repoFactory;
+  private final String basePath;
+  private final TextDifferencer textDifferencer;
 
   @Inject
   public CodeReviewService(
@@ -132,16 +133,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     }
   }
 
-  private String getAbsolutePath(String relativePath) throws SecurityException {
-    // normalize() resolves "../", to help prevent returning files outside rootPath
-    String absolutePath = Paths.get(basePath, relativePath).normalize().toString();
-    if (!absolutePath.startsWith(basePath)) {
-      throw new SecurityException("Resulting path is not under root");
-    }
-
-    return absolutePath;
-  }
-
   @Override
   public void getFile(FileRequest req, StreamObserver<FileResponse> responseObserver) {
     try {
@@ -165,9 +156,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     Diff diff =
         req.getDiff()
             .toBuilder()
-            .setAuthor(Author.newBuilder().setName(authService.getUserName()).build())
+            .setAuthor(Author.newBuilder().setEmail(authService.getUserEmail()).build())
             .build();
-    client.createDocument(diffPath, String.valueOf(diff.getNumber()), diff);
+    client.createProtoDocument(diffPath, String.valueOf(diff.getId()), diff);
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
@@ -204,10 +195,13 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
             client.getDocument(
                 firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
                 DiffNumberResponse.newBuilder());
+    diffNumberResponse =
+        diffNumberResponse
+            .toBuilder()
+            .setLastDiffId(diffNumberResponse.getLastDiffId() + 1)
+            .build();
     client.createDocument(
-        firestoreReviewRoot.get(),
-        DOCUMENT_FOR_LAST_DIFF_NUMBER,
-        diffNumberResponse.toBuilder().setLastDiffId(diffNumberResponse.getLastDiffId() + 1));
+        firestoreReviewRoot.get(), DOCUMENT_FOR_LAST_DIFF_NUMBER, diffNumberResponse);
     responseObserver.onNext(diffNumberResponse);
     responseObserver.onCompleted();
   }
@@ -258,7 +252,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           .listContents(workspacePath)
           .stream()
           .map(path -> fileUtils.joinPaths(workspacePath, path))
-          .filter(path -> fileUtils.folderExists(path))
+          .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
@@ -281,8 +275,14 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       e.printStackTrace();
     }
 
-    logger.atInfo().log("DiffFiles request\n" + request.toString());
+    logger.atInfo().log("DiffFiles request\n%s", request);
     responseObserver.onNext(response.build());
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
+    responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
     responseObserver.onCompleted();
   }
 }

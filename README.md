@@ -21,6 +21,14 @@ You can:
 * Use it as a reference and copy-paste parts of it to your own repo.
 * Use parts of it from your own repo. For an example of that, see https://github.com/hasadna/hasadna (look for `@startup_os` in BUILD files)
 
+### Installation
+1. Install [Bazel](https://docs.bazel.build/versions/master/install.html)
+2. Run `npm install` (temporarily needed)
+
+Now you can build any target you want. To build all targets and run all tests:
+
+`bazel query //... | grep -v ^\/\/third_party | grep -v *node_modules | xargs bazel test`
+
 ### Milestones
 #### ✓ Milestone I
 Working examples of:
@@ -47,6 +55,7 @@ Working examples of:
 Here are some other repos with examples of Bazel, gRPC and other related technologies:
 * Go, C++, Java: https://github.com/lucperkins/colossus
 * Go: https://github.com/Staffjoy/v2
+* Java and also some C++ and Python: https://github.com/apache/incubator-heron
 
 ## Feedback
 If you're interested in StartupOS, please let us know!

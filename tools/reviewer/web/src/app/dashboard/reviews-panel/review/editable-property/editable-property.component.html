@@ -25,7 +25,7 @@ class="bug">
       </div>
       <!-- Display inside a clickable `<a>` element if the property
         being displayed is bug property of Diff -->
-      <a *ngIf="property === 'bug'" class="link" href="{{ propertyValue }}">
+      <a *ngIf="property === 'bug'" class="link">
         {{ propertyValue.length ? propertyValue : '&nbsp;' }}
       </a>
       <button

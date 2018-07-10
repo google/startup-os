@@ -99,6 +99,24 @@ java_library(
 )
 
 java_library(
+    name = "grpc_services",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/io/grpc/grpc_services",
+    ],
+    runtime_deps = [
+        ":grpc_protobuf",
+        ":grpc_stub",
+        "//third_party/maven/com/google/instrumentation:instrumentation_api",
+    ],
+)
+
+java_library(
     name = "grpc_stub",
     licenses = [
         "permissive",

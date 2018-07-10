@@ -3,18 +3,18 @@ import {
   ElementRef,
   Input,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
 } from '@angular/core';
 
 // Sets the element's HTML
 @Directive({
-  selector: '[HTML]'
+  selector: '[HTML]',
 })
 export class HtmlDirective implements OnChanges {
   @Input() HTML: string;
 
   constructor(
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -17,7 +17,7 @@
 package com.google.startupos.examples.dagger.example1;
 
 class Class1Impl implements Class1Interface {
-  boolean booleanValue;
+  private boolean booleanValue;
 
   @Override
   public void setTrue() {

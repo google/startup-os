@@ -2,7 +2,9 @@
   <!-- User comments -->
   <div class="comments" *ngIf="comments.length">
     <div class="comment" *ngFor="let comment of comments">
-      <div class="username text">{{comment.getCreatedBy()}}</div>
+      <div class="username text">
+        {{ authService.getUsername(comment.getCreatedBy()) }}
+      </div>
       <pre class="message text">{{comment.getContent()}}</pre>
     </div>
   </div>
@@ -11,9 +13,11 @@
   <textarea class="text" placeholder="Leave a comment" #textareaRef
     [formControl]="textareaControl"
   ></textarea>
-  <button mat-raised-button (click)="addComment()">Comment</button>
-  <button mat-raised-button
-    (click)="closeComments()"
-    *ngIf="!comments.length"
-  >Close</button>
+  <div class="buttons">
+    <button mat-raised-button (click)="addComment()">Comment</button>
+    <button mat-raised-button
+      (click)="closeComments()"
+      *ngIf="!comments.length"
+    >Close</button>
+  </div>
 </div>

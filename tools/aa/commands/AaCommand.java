@@ -17,10 +17,10 @@
 package com.google.startupos.tools.aa.commands;
 
 public interface AaCommand {
-  public static final String ANSI_RED = "\u001B[31m";
-  public static final String ANSI_YELLOW = "\u001B[33m";
-  public static final String ANSI_BOLD = "\u001b[1m";
-  public static final String ANSI_RESET = "\u001B[0m";
+  String ANSI_RED = "\u001B[31m";
+  String ANSI_YELLOW = "\u001B[33m";
+  String ANSI_BOLD = "\u001b[1m";
+  String ANSI_RESET = "\u001B[0m";
   String RED_ERROR = ANSI_RED + ANSI_BOLD + "ERROR: " + ANSI_RESET;
   String YELLOW_NOTE = ANSI_YELLOW + ANSI_BOLD + "NOTE: " + ANSI_RESET;
   // Run command, return true on success.

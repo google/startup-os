@@ -1,0 +1,10 @@
+syntax = "proto3";
+package com.google.startupos.common.firestore;
+
+option java_package = "com.google.startupos.common.firestore";
+option java_outer_classname = "Protos";
+
+message ProtoDocument {
+  // Base64 encoding of binary proto
+  string proto = 1;
+}

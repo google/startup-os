@@ -17,7 +17,6 @@
 package com.google.startupos.examples.dagger.example2;
 
 import dagger.Module;
-import dagger.Provides;
 import dagger.Binds;
 
 @Module(includes = Class1Module.class)

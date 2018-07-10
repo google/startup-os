@@ -6,8 +6,8 @@
 # relevant issue: https://github.com/johnynek/bazel-deps/issues/126
 git_repository(
     name = "bazel_deps",
-    commit = "a15c2f64e099e78871ee78ff1f4e6bec5ec7ed4c",
-    remote = "https://github.com/vmax/bazel-deps-deploy",
+    commit = "89922f54a6abc59d8000b5118ae339d9e81120f4",
+    remote = "https://github.com/oferb/startupos-binaries",
 )
 
 load("//third_party/maven:workspace.bzl", "maven_dependencies")
@@ -227,3 +227,9 @@ load(
 )
 
 _java_image_repos()
+
+http_jar(
+    name = "grpc_polyglot",
+    sha256 = "c2a453921632c0c3559f9df92e1699b69c784181f36a316f9927b70f52e5a7d5",
+    url = "https://github.com/grpc-ecosystem/polyglot/releases/download/v1.6.0/polyglot.jar"
+)

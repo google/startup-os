@@ -1,12 +1,10 @@
-<div *ngIf="diffView" class="single-review">
+<div class="single-review" *ngIf="!isLoading">
   
   <!-- Title bar -->
   <review-titlebar 
-    [diff]="diffView"
-    [editable]="editable"
-    (onAddToAttentionList)="saveAttentionList($event)"
-    >
-  </review-titlebar>
+    [diff]="diff"
+    [editable]="isEditable"
+  ></review-titlebar>
 
   <!-- Details of the review -->
   <div class="review-details">
@@ -14,38 +12,18 @@
     <div fxLayout="row" fxLayoutGap="10%">
       <div fxLayout="column" fxLayoutGap="20px" fxFlex="45%">
   
-        <!-- Person List based on Reviewer in the Diff -->
-        <div>
-          <app-person-list 
-            [diff]="diff"
-            [property]="'reviewers'"
-            [enableAddToAttention]="true"
-            [editable]="editable"
-            (onUpdateDiff)="updateDiff($event, 'Reviewers Updated')"
-            (onRemove)="removeProperty($event, 'Reviewers Updated')"
-            (onAddToAttentionList)="saveAttentionList($event)"
-            ></app-person-list>
-        </div>
+        <!-- Reviewers -->
+        <reviewer-list [diff]="diff" [editable]="isEditable"></reviewer-list>
   
-        <!-- Person List based on CC in the Diff -->
-        <div>
-          <app-person-list 
-            [diff]="diff"
-            [property]="'cc'"
-            [editable]="editable"
-            [enableAddToAttention]="false"
-            (onUpdateDiff)="updateDiff($event, 'CC Updated')"
-            (onRemove)="removeProperty($event, 'CC Updated')"
-            ></app-person-list>
-        </div>
+        <!-- CC list -->
+        <cc-list [diff]="diff"></cc-list>
   
         <!-- Bug property of Diff that is a link to related Github Issue -->
         <div>
           <app-editable-property
           [diff]="diff"
           [property]="'bug'"
-          [editable]="editable"
-          (onUpdateDiff)="updateDiff($event, 'Bug Updated')"
+          [editable]="isEditable"
           ></app-editable-property>
         </div>
   
@@ -59,7 +37,7 @@
             Created:
           </div>
           <div fxFlex class="timestamp">
-            {{ diffView.createdTimestamp | date:'medium' }}
+            {{ diff.getCreatedTimestamp() | date:'medium' }}
           </div>
         </div>
   
@@ -74,7 +52,7 @@
           </div>
           <div fxFlex 
             class="timestamp">
-            {{ diffView.modifiedTimestamp | date:'medium' }}
+            {{ diff.getModifiedTimestamp() | date:'medium' }}
           </div>
         </div>
 
@@ -87,8 +65,7 @@
           <app-editable-property
             [diff]="diff"
             [property]="'description'"
-            [editable]="editable"
-            (onUpdateDiff)="updateDiff($event, 'Description Updated')"
+            [editable]="isEditable"
           ></app-editable-property>
         </div>
       </div>
@@ -97,9 +74,9 @@
   </div>
 
   <!-- Files -->
-  <review-files [files]="diffView.filesList" [diffId]="diffId"></review-files>
+  <review-files [fileList]="fileList" [diffId]="diff.getId()"></review-files>
 
   <!-- Review Comments -->
-  <review-discussion [diff]="diffView"></review-discussion>
+  <review-discussion [diff]="diff"></review-discussion>
   
 </div>
