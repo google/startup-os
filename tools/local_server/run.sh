@@ -2,6 +2,11 @@
 # Usage:
 # run.sh --root_path <root_path>
 
+#
+# Debugging gRPC server:
+# kill $(lsof -tnP -i:8001 -sTCP:LISTEN)
+# bazel build //tools/local_server:local_server; bazel-bin/tools/local_server/local_server --debug_token_mode
+
 cd $STARTUP_OS
 # Build and exit on fail:
 bazel build //tools/local_server:local_http_gateway
