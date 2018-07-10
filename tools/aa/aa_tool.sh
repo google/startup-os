@@ -139,16 +139,18 @@ function aa {
   # Uncomment to override StartupOS repo:
   #STARTUP_OS=<repo path>
   # Uncomment to force recompile:
-  #AA_FORCE_COMPILE=1
+  #AA_FORCE_COMPILE_WS=<workspace_name>
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/aa/aa_tool"
-  if [ ! -f $AA_BINARY ] || [ "$AA_FORCE_COMPILE" = "1" ]; then
-    cd $STARTUP_OS
+  if [ ! -f $AA_BINARY ] || [ ! -z "$AA_FORCE_COMPILE_WS" ]; then
+    echo "$RED[DEBUG]: building aa from ws $AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/$RESET"
+    cd $AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/
     bazel build //tools/aa:aa_tool
     if [ $? -ne 0 ]; then
       cd $CWD
       return 1
     fi
+    AA_BINARY="$AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/bazel-bin/tools/aa/aa_tool"
     cd $CWD
   fi
   if [ "$1" = "workspace" ]; then
