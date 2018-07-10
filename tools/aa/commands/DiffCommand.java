@@ -85,10 +85,10 @@ public class DiffCommand implements AaCommand {
   }
 
   private Diff createDiff() {
-    System.out.println("Creating diff");
     DiffNumberResponse response =
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
     String branchName = String.format("D%s", response.getLastDiffId());
+    System.out.println("Creating " + branchName);
 
     Diff.Builder diffBuilder =
         Diff.newBuilder()
