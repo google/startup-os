@@ -257,6 +257,9 @@ public class FileUtils {
                 return FileVisitResult.CONTINUE;
               }
             }
+            if (Files.isSymbolicLink(file)) {
+              return FileVisitResult.CONTINUE;
+            }
             Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
             return FileVisitResult.CONTINUE;
           }
