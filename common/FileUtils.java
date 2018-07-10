@@ -170,8 +170,8 @@ public class FileUtils {
   }
 
   /**
-   * Gets file and folder absolute paths recursively. 
-   * Throws NoSuchFileException if directory doesn't exist
+   * Gets file and folder absolute paths recursively. Throws NoSuchFileException if directory
+   * doesn't exist
    */
   public ImmutableList<String> listContentsRecursively(String path) throws IOException {
     try (Stream<Path> paths =
@@ -273,8 +273,8 @@ public class FileUtils {
   }
 
   /**
-   * Deletes all files and folders in directory. Target directory is deleted. 
-   * Rethrows exceptions as unchecked.
+   * Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as
+   * unchecked.
    */
   public void deleteDirectoryUnchecked(String path) {
     try {
@@ -303,8 +303,10 @@ public class FileUtils {
     deleteDirectoryContents(path, false);
   }
 
-  /** Deletes all files and folders inside directory. Target directory is not deleted.
-   * Rethrows exceptions as unchecked. */
+  /**
+   * Deletes all files and folders inside directory. Target directory is not deleted. Rethrows
+   * exceptions as unchecked.
+   */
   public void clearDirectoryUnchecked(String path) {
     try {
       clearDirectory(path);
@@ -313,28 +315,34 @@ public class FileUtils {
     }
   }
 
-  private void deleteDirectoryContents(String path, boolean deleteTargetDirectory) throws IOException {
+  private void deleteDirectoryContents(String path, boolean deleteTargetDirectory)
+      throws IOException {
     final Path targetDirectory = fileSystem.getPath(expandHomeDirectory(path));
-    Files.walkFileTree(targetDirectory, new SimpleFileVisitor<Path>() {
-      @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        Files.delete(file);
-        return FileVisitResult.CONTINUE;
-      }
-
-      @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
-        if (exception == null) {
-          if (!deleteTargetDirectory && (targetDirectory == dir)) {
-            // Do nothing
-          } else {
-            Files.delete(dir);
+    Files.walkFileTree(
+        targetDirectory,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+              throws IOException {
+            Files.delete(file);
+            return FileVisitResult.CONTINUE;
           }
-          return FileVisitResult.CONTINUE;
-        } else {
-          throw exception;
-        }
-      }
-    });
+
+          @Override
+          public FileVisitResult postVisitDirectory(Path dir, IOException exception)
+              throws IOException {
+            if (exception == null) {
+              if (!deleteTargetDirectory && (targetDirectory == dir)) {
+                // Do nothing
+              } else {
+                Files.delete(dir);
+              }
+              return FileVisitResult.CONTINUE;
+            } else {
+              throw exception;
+            }
+          }
+        });
   }
 }
+

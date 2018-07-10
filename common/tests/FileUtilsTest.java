@@ -676,8 +676,10 @@ public class FileUtilsTest {
     assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/empty_folder")));
     assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder")));
     assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/first_file.txt")));
-    assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/second_file.txt")));
-    assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/third_file.txt")));
+    assertFalse(
+        Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/second_file.txt")));
+    assertFalse(
+        Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/third_file.txt")));
     assertTrue(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH)));
   }
 
