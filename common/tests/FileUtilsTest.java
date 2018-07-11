@@ -673,7 +673,6 @@ public class FileUtilsTest {
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/second_file.txt"));
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/third_file.txt"));
     fileUtils.clearDirectory(TEST_DIR_PATH);
-
     assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/empty_folder")));
     assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder")));
     assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/first_file.txt")));
