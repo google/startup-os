@@ -12,6 +12,7 @@ and verify it in CI (see [here](https://github.com/google/startup-os/blob/6f55f4
 * Precommit checks: https://github.com/google/startup-os/blob/master/pre-commit.sh
 * [check-formatting.sh](https://github.com/google/startup-os/blob/master/check-formatting.sh) to check all code is formatted correctly.
 * [fix-formatting.sh](https://github.com/google/startup-os/blob/master/fix-formatting.sh) to format all code.
+* CI (using CircleCI) to enforce above formatting and checks, and to compile and run tests (see [here](https://github.com/google/startup-os/tree/master/.circleci))
 
 This part is still WIP:
 * `aa` - a tool for a multi-repo code-review workflow (e.g "Create a PR from these changes across these 2 repos", "I'm done fixing, notify reviewer").
