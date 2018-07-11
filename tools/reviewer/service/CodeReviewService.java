@@ -54,7 +54,7 @@ import com.google.common.collect.ImmutableList;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
- */
+*/
 @Singleton
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
