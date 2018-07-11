@@ -4,6 +4,7 @@ import {
   AuthService,
   FirebaseService,
   NotificationService,
+  ReviewService,
 } from '@/shared/services';
 import { Diff, Reviewer } from '@/shared/shell';
 
@@ -25,6 +26,7 @@ export class ReviewerListComponent implements OnInit {
     private firebaseService: FirebaseService,
     private notificationService: NotificationService,
     private authService: AuthService,
+    private reviewService: ReviewService,
   ) { }
 
   ngOnInit() {
@@ -49,7 +51,8 @@ export class ReviewerListComponent implements OnInit {
         // TODO: Add username validation
         // e.g. no spaces and special chars etc
         // same in CC list
-        let reviewer: Reviewer  = this.getReviewerWithTheUsername(username);
+        let reviewer: Reviewer  = this.reviewService
+          .getReviewerWithTheUsername(this.diff, username);
         if (!reviewer) {
           // If reviewer not found, create new one.
           reviewer = new Reviewer();

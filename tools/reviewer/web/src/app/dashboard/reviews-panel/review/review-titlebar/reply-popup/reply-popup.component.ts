@@ -1,9 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { AuthService,
   FirebaseService,
   NotificationService,
   Reviewer,
+  ReviewService,
 } from '@/shared';
 import { Diff } from '@/shared';
 
@@ -12,7 +13,7 @@ import { Diff } from '@/shared';
   templateUrl: './reply-popup.component.html',
   styleUrls: ['./reply-popup.component.scss'],
 })
-export class ReplyPopupComponent implements OnInit {
+export class ReplyPopupComponent {
   @Input() diff: Diff;
   actionRequired = false;
   approved = false;
@@ -21,6 +22,7 @@ export class ReplyPopupComponent implements OnInit {
     private authService: AuthService,
     private firebaseService: FirebaseService,
     private notificationService: NotificationService,
+    private reviewService: ReviewService,
   ) { }
 
   reply() {
@@ -41,7 +43,8 @@ export class ReplyPopupComponent implements OnInit {
       // Get reviewer from userEmail
       const username = this.authService
         .getUsername(this.authService.userEmail);
-      let reviewer = this.getReviewerWithTheUsername(username);
+      let reviewer = this.reviewService
+        .getReviewerWithTheUsername(this.diff, username);
 
       if (!reviewer) {
         // Current user is not a reviewer; add the current user to reviewers
@@ -51,7 +54,6 @@ export class ReplyPopupComponent implements OnInit {
 
         // Default values:
         reviewer.setApproved(false);
-        reviewer.setNeedsAttention(false);
 
         const reviewers = this.diff.getReviewerList();
         reviewers.push(reviewer);
@@ -62,6 +64,9 @@ export class ReplyPopupComponent implements OnInit {
       if (this.approved) {
         reviewer.setApproved(true);
       }
+
+      // Remove Attention of reviewer
+      reviewer.setNeedsAttention(false);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
@@ -69,17 +74,5 @@ export class ReplyPopupComponent implements OnInit {
     }, () => {
       this.notificationService.error("Reply couldn't be submitted");
     });
-  }
-
-  // TODO ask Vadim about making a utility function for this
-  getReviewerWithTheUsername(username: string): Reviewer {
-    for (const reviewer of this.diff.getReviewerList()) {
-      const reviewerUsername = this.authService
-        .getUsername(reviewer.getEmail());
-
-      if (reviewerUsername === username) {
-        return reviewer;
-      }
-    }
   }
 }
