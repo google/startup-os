@@ -45,7 +45,7 @@ import org.json.JSONObject;
 @Singleton
 public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-  private static final String REFRESH_TOKEN = "https://securetoken.googleapis.com/v1/token?key=%s";
+  private static final String REFRESH_TOKEN = "http://securetoken.googleapis.com/v1/token?key=%s";
 
   @FlagDesc(
     name = "debug_token_mode",

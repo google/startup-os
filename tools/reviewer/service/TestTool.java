@@ -33,7 +33,7 @@ public class TestTool {
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
 
   private TestTool() {
-    channel = ManagedChannelBuilder.forAddress("localhost", 8001).usePlaintext(true).build();
+    channel = ManagedChannelBuilder.forAddress("localhost", 8002).usePlaintext(true).build();
     blockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
