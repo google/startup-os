@@ -21,6 +21,7 @@ import static java.net.HttpURLConnection.HTTP_OK;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.protobuf.util.JsonFormat;
+import com.google.startupos.common.firestore.Protos.ProtoDocument;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Base64;
 
 // TODO: Fix open Firestore rules
 public class FirestoreClient {
@@ -83,16 +85,33 @@ public class FirestoreClient {
     }
   }
 
+  public void createProtoDocument(String path, Message proto) {
+    createProtoDocument(path, null, proto);
+  }
+
+  public void createProtoDocument(String path, String documentId, Message proto) {
+    byte[] protoBytes = proto.toByteArray();
+    String base64BinaryString = Base64.getEncoder().encodeToString(protoBytes);
+    createDocument(
+        path, documentId, ProtoDocument.newBuilder().setProto(base64BinaryString).build());
+  }
+
   public void createDocument(String path, MessageOrBuilder proto) {
     createDocument(path, null, proto);
   }
 
   public void createDocument(String path, String documentId, MessageOrBuilder proto) {
     try {
+      createDocument(path, documentId, FirestoreJsonFormat.printer().print(proto));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void createDocument(String path, String documentId, String json) {
+    try {
       URL url = new URL(getCreateDocumentUrl(path, documentId));
 
-      JsonFormat.printer().print(proto);
-      String json = FirestoreJsonFormat.printer().print(proto);
       byte[] postDataBytes = json.getBytes("UTF-8");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       // PATCH method updates the document if if exists and creates otherwise
