@@ -241,28 +241,52 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     return result.build();
   }
 
+  String getWorkspacePath(String workspace) {
+    return fileUtils.joinPaths(basePath, "ws", workspace);
+  }
+
   @Override
   public void getDiffFiles(
       DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
-    String workspacePath = fileUtils.joinPaths(basePath, "ws", request.getWorkspace());
-    String branch = "D" + request.getDiffId();
+    if (request.getWorkspace().isEmpty() || request.getDiffId() <= 0) {
+      responseObserver.onError(
+          Status.INVALID_ARGUMENT
+              .withDescription(
+                  "Workspace must be set and diff_id must be > 0.\nrequest:\n" + request)
+              .asRuntimeException());
+      return;
+    }
+    String workspacePath = getWorkspacePath(request.getWorkspace());
+    // Needs to be final for lambda; can also be set to base/head
+    String workspacePathFinal;
+    String workspace;
+    String branch;
+    if (fileUtils.folderExists(workspacePath)) {
+      workspacePathFinal = workspacePath;
+      workspace = request.getWorkspace();
+      branch = "D" + request.getDiffId();
+    } else {
+      logger.atInfo().log("Workspace does not exist at %s. Fallbacking to head.", workspacePath);
+      workspacePathFinal = fileUtils.joinPaths(basePath, "head");
+      workspace = "";
+      branch = "remotes/origin/D" + request.getDiffId();
+    }
+
     DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
     try {
       fileUtils
-          .listContents(workspacePath)
+          .listContents(workspacePathFinal)
           .stream()
-          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .map(path -> fileUtils.joinPaths(workspacePathFinal, path))
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 Repo repo = repoFactory.create(path);
                 ImmutableList<Commit> commits =
-                    addWorkspaceAndRepoToCommits(
-                        repo.getCommits(branch), request.getWorkspace(), repoName);
+                    addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
                 ImmutableList<File> uncommittedFiles =
-                    addWorkspaceAndRepoToFiles(
-                        repo.getUncommittedFiles(), request.getWorkspace(), repoName);
+                    addWorkspaceAndRepoToFiles(repo.getUncommittedFiles(), workspace, repoName);
                 response.addBranchInfo(
                     BranchInfo.newBuilder()
                         .setDiffId(request.getDiffId())
