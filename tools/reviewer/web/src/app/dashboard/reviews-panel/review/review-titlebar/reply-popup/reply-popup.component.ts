@@ -27,7 +27,7 @@ export class ReplyPopupComponent {
 
   reply(): void {
     if (this.authService.userEmail === this.diff.getAuthor().getEmail()) {
-      // current user is the author
+      // Current user is the author
       const author = this.diff.getAuthor();
       author.setNeedsAttention(false);
 
@@ -48,7 +48,6 @@ export class ReplyPopupComponent {
 
       if (!reviewer) {
         // Current user is not a reviewer; add the current user to reviewers
-        // If reviewer not found, create new one.
         reviewer = new Reviewer();
         reviewer.setEmail(username + '@gmail.com');
 
@@ -57,6 +56,8 @@ export class ReplyPopupComponent {
 
         const reviewers = this.diff.getReviewerList();
         reviewers.push(reviewer);
+
+        // TODO
         // Is there a better way for just Adding a reviewer to Reviewer list?
         this.diff.setReviewerList(reviewers);
       }
