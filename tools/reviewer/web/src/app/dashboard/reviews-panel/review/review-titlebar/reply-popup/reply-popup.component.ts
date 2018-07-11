@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
-import { AuthService,
+import {
+  AuthService,
   FirebaseService,
   NotificationService,
   Reviewer,
@@ -15,7 +16,6 @@ import { Diff } from '@/shared';
 })
 export class ReplyPopupComponent {
   @Input() diff: Diff;
-  actionRequired = false;
   approved = false;
 
   constructor(
@@ -25,7 +25,7 @@ export class ReplyPopupComponent {
     private reviewService: ReviewService,
   ) { }
 
-  reply() {
+  reply(): void {
     if (this.authService.userEmail === this.diff.getAuthor().getEmail()) {
       // current user is the author
       const author = this.diff.getAuthor();
