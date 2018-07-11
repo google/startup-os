@@ -49,8 +49,8 @@ export class LocalserverService {
 
           observer.next(diffFilesResponse.getBranchinfoList()[0]);
         }, () => {
-          observer.error();
           this.error();
+          observer.error();
         });
     });
   }
@@ -89,9 +89,9 @@ export class LocalserverService {
 
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
     return new Observable(observer => {
-      this.getBranchInfo(id, workspace).subscribe(diffFilesResponse => {
-        let files: File[] = [];
-        for (const commit of diffFilesResponse.getCommitList()) {
+      this.getBranchInfo(id, workspace).subscribe(branchInfo => {
+        let files: File[] = branchInfo.getUncommittedFileList();
+        for (const commit of branchInfo.getCommitList()) {
           // Remove duplicates
           let newfiles: File[] = commit.getFileList();
           newfiles = newfiles.filter(newfile => {

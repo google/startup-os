@@ -78,36 +78,48 @@ export class DiffComponent implements OnInit, OnDestroy {
   getBranchInfo(): void {
     this.localserverService
       .getBranchInfo(this.diff.getId(), this.diff.getWorkspace())
-      .subscribe(diffFilesResponse => {
-        this.branchInfo = diffFilesResponse;
+      .subscribe(branchInfo => {
+        this.branchInfo = branchInfo;
         this.file.setRepoId(this.branchInfo.getRepoId());
-        this.file.setCommitId(this.getCommitId(this.file, this.branchInfo));
+        this.setCommitId(this.file, this.branchInfo);
         this.getFileChanges(this.file);
       });
   }
 
   // Get id of commit, where the file is present
-  getCommitId(currentFile: File, branchInfo: BranchInfo): string {
+  setCommitId(currentFile: File, branchInfo: BranchInfo): void {
     for (const commit of this.branchInfo.getCommitList()) {
       for (const file of commit.getFileList()) {
         if (currentFile.getFilename() === file.getFilename()) {
-          return commit.getId();
+          currentFile.setCommitId(commit.getId());
         }
       }
     }
-    throw new Error('File not found');
   }
 
   getFileChanges(file: File): void {
+    // First commit in the list - commit before the changes.
+    // Second commit in the list - the oldest commit in the diff.
+    // ...
+    // Last commit in the list - most recent commit in the diff.
+
+    // Left commit id - first commit in the list.
+    const leftCommitId: string = this.branchInfo
+      .getCommitList()[0]
+      .getId();
+    // Right commit id - last commit in the list.
+    const rightCommitId: string = this.branchInfo
+      .getCommitList()[this.branchInfo.getCommitList().length - 1]
+      .getId();
+
     const leftFile = new File();
     leftFile.setFilename(file.getFilename());
     leftFile.setRepoId(this.branchInfo.getRepoId());
-    // TODO: add supporting of left commit_id
-    leftFile.setCommitId('f7be0169da78ead679e7491e726ed481532a0336');
+    leftFile.setCommitId(leftCommitId);
     const rightFile = new File();
     rightFile.setFilename(file.getFilename());
     rightFile.setRepoId(this.branchInfo.getRepoId());
-    rightFile.setCommitId(file.getCommitId());
+    rightFile.setCommitId(rightCommitId);
 
     this.localserverService
       .getFileChanges(leftFile, rightFile)
