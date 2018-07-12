@@ -76,7 +76,7 @@ export class ReviewerListComponent implements OnInit {
 
   getReviewerWithTheUsername(username: string): Reviewer {
     for (const reviewer of this.diff.getReviewerList()) {
-      const reviewerUsername = this.authService
+      const reviewerUsername: string = this.authService
         .getUsername(reviewer.getEmail());
 
       if (reviewerUsername === username) {
@@ -90,8 +90,9 @@ export class ReviewerListComponent implements OnInit {
     reviewer.setNeedsAttention(!reviewer.getNeedsAttention());
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      const username = this.authService.getUsername(reviewer.getEmail());
-      const message = reviewer.getNeedsAttention() ?
+      const username: string = this.authService
+        .getUsername(reviewer.getEmail());
+      const message: string = reviewer.getNeedsAttention() ?
         `Attention of ${username} is requested` :
         `Attention of ${username} is canceled`;
       this.notificationService.success(message);

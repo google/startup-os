@@ -28,8 +28,8 @@ export class LocalserverService {
       const diffFilesRequest = new DiffFilesRequest();
       diffFilesRequest.setDiffId(id);
       diffFilesRequest.setWorkspace(workspace);
-      const requestBinary = diffFilesRequest.serializeBinary();
-      const requestBase64 = this.encodingService
+      const requestBinary: Uint8Array = diffFilesRequest.serializeBinary();
+      const requestBase64: string = this.encodingService
         .encodeUint8ArrayToBase64String(requestBinary);
 
       // Send the request to local server
@@ -38,7 +38,7 @@ export class LocalserverService {
         .map(response => response.text())
         .subscribe(diffFilesResponseBase64 => {
           // Decode response
-          const diffFilesResponseBinary = this.encodingService
+          const diffFilesResponseBinary: Uint8Array = this.encodingService
             .decodeBase64StringToUint8Array(diffFilesResponseBase64);
           const diffFilesResponse: DiffFilesResponse = DiffFilesResponse
             .deserializeBinary(diffFilesResponseBinary);
@@ -65,8 +65,8 @@ export class LocalserverService {
       const textDiffRequest = new TextDiffRequest();
       textDiffRequest.setLeftFile(leftFile);
       textDiffRequest.setRightFile(rightFile);
-      const requestBinary = textDiffRequest.serializeBinary();
-      const requestBase64 = this.encodingService
+      const requestBinary: Uint8Array = textDiffRequest.serializeBinary();
+      const requestBase64: string = this.encodingService
         .encodeUint8ArrayToBase64String(requestBinary);
 
       // Send the request to local server
@@ -75,7 +75,7 @@ export class LocalserverService {
         .map(response => response.text())
         .subscribe(textDiffResponseBase64 => {
           // Decode response
-          const textDiffResponseBinary = this.encodingService
+          const textDiffResponseBinary: Uint8Array = this.encodingService
             .decodeBase64StringToUint8Array(textDiffResponseBase64);
           const textDiffResponse: TextDiffResponse = TextDiffResponse
             .deserializeBinary(textDiffResponseBinary);

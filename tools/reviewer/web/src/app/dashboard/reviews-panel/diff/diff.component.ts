@@ -3,7 +3,7 @@
 // e.g. FileChangeComponent
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -55,8 +55,8 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Get parameters from url
-    const urlSnapshot = this.activatedRoute.snapshot;
-    const filename = urlSnapshot.url
+    const urlSnapshot: ActivatedRouteSnapshot = this.activatedRoute.snapshot;
+    const filename: string = urlSnapshot.url
       .splice(1)
       .map(v => v.path)
       .join('/');
@@ -88,7 +88,8 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   // Get file from branchInfo by the filename
   getFile(filename: string, branchInfo: BranchInfo): File {
-    const files = this.localserverService.getFilesFromBranchInfo(branchInfo);
+    const files: File[] = this.localserverService
+      .getFilesFromBranchInfo(branchInfo);
     for (const file of files) {
       if (filename === file.getFilename()) {
         return file;
@@ -107,7 +108,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     leftFile.setFilename(currentFile.getFilename());
     leftFile.setRepoId(this.branchInfo.getRepoId());
     leftFile.setWorkspace(this.diff.getWorkspace());
-    const rightFile = currentFile;
+    const rightFile: File = currentFile;
 
     this.localserverService
       .getFileChanges(leftFile, rightFile)
@@ -128,8 +129,8 @@ export class DiffComponent implements OnInit, OnDestroy {
   addComment(lineNumber: number, comments: Comment[]): void {
     if (!this.file.getCommitId()) {
       // TODO: Add more UX behavior here
-      const errorMessage = 'Comment cannot be added to a uncommitted file';
-      this.notificationService.error(errorMessage);
+      this.notificationService
+        .error('Comment cannot be added to a uncommitted file');
       return;
     }
 

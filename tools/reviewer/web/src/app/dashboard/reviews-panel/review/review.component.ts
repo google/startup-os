@@ -43,7 +43,7 @@ export class ReviewComponent implements OnInit {
     // Render the fields un-editable if the current diff status
     // is in the list of notEditableStatus
     // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
-    const statuses = [
+    const statuses: Diff.Status[] = [
       Diff.Status.SUBMITTED,
       Diff.Status.REVERTED,
     ];
