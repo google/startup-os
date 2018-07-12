@@ -31,7 +31,7 @@ import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
  *
  * Alternatively, to run grpc_polyglot (curl-like tool for gRPC), use:
  * cat tools/reviewer/service/test_request.json | bazel run //tools:grpc_polyglot -- --command=call --endpoint=localhost:8001 --full_method=com.google.startupos.tools.reviewer.service.CodeReviewService/getDiffFiles
-*/
+ */
 
 public class TestTool {
   private final ManagedChannel channel;

@@ -112,18 +112,16 @@ public class GitRepoTest {
     String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(1);
     assertEquals(
         ImmutableList.of(
-          Commit.newBuilder()
-          .setId(lastMasterCommitId)
-          .build(),
-          Commit.newBuilder()
-              .setId(commitId)
-              .addFile(
-                  File.newBuilder()
-                      .setAction(File.Action.ADD)
-                      .setCommitId(commitId)
-                      .setFilename(TEST_FILE)
-                      .build())
-              .build()),
+            Commit.newBuilder().setId(lastMasterCommitId).build(),
+            Commit.newBuilder()
+                .setId(commitId)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.ADD)
+                        .setCommitId(commitId)
+                        .setFilename(TEST_FILE)
+                        .build())
+                .build()),
         repo.getCommits(TEST_BRANCH));
   }
 
@@ -139,9 +137,7 @@ public class GitRepoTest {
     String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(2);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder()
-                .setId(lastMasterCommit)
-                .build(),
+            Commit.newBuilder().setId(lastMasterCommit).build(),
             Commit.newBuilder()
                 .setId(commitId1)
                 .addFile(
