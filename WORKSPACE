@@ -12,8 +12,8 @@ git_repository(
 
 git_repository(
     name = "startupos_binaries",
-    commit = "020d701ea36b6f9db2411b280a7142b7957f550d",
-    remote = "https://github.com/oferb/startupos-binaries",
+    commit = "e4ada206e86f94ef78176fa6e78e0d25919ecf7a",
+    remote = "https://github.com/vmax/startupos-binaries",
 )
 
 load("//third_party/maven:workspace.bzl", "maven_dependencies")
