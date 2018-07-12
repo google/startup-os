@@ -1,3 +1,4 @@
+# SRC: https://github.com/grpc/grpc-java/blob/master/java_grpc_library.bzl
 def _path_ignoring_repository(f):
   if (len(f.owner.workspace_root) == 0):
     return f.short_path
