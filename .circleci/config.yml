@@ -39,7 +39,7 @@ jobs:
       - restore_cache:
           key: "v1-bazel_cache"
       - run: './pre-commit.sh'
-      - run: './check-formatting.sh'
+      - run: './formatting.sh'
 
   build:
     <<: *job_defaults

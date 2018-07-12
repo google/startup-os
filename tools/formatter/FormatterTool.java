@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.simple_formatter;
+package com.google.startupos.tools.formatter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.googlejavaformat.java.Formatter;
@@ -34,7 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class SimpleFormatterTool {
+class FormatterTool {
 
   static String readFile(Path path) throws IOException {
     return String.join(System.lineSeparator(), Files.readAllLines(path));
@@ -96,6 +96,17 @@ class SimpleFormatterTool {
     }
   }
 
+  static class BuildFormatter implements BaseFormatter {
+    static BuildFormatter init() {
+      return new BuildFormatter();
+    }
+
+    @Override
+    public void format(Path path) throws IOException {
+      execute("buildifier -mode=fix " + path.toAbsolutePath().toString());
+    }
+  }
+
   @FlagDesc(name = "path", description = "Format files in this path, recursively")
   private static final Flag<String> path = Flag.create(".");
 
@@ -113,6 +124,9 @@ class SimpleFormatterTool {
 
   @FlagDesc(name = "cpp", description = "Format C++ (*.cc) files")
   private static final Flag<Boolean> cpp = Flag.create(false);
+
+  @FlagDesc(name = "build", description = "Format bazel BUILD files")
+  private static final Flag<Boolean> build = Flag.create(false);
 
   @FlagDesc(name = "ignore_directories", description = "Ignored directories, split by comma")
   private static final Flag<String> ignoreDirectories = Flag.create("");
@@ -133,6 +147,11 @@ class SimpleFormatterTool {
     return getExtension(file).equals(".cc");
   }
 
+  private static boolean isBuild(Path file) {
+    return file.getFileName().toString().equals("BUILD")
+        || file.getFileName().toString().equals("BUILD.bazel");
+  }
+
   private static String getExtension(Path file) {
     String filename = file.getFileName().toString();
     int dotIndex = filename.lastIndexOf('.');
@@ -147,21 +166,25 @@ class SimpleFormatterTool {
         ((isJava(file) && java.get())
             || (isProto(file) && proto.get())
             || (isPython(file) && python.get())
-            || (isCpp(file) && cpp.get()));
+            || (isCpp(file) && cpp.get())
+            || (isBuild(file) && build.get()));
     boolean inIgnoredDirectory =
         ignoredDirectories.stream().anyMatch(ignoredDir -> file.startsWith(ignoredDir));
     return formatByExtension && !inIgnoredDirectory;
   }
 
   private static Map<String, BaseFormatter> formatters =
-      ImmutableMap.of(
-          ".java", JavaFormatter.init(),
-          ".proto", ClangFormatter.init(),
-          ".py", PythonFormatter.init(),
-          ".cc", ClangFormatter.init());
+      ImmutableMap.<String, BaseFormatter>builder()
+          .put(".java", JavaFormatter.init())
+          .put(".proto", ClangFormatter.init())
+          .put(".py", PythonFormatter.init())
+          .put(".cc", ClangFormatter.init())
+          .put(".bazel", BuildFormatter.init())
+          .put("", BuildFormatter.init())
+          .build();
 
   public static void main(String[] args) {
-    Flags.parse(args, SimpleFormatterTool.class.getPackage());
+    Flags.parse(args, FormatterTool.class.getPackage());
 
     Set<Path> ignoredDirectories =
         Stream.of(ignoreDirectories.get().split(","))
