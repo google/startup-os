@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { Dictionary } from 'associativearray';
 import { Observable } from 'rxjs';
 
 import {
@@ -90,25 +91,27 @@ export class LocalserverService {
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
     return new Observable(observer => {
       this.getBranchInfo(id, workspace).subscribe(branchInfo => {
-        let files: File[] = branchInfo.getUncommittedFileList();
-        for (const commit of branchInfo.getCommitList()) {
-          // Remove duplicates
-          let newfiles: File[] = commit.getFileList();
-          newfiles = newfiles.filter(newfile => {
-            for (const file of files) {
-              if (newfile.getFilename() === file.getFilename()) {
-                return false;
-              }
-            }
-            return true;
-          });
-
-          files = files.concat(newfiles);
-        }
-
-        observer.next(files);
+        observer.next(this.getFilesFromBranchInfo(branchInfo));
       });
     });
+  }
+
+  getFilesFromBranchInfo(branchInfo: BranchInfo): File[] {
+    const fileDictionary = new Dictionary<File>();
+    for (const commit of branchInfo.getCommitList()) {
+      this.addWithReplace(fileDictionary, commit.getFileList());
+    }
+    this.addWithReplace(fileDictionary, branchInfo.getUncommittedFileList());
+
+    return fileDictionary.values;
+  }
+
+  addWithReplace(fileDictionary: Dictionary<File>, newfiles: File[]): void {
+    for (const file of newfiles) {
+      // If file with the filename is already exist, it will be replaced by
+      // the new one.
+      fileDictionary.add(file.getFilename(), file);
+    }
   }
 
   error(): void {

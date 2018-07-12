@@ -32,7 +32,8 @@ export class ReviewComponent implements OnInit {
       this.localserverService
         .getDiffFiles(this.diff.getId(), this.diff.getWorkspace())
         .subscribe(files => {
-          this.files = files;
+          this.files = files
+            .filter(file => file.getAction() !== File.Action.DELETE);
           this.isLoading = false;
         });
     });
