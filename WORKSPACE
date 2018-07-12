@@ -10,6 +10,12 @@ git_repository(
     remote = "https://github.com/oferb/startupos-binaries",
 )
 
+git_repository(
+    name = "startupos_binaries",
+    commit = "020d701ea36b6f9db2411b280a7142b7957f550d",
+    remote = "https://github.com/oferb/startupos-binaries",
+)
+
 load("//third_party/maven:workspace.bzl", "maven_dependencies")
 
 maven_dependencies()
@@ -234,13 +240,6 @@ http_jar(
     url = "https://github.com/grpc-ecosystem/polyglot/releases/download/v1.6.0/polyglot.jar"
 )
 
-git_repository(
-    name = 'temp',
-    remote = 'https://github.com/vmax/temp',
-    commit = '40edea85e2c9029de00a18e51a0b70515777ac64'
-)
-
-
 http_file(
     name = "protoc_bin",
     executable = True,
@@ -268,5 +267,5 @@ bind(
 
 bind(
     name = "grpc_java_plugin",
-    actual = "@temp//:grpc_java_plugin"
+    actual = "@startupos_binaries//:grpc_java_plugin"
 )
