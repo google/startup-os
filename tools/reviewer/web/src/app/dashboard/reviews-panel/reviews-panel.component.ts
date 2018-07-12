@@ -1,15 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService, FirebaseService, Lists } from '@/shared';
-import { Diff, Reviewer } from '@/shared/shell/proto/code-review_pb';
+import { Diff, Reviewer } from '@/shared/shell';
 
 @Component({
   selector: 'app-reviews-panel',
   templateUrl: './reviews-panel.component.html',
   styleUrls: ['./reviews-panel.component.scss'],
 })
-export class ReviewsPanelComponent {
+export class ReviewsPanelComponent implements OnInit {
   isLoading: boolean = true;
   diffGroups: Diff[][] = [];
 
@@ -17,8 +17,20 @@ export class ReviewsPanelComponent {
     private firebaseService: FirebaseService,
     private authService: AuthService,
     private router: Router,
-  ) {
-    this.getReviews(this.authService.userEmail);
+  ) { }
+
+  ngOnInit() {
+    const urlEmail: string = this.router
+      .parseUrl(this.router.url)
+      .queryParams['email'];
+
+    if (urlEmail) {
+      // Show the page from a view of the user from url.
+      this.getReviews(urlEmail);
+    } else {
+      // Show the page from current login view.
+      this.getReviews(this.authService.userEmail);
+    }
   }
 
   // Get diff/reviews from Database
@@ -35,16 +47,14 @@ export class ReviewsPanelComponent {
         // and create Diff from proto and categorize
         // into a specific list.
         for (const diff of diffs) {
-          // needAttentionOfList is a list of author and all reviewers,
+          // needAttentionOfList is a list of all reviewers,
           // where attention is requested
           const needAttentionOfList: string[] = diff.getReviewerList()
-            .filter(reviewer => reviewer.getNeedsattention())
+            .filter(reviewer => reviewer.getNeedsAttention())
             .map(reviewer => reviewer.getEmail());
-          if (diff.getAuthor().getNeedsattention()) {
-            needAttentionOfList.concat(diff.getAuthor().getEmail());
-          }
 
           if (diff.getAuthor().getEmail() === userEmail) {
+            // Current user is an author of the diff
             switch (diff.getStatus()) {
               case Diff.Status.SUBMITTED:
                 // Submitted Review
@@ -54,6 +64,10 @@ export class ReviewsPanelComponent {
                 // Draft Review
                 this.diffGroups[Lists.DraftReviews].push(diff);
                 break;
+            }
+            // Attention of current user as an author is requested
+            if (diff.getAuthor().getNeedsAttention()) {
+              this.diffGroups[Lists.NeedAttention].push(diff);
             }
           } else if (needAttentionOfList.includes(userEmail)) {
             // Need attention of user
@@ -77,7 +91,7 @@ export class ReviewsPanelComponent {
   sortDiffs(): void {
     for (const diffList of this.diffGroups) {
       diffList.sort((a, b) => {
-        return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
+        return Math.sign(a.getModifiedTimestamp() - b.getModifiedTimestamp());
       });
     }
   }

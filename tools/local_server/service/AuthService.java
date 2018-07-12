@@ -186,5 +186,9 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   public String getUserName() {
     return userName;
   }
+
+  public String getUserEmail() {
+    return userEmail;
+  }
 }
 

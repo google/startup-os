@@ -156,9 +156,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     Diff diff =
         req.getDiff()
             .toBuilder()
-            .setAuthor(Author.newBuilder().setName(authService.getUserName()).build())
+            .setAuthor(Author.newBuilder().setEmail(authService.getUserEmail()).build())
             .build();
-    client.createDocument(diffPath, String.valueOf(diff.getNumber()), diff);
+    client.createProtoDocument(diffPath, String.valueOf(diff.getId()), diff);
     responseObserver.onNext(Empty.getDefaultInstance());
     responseObserver.onCompleted();
   }
@@ -195,10 +195,13 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
             client.getDocument(
                 firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
                 DiffNumberResponse.newBuilder());
+    diffNumberResponse =
+        diffNumberResponse
+            .toBuilder()
+            .setLastDiffId(diffNumberResponse.getLastDiffId() + 1)
+            .build();
     client.createDocument(
-        firestoreReviewRoot.get(),
-        DOCUMENT_FOR_LAST_DIFF_NUMBER,
-        diffNumberResponse.toBuilder().setLastDiffId(diffNumberResponse.getLastDiffId() + 1));
+        firestoreReviewRoot.get(), DOCUMENT_FOR_LAST_DIFF_NUMBER, diffNumberResponse);
     responseObserver.onNext(diffNumberResponse);
     responseObserver.onCompleted();
   }
