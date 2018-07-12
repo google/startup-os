@@ -46,8 +46,14 @@
     </div>
     <div *ngIf="showReplyDialog" class="reply-popup">
       <div>
-        <cr-reply-popup [diff]="diff"></cr-reply-popup>
+        <cr-reply-popup [diff]="diff" (submitted)="replySubmitted()"></cr-reply-popup>
       </div>
     </div>
   </div>
+</div>
+
+<div 
+  class="reply-popup-overlay"
+  *ngIf="showReplyDialog"
+  (click)="showReplyDialog = false">
 </div>

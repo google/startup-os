@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
   AuthService,
@@ -16,6 +16,7 @@ import { Diff } from '@/shared';
 })
 export class ReplyPopupComponent {
   @Input() diff: Diff;
+  @Output() submitted = new EventEmitter<boolean>();
   approved = false;
 
   constructor(
@@ -71,6 +72,7 @@ export class ReplyPopupComponent {
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.submitted.emit();
       this.notificationService.success('Reply Submitted');
     }, () => {
       this.notificationService.error("Reply couldn't be submitted");
