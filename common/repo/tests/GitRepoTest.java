@@ -58,6 +58,8 @@ public class GitRepoTest {
     repo = gitRepo;
     // We need one commit to make the repo have a master branch.
     repo.commit(repo.getUncommittedFiles(), "Initial commit");
+    // We need another initial commit so that master~1 is defined.
+    repo.commit(repo.getUncommittedFiles(), "Initial commit2");
   }
 
   @Singleton
@@ -98,7 +100,7 @@ public class GitRepoTest {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    assertEquals(1, gitRepo.getCommitIds(TEST_BRANCH).size());
+    assertEquals(2, gitRepo.getCommitIds(TEST_BRANCH).size());
   }
 
   @Test
@@ -106,18 +108,22 @@ public class GitRepoTest {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(0);
+    String lastMasterCommitId = gitRepo.getCommitIds(TEST_BRANCH).get(0);
+    String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(1);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder()
-                .setId(commitId)
-                .addFile(
-                    File.newBuilder()
-                        .setAction(File.Action.ADD)
-                        .setCommitId(commitId)
-                        .setFilename(TEST_FILE)
-                        .build())
-                .build()),
+          Commit.newBuilder()
+          .setId(lastMasterCommitId)
+          .build(),
+          Commit.newBuilder()
+              .setId(commitId)
+              .addFile(
+                  File.newBuilder()
+                      .setAction(File.Action.ADD)
+                      .setCommitId(commitId)
+                      .setFilename(TEST_FILE)
+                      .build())
+              .build()),
         repo.getCommits(TEST_BRANCH));
   }
 
@@ -128,15 +134,19 @@ public class GitRepoTest {
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     fileUtils.writeStringUnchecked("More content", fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    String commitId1 = gitRepo.getCommitIds(TEST_BRANCH).get(0);
-    String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(1);
+    String lastMasterCommit = gitRepo.getCommitIds(TEST_BRANCH).get(0);
+    String commitId1 = gitRepo.getCommitIds(TEST_BRANCH).get(1);
+    String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(2);
     assertEquals(
         ImmutableList.of(
+            Commit.newBuilder()
+                .setId(lastMasterCommit)
+                .build(),
             Commit.newBuilder()
                 .setId(commitId1)
                 .addFile(
                     File.newBuilder()
-                        .setAction(File.Action.MODIFY)
+                        .setAction(File.Action.ADD)
                         .setCommitId(commitId1)
                         .setFilename(TEST_FILE)
                         .build())
@@ -145,7 +155,7 @@ public class GitRepoTest {
                 .setId(commitId2)
                 .addFile(
                     File.newBuilder()
-                        .setAction(File.Action.ADD)
+                        .setAction(File.Action.MODIFY)
                         .setCommitId(commitId2)
                         .setFilename(TEST_FILE)
                         .build())
