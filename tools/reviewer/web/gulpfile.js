@@ -30,16 +30,23 @@ gulp.task('protoc', () => {
     fs.mkdirSync(protoPath);
   }
 
-  // Copy all packages to the proto folder
-  const codeReviewProtoPath = path.join(
-    startuposPath,
-    codeReviewProtoRelativePath
-  );
   var protoImportList = [];
-  const codeReviewFilename = path.parse(codeReviewProtoRelativePath).base;
-  protoImportList.push(codeReviewFilename);
-  const newCodeReviewPath = path.join(protoPath, codeReviewFilename);
-  fs.copySync(codeReviewProtoPath, newCodeReviewPath);
+  // Copy all packages to the proto folder
+  function copyPackage(relativePath) {
+    const absolutePath = path.join(
+      startuposPath,
+      relativePath
+    );
+    const filename = path.parse(absolutePath).base;
+    protoImportList.push(filename);
+    const newPackagePath = path.join(protoPath, filename);
+    fs.copySync(absolutePath, newPackagePath);
+
+    return newPackagePath;
+  }
+  const newCodeReviewPath = copyPackage(codeReviewProtoRelativePath);
+
+  // Copy children of code_review.proto to the proto folder
   const codeReviewContent = fs.readFileSync(newCodeReviewPath, 'utf8');
   const codeReviewLines = codeReviewContent.split('\n');
   for (let line of codeReviewLines) {

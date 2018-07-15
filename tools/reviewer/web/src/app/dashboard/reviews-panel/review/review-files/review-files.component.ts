@@ -10,7 +10,7 @@ import { File } from '@/shared/shell';
 })
 export class ReviewFilesComponent {
   isLoading: boolean = true;
-  @Input() fileList: File[];
+  @Input() files: File[];
   @Input() diffId: number;
 
   constructor(private router: Router) { }

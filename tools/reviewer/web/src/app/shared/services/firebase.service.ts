@@ -3,21 +3,24 @@ import {
   AngularFirestore,
   AngularFirestoreCollection,
 } from 'angularfire2/firestore';
-import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 
 import { Diff } from '@/shared/shell';
+import { EncodingService } from './encoding.service';
 
 interface FirebaseElement {
-  proto: firebase.firestore.Blob;
+  proto: string;
 }
 
 @Injectable()
 export class FirebaseService {
   private diffs: AngularFirestoreCollection<FirebaseElement>;
 
-  constructor(private db: AngularFirestore) {
-    this.diffs = this.db.collection('diffs');
+  constructor(
+    private db: AngularFirestore,
+    private encodingService: EncodingService,
+  ) {
+    this.diffs = this.db.collection('reviewer/data/diff');
   }
 
   getDiffs(): Observable<Diff[]> {
@@ -58,14 +61,20 @@ export class FirebaseService {
   }
 
   private convertDiffToFirebaseElement(diff: Diff): FirebaseElement {
-    return {
-      proto: firebase.firestore.Blob.fromUint8Array(diff.serializeBinary()),
+    // Convert diff to binary
+    const binary: Uint8Array = diff.serializeBinary();
+    // Convert binary to firebaseElement
+    const firebaseElement: FirebaseElement = {
+      proto: this.encodingService.encodeUint8ArrayToBase64String(binary),
     };
+
+    return firebaseElement;
   }
 
   private converFirebaseElementToDiff(firebaseElement: FirebaseElement): Diff {
-    // firebaseElement to binary
-    const binary: Uint8Array = firebaseElement.proto.toUint8Array();
+    // Convert firebaseElement to binary
+    const binary: Uint8Array = this.encodingService
+      .decodeBase64StringToUint8Array(firebaseElement.proto);
     // Convert binary to diff
     const diff: Diff = Diff.deserializeBinary(binary);
 
