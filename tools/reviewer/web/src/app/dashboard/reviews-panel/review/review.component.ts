@@ -32,7 +32,8 @@ export class ReviewComponent implements OnInit {
       this.localserverService
         .getDiffFiles(this.diff.getId(), this.diff.getWorkspace())
         .subscribe(files => {
-          this.files = files;
+          this.files = files
+            .filter(file => file.getAction() !== File.Action.DELETE);
           this.isLoading = false;
         });
     });
@@ -42,7 +43,7 @@ export class ReviewComponent implements OnInit {
     // Render the fields un-editable if the current diff status
     // is in the list of notEditableStatus
     // Fields can not be edited if status is 'SUBMITTED' or 'REVERTED'
-    const statuses = [
+    const statuses: Diff.Status[] = [
       Diff.Status.SUBMITTED,
       Diff.Status.REVERTED,
     ];
