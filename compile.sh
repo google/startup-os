@@ -13,7 +13,7 @@ fi
 # @com_google_protobuf//:protobuf (cpp library),
 # which leads to inability to use prebuilt binaries
 # and significantly increases build time
-if [[ ! -z "$CIRCLECI" ]]; then
+if [[ -z "$CIRCLECI" ]]; then
   DELETED_PACKAGES="";
 else
   DELETED_PACKAGES="--deleted_packages $(cat .circleci/deleted_bazel_packages.txt)";
