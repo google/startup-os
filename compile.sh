@@ -9,13 +9,15 @@ if [[ $1 != "build" && $1 != "test" ]]; then
   exit 1
 fi
 
+# On CircleCI we ignore packages that depend on
+# @com_google_protobuf//:protobuf (cpp library),
+# which leads to inability to use prebuilt binaries
+# and significantly increases build time
 if [[ ! -z "$CIRCLECI" ]]; then
   DELETED_PACKAGES="";
 else
   DELETED_PACKAGES="--deleted_packages $(cat .circleci/deleted_bazel_packages.txt)";
 fi
 
-PROTO_OPTIONS="--proto_compiler //external:proto_compiler --proto_toolchain_for_java //external:proto_java_toolchain"
-
-bazel $1 $PROTO_OPTIONS $DELETED_PACKAGES //...
+bazel $1 $DELETED_PACKAGES //...
 exit $?
