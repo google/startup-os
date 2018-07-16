@@ -117,13 +117,13 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   // Bootstrap method.
   initLines(fileContent: string): void {
     // TODO: detect language
-    const language = 'java';
-    const highlightedCode = this.highlightService.highlight(
+    const language: string = 'java';
+    const highlightedCode: string = this.highlightService.highlight(
       fileContent,
       language,
     );
 
-    const FileLines = fileContent.split('\n');
+    const FileLines: string[] = fileContent.split('\n');
     this.highlightedLines = highlightedCode.split('\n');
     FileLines.forEach((code, i) => {
       this.lines.push({
@@ -167,7 +167,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     div.style.display = 'inline-block';
     div.style.height = this.lines[i].height + 'px';
     div.innerText = ' ';
-    const placeholder = '\n' + div.outerHTML;
+    const placeholder: string = '\n' + div.outerHTML;
     this.highlightedLines[i] = this.lines[i].highlightedCode + placeholder;
 
     /*

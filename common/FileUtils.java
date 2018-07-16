@@ -272,28 +272,7 @@ public class FileUtils {
 
   /** Deletes all files and folders in directory. Target directory is deleted. */
   public void deleteDirectory(String path) throws IOException {
-    final Path directory = fileSystem.getPath(expandHomeDirectory(path));
-    Files.walkFileTree(
-        directory,
-        new SimpleFileVisitor<Path>() {
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-              throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exception)
-              throws IOException {
-            if (exception == null) {
-              Files.delete(dir);
-              return FileVisitResult.CONTINUE;
-            } else {
-              throw exception;
-            }
-          }
-        });
+    deleteDirectoryContents(path, true);
   }
 
   /**
@@ -320,6 +299,53 @@ public class FileUtils {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /** Deletes all files and folders inside directory. Target directory is not deleted. */
+  public void clearDirectory(String path) throws IOException {
+    deleteDirectoryContents(path, false);
+  }
+
+  /**
+   * Deletes all files and folders inside directory. Target directory is not deleted. Rethrows
+   * exceptions as unchecked.
+   */
+  public void clearDirectoryUnchecked(String path) {
+    try {
+      clearDirectory(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private void deleteDirectoryContents(String path, boolean deleteTargetDirectory)
+      throws IOException {
+    final Path targetDirectory = fileSystem.getPath(expandHomeDirectory(path));
+    Files.walkFileTree(
+        targetDirectory,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+              throws IOException {
+            Files.delete(file);
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult postVisitDirectory(Path dir, IOException exception)
+              throws IOException {
+            if (exception == null) {
+              if (!deleteTargetDirectory && (targetDirectory == dir)) {
+                // Do nothing
+              } else {
+                Files.delete(dir);
+              }
+              return FileVisitResult.CONTINUE;
+            } else {
+              throw exception;
+            }
+          }
+        });
   }
 }
 

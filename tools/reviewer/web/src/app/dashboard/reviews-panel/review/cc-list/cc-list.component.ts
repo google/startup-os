@@ -53,7 +53,7 @@ export class CCListComponent implements OnInit {
       .forEach(username => {
         this.usernames.push(username);
 
-        let email  = this.getCCWithTheUsername(username);
+        let email = this.getCCWithTheUsername(username);
         if (!email) {
           email = username + '@gmail.com';
         }
@@ -73,7 +73,7 @@ export class CCListComponent implements OnInit {
 
   getCCWithTheUsername(username: string): string {
     for (const email of this.diff.getCcList()) {
-      const usernameFromList = this.authService
+      const usernameFromList: string = this.authService
         .getUsername(email);
 
       if (usernameFromList === username) {
