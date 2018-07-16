@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
+import { Dictionary } from 'associativearray';
 import { Observable } from 'rxjs';
 
 import {
@@ -27,8 +28,8 @@ export class LocalserverService {
       const diffFilesRequest = new DiffFilesRequest();
       diffFilesRequest.setDiffId(id);
       diffFilesRequest.setWorkspace(workspace);
-      const requestBinary = diffFilesRequest.serializeBinary();
-      const requestBase64 = this.encodingService
+      const requestBinary: Uint8Array = diffFilesRequest.serializeBinary();
+      const requestBase64: string = this.encodingService
         .encodeUint8ArrayToBase64String(requestBinary);
 
       // Send the request to local server
@@ -37,7 +38,7 @@ export class LocalserverService {
         .map(response => response.text())
         .subscribe(diffFilesResponseBase64 => {
           // Decode response
-          const diffFilesResponseBinary = this.encodingService
+          const diffFilesResponseBinary: Uint8Array = this.encodingService
             .decodeBase64StringToUint8Array(diffFilesResponseBase64);
           const diffFilesResponse: DiffFilesResponse = DiffFilesResponse
             .deserializeBinary(diffFilesResponseBinary);
@@ -49,8 +50,8 @@ export class LocalserverService {
 
           observer.next(diffFilesResponse.getBranchinfoList()[0]);
         }, () => {
-          observer.error();
           this.error();
+          observer.error();
         });
     });
   }
@@ -64,8 +65,8 @@ export class LocalserverService {
       const textDiffRequest = new TextDiffRequest();
       textDiffRequest.setLeftFile(leftFile);
       textDiffRequest.setRightFile(rightFile);
-      const requestBinary = textDiffRequest.serializeBinary();
-      const requestBase64 = this.encodingService
+      const requestBinary: Uint8Array = textDiffRequest.serializeBinary();
+      const requestBase64: string = this.encodingService
         .encodeUint8ArrayToBase64String(requestBinary);
 
       // Send the request to local server
@@ -74,7 +75,7 @@ export class LocalserverService {
         .map(response => response.text())
         .subscribe(textDiffResponseBase64 => {
           // Decode response
-          const textDiffResponseBinary = this.encodingService
+          const textDiffResponseBinary: Uint8Array = this.encodingService
             .decodeBase64StringToUint8Array(textDiffResponseBase64);
           const textDiffResponse: TextDiffResponse = TextDiffResponse
             .deserializeBinary(textDiffResponseBinary);
@@ -89,26 +90,28 @@ export class LocalserverService {
 
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
     return new Observable(observer => {
-      this.getBranchInfo(id, workspace).subscribe(diffFilesResponse => {
-        let files: File[] = [];
-        for (const commit of diffFilesResponse.getCommitList()) {
-          // Remove duplicates
-          let newfiles: File[] = commit.getFileList();
-          newfiles = newfiles.filter(newfile => {
-            for (const file of files) {
-              if (newfile.getFilename() === file.getFilename()) {
-                return false;
-              }
-            }
-            return true;
-          });
-
-          files = files.concat(newfiles);
-        }
-
-        observer.next(files);
+      this.getBranchInfo(id, workspace).subscribe(branchInfo => {
+        observer.next(this.getFilesFromBranchInfo(branchInfo));
       });
     });
+  }
+
+  getFilesFromBranchInfo(branchInfo: BranchInfo): File[] {
+    const fileDictionary = new Dictionary<File>();
+    for (const commit of branchInfo.getCommitList()) {
+      this.addWithReplace(fileDictionary, commit.getFileList());
+    }
+    this.addWithReplace(fileDictionary, branchInfo.getUncommittedFileList());
+
+    return fileDictionary.values;
+  }
+
+  addWithReplace(fileDictionary: Dictionary<File>, newfiles: File[]): void {
+    for (const file of newfiles) {
+      // If file with the filename is already exist, it will be replaced by
+      // the new one.
+      fileDictionary.add(file.getFilename(), file);
+    }
   }
 
   error(): void {

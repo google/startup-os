@@ -73,7 +73,7 @@ export class CCListComponent implements OnInit {
 
   getCCWithTheUsername(username: string): string {
     for (const email of this.diff.getCcList()) {
-      const usernameFromList = this.authService
+      const usernameFromList: string = this.authService
         .getUsername(email);
 
       if (usernameFromList === username) {
