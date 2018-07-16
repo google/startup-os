@@ -586,7 +586,7 @@ public class FileUtilsTest {
   }
 
   @Test
-  public void testDeleteDirectoryContent() throws IOException {
+  public void testDeleteDirectory() throws IOException {
     if (fileSystemName.equals("Windows")) {
       return;
     }
@@ -605,7 +605,7 @@ public class FileUtilsTest {
   }
 
   @Test(expected = RuntimeException.class)
-  public void testDeleteDirectoryContentUnchecked() {
+  public void testDeleteDirectoryUnchecked() {
     if (fileSystemName.equals("Windows")) {
       throw new RuntimeException();
     }
@@ -613,7 +613,7 @@ public class FileUtilsTest {
   }
 
   @Test
-  public void testDeleteFileOrDirectoryIfExist() throws IOException {
+  public void testDeleteFileOrDirectoryIfExists() throws IOException {
     if (fileSystemName.equals("Windows")) {
       return;
     }
@@ -626,11 +626,69 @@ public class FileUtilsTest {
   }
 
   @Test(expected = RuntimeException.class)
-  public void testDeleteFileOrDirectoryIfExistUnchecked() {
+  public void testDeleteFileOrDirectoryIfExistsUnchecked() {
     if (fileSystemName.equals("Windows")) {
       throw new RuntimeException();
     }
     fileUtils.deleteFileOrDirectoryIfExistsUnchecked("");
+  }
+
+  @Test
+  public void testClearDirectoryWhenFolders() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/first_folder"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder"));
+    fileUtils.clearDirectory(TEST_DIR_PATH);
+    assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/first_folder")));
+    assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder")));
+    assertTrue(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH)));
+  }
+
+  @Test
+  public void testClearDirectoryWhenFiles() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/first_file.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/second_file.txt"));
+    fileUtils.clearDirectory(TEST_DIR_PATH);
+    assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/first_file.txt")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/second_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH)));
+  }
+
+  @Test
+  public void testClearDirectoryWhenFilesAndFolders() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/empty_folder"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/first_file.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/second_file.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/third_file.txt"));
+    fileUtils.clearDirectory(TEST_DIR_PATH);
+    assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/empty_folder")));
+    assertFalse(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/first_file.txt")));
+    assertFalse(
+        Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/second_file.txt")));
+    assertFalse(
+        Files.isRegularFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder/third_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath(TEST_DIR_PATH)));
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testClearDirectoryUnchecked() {
+    if (fileSystemName.equals("Windows")) {
+      throw new RuntimeException();
+    }
+    fileUtils.clearDirectoryUnchecked("/nonexistent_path");
   }
 }
 

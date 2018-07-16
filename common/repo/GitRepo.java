@@ -150,15 +150,21 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<String> getCommitIds(String branch) {
-    CommandResult commandResult = runCommand("log --pretty=%H master.." + branch);
-    return splitLines(commandResult.stdout);
+    CommandResult commandResult = runCommand("log --pretty=%H master~1.." + branch);
+    // We reverse to return by chronological order
+    return splitLines(commandResult.stdout).reverse();
   }
 
   public ImmutableList<Commit> getCommits(String branch) {
     ImmutableList<String> commits = getCommitIds(branch);
     ImmutableList.Builder<Commit> result = ImmutableList.builder();
     for (String commit : commits) {
-      result.add(Commit.newBuilder().setId(commit).addAllFile(getFilesInCommit(commit)).build());
+      if (commit.equals(commits.get(0))) {
+        // We don't need the file list for the first commit, which is the last commit from master.
+        result.add(Commit.newBuilder().setId(commit).build());
+      } else {
+        result.add(Commit.newBuilder().setId(commit).addAllFile(getFilesInCommit(commit)).build());
+      }
     }
     return result.build();
   }

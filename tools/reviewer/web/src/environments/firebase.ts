@@ -1,8 +1,8 @@
 export const config = {
-  apiKey: 'AIzaSyC_na_vn9d5Fi2sHrBKp1H6UD_0QIT8r3c',
-  authDomain: 'aa-storage.firebaseapp.com',
-  databaseURL: 'https://aa-storage.firebaseio.com',
-  projectId: 'aa-storage',
-  storageBucket: 'aa-storage.appspot.com',
-  messagingSenderId: '12109533178',
+  apiKey: 'AIzaSyAn-A7YXlqR2JNOvlbhkVwcnsOigmphQIw',
+  authDomain: 'startupos-5f279.firebaseapp.com',
+  databaseURL: 'https://startupos-5f279.firebaseio.com',
+  projectId: 'startupos-5f279',
+  storageBucket: 'startupos-5f279.appspot.com',
+  messagingSenderId: '160348327132',
 };
