@@ -14,7 +14,7 @@ bazel run //tools/formatter -- \
 					--java --python --proto --cpp --build \
 					--ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
 					&>/dev/null
-if [[ ! -z $(git status -s) ]]; then
+if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
 	echo "$RED[!] Source files are not formatted$RESET";
 	echo "Please run ''./formatting.sh'' to fix it"
 	exit 1
