@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 // TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
+  private static final String TWO_WHITE_SPACES = "\\s{2}";
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
 
@@ -166,7 +167,7 @@ public class GitRepo implements Repo {
       if (!line.trim().startsWith("M")
           || !line.trim().startsWith("RM")
           || !line.trim().startsWith("??")) {
-        line = line.replaceFirst("\\s{2}", " ");
+        line = line.replaceFirst(TWO_WHITE_SPACES, " ");
       }
       parts = line.trim().split(" ");
 
@@ -196,7 +197,7 @@ public class GitRepo implements Repo {
       case "C":
         return File.Action.COPY;
       case "??":
-        return File.Action.UNTRACKED;
+        return File.Action.ADD;
       default:
         throw new IllegalStateException("Unknown change type " + changeType);
     }
@@ -264,10 +265,17 @@ public class GitRepo implements Repo {
 
   public boolean merge(String branch, boolean remote) {
     switchToMasterBranch();
-    CommandResult commandResult;
+    CommandResult mergeCommandResult;
     if (remote) {
-      runCommand("fetch origin " + branch);
-      commandResult =
+      CommandResult fetchCommandResult = runCommand("fetch origin " + branch);
+      if (fetchCommandResult.stderr.length() != 0) {
+        throw new IllegalStateException(
+            "Failed to fetch remote branch before merging \'"
+                + branch
+                + "\': "
+                + fetchCommandResult.stderr);
+      }
+      mergeCommandResult =
           runCommand(
               "merge origin/"
                   + branch
@@ -275,9 +283,9 @@ public class GitRepo implements Repo {
                   + branch
                   + "\'");
     } else {
-      commandResult = runCommand("merge " + branch);
+      mergeCommandResult = runCommand("merge " + branch);
     }
-    String err = commandResult.stderr;
+    String err = mergeCommandResult.stderr;
     return err.length() == 0;
   }
 

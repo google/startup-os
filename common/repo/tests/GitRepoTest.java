@@ -211,7 +211,7 @@ public class GitRepoTest {
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     assertEquals(
         ImmutableList.of(
-            File.newBuilder().setFilename(TEST_FILE).setAction(File.Action.UNTRACKED).build()),
+            File.newBuilder().setFilename(TEST_FILE).setAction(File.Action.ADD).build()),
         repo.getUncommittedFiles());
   }
 
