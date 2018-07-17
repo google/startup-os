@@ -241,12 +241,12 @@ public class GitRepo implements Repo {
 
   @Override
   public void pushAll() {
-    runCommand("push origin " + currentBranch());
+    runCommand("push --all origin");
   }
 
   @Override
   public void pull() {
-    runCommand("pull origin master");
+    runCommand("pull");
   }
 
   @Override
@@ -257,7 +257,7 @@ public class GitRepo implements Repo {
   @Override
   public boolean mergeTheirs(String branch) {
     switchToMasterBranch();
-    CommandResult commandResult = runCommand("merge -s recursive -Xtheirs");
+    CommandResult commandResult = runCommand("merge " + branch + " -s recursive -Xtheirs");
     String err = commandResult.stderr;
     return err.length() == 0;
   }
@@ -266,7 +266,14 @@ public class GitRepo implements Repo {
     switchToMasterBranch();
     CommandResult commandResult;
     if (remote) {
-      commandResult = runCommand("merge origin/" + branch);
+      runCommand("fetch origin " + branch);
+      commandResult =
+          runCommand(
+              "merge origin/"
+                  + branch
+                  + " -m Merge_remote-tracking_branch_\'origin/"
+                  + branch
+                  + "\'");
     } else {
       commandResult = runCommand("merge " + branch);
     }
