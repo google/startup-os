@@ -29,6 +29,7 @@ message File {
     RENAME = 2;
     MODIFY = 3;
     COPY = 4;
+    UNTRACKED = 5;
   }
   // Includes the path + filename, relative to repo
   string filename = 1;
