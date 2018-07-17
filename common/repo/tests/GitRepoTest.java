@@ -298,5 +298,12 @@ public class GitRepoTest {
     assertEquals("master", repo.currentBranch());
     assertFalse(fileUtils.fileExists(TEST_FILE));
   }
+
+  @Test
+  public void testCurrentBranch() {
+    assertEquals("master", repo.currentBranch());
+    repo.switchBranch(TEST_BRANCH);
+    assertEquals(TEST_BRANCH, repo.currentBranch());
+  }
 }
 
