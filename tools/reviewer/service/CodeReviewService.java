@@ -17,7 +17,7 @@
 package com.google.startupos.tools.reviewer.service;
 
 import com.google.common.flogger.FluentLogger;
-import com.google.protobuf.Empty;
+import com.google.startupos.tools.reviewer.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
 import com.google.startupos.common.firestore.FirestoreClient;

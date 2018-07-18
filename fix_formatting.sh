@@ -21,6 +21,6 @@ bazel run //tools/formatter -- \
 # When ran locally it silently fixes everything.
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
 	echo "$RED[!] Source files are not formatted$RESET";
-	echo "Please run ''./formatting.sh'' to fix it"
+	echo "Please run ''./fix_formatting.sh'' to fix it"
 	exit 1
 fi
