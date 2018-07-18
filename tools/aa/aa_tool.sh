@@ -82,8 +82,8 @@ function start_local_server {
     export STARTUP_OS=$AA_BASE/head/startup-os
 
     # store stderr to debug
-    POLYGLOT_STDERR_DEBUG_FILE=$(mktemp)
-    SERVER_LOG_FILE=$(mktemp)
+    POLYGLOT_STDERR_DEBUG_FILE=$AA_BASE/logs/polyglot_stderr.log
+    SERVER_LOG_FILE=$AA_BASE/logs/server.log
     # call `ping` method via gRPC and store result (ignored for now)
     pushd $STARTUP_OS >/dev/null
     OUTPUT=$(echo {} | bazel run //tools:grpc_polyglot -- \
