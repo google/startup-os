@@ -39,7 +39,7 @@ jobs:
       - restore_cache:
           key: "v1-bazel_cache"
       - run: './pre-commit.sh'
-      - run: './formatting.sh'
+      - run: './fix_formatting.sh'
 
   build:
     <<: *job_defaults
@@ -60,11 +60,11 @@ jobs:
       - run: bazel info release
       - run: npm install
       - run: bash .circleci/get-android-sdk.sh
-      - run: 
+      - run:
           command: bazel query //... | grep -v third_party | grep -v *node_modules | xargs bazel test
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
-      
+
       # If we get this far, save the node_modules directory for use next time.
       - save_cache:
           key: *cache_key

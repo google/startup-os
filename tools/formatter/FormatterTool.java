@@ -52,10 +52,6 @@ class FormatterTool {
 
     static Formatter javaFormatter = new Formatter();
 
-    static JavaFormatter init() {
-      return new JavaFormatter();
-    }
-
     @Override
     public void format(Path path) throws IOException {
       try {
@@ -74,10 +70,6 @@ class FormatterTool {
 
   static class PythonFormatter implements BaseFormatter {
 
-    static PythonFormatter init() {
-      return new PythonFormatter();
-    }
-
     @Override
     public void format(Path path) throws IOException {
       execute("yapf -i " + path.toAbsolutePath().toString());
@@ -86,10 +78,6 @@ class FormatterTool {
 
   static class ClangFormatter implements BaseFormatter {
 
-    static ClangFormatter init() {
-      return new ClangFormatter();
-    }
-
     @Override
     public void format(Path path) throws IOException {
       execute("clang-format -i " + path.toAbsolutePath().toString());
@@ -97,9 +85,6 @@ class FormatterTool {
   }
 
   static class BuildFormatter implements BaseFormatter {
-    static BuildFormatter init() {
-      return new BuildFormatter();
-    }
 
     @Override
     public void format(Path path) throws IOException {
@@ -177,12 +162,12 @@ class FormatterTool {
 
   private static Map<String, BaseFormatter> formatters =
       ImmutableMap.<String, BaseFormatter>builder()
-          .put(".java", JavaFormatter.init())
-          .put(".proto", ClangFormatter.init())
-          .put(".py", PythonFormatter.init())
-          .put(".cc", ClangFormatter.init())
-          .put(".bazel", BuildFormatter.init())
-          .put("", BuildFormatter.init())
+          .put(".java", new JavaFormatter())
+          .put(".proto", new ClangFormatter())
+          .put(".py", new PythonFormatter())
+          .put(".cc", new ClangFormatter())
+          .put(".bazel", new BuildFormatter())
+          .put("", new BuildFormatter())
           .build();
 
   public static void main(String[] args) {

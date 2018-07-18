@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Run it before committing to verify whether all files 
+# Run it before committing to verify whether all files
 # are properly formatted so you won't fail early on review
 # Execute from repo root or, if using aa from base/head/startup-os
 
@@ -10,10 +10,15 @@ RESET=$(tput sgr0)
 npm install &>/dev/null
 
 bazel run //tools/formatter -- \
-					--path $(pwd) \
-					--java --python --proto --cpp --build \
-					--ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
-					&>/dev/null
+	--path $(pwd) \
+	--java --python --proto --cpp --build \
+	--ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
+	&>/dev/null
+
+# Prints out an error only if both conditions are satisfied:
+# * we are on CircleCI
+# * working tree contains unstaged changes
+# When you run it locally it silently fixes everything.
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
 	echo "$RED[!] Source files are not formatted$RESET";
 	echo "Please run ''./formatting.sh'' to fix it"
