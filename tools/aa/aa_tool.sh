@@ -141,6 +141,7 @@ function aa {
   # Uncomment or set externally by 'export AA_FORCE_COMPILE_WS=<>'
   # to force recompile:
   #AA_FORCE_COMPILE_WS=<workspace_name>
+  # to undo, execute 'unset AA_FORCE_COMPILE_WS'
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/aa/aa_tool"
   if [ ! -z "$AA_FORCE_COMPILE_WS" ]; then
