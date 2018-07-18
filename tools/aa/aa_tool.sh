@@ -138,7 +138,8 @@ function aa {
 
   # Uncomment to override StartupOS repo:
   #STARTUP_OS=<repo path>
-  # Uncomment to force recompile:
+  # Uncomment or set externally by 'export AA_FORCE_COMPILE_WS=<>'
+  # to force recompile:
   #AA_FORCE_COMPILE_WS=<workspace_name>
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/aa/aa_tool"
