@@ -4,9 +4,9 @@ import {
   AuthService,
   FirebaseService,
   NotificationService,
-  ReviewService,
 } from '@/shared/services';
 import { Diff, Reviewer } from '@/shared/shell';
+import { ReviewService } from '../services';
 
 // The ReviewerListComponent is used to display reviewers
 @Component({
@@ -75,17 +75,6 @@ export class ReviewerListComponent implements OnInit {
     }, () => {
       this.notificationService.error("Reviewers can't be saved");
     });
-  }
-
-  getReviewerWithTheUsername(username: string): Reviewer {
-    for (const reviewer of this.diff.getReviewerList()) {
-      const reviewerUsername = this.authService
-        .getUsername(reviewer.getEmail());
-
-      if (reviewerUsername === username) {
-        return reviewer;
-      }
-    }
   }
 
   // Request or cancel attention of the reviewer

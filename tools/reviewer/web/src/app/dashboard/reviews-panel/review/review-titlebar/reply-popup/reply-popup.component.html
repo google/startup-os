@@ -17,7 +17,7 @@
     fxLayoutAlign="end center">
     <!-- Hide Approved checkbox when Author is the current user -->
     <div 
-      *ngIf="authService.userEmail != diff.getAuthor().getEmail()">
+      *ngIf="authService.userEmail !== diff.getAuthor().getEmail()">
       <input 
         type="checkbox" 
         [(ngModel)]="approved" 

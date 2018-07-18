@@ -5,9 +5,10 @@ import {
   FirebaseService,
   NotificationService,
   Reviewer,
-  ReviewService,
+  Author
 } from '@/shared';
 import { Diff } from '@/shared';
+import { ReviewService } from '../../services';
 
 @Component({
   selector: 'cr-reply-popup',
@@ -38,7 +39,7 @@ export class ReplyPopupComponent {
       }
     } else {
       // Set attention of author
-      const author = this.diff.getAuthor();
+      const author: Author = this.diff.getAuthor();
       author.setNeedsAttention(true);
 
       // Get reviewer from userEmail

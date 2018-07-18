@@ -5,7 +5,6 @@ export * from './notification.service';
 export * from './highlight.service';
 export * from './selection.service';
 export * from './encoding.service';
-export * from './review.service';
 export * from './localserver.service';
 
 import { AuthGuard } from '@/shared/services/auth.guard';
@@ -16,7 +15,6 @@ import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { LocalserverService } from './localserver.service';
 import { NotificationService } from './notification.service';
-import { ReviewService } from './review.service';
 import { SelectionService } from './selection.service';
 
 export const Services = [
@@ -27,7 +25,6 @@ export const Services = [
   HighlightService,
   NotificationService,
   SelectionService,
-  ReviewService,
   EncodingService,
   LocalserverService,
 ];
