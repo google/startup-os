@@ -394,5 +394,10 @@ public class GitRepo implements Repo {
   public String currentBranch() {
     return runCommand("rev-parse --abbrev-ref HEAD").stdout.trim();
   }
+
+  public boolean cloneRepo(String url, String path) {
+    CommandResult commandResult = runCommand("clone " + url + " " + path);
+    return commandResult.stderr.length() == 0;
+  }
 }
 
