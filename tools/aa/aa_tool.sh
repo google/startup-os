@@ -6,6 +6,9 @@
 #
 # If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
 
+# Debugging:
+# To compile aa from a workspace: 'export AA_FORCE_COMPILE_WS=<>'
+# To undo: 'unset AA_FORCE_COMPILE_WS'
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
@@ -135,13 +138,6 @@ function aa {
   fi
 
   STARTUP_OS=$AA_BASE/head/startup-os
-
-  # Uncomment to override StartupOS repo:
-  #STARTUP_OS=<repo path>
-  # Uncomment or set externally by 'export AA_FORCE_COMPILE_WS=<>'
-  # to force recompile:
-  #AA_FORCE_COMPILE_WS=<workspace_name>
-  # to undo, execute 'unset AA_FORCE_COMPILE_WS'
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/aa/aa_tool"
   if [ ! -z "$AA_FORCE_COMPILE_WS" ]; then
