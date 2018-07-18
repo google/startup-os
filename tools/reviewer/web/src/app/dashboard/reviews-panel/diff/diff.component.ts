@@ -3,7 +3,7 @@
 // e.g. FileChangeComponent
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import {
@@ -18,6 +18,7 @@ import {
   DifferenceService,
   FirebaseService,
   LocalserverService,
+  NotificationService,
 } from '@/shared/services';
 import { DiffService } from './diff.service';
 
@@ -43,6 +44,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     private firebaseService: FirebaseService,
     private diffService: DiffService,
     private localserverService: LocalserverService,
+    private notificationService: NotificationService,
   ) {
     this.newCommentSubscription = this.diffService.newComment.subscribe(
       param => {
@@ -53,8 +55,8 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Get parameters from url
-    const urlSnapshot = this.activatedRoute.snapshot;
-    const filename = urlSnapshot.url
+    const urlSnapshot: ActivatedRouteSnapshot = this.activatedRoute.snapshot;
+    const filename: string = urlSnapshot.url
       .splice(1)
       .map(v => v.path)
       .join('/');
@@ -66,7 +68,6 @@ export class DiffComponent implements OnInit, OnDestroy {
   getDiff(diffId: string): void {
     this.firebaseService.getDiff(diffId).subscribe(diff => {
       this.diff = diff;
-      this.file.setWorkspace(this.diff.getWorkspace());
       this.localThreads = this.diff
         .getThreadList()
         .filter(v => v.getFile().getFilename() === this.file.getFilename());
@@ -78,36 +79,36 @@ export class DiffComponent implements OnInit, OnDestroy {
   getBranchInfo(): void {
     this.localserverService
       .getBranchInfo(this.diff.getId(), this.diff.getWorkspace())
-      .subscribe(diffFilesResponse => {
-        this.branchInfo = diffFilesResponse;
-        this.file.setRepoId(this.branchInfo.getRepoId());
-        this.file.setCommitId(this.getCommitId(this.file, this.branchInfo));
+      .subscribe(branchInfo => {
+        this.branchInfo = branchInfo;
+        this.file = this.getFile(this.file.getFilename(), this.branchInfo);
         this.getFileChanges(this.file);
       });
   }
 
-  // Get id of commit, where the file is present
-  getCommitId(currentFile: File, branchInfo: BranchInfo): string {
-    for (const commit of this.branchInfo.getCommitList()) {
-      for (const file of commit.getFileList()) {
-        if (currentFile.getFilename() === file.getFilename()) {
-          return commit.getId();
-        }
+  // Get file from branchInfo by the filename
+  getFile(filename: string, branchInfo: BranchInfo): File {
+    const files: File[] = this.localserverService
+      .getFilesFromBranchInfo(branchInfo);
+    for (const file of files) {
+      if (filename === file.getFilename()) {
+        return file;
       }
     }
-    throw new Error('File not found');
   }
 
-  getFileChanges(file: File): void {
+  getFileChanges(currentFile: File): void {
+    // Left commit id - commit before the changes.
+    const leftCommitId: string = this.branchInfo
+      .getCommitList()[0]
+      .getId();
+
     const leftFile = new File();
-    leftFile.setFilename(file.getFilename());
+    leftFile.setCommitId(leftCommitId);
+    leftFile.setFilename(currentFile.getFilename());
     leftFile.setRepoId(this.branchInfo.getRepoId());
-    // TODO: add supporting of left commit_id
-    leftFile.setCommitId('f7be0169da78ead679e7491e726ed481532a0336');
-    const rightFile = new File();
-    rightFile.setFilename(file.getFilename());
-    rightFile.setRepoId(this.branchInfo.getRepoId());
-    rightFile.setCommitId(file.getCommitId());
+    leftFile.setWorkspace(this.diff.getWorkspace());
+    const rightFile: File = currentFile;
 
     this.localserverService
       .getFileChanges(leftFile, rightFile)
@@ -126,6 +127,13 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   // Send diff with new comment to firebase
   addComment(lineNumber: number, comments: Comment[]): void {
+    if (!this.file.getCommitId()) {
+      // TODO: Add more UX behavior here
+      this.notificationService
+        .error('Comment cannot be added to a uncommitted file');
+      return;
+    }
+
     if (comments.length === 1) {
       // Create new thread
       const newThread: Thread = this.createNewThread(lineNumber, comments);
