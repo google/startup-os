@@ -18,7 +18,7 @@ bazel run //tools/formatter -- \
 # Prints out an error only if both conditions are satisfied:
 # * we are on CircleCI
 # * working tree contains unstaged changes
-# When you run it locally it silently fixes everything.
+# When ran locally it silently fixes everything.
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
 	echo "$RED[!] Source files are not formatted$RESET";
 	echo "Please run ''./formatting.sh'' to fix it"

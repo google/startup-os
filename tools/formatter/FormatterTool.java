@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+// TODO: refactor getting the formatter for file
+
 package com.google.startupos.tools.formatter;
 
 import com.google.common.collect.ImmutableMap;
