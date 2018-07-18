@@ -254,6 +254,12 @@ http_file(
     urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
 )
 
+"""
+We use proto_compiler and proto_java_toolchain bindings to avoid
+compilation of protoc. To turn off prebuilt binaries, replace
+- //tools:protoc with @com_google_protobuf//:protoc
+- //tools:java_toolchain with @com_google_protobuf//:java_toolchain
+"""
 
 bind(
     name = "proto_compiler",

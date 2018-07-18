@@ -13,10 +13,15 @@ fi
 # @com_google_protobuf//:protobuf (cpp library),
 # which leads to inability to use prebuilt binaries
 # and significantly increases build time
+
+# TODO: compile C++ targets using prebuilt binaries
+# this requires having cc_import of
+# already-built @com_google_protobuf//:protobuf
+
 if [[ -z "$CIRCLECI" ]]; then
   DELETED_PACKAGES="";
 else
-  DELETED_PACKAGES="--deleted_packages $(cat .circleci/deleted_bazel_packages.txt)";
+  DELETED_PACKAGES="--deleted_packages $(cat .circleci/ignored_bazel_packages.txt)";
 fi
 
 bazel $1 $DELETED_PACKAGES //...
