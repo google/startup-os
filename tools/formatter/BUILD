@@ -1,9 +1,12 @@
 package(default_visibility = ["//visibility:public"])
 
 java_binary(
-    name = "simple_formatter",
-    srcs = ["SimpleFormatterTool.java"],
-    main_class = "com.google.startupos.tools.simple_formatter.SimpleFormatterTool",
+    name = "formatter",
+    srcs = ["FormatterTool.java"],
+    main_class = "com.google.startupos.tools.formatter.FormatterTool",
+    runtime_deps = [
+        "//tools:buildifier",
+    ],
     deps = [
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
