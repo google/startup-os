@@ -4,6 +4,9 @@ java_binary(
     name = "formatter",
     srcs = ["FormatterTool.java"],
     main_class = "com.google.startupos.tools.formatter.FormatterTool",
+    runtime_deps = [
+        "//tools:buildifier",
+    ],
     deps = [
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",

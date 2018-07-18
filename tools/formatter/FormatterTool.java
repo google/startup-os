@@ -103,7 +103,9 @@ class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
-      execute("buildifier -mode=fix " + path.toAbsolutePath().toString());
+      String command =
+          "/usr/bin/env bash " + "tools/buildtools_wrappers/buildifier.sh -mode=fix " + "%s";
+      execute(String.format(command, path.toAbsolutePath().toString()));
     }
   }
 
@@ -215,4 +217,3 @@ class FormatterTool {
     }
   }
 }
-
