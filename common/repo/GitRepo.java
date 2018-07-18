@@ -169,42 +169,26 @@ public class GitRepo implements Repo {
     return result.build();
   }
 
+  @Override
   public ImmutableList<File> getUncommittedFiles() {
+    String TWO_WHITE_SPACES = "\\s{2}";
     ImmutableList.Builder<File> files = ImmutableList.builder();
-    try {
-      Status status = jGit.status().call();
-      status
-          .getAdded()
-          .forEach(
-              added ->
-                  files.add(
-                      File.newBuilder().setAction(File.Action.ADD).setFilename(added).build()));
-      status
-          .getModified()
-          .forEach(
-              changed ->
-                  files.add(
-                      File.newBuilder()
-                          .setAction(File.Action.MODIFY)
-                          .setFilename(changed)
-                          .build()));
-      status
-          .getRemoved()
-          .forEach(
-              removed ->
-                  files.add(
-                      File.newBuilder()
-                          .setAction(File.Action.DELETE)
-                          .setFilename(removed)
-                          .build()));
-      status
-          .getUntracked()
-          .forEach(
-              untracked ->
-                  files.add(
-                      File.newBuilder().setAction(File.Action.ADD).setFilename(untracked).build()));
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
+    CommandResult commandResult = runCommand("status --short");
+    ImmutableList<String> lines = splitLines(commandResult.stdout);
+    for (String line : lines) {
+      String[] parts;
+      if (!line.trim().startsWith("M")
+          || !line.trim().startsWith("RM")
+          || !line.trim().startsWith("??")) {
+        line = line.replaceFirst(TWO_WHITE_SPACES, " ");
+      }
+      parts = line.trim().split(" ");
+
+      File.Builder fileBuilder = File.newBuilder();
+      fileBuilder.setAction(getAction(parts[0]));
+      fileBuilder.setFilename(
+          fileBuilder.getAction().equals(File.Action.RENAME) ? parts[3] : parts[1]);
+      files.add(fileBuilder.build());
     }
     return files.build();
   }
@@ -215,12 +199,18 @@ public class GitRepo implements Repo {
         return File.Action.ADD;
       case "D":
         return File.Action.DELETE;
+      case "RM":
+        return File.Action.RENAME;
       case "R":
         return File.Action.RENAME;
       case "M":
         return File.Action.MODIFY;
+      case "AM":
+        return File.Action.COPY;
       case "C":
         return File.Action.COPY;
+      case "??":
+        return File.Action.ADD;
       default:
         throw new IllegalStateException("Unknown change type " + changeType);
     }
@@ -366,25 +356,18 @@ public class GitRepo implements Repo {
             .collect(Collectors.toList()));
   }
 
+  @Override
   public String getFileContents(String commitId, String path) {
-    try (ObjectReader objectReader = jGitRepo.newObjectReader();
-        RevWalk revWalk = new RevWalk(objectReader)) {
-      final ObjectId objectId = jGitRepo.resolve(commitId);
-      RevCommit revCommit = revWalk.parseCommit(objectId);
-      RevTree revTree = revCommit.getTree();
-      byte[] data;
-      try (TreeWalk treeWalk = TreeWalk.forPath(objectReader, path, revTree)) {
-        if (treeWalk == null) {
-          throw new IllegalStateException(
-              String.format("TreeWalk is null for commitId %s and path %s", commitId, path));
-        }
-        // Index 0 should have file data
-        data = objectReader.open(treeWalk.getObjectId(0)).getBytes();
-      }
-      return new String(data, UTF_8);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+    CommandResult commandResult = runCommand("show " + commitId + ":" + path);
+    String result = commandResult.stdout;
+    int lastIndexOfNewLineSymbol = result.lastIndexOf("\n");
+    if (lastIndexOfNewLineSymbol >= 0) {
+      result =
+          new StringBuilder(result)
+              .replace(lastIndexOfNewLineSymbol, lastIndexOfNewLineSymbol + 1, "")
+              .toString();
     }
+    return result;
   }
 
   public void init() {
