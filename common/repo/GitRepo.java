@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 @AutoFactory
 public class GitRepo implements Repo {
   private static final String TWO_WHITE_SPACES = "\\s{2}";
+  private static final String DOUBLE_QUOTE = "\"";
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
 
@@ -68,25 +69,9 @@ public class GitRepo implements Repo {
     CommandResult result = new CommandResult();
     try {
       List<String> fullCommand = new ArrayList<>(gitCommandBase);
-      if (!command.contains("\"")) {
-        fullCommand.addAll(Arrays.asList(command.split(" ")));
-      } else {
-        List<String> intermediateSeparation = new ArrayList<>();
-        intermediateSeparation.add(command.substring(0, command.indexOf("\"")));
-        intermediateSeparation.add(
-            command.substring(command.indexOf("\""), command.lastIndexOf("\"") + 1));
-        intermediateSeparation.add(
-            command.substring(command.lastIndexOf("\""), command.length() - 1));
-        for (String substring : intermediateSeparation) {
-          if (substring.length() == 0) {
-            continue;
-          }
-          if (substring.startsWith("\"")) {
-            fullCommand.add(substring);
-          } else {
-            fullCommand.addAll(Arrays.asList(substring.split(" ")));
-          }
-        }
+      fullCommand.addAll(Arrays.asList(command.split(" ")));
+      if (!command.isEmpty() && command.startsWith("commit")) {
+        fullCommand = runCommand(fullCommand);
       }
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
@@ -101,6 +86,28 @@ public class GitRepo implements Repo {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
+    return result;
+  }
+
+  private List<String> runCommand(List<String> command) {
+    int indexStartOfCommitMessage = 0;
+    int indexEndOfCommitMessage = 0;
+    for (int i = 0; i < command.size(); i++) {
+      String part = command.get(i);
+      if (part.startsWith("\"")) {
+        indexStartOfCommitMessage = i;
+      }
+      if (part.endsWith("\"")) {
+        indexEndOfCommitMessage = i;
+      }
+    }
+    StringBuilder commitMessage = new StringBuilder();
+    for (String partOfCommitMessage :
+        command.subList(indexStartOfCommitMessage, indexEndOfCommitMessage + 1)) {
+      commitMessage.append(" ").append(partOfCommitMessage.replaceAll(DOUBLE_QUOTE, ""));
+    }
+    List<String> result = command.subList(0, indexStartOfCommitMessage);
+    result.add(commitMessage.toString().trim());
     return result;
   }
 
@@ -296,9 +303,6 @@ public class GitRepo implements Repo {
 
   @Override
   public void reset(String ref) {
-    // HEAD pointer would be
-    // reset to `ref` and all changes introduced after it
-    // would be marked as unstaged but saved in working tree
     runCommand("reset " + ref);
   }
 
