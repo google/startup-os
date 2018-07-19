@@ -85,50 +85,61 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   private String readTextFile(File file) throws IOException {
-    if (file.getWorkspace().isEmpty()) {
-      // It's a file in head
-      String repoPath = fileUtils.joinPaths(basePath, "head", file.getRepoId());
-      Repo repo = repoFactory.create(repoPath);
-      return repo.getFileContents(file.getCommitId(), file.getFilename());
-    } else {
-      // It's a file in a workspace
-      if (file.getUser().isEmpty()) {
-        // It's the current user
-        if (file.getCommitId().isEmpty()) {
-          // It's a file in the local filesystem (not in a repo)
-          String filePath =
-              fileUtils.joinPaths(
-                  basePath, "ws", file.getWorkspace(), file.getRepoId(), file.getFilename());
-          return fileUtils.readFile(filePath);
-        } else {
-          // It's a file in a repo
-          String repoPath =
-              fileUtils.joinPaths(basePath, "ws", file.getWorkspace(), file.getRepoId());
-          Repo repo = repoFactory.create(repoPath);
-          return repo.getFileContents(file.getCommitId(), file.getFilename());
-        }
+    try {
+      if (file.getWorkspace().isEmpty()) {
+        // It's a file in head
+        String repoPath = fileUtils.joinPaths(basePath, "head", file.getRepoId());
+        Repo repo = repoFactory.create(repoPath);
+        return repo.getFileContents(file.getCommitId(), file.getFilename());
       } else {
-        // It's another user
-        if (file.getCommitId().isEmpty()) {
-          // It's a file in the local filesystem (not in a repo)
-          String filePath =
-              fileUtils.joinPaths(
-                  basePath,
-                  "users",
-                  file.getUser(),
-                  "ws",
-                  file.getWorkspace(),
-                  file.getRepoId(),
-                  file.getFilename());
-          return fileUtils.readFile(filePath);
+        // It's a file in a workspace
+        if (file.getUser().isEmpty()) {
+          // It's the current user
+          if (file.getCommitId().isEmpty()) {
+            // It's a file in the local filesystem (not in a repo)
+            String filePath =
+                fileUtils.joinPaths(
+                    basePath, "ws", file.getWorkspace(), file.getRepoId(), file.getFilename());
+            return fileUtils.readFile(filePath);
+          } else {
+            // It's a file in a repo
+            String repoPath =
+                fileUtils.joinPaths(basePath, "ws", file.getWorkspace(), file.getRepoId());
+            Repo repo = repoFactory.create(repoPath);
+            return repo.getFileContents(file.getCommitId(), file.getFilename());
+          }
         } else {
-          // It's a file in a repo
-          String repoPath =
-              fileUtils.joinPaths(
-                  basePath, "users", file.getUser(), "ws", file.getWorkspace(), file.getRepoId());
-          Repo repo = repoFactory.create(repoPath);
-          return repo.getFileContents(file.getCommitId(), file.getFilename());
+          // It's another user
+          if (file.getCommitId().isEmpty()) {
+            // It's a file in the local filesystem (not in a repo)
+            String filePath =
+                fileUtils.joinPaths(
+                    basePath,
+                    "users",
+                    file.getUser(),
+                    "ws",
+                    file.getWorkspace(),
+                    file.getRepoId(),
+                    file.getFilename());
+            return fileUtils.readFile(filePath);
+          } else {
+            // It's a file in a repo
+            String repoPath =
+                fileUtils.joinPaths(
+                    basePath, "users", file.getUser(), "ws", file.getWorkspace(), file.getRepoId());
+            Repo repo = repoFactory.create(repoPath);
+            return repo.getFileContents(file.getCommitId(), file.getFilename());
+          }
         }
+      }
+    } catch (RuntimeException e) {
+      if (!file.getCommitId().isEmpty() && !file.getWorkspace().isEmpty()) {
+        file = file.toBuilder().clearWorkspace().build();
+        logger.atInfo().log("File not found, trying at head with:\n" + file);
+        return readTextFile(file);
+      } else {
+        logger.atSevere().withCause(e).log("readTextFile failed for:\n" + file);
+        return "";
       }
     }
   }
