@@ -1,14 +1,12 @@
 java_library(
     name = "log4j",
-    exports = [
-        "//external:jar/log4j/log4j"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/log4j/log4j",
+    ],
 )
-
-

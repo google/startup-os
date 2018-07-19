@@ -1,14 +1,12 @@
 java_library(
     name = "jsch",
-    exports = [
-        "//external:jar/com/jcraft/jsch"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/jcraft/jsch",
+    ],
 )
-
-

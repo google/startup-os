@@ -1,17 +1,15 @@
 java_library(
     name = "auto_common",
-    exports = [
-        "//external:jar/com/google/auto/auto_common"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/com/google/guava:guava"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/auto/auto_common",
+    ],
+    runtime_deps = [
+        "//third_party/maven/com/google/guava",
+    ],
 )
-
-

@@ -1,14 +1,12 @@
 java_library(
     name = "google_api_services_storage",
-    exports = [
-        "//external:jar/com/google/apis/google_api_services_storage"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/com/google/apis/google_api_services_storage",
+    ],
 )
-
-

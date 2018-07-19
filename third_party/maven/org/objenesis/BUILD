@@ -1,14 +1,12 @@
 java_library(
     name = "objenesis",
-    exports = [
-        "//external:jar/org/objenesis/objenesis"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/org/objenesis/objenesis",
+    ],
 )
-
-

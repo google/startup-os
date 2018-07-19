@@ -1,14 +1,12 @@
 java_library(
     name = "jsoup",
-    exports = [
-        "//external:jar/org/jsoup/jsoup"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/org/jsoup/jsoup",
+    ],
 )
-
-

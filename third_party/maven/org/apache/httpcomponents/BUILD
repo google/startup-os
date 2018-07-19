@@ -1,52 +1,46 @@
 java_library(
     name = "fluent_hc",
-    exports = [
-        "//external:jar/org/apache/httpcomponents/fluent_hc"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/commons_logging:commons_logging",
-        ":httpclient"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/org/apache/httpcomponents/fluent_hc",
+    ],
+    runtime_deps = [
+        ":httpclient",
+        "//third_party/maven/commons_logging",
+    ],
 )
-
-
 
 java_library(
     name = "httpclient",
-    exports = [
-        "//external:jar/org/apache/httpcomponents/httpclient"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/commons_codec:commons_codec",
-        ":httpcore"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/org/apache/httpcomponents/httpclient",
+    ],
+    runtime_deps = [
+        ":httpcore",
+        "//third_party/maven/commons_codec",
+    ],
 )
-
-
 
 java_library(
     name = "httpcore",
-    exports = [
-        "//external:jar/org/apache/httpcomponents/httpcore"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/org/apache/httpcomponents/httpcore",
+    ],
 )
-
-
