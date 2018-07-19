@@ -40,7 +40,7 @@ import static org.junit.Assert.assertFalse;
 public class GitRepoTest {
   private static final String TEST_BRANCH = "test_branch";
   private static final String TEST_FILE = "test_file.txt";
-  private static final String TEST_FILE_CONTENTS = "Some test file contents";
+  private static final String TEST_FILE_CONTENTS = "Some test file contents\n";
   private static final String COMMIT_MESSAGE = "Some commit message";
 
   private GitRepoFactory gitRepoFactory;
@@ -237,12 +237,12 @@ public class GitRepoTest {
   @Test
   public void testReset() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked("first commit", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked("first commit\n", fileUtils.joinPaths(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "first commit message");
     String firstCommitId = gitRepo.getHeadCommitId();
     fileUtils.writeStringUnchecked(
-        repo.getFileContents(firstCommitId, TEST_FILE) + "\nsecond commit",
+        repo.getFileContents(firstCommitId, TEST_FILE) + "second commit\n",
         fileUtils.joinPaths(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "Second commit message");
@@ -271,7 +271,7 @@ public class GitRepoTest {
     repo.commit(repo.getUncommittedFiles(), "Commit to master");
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
-        repo.getFileContents(gitRepo.getHeadCommitId(), TEST_FILE) + "\nNew contents",
+        repo.getFileContents(gitRepo.getHeadCommitId(), TEST_FILE) + "New contents\n",
         fileUtils.joinPaths(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "Commit to another branch");
@@ -279,7 +279,7 @@ public class GitRepoTest {
     assertTrue(repo.merge(TEST_BRANCH));
     assertEquals("master", repo.currentBranch());
     assertEquals(
-        "Some test file contents\n" + "New contents",
+        TEST_FILE_CONTENTS + "New contents\n",
         repo.getFileContents(gitRepo.getHeadCommitId(), TEST_FILE));
   }
 

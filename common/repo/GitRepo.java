@@ -121,11 +121,7 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<String> getCommitIds(String branch) {
-    // <<<<<<< HEAD
-    //  CommandResult commandResult = runCommand("log --pretty=%H " + branch);
-    // =======
     CommandResult commandResult = runCommand("log --pretty=%H master.." + branch);
-    // >>>>>>> 8fdd7e1015b153ae054ccf67461a4d7e4d8e0c10
     // We reverse to return by chronological order
     ImmutableList<String> commits = splitLines(commandResult.stdout).reverse();
     // Get last commit on master branch
@@ -153,18 +149,12 @@ public class GitRepo implements Repo {
 
   @Override
   public ImmutableList<File> getUncommittedFiles() {
-    String TWO_WHITE_SPACES = "\\s{2}";
     ImmutableList.Builder<File> files = ImmutableList.builder();
-    CommandResult commandResult = runCommand("status --short");
+    CommandResult commandResult = runCommand("status --porcelain");
     ImmutableList<String> lines = splitLines(commandResult.stdout);
     for (String line : lines) {
-      String[] parts;
-      if (!line.trim().startsWith("M")
-          || !line.trim().startsWith("RM")
-          || !line.trim().startsWith("??")) {
-        line = line.replaceFirst(TWO_WHITE_SPACES, " ");
-      }
-      parts = line.trim().split(" ");
+      line = line.replaceFirst("\\s{2}", " ");
+      String[] parts = line.trim().split(" ");
 
       File.Builder fileBuilder = File.newBuilder();
       fileBuilder.setAction(getAction(parts[0]));
@@ -312,15 +302,7 @@ public class GitRepo implements Repo {
   @Override
   public String getFileContents(String commitId, String path) {
     CommandResult commandResult = runCommand("show " + commitId + ":" + path);
-    String result = commandResult.stdout;
-    int lastIndexOfNewLineSymbol = result.lastIndexOf("\n");
-    if (lastIndexOfNewLineSymbol >= 0) {
-      result =
-          new StringBuilder(result)
-              .replace(lastIndexOfNewLineSymbol, lastIndexOfNewLineSymbol + 1, "")
-              .toString();
-    }
-    return result;
+    return commandResult.stdout;
   }
 
   @Override
@@ -343,25 +325,18 @@ public class GitRepo implements Repo {
 
   private void switchToMasterBranch() {
     if (!currentBranch().equals("master")) {
-      System.out.println("You are not in the branch master");
-      System.out.println("Switching to the master branch...");
       switchBranch("master");
     }
   }
 
   @VisibleForTesting
   public ImmutableList<String> getTagList() {
-    ImmutableList.Builder<String> result = ImmutableList.builder();
     CommandResult commandResult = runCommand("tag");
     try {
-      ImmutableList<String> lines = splitLines(commandResult.stdout);
-      for (String line : lines) {
-        result.add(line);
-      }
+      return splitLines(commandResult.stdout);
     } catch (IllegalStateException e) {
       throw new IllegalStateException("Get tag list failed!");
     }
-    return result.build();
   }
 
   @VisibleForTesting
