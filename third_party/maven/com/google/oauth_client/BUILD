@@ -4,7 +4,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/oauth_client/google_oauth_client",

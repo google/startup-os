@@ -43,7 +43,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/dagger/dagger_producers",
@@ -59,7 +59,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/dagger/dagger_spi",

@@ -1,7 +1,7 @@
 options:
   languages: [ "java" ]
   licenses: [ "permissive" ]
-  resolvers: 
+  resolvers:
     - id: "mavencentral"
       type: "default"
       url: https://repo.maven.apache.org/maven2/
@@ -14,34 +14,39 @@ dependencies:
     api-common:
       lang: java
       version: "1.1.0"
-  
+
   com.google.auto:
     auto-common:
       lang: java
       version: "0.6"
-  
+
   com.google.auto.factory:
     auto-factory:
       lang: java
       version: "1.0-beta5"
-  
+
   com.google.auto.value:
     auto-value:
       lang: java
       processorClasses: [ "com.google.auto.value.processor.AutoValueProcessor" ]
       version: "1.5"
-  
+
+  com.google.code.findbugs:
+    jsr305:
+      lang: java
+      version: "3.0.2"
+
   com.google.code.gson:
     gson:
       lang: java
       version: "2.8.2"
-  
+
   com.google.dagger:
     dagger:
       lang: java
       modules: [ "", "compiler" ]
       version: "2.15"
-  
+
   com.google.firebase:
     firebase-admin:
       lang: java
@@ -50,37 +55,35 @@ dependencies:
   com.google.flogger:
     flogger:
       lang: java
-      version: "0.1"
-    flogger-system-backend:
-      lang: java
+      modules: [ "", "system-backend" ]
       version: "0.1"
 
   com.google.googlejavaformat:
     google-java-format:
       lang: java
       version: "1.5"
-  
+
   com.google.guava:
     guava:
       lang: java
       version: "24.0-android"
-  
+
   com.google.jimfs:
     jimfs:
       lang: java
       version: "1.1"
-  
+
   com.google.protobuf:
     protobuf-java:
       lang: java
       modules: [ "", "util" ]
-      version: "3.5.1"
-  
+      version: "3.6.0"
+
   com.jcraft:
     jsch:
       lang: java
       version: "0.1.54"
-  
+
   commons-logging:
     commons-logging:
       lang: java
@@ -89,19 +92,29 @@ dependencies:
   io.grpc:
     grpc:
       lang: java
-      modules: [ "netty", "protobuf", "stub", "services" ]
+      modules: [ "core", "netty", "protobuf", "services", "stub" ]
       version: "1.12.0"
-  
+
+  io.opencensus:
+    opencensus-contrib-grpc-metrics:
+      lang: java
+      version: "0.15.0"
+
   javax.annotation:
     javax.annotation-api:
       lang: java
       version: "1.3.2"
-  
+
+  javax.inject:
+    javax.inject:
+      lang: java
+      version: "1"
+
   junit:
     junit:
       lang: java
       version: "4.12"
-  
+
   org.apache.commons:
     commons-csv:
       lang: java
@@ -109,12 +122,12 @@ dependencies:
     commons-lang3:
       lang: java
       version: "3.7"
-  
+
   org.apache.httpcomponents:
     fluent-hc:
       lang: java
       version: "4.5.5"
-  
+
   org.apache.pdfbox:
     fontbox:
       lang: java
@@ -122,32 +135,32 @@ dependencies:
     pdfbox:
       lang: java
       version: "2.0.8"
-  
+
   org.eclipse.jgit:
     org.eclipse.jgit:
       lang: java
       version: "4.10.0.201712302008-r"
-  
+
   org.javassist:
     javassist:
       lang: java
       version: "3.22.0-GA"
-  
+
   org.json:
     json:
       lang: java
       version: "20180130"
-  
+
   org.jsoup:
     jsoup:
       lang: java
       version: "1.11.2"
-  
+
   org.mockito:
     mockito-core:
       lang: java
       version: "2.15.0"
-  
+
   org.objenesis:
     objenesis:
       lang: java

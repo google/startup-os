@@ -41,7 +41,7 @@ def list_dependencies():
     {"artifact": "com.google.cloud:google-cloud-core:1.15.0", "lang": "java", "sha1": "c0810f30f96d6f94335cdad7bf17009c466dcbe9", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_cloud_google_cloud_core", "actual": "@com_google_cloud_google_cloud_core//jar", "bind": "jar/com/google/cloud/google_cloud_core"},
     {"artifact": "com.google.cloud:google-cloud-firestore:0.33.0-beta", "lang": "java", "sha1": "70eea83c30e7472f7dbdbcf12f28a3fc4a34f4f3", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_cloud_google_cloud_firestore", "actual": "@com_google_cloud_google_cloud_firestore//jar", "bind": "jar/com/google/cloud/google_cloud_firestore"},
     {"artifact": "com.google.cloud:google-cloud-storage:1.15.0", "lang": "java", "sha1": "b2c6b1361eef9b084f9a5bfabf350b4997fb087b", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_cloud_google_cloud_storage", "actual": "@com_google_cloud_google_cloud_storage//jar", "bind": "jar/com/google/cloud/google_cloud_storage"},
-# duplicates in com.google.code.findbugs:jsr305 promoted to 3.0.1
+# duplicates in com.google.code.findbugs:jsr305 fixed to 3.0.2
 # - com.google.api:api-common:1.1.0 wanted version 3.0.0
 # - com.google.flogger:flogger-system-backend:0.1 wanted version 3.0.1
 # - com.google.flogger:flogger:0.1 wanted version 3.0.1
@@ -49,10 +49,10 @@ def list_dependencies():
 # - com.google.http-client:google-http-client:1.23.0 wanted version 1.3.9
 # - com.google.instrumentation:instrumentation-api:0.4.3 wanted version 3.0.0
 # - io.grpc:grpc-core:1.12.0 wanted version 3.0.0
-    {"artifact": "com.google.code.findbugs:jsr305:3.0.1", "lang": "java", "sha1": "f7be08ec23c21485b9b5a1cf1654c2ec8c58168d", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_code_findbugs_jsr305", "actual": "@com_google_code_findbugs_jsr305//jar", "bind": "jar/com/google/code/findbugs/jsr305"},
+    {"artifact": "com.google.code.findbugs:jsr305:3.0.2", "lang": "java", "sha1": "25ea2e8b0c338a877313bd4672d3fe056ea78f0d", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_code_findbugs_jsr305", "actual": "@com_google_code_findbugs_jsr305//jar", "bind": "jar/com/google/code/findbugs/jsr305"},
 # duplicates in com.google.code.gson:gson fixed to 2.8.2
 # - com.google.http-client:google-http-client-gson:1.23.0 wanted version 2.1
-# - com.google.protobuf:protobuf-java-util:3.5.1 wanted version 2.7
+# - com.google.protobuf:protobuf-java-util:3.6.0 wanted version 2.7
 # - io.grpc:grpc-core:1.12.0 wanted version 2.7
     {"artifact": "com.google.code.gson:gson:2.8.2", "lang": "java", "sha1": "3edcfe49d2c6053a70a2a47e4e1c2f94998a49cf", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_code_gson_gson", "actual": "@com_google_code_gson_gson//jar", "bind": "jar/com/google/code/gson/gson"},
     {"artifact": "com.google.dagger:dagger-compiler:2.15", "lang": "java", "sha1": "c114d70b9a4e814132fc147e8b79b1a294e5c2db", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_dagger_dagger_compiler", "actual": "@com_google_dagger_dagger_compiler//jar", "bind": "jar/com/google/dagger/dagger_compiler"},
@@ -79,9 +79,10 @@ def list_dependencies():
 # - com.google.firebase:firebase-admin:5.9.0 wanted version 20.0
 # - com.google.googlejavaformat:google-java-format:1.5 wanted version 22.0
 # - com.google.jimfs:jimfs:1.1 wanted version 18.0
-# - com.google.protobuf:protobuf-java-util:3.5.1 wanted version 19.0
+# - com.google.protobuf:protobuf-java-util:3.6.0 wanted version 19.0
 # - io.grpc:grpc-core:1.12.0 wanted version 20.0
 # - io.grpc:grpc-protobuf:1.12.0 wanted version 20.0
+# - io.opencensus:opencensus-api:0.15.0 wanted version 20.0
     {"artifact": "com.google.guava:guava:24.0-android", "lang": "java", "sha1": "bfc941bd9285e7534ebde47236f14e5c7396a90c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_guava_guava", "actual": "@com_google_guava_guava//jar", "bind": "jar/com/google/guava/guava"},
     {"artifact": "com.google.http-client:google-http-client-appengine:1.23.0", "lang": "java", "sha1": "0eda0d0f758c1cc525866e52e1226c4eb579d130", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_appengine", "actual": "@com_google_http_client_google_http_client_appengine//jar", "bind": "jar/com/google/http_client/google_http_client_appengine"},
     {"artifact": "com.google.http-client:google-http-client-gson:1.23.0", "lang": "java", "sha1": "7029b196174e7f424217d047a9d1966dd2aa61df", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_http_client_google_http_client_gson", "actual": "@com_google_http_client_google_http_client_gson//jar", "bind": "jar/com/google/http_client/google_http_client_gson"},
@@ -92,8 +93,12 @@ def list_dependencies():
     {"artifact": "com.google.j2objc:j2objc-annotations:1.1", "lang": "java", "sha1": "ed28ded51a8b1c6b112568def5f4b455e6809019", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_j2objc_j2objc_annotations", "actual": "@com_google_j2objc_j2objc_annotations//jar", "bind": "jar/com/google/j2objc/j2objc_annotations"},
     {"artifact": "com.google.jimfs:jimfs:1.1", "lang": "java", "sha1": "8fbd0579dc68aba6186935cc1bee21d2f3e7ec1c", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_jimfs_jimfs", "actual": "@com_google_jimfs_jimfs//jar", "bind": "jar/com/google/jimfs/jimfs"},
     {"artifact": "com.google.oauth-client:google-oauth-client:1.23.0", "lang": "java", "sha1": "e57ea1e2220bda5a2bd24ff17860212861f3c5cf", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_oauth_client_google_oauth_client", "actual": "@com_google_oauth_client_google_oauth_client//jar", "bind": "jar/com/google/oauth_client/google_oauth_client"},
-    {"artifact": "com.google.protobuf:protobuf-java-util:3.5.1", "lang": "java", "sha1": "6e40a6a3f52455bd633aa2a0dba1a416e62b4575", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java_util", "actual": "@com_google_protobuf_protobuf_java_util//jar", "bind": "jar/com/google/protobuf/protobuf_java_util"},
-    {"artifact": "com.google.protobuf:protobuf-java:3.5.1", "lang": "java", "sha1": "8c3492f7662fa1cbf8ca76a0f5eb1146f7725acd", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java", "actual": "@com_google_protobuf_protobuf_java//jar", "bind": "jar/com/google/protobuf/protobuf_java"},
+    {"artifact": "com.google.protobuf:protobuf-java-util:3.6.0", "lang": "java", "sha1": "3680d0042d4fe0b95ada844ff24da0698a7f0773", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java_util", "actual": "@com_google_protobuf_protobuf_java_util//jar", "bind": "jar/com/google/protobuf/protobuf_java_util"},
+# duplicates in com.google.protobuf:protobuf-java fixed to 3.6.0
+# - com.google.cloud:google-cloud-core-grpc:1.15.0 wanted version 3.5.1
+# - com.google.protobuf:protobuf-java-util:3.6.0 wanted version 3.6.0
+# - io.grpc:grpc-protobuf:1.12.0 wanted version 3.5.1
+    {"artifact": "com.google.protobuf:protobuf-java:3.6.0", "lang": "java", "sha1": "5333f7e422744d76840c08a106e28e519fbe3acd", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java", "actual": "@com_google_protobuf_protobuf_java//jar", "bind": "jar/com/google/protobuf/protobuf_java"},
     {"artifact": "com.googlecode.javaewah:JavaEWAH:1.1.6", "lang": "java", "sha1": "94ad16d728b374d65bd897625f3fbb3da223a2b6", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_googlecode_javaewah_JavaEWAH", "actual": "@com_googlecode_javaewah_JavaEWAH//jar", "bind": "jar/com/googlecode/javaewah/JavaEWAH"},
     {"artifact": "com.jcraft:jsch:0.1.54", "lang": "java", "sha1": "da3584329a263616e277e15462b387addd1b208d", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_jcraft_jsch", "actual": "@com_jcraft_jsch//jar", "bind": "jar/com/jcraft/jsch"},
 # duplicates in com.squareup:javapoet promoted to 1.8.0
@@ -106,6 +111,7 @@ def list_dependencies():
 # duplicates in io.grpc:grpc-context promoted to 1.12.0
 # - com.google.cloud:google-cloud-core-grpc:1.15.0 wanted version 1.9.0
 # - io.grpc:grpc-core:1.12.0 wanted version 1.12.0
+# - io.opencensus:opencensus-api:0.15.0 wanted version 1.12.0
     {"artifact": "io.grpc:grpc-context:1.12.0", "lang": "java", "sha1": "5b63a170b786051a42cce08118d5ea3c8f60f749", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_context", "actual": "@io_grpc_grpc_context//jar", "bind": "jar/io/grpc/grpc_context"},
     {"artifact": "io.grpc:grpc-core:1.12.0", "lang": "java", "sha1": "541a5c68ce85c03190e29bc9e0ec611d2b75ff24", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_core", "actual": "@io_grpc_grpc_core//jar", "bind": "jar/io/grpc/grpc_core"},
     {"artifact": "io.grpc:grpc-netty:1.12.0", "lang": "java", "sha1": "a4dfc839dae9206c0d1f8b53657c2a8e4a81ad41", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_grpc_grpc_netty", "actual": "@io_grpc_grpc_netty//jar", "bind": "jar/io/grpc/grpc_netty"},
@@ -139,13 +145,20 @@ def list_dependencies():
 # - com.google.firebase:firebase-admin:5.9.0 wanted version 4.1.17.Final
 # - io.netty:netty-handler-proxy:4.1.22.Final wanted version 4.1.22.Final
     {"artifact": "io.netty:netty-transport:4.1.22.Final", "lang": "java", "sha1": "3bd455cd9e5e5fb2e08fd9cd0acfa54c079ca989", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_netty_netty_transport", "actual": "@io_netty_netty_transport//jar", "bind": "jar/io/netty/netty_transport"},
-    {"artifact": "io.opencensus:opencensus-api:0.11.0", "lang": "java", "sha1": "c1ff1f0d737a689d900a3e2113ddc29847188c64", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_opencensus_opencensus_api", "actual": "@io_opencensus_opencensus_api//jar", "bind": "jar/io/opencensus/opencensus_api"},
-    {"artifact": "io.opencensus:opencensus-contrib-grpc-metrics:0.11.0", "lang": "java", "sha1": "d57b877f1a28a613452d45e35c7faae5af585258", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_opencensus_opencensus_contrib_grpc_metrics", "actual": "@io_opencensus_opencensus_contrib_grpc_metrics//jar", "bind": "jar/io/opencensus/opencensus_contrib_grpc_metrics"},
+# duplicates in io.opencensus:opencensus-api promoted to 0.15.0
+# - io.grpc:grpc-core:1.12.0 wanted version 0.11.0
+# - io.opencensus:opencensus-contrib-grpc-metrics:0.15.0 wanted version 0.15.0
+    {"artifact": "io.opencensus:opencensus-api:0.15.0", "lang": "java", "sha1": "9a098392b287d7924660837f4eba0ce252013683", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_opencensus_opencensus_api", "actual": "@io_opencensus_opencensus_api//jar", "bind": "jar/io/opencensus/opencensus_api"},
+    {"artifact": "io.opencensus:opencensus-contrib-grpc-metrics:0.15.0", "lang": "java", "sha1": "092d8f796006619ce4e86d987f9d441c6155bef9", "repository": "https://repo.maven.apache.org/maven2/", "name": "io_opencensus_opencensus_contrib_grpc_metrics", "actual": "@io_opencensus_opencensus_contrib_grpc_metrics//jar", "bind": "jar/io/opencensus/opencensus_contrib_grpc_metrics"},
     {"artifact": "javax.annotation:javax.annotation-api:1.3.2", "lang": "java", "sha1": "934c04d3cfef185a8008e7bf34331b79730a9d43", "repository": "https://repo.maven.apache.org/maven2/", "name": "javax_annotation_javax_annotation_api", "actual": "@javax_annotation_javax_annotation_api//jar", "bind": "jar/javax/annotation/javax_annotation_api"},
     {"artifact": "javax.annotation:jsr250-api:1.0", "lang": "java", "sha1": "5025422767732a1ab45d93abfea846513d742dcf", "repository": "https://repo.maven.apache.org/maven2/", "name": "javax_annotation_jsr250_api", "actual": "@javax_annotation_jsr250_api//jar", "bind": "jar/javax/annotation/jsr250_api"},
     {"artifact": "javax.inject:javax.inject:1", "lang": "java", "sha1": "6975da39a7040257bd51d21a231b76c915872d38", "repository": "https://repo.maven.apache.org/maven2/", "name": "javax_inject_javax_inject", "actual": "@javax_inject_javax_inject//jar", "bind": "jar/javax/inject/javax_inject"},
     {"artifact": "joda-time:joda-time:2.9.2", "lang": "java", "sha1": "36d6e77a419cb455e6fd5909f6f96b168e21e9d0", "repository": "https://repo.maven.apache.org/maven2/", "name": "joda_time_joda_time", "actual": "@joda_time_joda_time//jar", "bind": "jar/joda_time/joda_time"},
     {"artifact": "junit:junit:4.12", "lang": "java", "sha1": "2973d150c0dc1fefe998f834810d68f278ea58ec", "repository": "https://repo.maven.apache.org/maven2/", "name": "junit_junit", "actual": "@junit_junit//jar", "bind": "jar/junit/junit"},
+# duplicates in log4j:log4j promoted to 1.2.17
+# - commons-logging:commons-logging:1.2 wanted version 1.2.15
+# - commons-logging:commons-logging:1.2 wanted version 1.2.17
+    {"artifact": "log4j:log4j:1.2.17", "lang": "java", "sha1": "5af35056b4d257e4b64b9e8069c0746e8b08629f", "repository": "https://repo.maven.apache.org/maven2/", "name": "log4j_log4j", "actual": "@log4j_log4j//jar", "bind": "jar/log4j/log4j"},
     {"artifact": "net.bytebuddy:byte-buddy-agent:1.7.9", "lang": "java", "sha1": "a6c65f9da7f467ee1f02ff2841ffd3155aee2fc9", "repository": "https://repo.maven.apache.org/maven2/", "name": "net_bytebuddy_byte_buddy_agent", "actual": "@net_bytebuddy_byte_buddy_agent//jar", "bind": "jar/net/bytebuddy/byte_buddy_agent"},
     {"artifact": "net.bytebuddy:byte-buddy:1.7.9", "lang": "java", "sha1": "51218a01a882c04d0aba8c028179cce488bbcb58", "repository": "https://repo.maven.apache.org/maven2/", "name": "net_bytebuddy_byte_buddy", "actual": "@net_bytebuddy_byte_buddy//jar", "bind": "jar/net/bytebuddy/byte_buddy"},
     {"artifact": "org.apache.commons:commons-csv:1.5", "lang": "java", "sha1": "e10f140af5b82167640f254fa9d88e35ad74329c", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_apache_commons_commons_csv", "actual": "@org_apache_commons_commons_csv//jar", "bind": "jar/org/apache/commons/commons_csv"},
