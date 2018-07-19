@@ -1,162 +1,184 @@
 java_library(
     name = "netty_buffer",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/io/netty/netty_buffer",
+        "//external:jar/io/netty/netty_buffer"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":netty_common",
+        ":netty_common"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_codec",
+    exports = [
+        "//external:jar/io/netty/netty_codec"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/io/netty/netty_codec",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_codec_http",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/io/netty/netty_codec_http",
+        "//external:jar/io/netty/netty_codec_http"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":netty_codec",
+        ":netty_codec"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_codec_http2",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/io/netty/netty_codec_http2",
+        "//external:jar/io/netty/netty_codec_http2"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
         ":netty_codec_http",
-        ":netty_handler",
+        ":netty_handler"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_codec_socks",
+    exports = [
+        "//external:jar/io/netty/netty_codec_socks"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/io/netty/netty_codec_socks",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_common",
+    exports = [
+        "//external:jar/io/netty/netty_common"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/io/netty/netty_common",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_handler",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/io/netty/netty_handler",
+        "//external:jar/io/netty/netty_handler"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":netty_buffer",
+        ":netty_buffer"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_handler_proxy",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/io/netty/netty_handler_proxy",
+        "//external:jar/io/netty/netty_handler_proxy"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
         ":netty_codec_socks",
-        ":netty_transport",
+        ":netty_transport"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_resolver",
+    exports = [
+        "//external:jar/io/netty/netty_resolver"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/io/netty/netty_resolver",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_tcnative_boringssl_static",
+    exports = [
+        "//external:jar/io/netty/netty_tcnative_boringssl_static"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/io/netty/netty_tcnative_boringssl_static",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "netty_transport",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/io/netty/netty_transport",
+        "//external:jar/io/netty/netty_transport"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":netty_resolver",
+        ":netty_resolver"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

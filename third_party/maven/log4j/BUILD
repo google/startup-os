@@ -1,7 +1,7 @@
 java_library(
-    name = "google_oauth_client",
+    name = "log4j",
     exports = [
-        "//external:jar/com/google/oauth_client/google_oauth_client"
+        "//external:jar/log4j/log4j"
     ],
     licenses = [
         "permissive"

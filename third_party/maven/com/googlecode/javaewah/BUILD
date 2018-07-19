@@ -1,12 +1,14 @@
 java_library(
     name = "JavaEWAH",
+    exports = [
+        "//external:jar/com/googlecode/javaewah/JavaEWAH"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/com/googlecode/javaewah/JavaEWAH",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

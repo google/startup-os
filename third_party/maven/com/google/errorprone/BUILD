@@ -1,25 +1,29 @@
 java_library(
     name = "error_prone_annotations",
+    exports = [
+        "//external:jar/com/google/errorprone/error_prone_annotations"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/com/google/errorprone/error_prone_annotations",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "javac_shaded",
+    exports = [
+        "//external:jar/com/google/errorprone/javac_shaded"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/com/google/errorprone/javac_shaded",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

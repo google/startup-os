@@ -1,12 +1,14 @@
 java_library(
     name = "javassist",
+    exports = [
+        "//external:jar/org/javassist/javassist"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/org/javassist/javassist",
-    ],
+        "//visibility:public"
+    ]
 )
+
+

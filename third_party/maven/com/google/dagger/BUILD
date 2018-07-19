@@ -1,67 +1,75 @@
 java_library(
     name = "dagger",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/com/google/dagger/dagger",
+        "//external:jar/com/google/dagger/dagger"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/javax/inject:javax_inject"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "dagger_compiler",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/com/google/dagger/dagger_compiler",
+        "//external:jar/com/google/dagger/dagger_compiler"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":dagger",
-        ":dagger_producers",
-        ":dagger_spi",
         "//third_party/maven/com/google/googlejavaformat:google_java_format",
-        "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/guava:guava",
         "//third_party/maven/com/squareup:javapoet",
         "//third_party/maven/javax/annotation:jsr250_api",
         "//third_party/maven/javax/inject:javax_inject",
+        ":dagger",
+        ":dagger_producers",
+        ":dagger_spi"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "dagger_producers",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/com/google/dagger/dagger_producers",
+        "//external:jar/com/google/dagger/dagger_producers"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/org/checkerframework:checker_compat_qual",
+        "//third_party/maven/org/checkerframework:checker_compat_qual"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "dagger_spi",
+    exports = [
+        "//external:jar/com/google/dagger/dagger_spi"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/com/google/dagger/dagger_spi",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

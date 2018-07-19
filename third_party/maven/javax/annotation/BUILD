@@ -1,25 +1,29 @@
 java_library(
     name = "javax_annotation_api",
+    exports = [
+        "//external:jar/javax/annotation/javax_annotation_api"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/javax/annotation/javax_annotation_api",
-    ],
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "jsr250_api",
+    exports = [
+        "//external:jar/javax/annotation/jsr250_api"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/javax/annotation/jsr250_api",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
