@@ -33,6 +33,7 @@ import io.grpc.ServerBuilder;
 import io.grpc.protobuf.services.ProtoReflectionService;
 import java.io.IOException;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -59,19 +60,19 @@ public class LocalServer {
   public static class HeadUpdater extends TimerTask {
 
     private final FileUtils fileUtils;
-    private final Config config;
+    private final String basePath;
     private GitRepoFactory repoFactory;
-    private String currentWorkspaceName;
 
     @Inject
-    public HeadUpdater(FileUtils utils, Config config, GitRepoFactory repoFactory) {
+    public HeadUpdater(
+        FileUtils utils, @Named("Base path") String basePath, GitRepoFactory repoFactory) {
       this.fileUtils = utils;
-      this.config = config;
+      this.basePath = basePath;
       this.repoFactory = repoFactory;
     }
 
     public void run() {
-      String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
+      String headPath = fileUtils.joinPaths(this.basePath, "head");
 
       // Pull all repos in head
       try {
