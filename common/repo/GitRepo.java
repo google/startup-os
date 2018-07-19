@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @AutoFactory
 public class GitRepo implements Repo {
   private static final String TWO_WHITE_SPACES = "\\s{2}";
-  private static final String DOUBLE_QUOTE = "\"";
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
 
@@ -66,13 +65,14 @@ public class GitRepo implements Repo {
   }
 
   private CommandResult runCommand(String command) {
+    return runCommand(Arrays.asList(command.split(" ")));
+  }
+
+  private CommandResult runCommand(List<String> command) {
     CommandResult result = new CommandResult();
     try {
       List<String> fullCommand = new ArrayList<>(gitCommandBase);
-      fullCommand.addAll(Arrays.asList(command.split(" ")));
-      if (!command.isEmpty() && command.startsWith("commit")) {
-        fullCommand = runCommand(fullCommand);
-      }
+      fullCommand.addAll(command);
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
@@ -86,28 +86,6 @@ public class GitRepo implements Repo {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
-    return result;
-  }
-
-  private List<String> runCommand(List<String> command) {
-    int indexStartOfCommitMessage = 0;
-    int indexEndOfCommitMessage = 0;
-    for (int i = 0; i < command.size(); i++) {
-      String part = command.get(i);
-      if (part.startsWith("\"")) {
-        indexStartOfCommitMessage = i;
-      }
-      if (part.endsWith("\"")) {
-        indexEndOfCommitMessage = i;
-      }
-    }
-    StringBuilder commitMessage = new StringBuilder();
-    for (String partOfCommitMessage :
-        command.subList(indexStartOfCommitMessage, indexEndOfCommitMessage + 1)) {
-      commitMessage.append(" ").append(partOfCommitMessage.replaceAll(DOUBLE_QUOTE, ""));
-    }
-    List<String> result = command.subList(0, indexStartOfCommitMessage);
-    result.add(commitMessage.toString().trim());
     return result;
   }
 
@@ -239,7 +217,7 @@ public class GitRepo implements Repo {
     for (File file : files) {
       addFile(file.getFilename());
     }
-    runCommand("commit -m \"" + message + "\"");
+    runCommand(Arrays.asList("commit", "-m", "\"" + message + "\""));
     String commitId = getHeadCommitId();
     for (File file : files) {
       commitBuilder.addFile(file.toBuilder().setCommitId(commitId));
