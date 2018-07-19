@@ -150,9 +150,15 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<String> getCommitIds(String branch) {
-    CommandResult commandResult = runCommand("log --pretty=%H master~1.." + branch);
+    CommandResult commandResult = runCommand("log --pretty=%H master.." + branch);
     // We reverse to return by chronological order
-    return splitLines(commandResult.stdout).reverse();
+    ImmutableList<String> commits = splitLines(commandResult.stdout).reverse();
+    // Get last commit on master branch
+    commandResult = runCommand("merge-base master " + branch);
+    return ImmutableList.<String>builder()
+        .addAll(splitLines(commandResult.stdout))
+        .addAll(commits)
+        .build();
   }
 
   public ImmutableList<Commit> getCommits(String branch) {

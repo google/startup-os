@@ -133,10 +133,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
         }
       }
     } catch (RuntimeException e) {
-      logger.atSevere().withCause(e).log("readTextFile failed for\n" + file);
       if (!file.getCommitId().isEmpty() && !file.getWorkspace().isEmpty()) {
         file = file.toBuilder().clearWorkspace().build();
-        logger.atInfo().log("Trying at head with:\n" + file);
+        logger.atInfo().log("File not found, trying at head with:\n" + file);
         return readTextFile(file);
       } else {
         logger.atSevere().withCause(e).log("readTextFile failed for:\n" + file);
