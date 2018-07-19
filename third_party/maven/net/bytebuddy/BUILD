@@ -4,7 +4,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/net/bytebuddy/byte_buddy",
@@ -17,7 +17,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/net/bytebuddy/byte_buddy_agent",

@@ -21,7 +21,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/api/gax",
@@ -34,7 +34,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/api/gax_grpc",
@@ -51,7 +51,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/api/gax_httpjson",

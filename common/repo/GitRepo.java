@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 // TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
-  private static final String TWO_WHITE_SPACES = "\\s{2}";
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
 
@@ -122,9 +121,19 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<String> getCommitIds(String branch) {
-    CommandResult commandResult = runCommand("log --pretty=%H " + branch);
+    // <<<<<<< HEAD
+    //  CommandResult commandResult = runCommand("log --pretty=%H " + branch);
+    // =======
+    CommandResult commandResult = runCommand("log --pretty=%H master.." + branch);
+    // >>>>>>> 8fdd7e1015b153ae054ccf67461a4d7e4d8e0c10
     // We reverse to return by chronological order
-    return splitLines(commandResult.stdout).reverse();
+    ImmutableList<String> commits = splitLines(commandResult.stdout).reverse();
+    // Get last commit on master branch
+    commandResult = runCommand("merge-base master " + branch);
+    return ImmutableList.<String>builder()
+        .addAll(splitLines(commandResult.stdout))
+        .addAll(commits)
+        .build();
   }
 
   @Override
@@ -144,6 +153,7 @@ public class GitRepo implements Repo {
 
   @Override
   public ImmutableList<File> getUncommittedFiles() {
+    String TWO_WHITE_SPACES = "\\s{2}";
     ImmutableList.Builder<File> files = ImmutableList.builder();
     CommandResult commandResult = runCommand("status --short");
     ImmutableList<String> lines = splitLines(commandResult.stdout);

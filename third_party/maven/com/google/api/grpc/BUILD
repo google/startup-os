@@ -4,7 +4,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/api/grpc/proto_google_cloud_firestore_v1beta1",
@@ -17,7 +17,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/api/grpc/proto_google_common_protos",
@@ -30,7 +30,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//visibility:public",
+        "//third_party/maven:__subpackages__",
     ],
     exports = [
         "//external:jar/com/google/api/grpc/proto_google_iam_v1",

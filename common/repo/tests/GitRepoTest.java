@@ -62,7 +62,7 @@ public class GitRepoTest {
     // We need one commit to make the repo have a master branch.
     fileUtils.writeStringUnchecked(
         "initial commit", fileUtils.joinPaths(repoFolder, "initial_commit.txt"));
-    repo.commit(repo.getUncommittedFiles(), "Initial_commit");
+    repo.commit(repo.getUncommittedFiles(), "Initial commit");
   }
 
   @Singleton
