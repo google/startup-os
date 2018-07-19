@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Protos.File.Action;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -153,14 +154,11 @@ public class GitRepo implements Repo {
     CommandResult commandResult = runCommand("status --porcelain");
     ImmutableList<String> lines = splitLines(commandResult.stdout);
     for (String line : lines) {
-      line = line.replaceFirst("\\s{2}", " ");
+      line = line.replaceFirst("  ", " ");
       String[] parts = line.trim().split(" ");
-
-      File.Builder fileBuilder = File.newBuilder();
-      fileBuilder.setAction(getAction(parts[0]));
-      fileBuilder.setFilename(
-          fileBuilder.getAction().equals(File.Action.RENAME) ? parts[3] : parts[1]);
-      files.add(fileBuilder.build());
+      Action action = getAction(parts[0]);
+      String filename = action.equals(File.Action.RENAME) ? parts[3] : parts[1];
+      files.add(File.newBuilder().setAction(action).setFilename(filename).build());
     }
     return files.build();
   }
@@ -301,8 +299,7 @@ public class GitRepo implements Repo {
 
   @Override
   public String getFileContents(String commitId, String path) {
-    CommandResult commandResult = runCommand("show " + commitId + ":" + path);
-    return commandResult.stdout;
+    return runCommand("show " + commitId + ":" + path).stdout;
   }
 
   @Override
@@ -320,7 +317,7 @@ public class GitRepo implements Repo {
 
   public String getHeadCommitId() {
     CommandResult commandResult = runCommand("rev-parse HEAD");
-    return commandResult.stdout.replace("\n", "");
+    return commandResult.stdout.trim().replace("\n", "");
   }
 
   private void switchToMasterBranch() {
@@ -331,12 +328,7 @@ public class GitRepo implements Repo {
 
   @VisibleForTesting
   public ImmutableList<String> getTagList() {
-    CommandResult commandResult = runCommand("tag");
-    try {
-      return splitLines(commandResult.stdout);
-    } catch (IllegalStateException e) {
-      throw new IllegalStateException("Get tag list failed!");
-    }
+    return splitLines(runCommand("tag").stdout);
   }
 
   @VisibleForTesting

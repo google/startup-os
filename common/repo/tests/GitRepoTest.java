@@ -167,6 +167,14 @@ public class GitRepoTest {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
+    assertEquals(1, repo.getUncommittedFiles().size());
+  }
+
+  @Test
+  public void testAddAndCommitFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     assertEquals(0, repo.getUncommittedFiles().size());
   }
@@ -198,7 +206,7 @@ public class GitRepoTest {
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    fileUtils.writeStringUnchecked("new file contains", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked("new file contents", fileUtils.joinPaths(repoFolder, TEST_FILE));
     assertEquals(
         ImmutableList.of(
             File.newBuilder().setFilename(TEST_FILE).setAction(File.Action.MODIFY).build()),
@@ -229,9 +237,17 @@ public class GitRepoTest {
   }
 
   @Test
-  public void testTadHead() {
+  public void testTagHead() {
     repo.tagHead("test_tag");
     assertEquals(ImmutableList.of("test_tag"), gitRepo.getTagList());
+  }
+
+  @Test
+  public void testTwoTagHead() {
+    repo.tagHead("first_tag");
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    repo.tagHead("second_tag");
+    assertEquals(ImmutableList.of("first_tag", "second_tag"), gitRepo.getTagList());
   }
 
   @Test
