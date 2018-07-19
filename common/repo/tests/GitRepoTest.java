@@ -58,8 +58,6 @@ public class GitRepoTest {
     repo = gitRepo;
     // We need one commit to make the repo have a master branch.
     repo.commit(repo.getUncommittedFiles(), "Initial commit");
-    // We need another initial commit so that master~1 is defined.
-    repo.commit(repo.getUncommittedFiles(), "Initial commit2");
   }
 
   @Singleton
