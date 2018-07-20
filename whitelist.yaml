@@ -16,3 +16,6 @@ maven_dependencies:
   - org.objenesis
   - org.slf4j
   - org.yaml
+workspace_git_repositories:
+  - https://github.com/oferb/startupos-binaries
+  - https://github.com/bazelbuild/rules_nodejs

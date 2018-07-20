@@ -10,3 +10,16 @@ java_test(
         "//third_party/maven/org/yaml:snakeyaml",
     ],
 )
+
+java_test(
+    name = "WorkspaceDepsWhitelistTest",
+    srcs = ["WorkspaceDepsWhiteListTest.java"],
+    data = [
+        "//:WORKSPACE",
+        "//:whitelist.yaml",
+    ],
+    test_class = "com.google.startupos.tools.whitelist.WorkspaceDepsWhiteListTest",
+    deps = [
+        "//third_party/maven/org/yaml:snakeyaml",
+    ],
+)

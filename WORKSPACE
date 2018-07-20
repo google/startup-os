@@ -60,13 +60,11 @@ grpc_java_repositories(
 )
 
 # Google Maven Repository
-GMAVEN_TAG = "20180513-1"
-
 http_archive(
     name = "gmaven_rules",
     sha256 = "da44017f6d7bc5148a73cfd9bf8dbb1ee5a1301a596edad9181c5dc7648076ae",
-    strip_prefix = "gmaven_rules-%s" % GMAVEN_TAG,
-    url = "https://github.com/bazelbuild/gmaven_rules/archive/%s.tar.gz" % GMAVEN_TAG,
+    strip_prefix = "gmaven_rules-20180513-1",
+    url = "https://github.com/bazelbuild/gmaven_rules/archive/20180513-1.tar.gz",
 )
 
 load("@gmaven_rules//:gmaven.bzl", "gmaven_rules")
@@ -168,14 +166,12 @@ http_archive(
 http_archive(
     name = "io_bazel_rules_webtesting",
     strip_prefix = "rules_webtesting-master",
-    urls = [
-        "https://github.com/bazelbuild/rules_webtesting/archive/master.tar.gz",
-    ],
+    urls = ["https://github.com/bazelbuild/rules_webtesting/archive/master.tar.gz"],
 )
 
 git_repository(
     name = "build_bazel_rules_nodejs",
-    remote = "https://github.com/bazelbuild/rules_nodejs.git",
+    remote = "https://github.com/bazelbuild/rules_nodejs",
     tag = "0.9.1",
 )
 
@@ -227,10 +223,7 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.4.0.tar.gz"],
 )
 
-load(
-    "@io_bazel_rules_docker//java:image.bzl",
-    _java_image_repos = "repositories",
-)
+load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
 
 _java_image_repos()
 
