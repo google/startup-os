@@ -185,7 +185,14 @@ public class FileUtils {
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    return String.join("\n", Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
+    ImmutableList<String> lines =
+        ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
+    if (lines.isEmpty()) {
+      return "";
+    } else {
+      String lastLine = lines.get(lines.size() - 1);
+      return lastLine.equals("\n") ? String.join("\n", lines) + "\n" : String.join("\n", lines);
+    }
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */

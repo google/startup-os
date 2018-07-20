@@ -285,6 +285,18 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void testReadFileWhenOneLineWithNewLineInTheEnd() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    Files.createDirectories(testPath.getParent());
+    Files.write(testPath, ImmutableList.of("first line\n"), UTF_8);
+    String content = fileUtils.readFile(TEST_FILE_PATH);
+    assertEquals("first line\n", content);
+  }
+
+  @Test
   public void testReadFileWhenTwoLine() throws IOException {
     if (fileSystemName.equals("Windows")) {
       return;
@@ -297,6 +309,18 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void testReadFileWhenTwoLineWithNewLineInTheEnd() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    Files.createDirectories(testPath.getParent());
+    Files.write(testPath, ImmutableList.of("first line", "second line\n"), UTF_8);
+    String content = fileUtils.readFile(TEST_FILE_PATH);
+    assertEquals("first line\nsecond line\n", content);
+  }
+
+  @Test
   public void testReadFileWhenIsEmpty() throws IOException {
     if (fileSystemName.equals("Windows")) {
       return;
@@ -306,6 +330,18 @@ public class FileUtilsTest {
     Files.write(testPath, ImmutableList.of(), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
     assertEquals("", content);
+  }
+
+  @Test
+  public void testReadFileWhenIsEmptyWithNewLine() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    Files.createDirectories(testPath.getParent());
+    Files.write(testPath, ImmutableList.of("\n"), UTF_8);
+    String content = fileUtils.readFile(TEST_FILE_PATH);
+    assertEquals("\n", content);
   }
 
   @Test(expected = RuntimeException.class)
