@@ -23,18 +23,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystem;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.inject.Inject;
 
 /** File utils */
 @Singleton
@@ -230,6 +230,10 @@ public class FileUtils {
     }
   }
 
+  /**
+   * Copies a directory to another directory. Creates target directory if needed and doesn't copy
+   * symlinks.
+   */
   public void copyDirectoryToDirectory(String source, String destination, String ignored)
       throws IOException {
     final Path sourcePath = Paths.get(source);
@@ -256,6 +260,9 @@ public class FileUtils {
               if (Pattern.matches(ignored, file.getFileName().toString())) {
                 return FileVisitResult.CONTINUE;
               }
+            }
+            if (Files.isSymbolicLink(file)) {
+              return FileVisitResult.CONTINUE;
             }
             Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
             return FileVisitResult.CONTINUE;
