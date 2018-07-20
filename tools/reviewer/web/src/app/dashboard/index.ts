@@ -12,6 +12,7 @@ import {
   LineNumbersComponent,
   ReplyPopupComponent,
   ReviewComponent,
+  ReviewService,
   ReviewDiscussionComponent,
   ReviewerListComponent,
   ReviewFilesComponent,
@@ -39,4 +40,4 @@ export const DashboardComponents = [
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [DiffService];
+export const DashboardProviders = [DiffService, ReviewService];

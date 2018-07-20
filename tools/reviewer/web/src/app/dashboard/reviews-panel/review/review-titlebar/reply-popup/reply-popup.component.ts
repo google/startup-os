@@ -2,10 +2,12 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
   AuthService,
+  Author,
+  Comment,
   FirebaseService,
   NotificationService,
   Reviewer,
-  Author
+  Thread,
 } from '@/shared';
 import { Diff } from '@/shared';
 import { ReviewService } from '../../services';
@@ -16,9 +18,11 @@ import { ReviewService } from '../../services';
   styleUrls: ['./reply-popup.component.scss'],
 })
 export class ReplyPopupComponent {
+  message: string;
+  approved: boolean = false;
+  actionRequired: boolean = false;
   @Input() diff: Diff;
   @Output() submitted = new EventEmitter<boolean>();
-  approved = false;
 
   constructor(
     private authService: AuthService,
@@ -71,6 +75,22 @@ export class ReplyPopupComponent {
       // Remove Attention of reviewer
       reviewer.setNeedsAttention(false);
     }
+
+    // Add the message as a DiffThread
+    this.message = this.message.trim();
+    if (this.message) {
+      const diffThread: Thread = new Thread();
+      const comment: Comment = new Comment();
+      comment.setContent(this.message);
+      comment.setCreatedBy(this.authService.userEmail);
+      comment.setTimestamp(Date.now());
+      // Set isDone of Thread based on Action Required Checkbox
+      diffThread.setIsDone(!this.actionRequired);
+      diffThread.addComment(comment);
+      this.diff.addDiffThread(diffThread);
+    }
+
+    this.diff.addDiffThread()
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
       this.submitted.emit();

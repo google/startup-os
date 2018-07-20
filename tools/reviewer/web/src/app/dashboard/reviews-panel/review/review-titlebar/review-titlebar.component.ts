@@ -5,7 +5,7 @@ import { FirebaseService, NotificationService } from '@/shared/services';
 import {
   AuthService,
 } from '@/shared/services';
-import { Diff } from '@/shared/shell';
+import { Diff, Author } from '@/shared/shell';
 import { statusList } from './status-ui';
 
 @Component({
@@ -32,7 +32,7 @@ export class ReviewTitlebarComponent implements OnInit {
 
   // Request or cancel attention of the author
   changeAttentionOfAuthor(): void {
-    const author = this.diff.getAuthor();
+    const author: Author = this.diff.getAuthor();
     author.setNeedsAttention(!author.getNeedsAttention());
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {

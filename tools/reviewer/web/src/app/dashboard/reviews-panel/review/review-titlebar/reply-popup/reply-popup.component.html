@@ -1,11 +1,10 @@
 <div class="reply-form" fxLayout="column">
   <div class="reply-title">Reply</div>
-  <!-- TODO functionality for textarea text -->
-  <textarea></textarea>
+  <textarea [(ngModel)]="message"></textarea>
   <div class="action-required">
-    <!-- TODO functionality for Action Required checkbox -->
     <input 
-      type="checkbox" 
+      type="checkbox"
+      [(ngModel)]="actionRequired"
       value="Action Required"> 
     <span> 
       Action Required 
