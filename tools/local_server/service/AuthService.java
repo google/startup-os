@@ -47,10 +47,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
   private static final String REFRESH_TOKEN = "https://securetoken.googleapis.com/v1/token?key=%s";
 
-  @FlagDesc(
-    name = "disk_token_mode",
-    description = "Read and write token to disk"
-  )
+  @FlagDesc(name = "disk_token_mode", description = "Read and write token to disk")
   private static final Flag<Boolean> diskTokenMode = Flag.create(true);
 
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
