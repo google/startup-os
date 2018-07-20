@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.whitelist;
+package com.google.startupos.tools.dep_whitelist;
 
 import org.junit.Test;
 import org.junit.Before;
