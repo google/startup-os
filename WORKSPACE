@@ -10,6 +10,12 @@ git_repository(
     remote = "https://github.com/oferb/startupos-binaries",
 )
 
+git_repository(
+    name = "startupos_binaries",
+    commit = "3eaa31c93ca9ecb22ad8c348649d1ba4f61f332c",
+    remote = "https://github.com/oferb/startupos-binaries",
+)
+
 load("//third_party/maven:workspace.bzl", "maven_dependencies")
 
 maven_dependencies()
@@ -87,9 +93,9 @@ maven_jar(
 
 http_archive(
     name = "com_google_protobuf",
-    sha256 = "091d4263d9a55eccb6d3c8abde55c26eaaa933dea9ecabb185cdf3795f9b5ca2",
-    strip_prefix = "protobuf-3.5.1.1",
-    urls = ["https://github.com/google/protobuf/archive/3.5.1.1.zip"],
+    sha256 = "e514c2e613dc47c062ea8df480efeec368ffbef98af0437ac00cdaadcb0d80d2",
+    strip_prefix = "protobuf-3.6.0",
+    urls = ["https://github.com/google/protobuf/archive/v3.6.0.zip"],
 )
 
 http_file(
@@ -232,4 +238,40 @@ http_jar(
     name = "grpc_polyglot",
     sha256 = "c2a453921632c0c3559f9df92e1699b69c784181f36a316f9927b70f52e5a7d5",
     url = "https://github.com/grpc-ecosystem/polyglot/releases/download/v1.6.0/polyglot.jar"
+)
+
+http_file(
+    name = "protoc_bin",
+    executable = True,
+    sha256 = "84e29b25de6896c6c4b22067fb79472dac13cf54240a7a210ef1cac623f5231d",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-linux-x86_64.zip"]
+)
+
+http_file(
+    name = "protoc_bin_osx",
+    executable = True,
+    sha256 = "768a42032718accd12e056447b0d93d42ffcdc27d1b0f21fc1e30a900da94842",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
+)
+
+"""
+We use proto_compiler and proto_java_toolchain bindings to avoid
+compilation of protoc. To turn off prebuilt binaries, replace
+- //tools:protoc with @com_google_protobuf//:protoc
+- //tools:java_toolchain with @com_google_protobuf//:java_toolchain
+"""
+
+bind(
+    name = "proto_compiler",
+    actual = "//tools:protoc"
+)
+
+bind(
+    name = "proto_java_toolchain",
+    actual = "//tools:java_toolchain"
+)
+
+bind(
+    name = "grpc_java_plugin",
+    actual = "@startupos_binaries//:grpc_java_plugin"
 )
