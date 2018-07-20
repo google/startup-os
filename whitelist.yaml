@@ -1,0 +1,18 @@
+maven_dependencies:
+  - com.google
+  - com.jcraft
+  - commons-logging
+  - io.grpc
+  - io.opencensus
+  - javax.annotation
+  - javax.inject
+  - junit
+  - org.apache
+  - org.eclipse
+  - org.javassist
+  - org.json
+  - org.jsoup
+  - org.mockito
+  - org.objenesis
+  - org.slf4j
+  - org.yaml
