@@ -22,16 +22,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.List;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.stream.Stream;
 import java.util.stream.Collectors;
-import java.util.HashMap;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.io.File;
 
@@ -40,74 +36,50 @@ import static org.junit.Assert.assertTrue;
 import org.yaml.snakeyaml.Yaml;
 
 public class WorkspaceDepsWhiteListTest {
-
-  private static class WorkspaceElement {
-    private String label;
-    public Map<String, String> attributes;
-
-    public WorkspaceElement(String label) {
-      this.label = label;
-      this.attributes = new HashMap<String, String>();
-    }
-
-    public void setAttribute(String key, String value) {
-      this.attributes.put(key, value);
-    }
-
-    public String getLabel() {
-      return this.label;
-    }
-
-    public String getAttribute(String key) {
-      return this.attributes.get(key);
-    }
-  }
-
-  private List<WorkspaceElement> parseLines(List<String> lines) {
-    ArrayList<WorkspaceElement> result = new ArrayList<>();
-    WorkspaceElement currentElement = null;
-    boolean inAttribute = false;
-    for (String line : lines) {
-      // System.err.println(String.format("processing line: %s", line));
-      if (line.contains("(") && !line.contains(")")) {
-        inAttribute = true;
-        currentElement = new WorkspaceElement(line.replace("(", ""));
-      } else if (inAttribute && line.contains(")")) {
-        inAttribute = false;
-        result.add(currentElement);
-      } else if (inAttribute) {
-        String[] kv = line.split("=");
-        if (kv.length == 2) {
-          // it's indeed key-value
-          String key = kv[0].replaceAll("[^a-zA-Z_]", "");
-          String value = kv[1].replaceAll("[\\s\\[\\]\\,\"]", "");
-          currentElement.setAttribute(key, value);
-        }
-      }
-    }
-    return result;
-  }
-
   private Map<String, List<String>> whitelist;
-  private List<WorkspaceElement> workspace;
+  private List<String> workspace;
+  private static Set<String> keysToValidate =
+      new HashSet<String>() {
+        {
+          add("url");
+          add("urls");
+          add("remote");
+          add("artifact");
+        }
+      };
 
   @Before
   public void setUp() throws Exception {
     whitelist = new Yaml().load(new FileInputStream(new File("whitelist.yaml")));
     try (Stream<String> stream = Files.lines(Paths.get("WORKSPACE"))) {
-      workspace = parseLines(stream.collect(Collectors.toList()));
+      workspace = stream.collect(Collectors.toList());
     }
   }
 
   @Test
-  public void gitRepositoriesMatchWhitelist() throws Exception {
-    assertTrue(
-        "There are non-whitelisted repos in WORKSPACE",
-        workspace
-            .stream()
-            .filter(elem -> elem.getLabel().equals("git_repository"))
-            .map(elem -> elem.getAttribute("remote"))
-            .allMatch(elem -> whitelist.get("workspace_git_repositories").contains(elem)));
+  public void urlsMatchWhitelist() throws Exception {
+    List<String> validUrls = whitelist.get("workspace_urls");
+
+    for (String line : workspace) {
+      String[] kv = line.split("=");
+      if (kv.length == 2) {
+        boolean isValidUrl = false;
+
+        String key = kv[0].replaceAll("[^a-zA-Z_]", "");
+        String value = kv[1].replaceAll("[\\s\\[\\]\\,\"]", "");
+        if (keysToValidate.contains(key)) {
+
+          for (String validUrl : validUrls) {
+            if (value.startsWith(validUrl)) {
+              isValidUrl = true;
+              break;
+            }
+          }
+
+          assertTrue(String.format("URL %s is not in the whitelist", value), isValidUrl);
+        }
+      }
+    }
   }
 }
 
