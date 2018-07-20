@@ -16,16 +16,11 @@ maven_dependencies:
   - org.objenesis
   - org.slf4j
   - org.yaml
-workspace_urls:
+workspace_dependencies:
     - com.squareup.okhttp
     - com.squareup.okio
     - https://github.com/abseil/abseil-cpp
-    - https://github.com/bazelbuild/bazel
-    - https://github.com/bazelbuild/buildtools
-    - https://github.com/bazelbuild/gmaven_rules
-    - https://github.com/bazelbuild/rules_docker
-    - https://github.com/bazelbuild/rules_nodejs
-    - https://github.com/bazelbuild/rules_webtesting
+    - https://github.com/bazelbuild/
     - https://github.com/gflags/gflags
     - https://github.com/google/benchmark
     - https://github.com/google/glog

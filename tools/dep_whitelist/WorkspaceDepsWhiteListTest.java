@@ -32,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.File;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.yaml.snakeyaml.Yaml;
 
@@ -58,14 +59,14 @@ public class WorkspaceDepsWhiteListTest {
 
   @Test
   public void urlsMatchWhitelist() throws Exception {
-    List<String> validUrls = whitelist.get("workspace_urls");
+    List<String> validUrls = whitelist.get("workspace_dependencies");
 
     for (String line : workspace) {
       String[] kv = line.split("=");
       if (kv.length == 2) {
         boolean isValidUrl = false;
 
-        String key = kv[0].replaceAll("[^a-zA-Z_]", "");
+        String key = kv[0].trim();
         String value = kv[1].replaceAll("[\\s\\[\\]\\,\"]", "");
         if (keysToValidate.contains(key)) {
 
@@ -77,6 +78,9 @@ public class WorkspaceDepsWhiteListTest {
           }
 
           assertTrue(String.format("URL %s is not in the whitelist", value), isValidUrl);
+        } else {
+          assertFalse(
+              String.format("Value at key %s should not contain ://", key), value.contains("://"));
         }
       }
     }
