@@ -16,7 +16,7 @@ import { statusList } from './status-ui';
 export class ReviewTitlebarComponent implements OnInit {
   statusList = statusList;
   isLoading: boolean = true;
-  showReplyDialog: boolean = false;
+  isReplyDialogShown: boolean = false;
   @Input() diff: Diff;
   @Input() editable;
 
@@ -47,6 +47,6 @@ export class ReviewTitlebarComponent implements OnInit {
 
   // Hide the Reply form when it's submitted successfully
   replySubmitted(): void {
-    this.showReplyDialog = false;
+    this.isReplyDialogShown = false;
   }
 }

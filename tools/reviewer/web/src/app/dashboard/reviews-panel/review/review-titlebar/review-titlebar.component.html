@@ -42,9 +42,9 @@
       <button>Submit</button>
     </div>
     <div class="reply">
-      <button (click)="showReplyDialog = !showReplyDialog">Reply</button>
+      <button (click)="isReplyDialogShown = true">Reply</button>
     </div>
-    <div *ngIf="showReplyDialog" class="reply-popup">
+    <div *ngIf="isReplyDialogShown" class="reply-popup">
       <div>
         <cr-reply-popup [diff]="diff" (submitted)="replySubmitted()"></cr-reply-popup>
       </div>
@@ -54,6 +54,6 @@
 
 <div 
   class="reply-popup-overlay"
-  *ngIf="showReplyDialog"
-  (click)="showReplyDialog = false">
+  *ngIf="isReplyDialogShown"
+  (click)="isReplyDialogShown = false">
 </div>
