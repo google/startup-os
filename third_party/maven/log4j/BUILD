@@ -1,5 +1,5 @@
 java_library(
-    name = "joda_time",
+    name = "log4j",
     licenses = [
         "permissive",
     ],
@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/joda_time/joda_time",
+        "//external:jar/log4j/log4j",
     ],
 )
