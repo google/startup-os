@@ -50,6 +50,7 @@ import java.nio.file.FileSystems;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import com.google.startupos.common.TextDifferencer;
+import com.google.startupos.common.repo.Protos.Commit;
 
 import javax.inject.Singleton;
 
@@ -59,9 +60,9 @@ public class CodeReviewServiceTest {
   private static final String TEST_FILE = "test_file.txt";
   private static final String TEST_FILE_CONTENTS = "Some test file contents\n";
   private static final String TEST_WORKSPACE = "ws1";
+  private static final String COMMIT_MESSAGE = "Some commit message";
 
   private GitRepoFactory gitRepoFactory;
-  private GitRepo gitRepo;
   private String aaBaseFolder;
   private FileUtils fileUtils;
   private TextDifferencer textDifferencer;
@@ -158,10 +159,20 @@ public class CodeReviewServiceTest {
     return joinPaths(aaBaseFolder, "ws", workspace);
   }
 
-  /**
-   * To test the server, make calls with a real stub using the in-process channel, and verify
-   * behaviors or state changes from the client side.
-   */
+  TextDiffResponse getResponse(File file) {
+    final TextDiffRequest request =
+        TextDiffRequest.newBuilder().setLeftFile(file).setRightFile(file).build();
+    return blockingStub.getTextDiff(request);
+  }
+
+  TextDiffResponse getExpectedResponse(String contents) {
+    return TextDiffResponse.newBuilder()
+        .addAllChanges(component.getTextDifferencer().getAllTextChanges(contents, contents))
+        .setLeftFileContents(contents)
+        .setRightFileContents(contents)
+        .build();
+  }
+
   @Test
   public void testTextDiff_untrackedlocallyModifiedFile() throws Exception {
     fileUtils.writeStringUnchecked(
@@ -173,21 +184,51 @@ public class CodeReviewServiceTest {
             .setWorkspace(TEST_WORKSPACE)
             .setFilename(TEST_FILE)
             .build();
-    final TextDiffRequest request =
-        TextDiffRequest.newBuilder().setLeftFile(file).setRightFile(file).build();
 
-    TextDiffResponse response = blockingStub.getTextDiff(request);
-
+    TextDiffResponse response = getResponse(file);
     // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
     String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    TextDiffResponse expectedResponse =
-        TextDiffResponse.newBuilder()
-            .addAllChanges(component.getTextDifferencer().getAllTextChanges(tempFix, tempFix))
-            .setLeftFileContents(tempFix)
-            .setRightFileContents(tempFix)
+    assertEquals(getExpectedResponse(tempFix), response);
+  }
+
+  @Test
+  public void testTextDiff_committedFile() throws Exception {
+    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoPath, TEST_FILE));
+    GitRepo repo = gitRepoFactory.create(repoPath);
+    Commit commit = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+
+    File file =
+        File.newBuilder()
+            .setRepoId("startup-os")
+            .setWorkspace(TEST_WORKSPACE)
+            .setCommitId(commit.getId())
+            .setFilename(TEST_FILE)
             .build();
 
-    assertEquals(expectedResponse, response);
+    TextDiffResponse response = getResponse(file);
+    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
+    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
+    assertEquals(getExpectedResponse(tempFix), response);
+  }
+
+  @Test
+  public void testTextDiff_committedModifiedFile() throws Exception {
+    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoPath, TEST_FILE));
+    GitRepo repo = gitRepoFactory.create(repoPath);
+    Commit commit = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    fileUtils.writeStringUnchecked("Some changes", fileUtils.joinPaths(repoPath, TEST_FILE));
+
+    File file =
+        File.newBuilder()
+            .setRepoId("startup-os")
+            .setWorkspace(TEST_WORKSPACE)
+            .setFilename(TEST_FILE)
+            .build();
+
+    TextDiffResponse response = getResponse(file);
+    assertEquals(getExpectedResponse("Some changes"), response);
   }
 }
 
