@@ -24,7 +24,6 @@ import com.google.common.collect.Lists;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.repo.Protos.File.Action;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -156,7 +155,19 @@ public class GitRepo implements Repo {
     for (String line : lines) {
       line = line.replaceFirst("  ", " ");
       String[] parts = line.trim().split(" ");
-      Action action = getAction(parts[0]);
+      /* We extract the action and filename from line. Here are some example lines:
+      D  deleted.txt
+      action:DELETE, filename:deleted.txt
+       M modified.txt
+      action:MODIFY, filename:modified.txt
+      A  package/new.txt
+      action:ADD, filename:package/new.txt
+      R  old_name.txt -> new_name.txt
+      action:RENAME, filename:new_name.txt
+      ?? package/untracked.txt
+      action:ADD, filename:package/untracked.txt
+      */
+      File.Action action = getAction(parts[0]);
       String filename = action.equals(File.Action.RENAME) ? parts[3] : parts[1];
       files.add(File.newBuilder().setAction(action).setFilename(filename).build());
     }
@@ -225,7 +236,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void pushAll() {
-    runCommand("push --all origin");
+    runCommand("push --all --atomic origin");
   }
 
   @Override
@@ -242,8 +253,7 @@ public class GitRepo implements Repo {
   public boolean mergeTheirs(String branch) {
     switchToMasterBranch();
     CommandResult commandResult = runCommand("merge " + branch + " -s recursive -Xtheirs");
-    String err = commandResult.stderr;
-    return err.length() == 0;
+    return commandResult.stderr.isEmpty();
   }
 
   public boolean merge(String branch, boolean remote) {
@@ -251,7 +261,7 @@ public class GitRepo implements Repo {
     CommandResult mergeCommandResult;
     if (remote) {
       CommandResult fetchCommandResult = runCommand("fetch origin " + branch);
-      if (fetchCommandResult.stderr.length() != 0) {
+      if (!fetchCommandResult.stderr.isEmpty()) {
         throw new IllegalStateException(
             "Failed to fetch remote branch before merging \'"
                 + branch
@@ -268,8 +278,7 @@ public class GitRepo implements Repo {
     } else {
       mergeCommandResult = runCommand("merge " + branch);
     }
-    String err = mergeCommandResult.stderr;
-    return err.length() == 0;
+    return mergeCommandResult.stderr.isEmpty();
   }
 
   @Override
