@@ -34,7 +34,7 @@ export class ReplyPopupComponent {
   reply(): void {
     if (this.authService.userEmail === this.diff.getAuthor().getEmail()) {
       // Current user is the author
-      const author = this.diff.getAuthor();
+      const author: Author = this.diff.getAuthor();
       author.setNeedsAttention(false);
 
       // Set attention of all reviewers
@@ -47,9 +47,9 @@ export class ReplyPopupComponent {
       author.setNeedsAttention(true);
 
       // Get reviewer from userEmail
-      const username = this.authService
+      const username: string = this.authService
         .getUsername(this.authService.userEmail);
-      let reviewer = this.reviewService
+      let reviewer: Reviewer = this.reviewService
         .getReviewerWithTheUsername(this.diff, username);
 
       if (!reviewer) {
@@ -57,15 +57,11 @@ export class ReplyPopupComponent {
         reviewer = new Reviewer();
         reviewer.setEmail(username + '@gmail.com');
 
-        // Default values:
+        // Default values
         reviewer.setApproved(false);
 
-        const reviewers = this.diff.getReviewerList();
-        reviewers.push(reviewer);
-
-        // TODO
-        // Is there a better way for just Adding a reviewer to Reviewer list?
-        this.diff.setReviewerList(reviewers);
+        // Add reviewer to Diff
+        this.diff.addReviewer(reviewer);
       }
       // If Approved checkbox was checked
       if (this.approved) {
@@ -89,8 +85,6 @@ export class ReplyPopupComponent {
       diffThread.addComment(comment);
       this.diff.addDiffThread(diffThread);
     }
-
-    this.diff.addDiffThread()
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
       this.submitted.emit();
