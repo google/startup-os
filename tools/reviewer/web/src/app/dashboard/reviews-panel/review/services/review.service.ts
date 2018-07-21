@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { Diff, Reviewer, AuthService } from '@/shared';
+import { AuthService } from '@/shared/services';
+import { Diff, Reviewer } from '@/shared/shell';
 
 @Injectable()
 export class ReviewService {

@@ -12,10 +12,10 @@ import {
   LineNumbersComponent,
   ReplyPopupComponent,
   ReviewComponent,
-  ReviewService,
   ReviewDiscussionComponent,
   ReviewerListComponent,
   ReviewFilesComponent,
+  ReviewService,
   ReviewsPanelComponent,
   ReviewTitlebarComponent,
 } from './reviews-panel/';

@@ -2,23 +2,25 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import {
   AuthService,
-  Author,
-  Comment,
   FirebaseService,
   NotificationService,
+} from '@/shared/services';
+import {
+  Author,
+  Comment,
+  Diff,
   Reviewer,
   Thread,
-} from '@/shared';
-import { Diff } from '@/shared';
+} from '@/shared/shell';
 import { ReviewService } from '../../services';
 
 @Component({
-  selector: 'cr-reply-popup',
+  selector: 'reply-popup',
   templateUrl: './reply-popup.component.html',
   styleUrls: ['./reply-popup.component.scss'],
 })
 export class ReplyPopupComponent {
-  message: string;
+  message: string = '';
   approved: boolean = false;
   actionRequired: boolean = false;
   @Input() diff: Diff;

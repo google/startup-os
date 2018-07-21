@@ -1,11 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { FirebaseService, NotificationService } from '@/shared/services';
-
 import {
   AuthService,
-} from '@/shared/services';
-import { Diff, Author } from '@/shared/shell';
+  FirebaseService,
+  NotificationService } from '@/shared/services';
+import { Author, Diff } from '@/shared/shell';
 import { statusList } from './status-ui';
 
 @Component({
