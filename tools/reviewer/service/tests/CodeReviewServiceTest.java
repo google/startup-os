@@ -61,26 +61,26 @@ import com.google.startupos.common.repo.Protos.File.Action;
 import javax.inject.Singleton;
 
 /*
-* Unit tests for {@link CodeReviewService}.
-*
-* There are 5 file modes: ADD, DELETE, RENAME, MODIFY and COPY
-* We separate the tests into these modes.
-*
-* Any mode:
-* - Committed, workspace exists - Committed, workspace doesn't exist
-* - Committed, workspace doesn't exist (pushed)
-* - Head
-*
-* ADD:
-* - Locally modified, workspace exists, new file
-* - Locally modified, workspace doesn't exist, new file
-*
-* MODIFY, RENAME, COPY:
-* - Locally modified, workspace exists, previously committed
-*
-* DELETE:
-* - Any deleted file should return ""
-*/
+ * Unit tests for {@link CodeReviewService}.
+ *
+ * There are 5 file modes: ADD, DELETE, RENAME, MODIFY and COPY
+ * We separate the tests into these modes.
+ *
+ * Any mode:
+ * - Committed, workspace exists - Committed, workspace doesn't exist
+ * - Committed, workspace doesn't exist (pushed)
+ * - Head
+ *
+ * ADD:
+ * - Locally modified, workspace exists, new file
+ * - Locally modified, workspace doesn't exist, new file
+ *
+ * MODIFY, RENAME, COPY:
+ * - Locally modified, workspace exists, previously committed
+ *
+ * DELETE:
+ * - Any deleted file should return ""
+ */
 @RunWith(JUnit4.class)
 public class CodeReviewServiceTest {
   private static final String TEST_FILE = "test_file.txt";
