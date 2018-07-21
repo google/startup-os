@@ -64,6 +64,8 @@ public class CodeReviewServiceTest {
 
   private GitRepoFactory gitRepoFactory;
   private String aaBaseFolder;
+  private String repoPath;
+  private GitRepo repo;
   private FileUtils fileUtils;
   private TextDifferencer textDifferencer;
   TestComponent component;
@@ -120,6 +122,8 @@ public class CodeReviewServiceTest {
     WorkspaceCommand workspaceCommand = component.getWorkspaceCommand();
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
+    repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    repo = gitRepoFactory.create(repoPath);
   }
 
   private void createBlockingStub() throws IOException {
@@ -173,11 +177,14 @@ public class CodeReviewServiceTest {
         .build();
   }
 
+  void writeFile(String contents) {
+    fileUtils.writeStringUnchecked(
+        contents, fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
+  }
+
   @Test
   public void testTextDiff_untrackedlocallyModifiedFile() throws Exception {
-    fileUtils.writeStringUnchecked(
-        TEST_FILE_CONTENTS,
-        fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
+    writeFile(TEST_FILE_CONTENTS);
     File file =
         File.newBuilder()
             .setRepoId("startup-os")
@@ -193,9 +200,7 @@ public class CodeReviewServiceTest {
 
   @Test
   public void testTextDiff_committedFile() throws Exception {
-    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoPath, TEST_FILE));
-    GitRepo repo = gitRepoFactory.create(repoPath);
+    writeFile(TEST_FILE_CONTENTS);
     Commit commit = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
 
     File file =
@@ -214,11 +219,9 @@ public class CodeReviewServiceTest {
 
   @Test
   public void testTextDiff_committedModifiedFile() throws Exception {
-    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoPath, TEST_FILE));
-    GitRepo repo = gitRepoFactory.create(repoPath);
+    writeFile(TEST_FILE_CONTENTS);
     Commit commit = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    fileUtils.writeStringUnchecked("Some changes", fileUtils.joinPaths(repoPath, TEST_FILE));
+    writeFile("Some changes");
 
     File file =
         File.newBuilder()
