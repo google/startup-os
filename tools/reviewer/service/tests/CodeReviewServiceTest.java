@@ -101,6 +101,22 @@ public class CodeReviewServiceTest {
     createBlockingStub();
   }
 
+  @Singleton
+  @Component(modules = {CommonModule.class, AaModule.class})
+  interface TestComponent {
+    CodeReviewService getCodeReviewService();
+
+    GitRepoFactory getFactory();
+
+    InitCommand getInitCommand();
+
+    WorkspaceCommand getWorkspaceCommand();
+
+    FileUtils getFileUtils();
+
+    TextDifferencer getTextDifferencer();
+  }
+
   private void createInitialRepo(String initialRepoFolder) {
     fileUtils.mkdirs(initialRepoFolder);
     GitRepo repo = gitRepoFactory.create(initialRepoFolder);
@@ -141,22 +157,6 @@ public class CodeReviewServiceTest {
 
   public String joinPaths(String first, String... more) {
     return FileSystems.getDefault().getPath(first, more).toAbsolutePath().toString();
-  }
-
-  @Singleton
-  @Component(modules = {CommonModule.class, AaModule.class})
-  interface TestComponent {
-    CodeReviewService getCodeReviewService();
-
-    GitRepoFactory getFactory();
-
-    InitCommand getInitCommand();
-
-    WorkspaceCommand getWorkspaceCommand();
-
-    FileUtils getFileUtils();
-
-    TextDifferencer getTextDifferencer();
   }
 
   private String getWorkspaceFolder(String workspace) {
