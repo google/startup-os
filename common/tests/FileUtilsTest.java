@@ -228,7 +228,42 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     fileUtils.writeString("hello world", TEST_FILE_PATH);
-    assertTrue(Files.readAllLines(testPath, UTF_8).contains("hello world"));
+    assertEquals(Arrays.asList("hello world"), Files.readAllLines(testPath, UTF_8));
+  }
+
+  @Test
+  public void testWriteStringOneLineWithNewLine() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    fileUtils.writeString("hello world" + System.lineSeparator(), TEST_FILE_PATH);
+    assertEquals(Arrays.asList("hello world", ""), Files.readAllLines(testPath, UTF_8));
+  }
+
+  @Test
+  public void testWriteStringOneLineWithTwoNewLinesInTheEnd() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    fileUtils.writeString(
+        "hello world" + System.lineSeparator() + System.lineSeparator(), TEST_FILE_PATH);
+    assertEquals(Arrays.asList("hello world", "", ""), Files.readAllLines(testPath, UTF_8));
+  }
+
+  @Test
+  public void testWriteStringTwoLinesWithNewLines() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    Files.createDirectories(testPath.getParent());
+    fileUtils.writeString(
+        "first line" + System.lineSeparator() + "second line" + System.lineSeparator(),
+        TEST_FILE_PATH);
+    assertEquals(
+        Arrays.asList("first line", "second line", ""), Files.readAllLines(testPath, UTF_8));
   }
 
   @Test
@@ -240,8 +275,7 @@ public class FileUtilsTest {
     Files.createDirectories(testPath.getParent());
     Files.write(testPath, ImmutableList.of("first line"), UTF_8);
     fileUtils.writeString("second line", TEST_FILE_PATH);
-    assertTrue(Files.readAllLines(testPath, UTF_8).contains("second line"));
-    assertFalse(Files.readAllLines(testPath, UTF_8).contains("first line"));
+    assertEquals(Arrays.asList("second line"), Files.readAllLines(testPath, UTF_8));
   }
 
   @Test
@@ -251,7 +285,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_DIR_PATH);
     fileUtils.writeString("hello world", TEST_DIR_PATH);
-    assertTrue(Files.readAllLines(testPath, UTF_8).contains("hello world"));
+    assertEquals(Arrays.asList("hello world"), Files.readAllLines(testPath, UTF_8));
   }
 
   @Test
@@ -261,7 +295,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath("/foo.txt");
     fileUtils.writeString("hello world", "/foo.txt");
-    assertTrue(Files.readAllLines(testPath, UTF_8).contains("hello world"));
+    assertEquals(Arrays.asList("hello world"), Files.readAllLines(testPath, UTF_8));
   }
 
   @Test(expected = RuntimeException.class)
@@ -291,9 +325,24 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(testPath, ImmutableList.of("first line\n"), UTF_8);
+    Files.write(testPath, ImmutableList.of("first line" + System.lineSeparator()), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("first line\n", content);
+    assertEquals("first line" + System.lineSeparator(), content);
+  }
+
+  @Test
+  public void testReadFileWhenOneLineWithTwoNewLinesInTheEnd() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Path testPath = fileSystem.getPath(TEST_FILE_PATH);
+    Files.createDirectories(testPath.getParent());
+    Files.write(
+        testPath,
+        ImmutableList.of("first line" + System.lineSeparator() + System.lineSeparator()),
+        UTF_8);
+    String content = fileUtils.readFile(TEST_FILE_PATH);
+    assertEquals("first line" + System.lineSeparator() + System.lineSeparator(), content);
   }
 
   @Test
@@ -305,7 +354,7 @@ public class FileUtilsTest {
     Files.createDirectories(testPath.getParent());
     Files.write(testPath, ImmutableList.of("first line", "second line"), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("first line\nsecond line", content);
+    assertEquals("first line" + System.lineSeparator() + "second line", content);
   }
 
   @Test
@@ -315,9 +364,11 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(testPath, ImmutableList.of("first line", "second line\n"), UTF_8);
+    Files.write(
+        testPath, ImmutableList.of("first line", "second line" + System.lineSeparator()), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("first line\nsecond line\n", content);
+    assertEquals(
+        "first line" + System.lineSeparator() + "second line" + System.lineSeparator(), content);
   }
 
   @Test
@@ -339,9 +390,9 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(testPath, ImmutableList.of("\n"), UTF_8);
+    Files.write(testPath, ImmutableList.of(System.lineSeparator()), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("\n", content);
+    assertEquals(System.lineSeparator(), content);
   }
 
   @Test(expected = RuntimeException.class)
