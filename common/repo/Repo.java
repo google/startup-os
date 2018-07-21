@@ -38,6 +38,8 @@ public interface Repo {
   ImmutableList<Commit> getCommits(String branch);
   /** Gets all uncommited files. This includes new, modified and deleted files. */
   ImmutableList<File> getUncommittedFiles();
+  /** Does commit exist. */
+  boolean commitExists(String commitId);
   /** Gets files in commit. */
   ImmutableList<File> getFilesInCommit(String commitId);
   /** Commits files to current branch and returns commit */

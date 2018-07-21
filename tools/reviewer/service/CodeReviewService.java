@@ -30,7 +30,7 @@ import com.google.startupos.tools.reviewer.service.Protos.Author;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
-import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Protos.File.Action;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.FileResponse;
 import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
@@ -51,6 +51,7 @@ import javax.inject.Singleton;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.repo.Protos.File;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -84,13 +85,20 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     this.textDifferencer = textDifferencer;
   }
 
+  private Repo getHeadRepo(String repoId) {
+    String repoPath = fileUtils.joinPaths(basePath, "head", repoId);
+    return repoFactory.create(repoPath);
+  }
+
   private String readTextFile(File file) throws IOException {
+    if (file.getAction() == Action.DELETE) {
+      return "";
+    }
     try {
       if (file.getWorkspace().isEmpty()) {
         // It's a file in head
-        String repoPath = fileUtils.joinPaths(basePath, "head", file.getRepoId());
-        Repo repo = repoFactory.create(repoPath);
-        return repo.getFileContents(file.getCommitId(), file.getFilename());
+        return getHeadRepo(file.getRepoId())
+            .getFileContents(file.getCommitId(), file.getFilename());
       } else {
         // It's a file in a workspace
         if (file.getUser().isEmpty()) {
@@ -103,10 +111,24 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
             return fileUtils.readFile(filePath);
           } else {
             // It's a file in a repo
-            String repoPath =
-                fileUtils.joinPaths(basePath, "ws", file.getWorkspace(), file.getRepoId());
-            Repo repo = repoFactory.create(repoPath);
-            return repo.getFileContents(file.getCommitId(), file.getFilename());
+            if (workspaceExists(file.getWorkspace())) {
+              String repoPath =
+                  fileUtils.joinPaths(basePath, "ws", file.getWorkspace(), file.getRepoId());
+              Repo repo = repoFactory.create(repoPath);
+              return repo.getFileContents(file.getCommitId(), file.getFilename());
+            } else {
+              // Workspace doesn't exist, try to read from head repo
+              if (!getHeadRepo(file.getRepoId()).commitExists(file.getCommitId())) {
+                logger
+                    .atInfo()
+                    .log(
+                        "Workspace %s doesn't exist, and commit %s doesn't exist in head repo",
+                        file.getWorkspace(), file.getCommitId());
+                return "";
+              }
+              file = file.toBuilder().clearWorkspace().build();
+              return readTextFile(file);
+            }
           }
         } else {
           // It's another user
@@ -133,14 +155,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
         }
       }
     } catch (RuntimeException e) {
-      if (!file.getCommitId().isEmpty() && !file.getWorkspace().isEmpty()) {
-        file = file.toBuilder().clearWorkspace().build();
-        logger.atInfo().log("File not found, trying at head with:\n" + file);
-        return readTextFile(file);
-      } else {
-        logger.atSevere().withCause(e).log("readTextFile failed for:\n" + file);
-        return "";
-      }
+      logger.atSevere().withCause(e).log("readTextFile failed for:\n" + file);
+      return "";
     }
   }
 
@@ -256,6 +272,10 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     return fileUtils.joinPaths(basePath, "ws", workspace);
   }
 
+  boolean workspaceExists(String workspace) {
+    return fileUtils.folderExists(getWorkspacePath(workspace));
+  }
+
   @Override
   public void getDiffFiles(
       DiffFilesRequest request, StreamObserver<DiffFilesResponse> responseObserver) {
@@ -267,18 +287,18 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               .asRuntimeException());
       return;
     }
-    String workspacePath = getWorkspacePath(request.getWorkspace());
-    // Needs to be final for lambda; can also be set to base/head
-    String workspacePathFinal;
+    String workspacePath;
     String workspace;
     String branch;
-    if (fileUtils.folderExists(workspacePath)) {
-      workspacePathFinal = workspacePath;
+    if (workspaceExists(request.getWorkspace())) {
+      workspacePath = getWorkspacePath(request.getWorkspace());
       workspace = request.getWorkspace();
       branch = "D" + request.getDiffId();
     } else {
-      logger.atInfo().log("Workspace does not exist at %s. Fallbacking to head.", workspacePath);
-      workspacePathFinal = fileUtils.joinPaths(basePath, "head");
+      logger
+          .atInfo()
+          .log("Workspace %s does not exist. Fallbacking to head.", request.getWorkspace());
+      workspacePath = fileUtils.joinPaths(basePath, "head");
       workspace = "";
       branch = "remotes/origin/D" + request.getDiffId();
     }
@@ -286,9 +306,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
     try {
       fileUtils
-          .listContents(workspacePathFinal)
+          .listContents(workspacePath)
           .stream()
-          .map(path -> fileUtils.joinPaths(workspacePathFinal, path))
+          .map(path -> fileUtils.joinPaths(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
