@@ -44,3 +44,22 @@ java_test(
         "//third_party/maven/junit",
     ],
 )
+
+java_binary(
+    name = "text_differencer_tool",
+    srcs = [
+        "TextDifferencerTool.java",
+    ],
+    main_class = "com.google.startupos.common.tests.TextDifferencerTool",
+    deps = [
+        "//common",
+        "//common:dagger_with_annotation_processor",
+        "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/slf4j:slf4j_simple",
+        "//common:text_differencer",
+        "//common:text_difference_java_proto",
+        "//common:diff_match_patch",
+    ],
+)
