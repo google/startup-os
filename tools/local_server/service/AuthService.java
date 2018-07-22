@@ -47,11 +47,8 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
   private static final String REFRESH_TOKEN = "https://securetoken.googleapis.com/v1/token?key=%s";
 
-  @FlagDesc(
-    name = "debug_token_mode",
-    description = "Make it easy to debug by storing and reading the token from disk"
-  )
-  private static final Flag<Boolean> debugTokenMode = Flag.create(false);
+  @FlagDesc(name = "disk_token_mode", description = "Read and write token to disk")
+  private static final Flag<Boolean> diskTokenMode = Flag.create(true);
 
   private static final String DEBUGGING_TOKEN_PATH = "~/aa_token";
 
@@ -70,7 +67,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   @Inject
   AuthService(FileUtils fileUtils) {
     this.fileUtils = fileUtils;
-    if (debugTokenMode.get() && fileUtils.fileExists(DEBUGGING_TOKEN_PATH)) {
+    if (diskTokenMode.get() && fileUtils.fileExists(DEBUGGING_TOKEN_PATH)) {
       AuthDataRequest req =
           (AuthDataRequest)
               fileUtils.readProtoBinaryUnchecked(
@@ -97,7 +94,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       responseObserver.onNext(AuthDataResponse.getDefaultInstance());
       responseObserver.onCompleted();
       logger.atInfo().log("Received token for project " + projectId);
-      if (debugTokenMode.get()) {
+      if (diskTokenMode.get()) {
         fileUtils.writeProtoBinaryUnchecked(req, DEBUGGING_TOKEN_PATH);
       }
     } catch (SecurityException e) {
