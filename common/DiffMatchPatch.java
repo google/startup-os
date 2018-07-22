@@ -1,4 +1,7 @@
 /*
+ * Copyright 2018 The StartupOS Authors.
+ * First line just added temporarily, see TODO below.
+ *
  * Diff Match and Patch
  * Copyright 2018 The diff-match-patch Authors.
  * https://github.com/google/diff-match-patch
