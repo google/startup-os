@@ -18,8 +18,8 @@ package com.google.startupos.common;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.TextChange.Type;
-import name.fraser.neil.plaintext.DiffMatchPatch;
-import name.fraser.neil.plaintext.DiffMatchPatch.Operation;
+import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
+import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

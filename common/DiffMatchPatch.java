@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package name.fraser.neil.plaintext;
+package com.google.startupos.name.fraser.neil.plaintext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
