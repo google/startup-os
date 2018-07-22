@@ -19,6 +19,7 @@ java_library(
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
+        "//third_party/maven/io/opencensus:opencensus_api",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
         "//tools/aa:config_java_proto",
