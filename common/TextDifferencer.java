@@ -29,7 +29,6 @@ import javax.inject.Inject;
 import javax.swing.text.Segment;
 import java.util.LinkedList;
 
-
 /** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */
 public class TextDifferencer {
 
@@ -51,9 +50,8 @@ public class TextDifferencer {
     int firstIndex = 0;
     int secondIndex = 0;
     for (DiffMatchPatch.Diff diff : diffs) {
-      TextChange.Builder textChange = TextChange.newBuilder()
-          .setText(diff.text)
-          .setType(getType(diff.operation));
+      TextChange.Builder textChange =
+          TextChange.newBuilder().setText(diff.text).setType(getType(diff.operation));
       if (diff.operation == Operation.EQUAL) {
         textChange.setFirstStringIndex(firstIndex);
         textChange.setSecondStringIndex(secondIndex);

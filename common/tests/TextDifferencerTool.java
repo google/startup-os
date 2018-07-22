@@ -32,7 +32,6 @@ import name.fraser.neil.plaintext.DiffMatchPatch;
 import name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import java.util.LinkedList;
 
-
 /** A tool for testing TextDifferencer. */
 @Singleton
 public class TextDifferencerTool {
@@ -44,7 +43,7 @@ public class TextDifferencerTool {
 
   private FileUtils fileUtils;
   private TextDifferencer textDifferencer;
- 
+
   @Inject
   TextDifferencerTool(FileUtils fileUtils, TextDifferencer textDifferencer) {
     this.fileUtils = fileUtils;
@@ -54,8 +53,9 @@ public class TextDifferencerTool {
   void run() throws IOException {
     String leftFileContents = fileUtils.readFile(leftFile.get());
     String rightFileContents = fileUtils.readFile(rightFile.get());
-    
-    for (TextChange textChange : textDifferencer.getAllTextChanges(leftFileContents, rightFileContents)) {
+
+    for (TextChange textChange :
+        textDifferencer.getAllTextChanges(leftFileContents, rightFileContents)) {
       System.out.println(textChange);
     }
   }
