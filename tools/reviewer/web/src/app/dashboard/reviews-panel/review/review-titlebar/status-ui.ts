@@ -1,13 +1,13 @@
 import { Diff } from '@/shared/shell';
 
-interface StatusUI {
+export interface StatusUI {
   label: string;
   icon: string;
   spanClass?: string;
   iconClass: string;
 }
 
-export const statusList: StatusUI[] = [];
+export const statusList: Array<StatusUI> = [];
 
 statusList[Diff.Status.REVIEW_NOT_STARTED] = {
   label: 'Review Not Started',

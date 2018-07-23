@@ -16,7 +16,7 @@ import { ReviewService } from '../services';
 })
 export class ReviewerListComponent implements OnInit {
   // To show editable fields
-  isEditing = false;
+  isEditing: boolean = false;
   usernames: string = '';
 
   @Input() diff: Diff;

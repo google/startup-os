@@ -10,7 +10,7 @@ export class ReviewService {
 
   getReviewerWithTheUsername(diff: Diff, username: string): Reviewer {
     for (const reviewer of diff.getReviewerList()) {
-      const reviewerUsername = this.authService
+      const reviewerUsername: string = this.authService
         .getUsername(reviewer.getEmail());
 
       if (reviewerUsername === username) {

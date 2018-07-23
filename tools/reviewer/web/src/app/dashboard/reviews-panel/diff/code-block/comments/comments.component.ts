@@ -19,9 +19,9 @@ import { DiffService } from '../../diff.service';
   styleUrls: ['./comments.component.scss'],
 })
 export class CommentsComponent implements OnInit {
-  textareaControl = new FormControl();
-  private componentHeightChanges = new Subject<number>();
-  private onChanges = new Subject<number>();
+  textareaControl: FormControl = new FormControl();
+  private componentHeightChanges: Subject<number> = new Subject<number>();
+  private onChanges: Subject<number> = new Subject<number>();
 
   @ViewChild('commentsRef') commentsElementRef: ElementRef;
   @ViewChild('textareaRef') textareaElementRef: ElementRef;
@@ -89,7 +89,7 @@ export class CommentsComponent implements OnInit {
   }
 
   addComment(): void {
-    const comment = new Comment();
+    const comment: Comment = new Comment();
     comment.setContent(this.textareaControl.value);
     comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());

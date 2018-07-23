@@ -19,6 +19,12 @@
       "check-typecast",
       "check-preblock"
     ],
+    "typedef": [
+      true,
+      "parameter",
+      "variable-declaration",
+      "member-variable-declaration"
+    ],
     "typedef-whitespace": [
       true,
       {

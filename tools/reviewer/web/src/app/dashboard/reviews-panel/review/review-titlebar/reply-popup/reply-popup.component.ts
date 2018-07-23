@@ -24,7 +24,7 @@ export class ReplyPopupComponent {
   approved: boolean = false;
   actionRequired: boolean = false;
   @Input() diff: Diff;
-  @Output() submitted = new EventEmitter<boolean>();
+  @Output() submitted: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(
     private authService: AuthService,
