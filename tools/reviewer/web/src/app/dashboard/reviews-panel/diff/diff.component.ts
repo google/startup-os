@@ -35,7 +35,7 @@ export class DiffComponent implements OnInit, OnDestroy {
   localThreads: Thread[];
   diff: Diff;
   newCommentSubscription: Subscription;
-  file = new File();
+  file: File = new File();
   branchInfo: BranchInfo;
 
   constructor(
@@ -103,7 +103,7 @@ export class DiffComponent implements OnInit, OnDestroy {
       .getCommitList()[0]
       .getId();
 
-    const leftFile = new File();
+    const leftFile: File = new File();
     leftFile.setCommitId(leftCommitId);
     leftFile.setFilename(currentFile.getFilename());
     leftFile.setRepoId(this.branchInfo.getRepoId());
@@ -144,7 +144,7 @@ export class DiffComponent implements OnInit, OnDestroy {
   }
 
   createNewThread(lineNumber: number, comments: Comment[]): Thread {
-    const newThread = new Thread();
+    const newThread: Thread = new Thread();
     newThread.setLineNumber(lineNumber);
     newThread.setIsDone(false);
     newThread.setCommentList(comments);

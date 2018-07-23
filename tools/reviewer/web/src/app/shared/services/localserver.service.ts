@@ -25,7 +25,7 @@ export class LocalserverService {
   getBranchInfo(id: number, workspace: string): Observable<BranchInfo> {
     return new Observable(observer => {
       // Create diff files request
-      const diffFilesRequest = new DiffFilesRequest();
+      const diffFilesRequest: DiffFilesRequest = new DiffFilesRequest();
       diffFilesRequest.setDiffId(id);
       diffFilesRequest.setWorkspace(workspace);
       const requestBinary: Uint8Array = diffFilesRequest.serializeBinary();
@@ -62,7 +62,7 @@ export class LocalserverService {
   ): Observable<TextDiffResponse> {
     return new Observable(observer => {
       // Create text diff request
-      const textDiffRequest = new TextDiffRequest();
+      const textDiffRequest: TextDiffRequest = new TextDiffRequest();
       textDiffRequest.setLeftFile(leftFile);
       textDiffRequest.setRightFile(rightFile);
       const requestBinary: Uint8Array = textDiffRequest.serializeBinary();
@@ -97,7 +97,7 @@ export class LocalserverService {
   }
 
   getFilesFromBranchInfo(branchInfo: BranchInfo): File[] {
-    const fileDictionary = new Dictionary<File>();
+    const fileDictionary: Dictionary<File> = new Dictionary<File>();
     for (const commit of branchInfo.getCommitList()) {
       this.addWithReplace(fileDictionary, commit.getFileList());
     }
