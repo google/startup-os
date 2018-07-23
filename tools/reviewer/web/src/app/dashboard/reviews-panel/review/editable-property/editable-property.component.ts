@@ -16,7 +16,7 @@ export class EditablePropertyComponent {
   @Input() editable: boolean = true;
 
   // To show editable fields
-  showEditableProperty = false;
+  showEditableProperty: boolean = false;
 
   // Following variable is used in editing the fields
   propertyValue: string = '';
