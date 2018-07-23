@@ -239,7 +239,7 @@ public class FileUtilsTest {
       return;
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
-    fileUtils.writeString("hello world" + System.lineSeparator(), TEST_FILE_PATH);
+    fileUtils.writeString("hello world\n", TEST_FILE_PATH);
     assertEquals(Arrays.asList("hello world", ""), Files.readAllLines(testPath, UTF_8));
   }
 
@@ -249,8 +249,7 @@ public class FileUtilsTest {
       return;
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
-    fileUtils.writeString(
-        "hello world" + System.lineSeparator() + System.lineSeparator(), TEST_FILE_PATH);
+    fileUtils.writeString("hello world\n\n", TEST_FILE_PATH);
     assertEquals(Arrays.asList("hello world", "", ""), Files.readAllLines(testPath, UTF_8));
   }
 
@@ -261,9 +260,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    fileUtils.writeString(
-        "first line" + System.lineSeparator() + "second line" + System.lineSeparator(),
-        TEST_FILE_PATH);
+    fileUtils.writeString("first line\n" + "second line\n", TEST_FILE_PATH);
     assertEquals(
         Arrays.asList("first line", "second line", ""), Files.readAllLines(testPath, UTF_8));
   }
@@ -327,9 +324,9 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(testPath, ImmutableList.of("first line" + System.lineSeparator()), UTF_8);
+    Files.write(testPath, ImmutableList.of("first line\n"), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("first line" + System.lineSeparator(), content);
+    assertEquals("first line\n", content);
   }
 
   @Test
@@ -339,12 +336,9 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(
-        testPath,
-        ImmutableList.of("first line" + System.lineSeparator() + System.lineSeparator()),
-        UTF_8);
+    Files.write(testPath, ImmutableList.of("first line\n\n"), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("first line" + System.lineSeparator() + System.lineSeparator(), content);
+    assertEquals("first line\n\n", content);
   }
 
   @Test
@@ -356,7 +350,7 @@ public class FileUtilsTest {
     Files.createDirectories(testPath.getParent());
     Files.write(testPath, ImmutableList.of("first line", "second line"), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals("first line" + System.lineSeparator() + "second line", content);
+    assertEquals("first line\n" + "second line", content);
   }
 
   @Test
@@ -366,11 +360,9 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(
-        testPath, ImmutableList.of("first line", "second line" + System.lineSeparator()), UTF_8);
+    Files.write(testPath, ImmutableList.of("first line", "second line\n"), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals(
-        "first line" + System.lineSeparator() + "second line" + System.lineSeparator(), content);
+    assertEquals("first line\n" + "second line\n", content);
   }
 
   @Test
@@ -392,9 +384,9 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    Files.write(testPath, ImmutableList.of(System.lineSeparator()), UTF_8);
+    Files.write(testPath, ImmutableList.of("\n"), UTF_8);
     String content = fileUtils.readFile(TEST_FILE_PATH);
-    assertEquals(System.lineSeparator(), content);
+    assertEquals("\n", content);
   }
 
   @Test(expected = RuntimeException.class)

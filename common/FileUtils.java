@@ -80,7 +80,8 @@ public class FileUtils {
     String fileContent = TextFormat.printToUnicodeString(proto);
     if (!fileContent.isEmpty()) {
       String lastSymbol = fileContent.substring(fileContent.length() - 1);
-      if (lastSymbol.equals(System.lineSeparator())) {
+      // TODO: Add support for '/r/n' for Windows.
+      if (lastSymbol.equals("\n")) {
         fileContent = fileContent.substring(0, fileContent.length() - 1);
       }
     }
@@ -104,10 +105,9 @@ public class FileUtils {
     }
     if (!text.isEmpty()) {
       String lastSymbol = text.substring(text.length() - 1);
-      if (lastSymbol.equals(System.lineSeparator())) {
-        Files.write(
-            fileSystem.getPath(expandHomeDirectory(path)),
-            (text + System.lineSeparator()).getBytes(UTF_8));
+      // TODO: Add support for '/r/n' for Windows.
+      if (lastSymbol.equals("\n")) {
+        Files.write(fileSystem.getPath(expandHomeDirectory(path)), (text + "\n").getBytes(UTF_8));
         return;
       }
     }
@@ -210,9 +210,8 @@ public class FileUtils {
       return "";
     } else {
       String lastLine = lines.get(lines.size() - 1);
-      return lastLine.equals(System.lineSeparator())
-          ? String.join(System.lineSeparator(), lines) + System.lineSeparator()
-          : String.join(System.lineSeparator(), lines);
+      // TODO: Add support for '/r/n' for Windows.
+      return lastLine.equals("\n") ? String.join("\n", lines) + "\n" : String.join("\n", lines);
     }
   }
 
