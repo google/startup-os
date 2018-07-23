@@ -58,8 +58,6 @@ public class GitRepoTest {
     repo = gitRepo;
     // We need one commit to make the repo have a master branch.
     repo.commit(repo.getUncommittedFiles(), "Initial commit");
-    // We need another initial commit so that master~1 is defined.
-    repo.commit(repo.getUncommittedFiles(), "Initial commit2");
   }
 
   @Singleton
@@ -112,18 +110,16 @@ public class GitRepoTest {
     String commitId = gitRepo.getCommitIds(TEST_BRANCH).get(1);
     assertEquals(
         ImmutableList.of(
-          Commit.newBuilder()
-          .setId(lastMasterCommitId)
-          .build(),
-          Commit.newBuilder()
-              .setId(commitId)
-              .addFile(
-                  File.newBuilder()
-                      .setAction(File.Action.ADD)
-                      .setCommitId(commitId)
-                      .setFilename(TEST_FILE)
-                      .build())
-              .build()),
+            Commit.newBuilder().setId(lastMasterCommitId).build(),
+            Commit.newBuilder()
+                .setId(commitId)
+                .addFile(
+                    File.newBuilder()
+                        .setAction(File.Action.ADD)
+                        .setCommitId(commitId)
+                        .setFilename(TEST_FILE)
+                        .build())
+                .build()),
         repo.getCommits(TEST_BRANCH));
   }
 
@@ -139,9 +135,7 @@ public class GitRepoTest {
     String commitId2 = gitRepo.getCommitIds(TEST_BRANCH).get(2);
     assertEquals(
         ImmutableList.of(
-            Commit.newBuilder()
-                .setId(lastMasterCommit)
-                .build(),
+            Commit.newBuilder().setId(lastMasterCommit).build(),
             Commit.newBuilder()
                 .setId(commitId1)
                 .addFile(

@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.simple_formatter;
+// TODO: refactor getting the formatter for file
+
+package com.google.startupos.tools.formatter;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.googlejavaformat.java.Formatter;
@@ -34,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class SimpleFormatterTool {
+class FormatterTool {
 
   static String readFile(Path path) throws IOException {
     return String.join(System.lineSeparator(), Files.readAllLines(path));
@@ -51,10 +53,6 @@ class SimpleFormatterTool {
   static class JavaFormatter implements BaseFormatter {
 
     static Formatter javaFormatter = new Formatter();
-
-    static JavaFormatter init() {
-      return new JavaFormatter();
-    }
 
     @Override
     public void format(Path path) throws IOException {
@@ -74,10 +72,6 @@ class SimpleFormatterTool {
 
   static class PythonFormatter implements BaseFormatter {
 
-    static PythonFormatter init() {
-      return new PythonFormatter();
-    }
-
     @Override
     public void format(Path path) throws IOException {
       execute("yapf -i " + path.toAbsolutePath().toString());
@@ -86,13 +80,19 @@ class SimpleFormatterTool {
 
   static class ClangFormatter implements BaseFormatter {
 
-    static ClangFormatter init() {
-      return new ClangFormatter();
-    }
-
     @Override
     public void format(Path path) throws IOException {
       execute("clang-format -i " + path.toAbsolutePath().toString());
+    }
+  }
+
+  static class BuildFormatter implements BaseFormatter {
+
+    @Override
+    public void format(Path path) throws IOException {
+      String command =
+          "/usr/bin/env bash " + "tools/buildtools_wrappers/buildifier.sh -mode=fix " + "%s";
+      execute(String.format(command, path.toAbsolutePath().toString()));
     }
   }
 
@@ -114,6 +114,9 @@ class SimpleFormatterTool {
   @FlagDesc(name = "cpp", description = "Format C++ (*.cc) files")
   private static final Flag<Boolean> cpp = Flag.create(false);
 
+  @FlagDesc(name = "build", description = "Format bazel BUILD files")
+  private static final Flag<Boolean> build = Flag.create(false);
+
   @FlagDesc(name = "ignore_directories", description = "Ignored directories, split by comma")
   private static final Flag<String> ignoreDirectories = Flag.create("");
 
@@ -133,6 +136,11 @@ class SimpleFormatterTool {
     return getExtension(file).equals(".cc");
   }
 
+  private static boolean isBuild(Path file) {
+    return file.getFileName().toString().equals("BUILD")
+        || file.getFileName().toString().equals("BUILD.bazel");
+  }
+
   private static String getExtension(Path file) {
     String filename = file.getFileName().toString();
     int dotIndex = filename.lastIndexOf('.');
@@ -147,21 +155,25 @@ class SimpleFormatterTool {
         ((isJava(file) && java.get())
             || (isProto(file) && proto.get())
             || (isPython(file) && python.get())
-            || (isCpp(file) && cpp.get()));
+            || (isCpp(file) && cpp.get())
+            || (isBuild(file) && build.get()));
     boolean inIgnoredDirectory =
         ignoredDirectories.stream().anyMatch(ignoredDir -> file.startsWith(ignoredDir));
     return formatByExtension && !inIgnoredDirectory;
   }
 
   private static Map<String, BaseFormatter> formatters =
-      ImmutableMap.of(
-          ".java", JavaFormatter.init(),
-          ".proto", ClangFormatter.init(),
-          ".py", PythonFormatter.init(),
-          ".cc", ClangFormatter.init());
+      ImmutableMap.<String, BaseFormatter>builder()
+          .put(".java", new JavaFormatter())
+          .put(".proto", new ClangFormatter())
+          .put(".py", new PythonFormatter())
+          .put(".cc", new ClangFormatter())
+          .put(".bazel", new BuildFormatter())
+          .put("", new BuildFormatter())
+          .build();
 
   public static void main(String[] args) {
-    Flags.parse(args, SimpleFormatterTool.class.getPackage());
+    Flags.parse(args, FormatterTool.class.getPackage());
 
     Set<Path> ignoredDirectories =
         Stream.of(ignoreDirectories.get().split(","))

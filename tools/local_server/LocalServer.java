@@ -17,11 +17,14 @@
 package com.google.startupos.tools.localserver;
 
 import com.google.common.flogger.FluentLogger;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.AaModule;
+import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import dagger.Component;
@@ -30,7 +33,10 @@ import io.grpc.ServerBuilder;
 import io.grpc.protobuf.services.ProtoReflectionService;
 import java.io.IOException;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
@@ -46,7 +52,45 @@ public class LocalServer {
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
   private static final Flag<Integer> localServerPort = Flag.create(8001);
 
+  @FlagDesc(name = "pull_frequency", description = "Frequency of pulling head (in seconds)")
+  private static final Flag<Integer> pullFrequency = Flag.create(60);
+
   private final Server server;
+
+  public static class HeadUpdater extends TimerTask {
+
+    private final FileUtils fileUtils;
+    private final String basePath;
+    private GitRepoFactory repoFactory;
+
+    @Inject
+    public HeadUpdater(
+        FileUtils utils, @Named("Base path") String basePath, GitRepoFactory repoFactory) {
+      this.fileUtils = utils;
+      this.basePath = basePath;
+      this.repoFactory = repoFactory;
+    }
+
+    public void run() {
+      String headPath = fileUtils.joinPaths(this.basePath, "head");
+
+      // Pull all repos in head
+      try {
+        fileUtils
+            .listContents(headPath)
+            .stream()
+            .map(path -> fileUtils.joinPaths(headPath, path))
+            .filter(fileUtils::folderExists)
+            .forEach(
+                path -> {
+                  System.out.println(String.format("[HEAD]: Performing sync: %s", path));
+                  repoFactory.create(path).pull();
+                });
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 
   @Inject
   LocalServer(AuthService authService, CodeReviewService codeReviewService) {
@@ -88,11 +132,15 @@ public class LocalServer {
   @Component(modules = {CommonModule.class, AaModule.class})
   public interface LocalServerComponent {
     LocalServer getLocalServer();
+
+    HeadUpdater getHeadUpdater();
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
     Flags.parse(args, LocalServer.class.getPackage(), CodeReviewService.class.getPackage());
-    LocalServer server = DaggerLocalServer_LocalServerComponent.builder().build().getLocalServer();
+    LocalServerComponent component = DaggerLocalServer_LocalServerComponent.builder().build();
+    LocalServer server = component.getLocalServer();
+    new Timer().scheduleAtFixedRate(component.getHeadUpdater(), 0, pullFrequency.get() * 1000L);
     server.start();
     server.blockUntilShutdown();
   }

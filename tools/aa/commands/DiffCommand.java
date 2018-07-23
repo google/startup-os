@@ -16,7 +16,7 @@
 package com.google.startupos.tools.aa.commands;
 
 import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Empty;
+import com.google.startupos.tools.reviewer.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
