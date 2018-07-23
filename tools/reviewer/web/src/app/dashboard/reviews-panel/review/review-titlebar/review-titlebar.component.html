@@ -9,7 +9,7 @@
       }"
     ><button mat-raised-button 
         class="add-to-list"
-        *ngIf="editable"
+        *ngIf="isEditable"
         (click)="changeAttentionOfAuthor()"
       >
         {{ 
@@ -38,12 +38,22 @@
     fxLayoutGap="20px"
     fxFlex="212px"
     fxLayoutAlign="end end">
-    <!-- TODO: add some action for the buttons -->
     <div class="submit">
       <button>Submit</button>
     </div>
     <div class="reply">
-      <button>Reply</button>
+      <button (click)="isReplyDialogShown = true">Reply</button>
+    </div>
+    <div *ngIf="isReplyDialogShown" class="reply-popup">
+      <div>
+        <reply-popup [diff]="diff" (submitted)="replySubmitted()"></reply-popup>
+      </div>
     </div>
   </div>
+</div>
+
+<div 
+  class="reply-popup-overlay"
+  *ngIf="isReplyDialogShown"
+  (click)="isReplyDialogShown = false">
 </div>

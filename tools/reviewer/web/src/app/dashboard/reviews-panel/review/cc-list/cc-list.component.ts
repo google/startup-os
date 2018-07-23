@@ -53,7 +53,7 @@ export class CCListComponent implements OnInit {
       .forEach(username => {
         this.usernames.push(username);
 
-        let email = this.getCCWithTheUsername(username);
+        let email: string = this.getCCWithTheUsername(username);
         if (!email) {
           email = username + '@gmail.com';
         }

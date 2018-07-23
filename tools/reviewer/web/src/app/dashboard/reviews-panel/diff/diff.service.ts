@@ -23,10 +23,10 @@ export class DiffService {
   private isHoveredNewCode: boolean;
 
   // Subjects, which send data:
-  lineHeightChanges = new Subject<HeightResponse>();
-  openCommentsChanges = new Subject<number>();
-  closeCommentsChanges = new Subject<number>();
-  newComment = new Subject<AddCommentResponse>();
+  lineHeightChanges: Subject<HeightResponse> = new Subject<HeightResponse>();
+  openCommentsChanges: Subject<number> = new Subject<number>();
+  closeCommentsChanges: Subject<number> = new Subject<number>();
+  newComment: Subject<AddCommentResponse> = new Subject<AddCommentResponse>();
 
   // Methods, which receive data:
   setLineHeight(param: HeightResponse): void {
