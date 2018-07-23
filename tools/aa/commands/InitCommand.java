@@ -76,7 +76,7 @@ public class InitCommand implements AaCommand {
         String startupOsPath = fileUtils.joinPaths(basePath.get(), "head", "startup-os");
         System.out.println("Cloning StartupOS into " + startupOsPath);
         GitRepo repo = this.gitRepoFactory.create(startupOsPath);
-        repo.cloneRepo(startuposRepo.get(), startupOsPath);
+        repo.cloneRepo(startuposRepo.get(), fileUtils.joinPaths(startupOsPath, ".git"));
         System.out.println("Completed Cloning");
       } else {
         System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");

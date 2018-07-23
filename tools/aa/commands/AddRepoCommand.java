@@ -75,7 +75,7 @@ public class AddRepoCommand implements AaCommand {
     String repoPath = fileUtils.joinPaths(headPath, repoName);
     System.out.println(String.format("Cloning repo %s into %s", repoName, repoPath));
     GitRepo repo = this.gitRepoFactory.create(repoPath);
-    if (!repo.cloneRepo(url.get(), repoPath)) {
+    if (!repo.cloneRepo(url.get(), fileUtils.joinPaths(repoPath, ".git"))) {
       System.err.println(RED_ERROR + "Could not clone repository");
       return false;
     }
