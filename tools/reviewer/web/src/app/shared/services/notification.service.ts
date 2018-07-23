@@ -18,8 +18,8 @@ export class NotificationService {
 
   snack(
     message: string,
-    action = '',
-    duration = null,
+    action: string = '',
+    duration: number = null,
     status: NotifierStatus,
   ): void {
     if (!message) {
@@ -32,19 +32,27 @@ export class NotificationService {
     });
   }
 
-  success(message, action = '', duration = null): void {
+  success(
+    message: string,
+    action: string = '',
+    duration: number = null,
+  ): void {
     this.snack(message, action, duration, NotifierStatus.success);
   }
 
-  info(message, action = '', duration = null): void {
+  info(message: string, action: string = '', duration: number = null): void {
     this.snack(message, action, duration, NotifierStatus.info);
   }
 
-  warning(message, action = '', duration = null): void {
+  warning(
+    message: string,
+    action: string = '',
+    duration: number = null,
+  ): void {
     this.snack(message, action, duration, NotifierStatus.warning);
   }
 
-  error(message, action = '', duration = null): void {
+  error(message: string, action: string = '', duration: number = null): void {
     this.snack(message, action, duration, NotifierStatus.error);
   }
 }

@@ -155,7 +155,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
       return;
     }
     for (const thread of threads) {
-      const i = thread.getLineNumber();
+      const i: number = thread.getLineNumber();
       this.lines[i].comments = thread.getCommentList();
       this.openCommentsBlock(i);
     }

@@ -10,10 +10,12 @@ import {
   DiffService,
   EditablePropertyComponent,
   LineNumbersComponent,
+  ReplyPopupComponent,
   ReviewComponent,
   ReviewDiscussionComponent,
   ReviewerListComponent,
   ReviewFilesComponent,
+  ReviewService,
   ReviewsPanelComponent,
   ReviewTitlebarComponent,
 } from './reviews-panel/';
@@ -26,6 +28,7 @@ export const DashboardComponents = [
   DiffComponent,
   EditablePropertyComponent,
   LineNumbersComponent,
+  ReplyPopupComponent,
   ReviewerListComponent,
   CCListComponent,
   ReviewComponent,
@@ -37,4 +40,4 @@ export const DashboardComponents = [
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [DiffService];
+export const DashboardProviders = [DiffService, ReviewService];

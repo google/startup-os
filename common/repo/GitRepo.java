@@ -102,7 +102,6 @@ public class GitRepo implements Repo {
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
-      process.waitFor();
       result.stdout = readLines(process.getInputStream());
       result.stderr = readLines(process.getErrorStream());
     } catch (Exception e) {
@@ -364,7 +363,7 @@ public class GitRepo implements Repo {
 
   @Override
   public String getFileContents(String commitId, String path) {
-    CommandResult commandResult = runCommand("show " + commitId + ":" + path);
+    CommandResult commandResult = runCommand("--no-pager show " + commitId + ":" + path);
     String result = commandResult.stdout;
     int lastIndexOfNewLineSymbol = result.lastIndexOf("\n");
     if (lastIndexOfNewLineSymbol >= 0) {
