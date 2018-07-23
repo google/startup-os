@@ -2,7 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 android_library(
     name = "firestore_config_manager_impl",
-    srcs = ["examples/android/FirestoreInitializer.java"],
+    srcs = ["FirestoreInitializer.java"],
     deps = ["@com_google_firebase_firebase_common_11_8_0//aar"],
 )
 
@@ -30,21 +30,21 @@ android_library(
 
 android_library(
     name = "firestore_config_manager",
-    data = ["src/main/assets/google-services.json"],
+    data = ["assets/google-services.json"],
     exports = [":firestore_config_manager_impl"],
 )
 
 android_binary(
     name = "android_app",
     srcs = glob([
-        "examples/android/MainApplication.java",
-        "examples/android/activities/*.java",
+        "MainApplication.java",
+        "activities/*.java",
     ]),
-    assets = ["src/main/assets/google-services.json"],
-    assets_dir = "src/main/assets/",
+    assets = ["assets/google-services.json"],
+    assets_dir = "assets/",
     custom_package = "com.google.startupos.examples.android",
-    manifest = "examples/android/AndroidManifest.xml",
-    resource_files = glob(["examples/android/res/**"]),
+    manifest = "AndroidManifest.xml",
+    resource_files = glob(["res/**"]),
     deps = [
         ":firestore",
         ":firestore_config_manager",
