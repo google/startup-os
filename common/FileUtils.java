@@ -36,6 +36,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /** File utils */
 @Singleton
 public class FileUtils {
@@ -74,7 +76,14 @@ public class FileUtils {
 
   /** Writes a proto to file. */
   public void writePrototxt(Message proto, String path) throws IOException {
-    writeString(TextFormat.printToUnicodeString(proto), path);
+    String fileContent = TextFormat.printToUnicodeString(proto);
+    if (!fileContent.isEmpty()) {
+      String lastSymbol = fileContent.substring(fileContent.length() - 1);
+      if (lastSymbol.equals(System.lineSeparator())) {
+        fileContent = fileContent.substring(0, fileContent.length() - 1);
+      }
+    }
+    writeString(fileContent, path);
   }
 
   /** Writes a proto to file, rethrows exceptions as unchecked. */
@@ -92,7 +101,16 @@ public class FileUtils {
     if (file.getParent() != null) {
       mkdirs(file.getParent());
     }
-    Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes());
+    if (!text.isEmpty()) {
+      String lastSymbol = text.substring(text.length() - 1);
+      if (lastSymbol.equals(System.lineSeparator())) {
+        Files.write(
+            fileSystem.getPath(expandHomeDirectory(path)),
+            (text + System.lineSeparator()).getBytes(UTF_8));
+        return;
+      }
+    }
+    Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes(UTF_8));
   }
 
   /** Writes a string to file, rethrows exceptions as unchecked. */
@@ -185,7 +203,16 @@ public class FileUtils {
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    return String.join("\n", Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
+    ImmutableList<String> lines =
+        ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
+    if (lines.isEmpty()) {
+      return "";
+    } else {
+      String lastLine = lines.get(lines.size() - 1);
+      return lastLine.equals(System.lineSeparator())
+          ? String.join(System.lineSeparator(), lines) + System.lineSeparator()
+          : String.join(System.lineSeparator(), lines);
+    }
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */
