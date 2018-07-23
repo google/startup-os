@@ -16,42 +16,37 @@
 
 package com.google.startupos.tools.reviewer.service.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import com.google.startupos.tools.reviewer.service.CodeReviewService;
-import com.google.startupos.tools.localserver.service.AuthService;
-import io.grpc.inprocess.InProcessChannelBuilder;
-import io.grpc.inprocess.InProcessServerBuilder;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import dagger.Component;
-import org.junit.Before;
-import org.junit.Test;
 import com.google.startupos.common.CommonModule;
-import com.google.startupos.tools.aa.AaModule;
-import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
-import java.io.IOException;
-import java.nio.file.Files;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.TextDifferencer;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.common.repo.Repo;
-import com.google.startupos.common.flags.Flags;
-import javax.inject.Named;
-import dagger.Module;
-import dagger.Provides;
-import java.nio.file.FileSystems;
+import com.google.startupos.tools.aa.AaModule;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
-import com.google.startupos.common.TextDifferencer;
+import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
+import dagger.Component;
+import dagger.Provides;
+import io.grpc.inprocess.InProcessChannelBuilder;
+import io.grpc.inprocess.InProcessServerBuilder;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+
+import static org.junit.Assert.assertEquals;
 
 /** Unit tests for {@link CodeReviewService}. */
 @RunWith(JUnit4.class)
@@ -61,10 +56,8 @@ public class CodeReviewServiceTest {
   private static final String TEST_WORKSPACE = "ws1";
 
   private GitRepoFactory gitRepoFactory;
-  private GitRepo gitRepo;
   private String aaBaseFolder;
   private FileUtils fileUtils;
-  private TextDifferencer textDifferencer;
   TestComponent component;
   CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
 
@@ -163,7 +156,7 @@ public class CodeReviewServiceTest {
    * behaviors or state changes from the client side.
    */
   @Test
-  public void testTextDiff_untrackedlocallyModifiedFile() throws Exception {
+  public void testTextDiff_untrackedLocallyModifiedFile() {
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS,
         fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
@@ -178,13 +171,14 @@ public class CodeReviewServiceTest {
 
     TextDiffResponse response = blockingStub.getTextDiff(request);
 
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
     TextDiffResponse expectedResponse =
         TextDiffResponse.newBuilder()
-            .addAllChanges(component.getTextDifferencer().getAllTextChanges(tempFix, tempFix))
-            .setLeftFileContents(tempFix)
-            .setRightFileContents(tempFix)
+            .addAllChanges(
+                component
+                    .getTextDifferencer()
+                    .getAllTextChanges(TEST_FILE_CONTENTS, TEST_FILE_CONTENTS))
+            .setLeftFileContents(TEST_FILE_CONTENTS)
+            .setRightFileContents(TEST_FILE_CONTENTS)
             .build();
 
     assertEquals(expectedResponse, response);
