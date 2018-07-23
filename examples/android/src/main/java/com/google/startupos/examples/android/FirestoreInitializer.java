@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.android;
+package com.google.startupos.examples.android;
 
 import android.content.Context;
 
