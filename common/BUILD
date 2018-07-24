@@ -42,6 +42,7 @@ java_library(
         "TextDifferencer.java",
     ],
     deps = [
+        ":diff_match_patch",
         ":text_difference_java_proto",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
@@ -85,4 +86,9 @@ java_plugin(
         "//third_party/maven/com/google/auto:auto_common",
         "//third_party/maven/com/google/auto/factory:auto_factory",
     ],
+)
+
+java_library(
+    name = "diff_match_patch",
+    srcs = ["DiffMatchPatch.java"],
 )
