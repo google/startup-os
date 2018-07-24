@@ -58,8 +58,10 @@ public class GitRepo implements Repo {
   private final Repository jGitRepo;
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
+  private final FileUtils fileUtils;
 
   GitRepo(@Provided FileUtils fileUtils, String repoPath) {
+    this.fileUtils = fileUtils;
     gitCommandBase =
         Arrays.asList(
             "git", "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"), "--work-tree=" + repoPath);
@@ -384,8 +386,9 @@ public class GitRepo implements Repo {
   }
 
   public boolean cloneRepo(String url, String path) {
-    CommandResult commandResult = runCommand("clone " + url + " " + path);
-    return commandResult.stderr.length() == 0;
+    CommandResult commandResult =
+        runCommand("clone " + url + " " + fileUtils.joinPaths(path, ".git"));
+    return commandResult.stderr.isEmpty();
   }
 }
 
