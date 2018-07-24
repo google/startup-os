@@ -6,6 +6,7 @@ import {
   NotificationService,
 } from '@/shared/services';
 import { Diff, Reviewer } from '@/shared/shell';
+import { ReviewService } from '../services';
 
 // The ReviewerListComponent is used to display reviewers
 @Component({
@@ -15,7 +16,7 @@ import { Diff, Reviewer } from '@/shared/shell';
 })
 export class ReviewerListComponent implements OnInit {
   // To show editable fields
-  isEditing = false;
+  isEditing: boolean = false;
   usernames: string = '';
 
   @Input() diff: Diff;
@@ -25,6 +26,7 @@ export class ReviewerListComponent implements OnInit {
     private firebaseService: FirebaseService,
     private notificationService: NotificationService,
     private authService: AuthService,
+    private reviewService: ReviewService,
   ) { }
 
   ngOnInit() {
@@ -49,7 +51,8 @@ export class ReviewerListComponent implements OnInit {
         // TODO: Add username validation
         // e.g. no spaces and special chars etc
         // same in CC list
-        let reviewer: Reviewer  = this.getReviewerWithTheUsername(username);
+        let reviewer: Reviewer  = this.reviewService
+          .getReviewerWithTheUsername(this.diff, username);
         if (!reviewer) {
           // If reviewer not found, create new one.
           reviewer = new Reviewer();
@@ -72,17 +75,6 @@ export class ReviewerListComponent implements OnInit {
     }, () => {
       this.notificationService.error("Reviewers can't be saved");
     });
-  }
-
-  getReviewerWithTheUsername(username: string): Reviewer {
-    for (const reviewer of this.diff.getReviewerList()) {
-      const reviewerUsername: string = this.authService
-        .getUsername(reviewer.getEmail());
-
-      if (reviewerUsername === username) {
-        return reviewer;
-      }
-    }
   }
 
   // Request or cancel attention of the reviewer
