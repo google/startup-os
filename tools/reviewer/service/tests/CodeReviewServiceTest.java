@@ -95,6 +95,9 @@ public class CodeReviewServiceTest {
     fileUtils.mkdirs(initialRepoFolder);
     GitRepo repo = gitRepoFactory.create(initialRepoFolder);
     repo.init();
+    repo.setFakeUsersData();
+    fileUtils.writeStringUnchecked(
+        "initial commit", fileUtils.joinPaths(initialRepoFolder, "initial_commit.txt"));
     // We need one commit to make the repo have a master branch.
     repo.commit(repo.getUncommittedFiles(), "Initial commit");
   }
