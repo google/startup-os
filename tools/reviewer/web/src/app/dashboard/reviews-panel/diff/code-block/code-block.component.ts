@@ -1,6 +1,8 @@
 // NOTICE: Lines with more than 100 chars create a horizontal scroll.
 // TODO: add supporting of line wrap
 
+// TODO: Components contain too much logic. Put it to services.
+
 import {
   ChangeDetectorRef,
   Component,
@@ -36,21 +38,13 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   lines: Line[] = [];
   // Highlighted code with placeholders, in lines.
   highlightedLines: string[] = [];
+  // Line numbers of all open threads.
+  openThreads: number[] = [];
 
   @Input() fileContent: string;
   @Input() isNewCode: boolean;
   @Input() changes: number[];
-  // TODO: add supporting of deleting whole thread.
-  // if you delete a comment in firebase, the comment is deleted on the app too
-  // but if you delete a thread in firebase, it's still present
-  // on the app until refresh a page.
-
-  // Also notice, if you delete not last comment in a thread, then you need to
-  // restore range. e.g. 1,2,3,4... etc.
-  // You get an error if there're missed elements. e.g. 1,3,4,6
-
-  // Last thing: if all comments are deleted in a thread, it causes an error.
-  // You need to delete a thread, if it doesn't have a comment.
+  @Input() language: string;
   @Input() threads: Thread[];
 
   lineHeightChangesSubscription: Subscription;
@@ -63,33 +57,30 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     private diffService: DiffService,
   ) {
     // Subscriptions on events
+
     this.lineHeightChangesSubscription = this.diffService
-      .lineHeightChanges.subscribe(
-        param => {
-          // Height of a comment block is changed
-          this.lines[param.lineNumber].hasPlaceholder = true;
-          this.lines[param.lineNumber].height = param.height;
-          this.addPlaceholder(param.lineNumber);
-        },
-      );
+      .lineHeightChanges.subscribe(param => {
+        // Height of a comment block is changed
+        this.lines[param.lineNumber].hasPlaceholder = true;
+        this.lines[param.lineNumber].height = param.height;
+        this.addPlaceholder(param.lineNumber);
+      });
+
     this.closeCommentsChangesSubscription = this.diffService
-      .closeCommentsChanges.subscribe(
-        lineNumber => {
-          // Request for closing a comment block
-          this.closeCommentsBlock(lineNumber);
-        },
-      );
+      .closeCommentsChanges.subscribe(lineNumber => {
+        // Request for closing a comment block
+        this.closeCommentsBlock(lineNumber);
+      });
+
     this.openCommentsChangesSubscription = this.diffService
-      .openCommentsChanges.subscribe(
-        lineNumber => {
-          // Request for opening a comment block
-          if (!this.isNewCode) {
-            // Open comments always on right side
-            return;
-          }
-          this.openCommentsBlock(lineNumber);
-        },
-      );
+      .openCommentsChanges.subscribe(lineNumber => {
+        // Request for opening a comment block
+        if (!this.isNewCode) {
+          // Open comments always on right side
+          return;
+        }
+        this.openCommentsBlock(lineNumber);
+      });
   }
 
   ngOnInit() {
@@ -116,11 +107,9 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   // Highlitght code, split it by lines.
   // Bootstrap method.
   initLines(fileContent: string): void {
-    // TODO: detect language
-    const language: string = 'java';
     const highlightedCode: string = this.highlightService.highlight(
       fileContent,
-      language,
+      this.language,
     );
 
     const FileLines: string[] = fileContent.split('\n');
@@ -154,10 +143,23 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     if (!threads) {
       return;
     }
+
+    // Copy current open threads to create list of empty threads
+    const emptyThreads: number[] = this.openThreads.slice();
+
     for (const thread of threads) {
+      // Add new comments to lines
       const i: number = thread.getLineNumber();
       this.lines[i].comments = thread.getCommentList();
       this.openCommentsBlock(i);
+
+      // If thread contains comments then thread isn't empty
+      this.removeThread(i, emptyThreads);
+    }
+
+    // Close empty threads
+    for (const lineNumber of emptyThreads) {
+      this.diffService.closeComments(lineNumber);
     }
   }
 
@@ -202,6 +204,9 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     }
     this.lines[i].hasPlaceholder = true;
     this.lines[i].isCommentsVisible = true;
+
+    // Add to open threads
+    this.openThreads.push(i);
   }
 
   closeCommentsBlock(i: number): void {
@@ -209,5 +214,15 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
     this.lines[i].isCommentsVisible = false;
     this.lines[i].height = 0;
     this.highlightedLines[i] = this.lines[i].highlightedCode;
+
+    // Remove from open threads
+    this.removeThread(i, this.openThreads);
+  }
+
+  removeThread(lineNumber: number, threads: number[]): void {
+    const index: number = threads.indexOf(lineNumber);
+    if (index > -1) {
+      threads.splice(index, 1);
+    }
   }
 }

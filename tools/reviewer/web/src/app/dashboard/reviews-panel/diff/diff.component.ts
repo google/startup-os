@@ -34,7 +34,8 @@ export class DiffComponent implements OnInit, OnDestroy {
   changes: number[];
   localThreads: Thread[];
   diff: Diff;
-  newCommentSubscription: Subscription;
+  addCommentSubscription: Subscription;
+  deleteCommentSubscription: Subscription;
   file: File = new File();
   branchInfo: BranchInfo;
 
@@ -46,11 +47,15 @@ export class DiffComponent implements OnInit, OnDestroy {
     private localserverService: LocalserverService,
     private notificationService: NotificationService,
   ) {
-    this.newCommentSubscription = this.diffService.newComment.subscribe(
-      param => {
+    this.addCommentSubscription = this.diffService.addCommentChanges
+      .subscribe(param => {
         this.addComment(param.lineNumber, param.comments);
-      },
-    );
+      });
+
+    this.deleteCommentSubscription = this.diffService.deleteCommentChanges
+      .subscribe(isDeleteThread => {
+        this.deleteComment(isDeleteThread);
+      });
   }
 
   ngOnInit() {
@@ -129,8 +134,12 @@ export class DiffComponent implements OnInit, OnDestroy {
   addComment(lineNumber: number, comments: Comment[]): void {
     if (!this.file.getCommitId()) {
       // TODO: Add more UX behavior here
+      // For example:
+      // Remove button 'add comment' if it's an uncommitted file.
+      // Or open uncommitted files in a special readonly mode.
+      // etc
       this.notificationService
-        .error('Comment cannot be added to a uncommitted file');
+        .error('Comment cannot be added to an uncommitted file');
       return;
     }
 
@@ -140,7 +149,9 @@ export class DiffComponent implements OnInit, OnDestroy {
       this.diff.addThread(newThread);
     }
 
-    this.firebaseService.updateDiff(this.diff).subscribe();
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success('Comment is saved in firebase');
+    });
   }
 
   createNewThread(lineNumber: number, comments: Comment[]): Thread {
@@ -155,7 +166,24 @@ export class DiffComponent implements OnInit, OnDestroy {
     return newThread;
   }
 
+  deleteComment(isDeleteThread: boolean): void {
+    if (isDeleteThread) {
+      // Delete all threads without comments.
+      const threads: Thread[] = this.diff.getThreadList();
+      threads.forEach((thread, threadIndex) => {
+        if (thread.getCommentList().length === 0) {
+          threads.splice(threadIndex, 1);
+        }
+      });
+      this.diff.setThreadList(threads);
+    }
+
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success('Comment is deleted');
+    });
+  }
+
   ngOnDestroy() {
-    this.newCommentSubscription.unsubscribe();
+    this.addCommentSubscription.unsubscribe();
   }
 }

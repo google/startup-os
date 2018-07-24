@@ -89,6 +89,11 @@ export class CommentsComponent implements OnInit {
   }
 
   addComment(): void {
+    if (!this.textareaControl.value) {
+      // Blank comments are not allowed.
+      return;
+    }
+    
     const comment: Comment = new Comment();
     comment.setContent(this.textareaControl.value);
     comment.setCreatedBy(this.authService.userEmail);
@@ -101,5 +106,13 @@ export class CommentsComponent implements OnInit {
     });
 
     this.textareaControl.reset();
+  }
+
+  deleteComment(index: number): void {
+    this.comments.splice(index, 1);
+
+    // Delete the thread if it doesn't contain comments.
+    const isDeleteThread: boolean = this.comments.length === 0;
+    this.diffService.deleteComment(isDeleteThread);
   }
 }

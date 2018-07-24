@@ -48,6 +48,7 @@ export class LocalserverService {
             this.notificationService.error('Local server: Branches not found');
           }
 
+          // TODO: Add supporting of multiple repos
           observer.next(diffFilesResponse.getBranchinfoList()[0]);
         }, () => {
           this.error();

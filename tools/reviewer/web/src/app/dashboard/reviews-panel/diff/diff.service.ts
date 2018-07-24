@@ -19,14 +19,15 @@ interface AddCommentResponse {
 export class DiffService {
   // A number of the line, where user cursor is hovering right now.
   private hoveredLine: number;
-  // Is cursor hovering above new/old code?
+  // Is cursor hovering above new code?
   private isHoveredNewCode: boolean;
 
   // Subjects, which send data:
-  lineHeightChanges: Subject<HeightResponse> = new Subject<HeightResponse>();
-  openCommentsChanges: Subject<number> = new Subject<number>();
-  closeCommentsChanges: Subject<number> = new Subject<number>();
-  newComment: Subject<AddCommentResponse> = new Subject<AddCommentResponse>();
+  lineHeightChanges = new Subject<HeightResponse>();
+  openCommentsChanges = new Subject<number>();
+  closeCommentsChanges = new Subject<number>();
+  addCommentChanges = new Subject<AddCommentResponse>();
+  deleteCommentChanges = new Subject<boolean>();
 
   // Methods, which receive data:
   setLineHeight(param: HeightResponse): void {
@@ -39,7 +40,10 @@ export class DiffService {
     this.closeCommentsChanges.next(lineNumber);
   }
   addComment(param: AddCommentResponse): void {
-    this.newComment.next(param);
+    this.addCommentChanges.next(param);
+  }
+  deleteComment(isDeleteThread: boolean): void {
+    this.deleteCommentChanges.next(isDeleteThread);
   }
 
   // Lines detect mouse hover by the method
@@ -52,5 +56,29 @@ export class DiffService {
   // 'add-comment-button` on the line or not
   hoverCheck(i: number, isNewCode: boolean): boolean {
     return this.hoveredLine === i && this.isHoveredNewCode === isNewCode;
+  }
+
+  // Get langulage from filename. Example:
+  // filename.js -> javascript
+  getLanguage(filename: string): string {
+    const extensionRegExp: RegExp = /(?:\.([^.]+))?$/;
+    const extension: string =  extensionRegExp.exec(filename)[1];
+
+    switch (extension) {
+      case 'js': return 'javascript';
+      case 'ts': return 'typescript';
+      case 'java': return 'java';
+      case 'proto': return 'protobuf';
+      case 'md': return 'markdown';
+      case 'json': return 'json';
+      case 'css': return 'css';
+      case 'scss': return 'scss';
+      case 'html': return 'html';
+      case 'sh': return 'bash';
+      case 'xml': return 'xml';
+      case 'py': return 'python';
+
+      default: return 'code';
+    }
   }
 }
