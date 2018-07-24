@@ -20,23 +20,25 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.Protos.Config;
+
+import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import javax.inject.Inject;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class AddRepoCommand implements AaCommand {
 
   private final FileUtils fileUtils;
   private final Config config;
+  private final GitRepoFactory gitRepoFactory;
 
   @Inject
-  public AddRepoCommand(FileUtils utils, Config config) {
+  public AddRepoCommand(FileUtils utils, Config config, GitRepoFactory gitRepoFactory) {
     this.fileUtils = utils;
     this.config = config;
+    this.gitRepoFactory = gitRepoFactory;
   }
 
   @FlagDesc(name = "url", description = "Repository URL to add", required = true)
@@ -72,11 +74,9 @@ public class AddRepoCommand implements AaCommand {
 
     String repoPath = fileUtils.joinPaths(headPath, repoName);
     System.out.println(String.format("Cloning repo %s into %s", repoName, repoPath));
-    try {
-      Git.cloneRepository().setURI(url.get()).setDirectory(Paths.get(repoPath).toFile()).call();
-    } catch (GitAPIException e) {
+    GitRepo repo = this.gitRepoFactory.create(repoPath);
+    if (!repo.cloneRepo(url.get(), repoPath)) {
       System.err.println(RED_ERROR + "Could not clone repository");
-      e.printStackTrace();
       return false;
     }
 

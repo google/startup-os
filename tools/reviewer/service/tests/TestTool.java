@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.service;
+package com.google.startupos.tools.reviewer.service.tests;
 
+import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
