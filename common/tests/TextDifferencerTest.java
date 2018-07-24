@@ -37,7 +37,7 @@ public class TextDifferencerTest {
     return TextChange.newBuilder()
         .setFirstStringIndex(leftIndex)
         .setSecondStringIndex(rightIndex)
-        .setDifference(difference)
+        .setText(difference)
         .setType(type);
   }
 
@@ -55,14 +55,14 @@ public class TextDifferencerTest {
   @Test
   public void testOnlyAdditions() {
     assertEquals(
-        ImmutableList.of(newTextChange(0, 0, "Addition.", Type.ADD).build()),
+        ImmutableList.of(newTextChange(-1, 0, "Addition.", Type.ADD).build()),
         differencer.getAllTextChanges("", "Addition."));
   }
 
   @Test
   public void testOnlyDeletions() {
     assertEquals(
-        ImmutableList.of(newTextChange(0, 0, "Deletion.", Type.DELETE).build()),
+        ImmutableList.of(newTextChange(0, -1, "Deletion.", Type.DELETE).build()),
         differencer.getAllTextChanges("Deletion.", ""));
   }
 
@@ -77,8 +77,8 @@ public class TextDifferencerTest {
   public void testMixedChangesAtTheBeginning() {
     assertEquals(
         ImmutableList.of(
-            newTextChange(0, 0, "No", Type.DELETE).build(),
-            newTextChange(1, 0, "With", Type.ADD).build(),
+            newTextChange(0, -1, "No", Type.DELETE).build(),
+            newTextChange(-1, 0, "With", Type.ADD).build(),
             newTextChange(2, 4, " Change.", Type.NO_CHANGE).build()),
         differencer.getAllTextChanges("No Change.", "With Change."));
   }
@@ -88,7 +88,7 @@ public class TextDifferencerTest {
     assertEquals(
         ImmutableList.of(
             newTextChange(0, 0, "With ", Type.NO_CHANGE).build(),
-            newTextChange(5, 5, "a ", Type.ADD).build(),
+            newTextChange(-1, 5, "a ", Type.ADD).build(),
             newTextChange(5, 7, "Change.", Type.NO_CHANGE).build()),
         differencer.getAllTextChanges("With Change.", "With a Change."));
   }
@@ -98,8 +98,8 @@ public class TextDifferencerTest {
     assertEquals(
         ImmutableList.of(
             newTextChange(0, 0, "No Change", Type.NO_CHANGE).build(),
-            newTextChange(9, 9, ".", Type.DELETE).build(),
-            newTextChange(9, 9, "!", Type.ADD).build()),
+            newTextChange(9, -1, ".", Type.DELETE).build(),
+            newTextChange(-1, 9, "!", Type.ADD).build()),
         differencer.getAllTextChanges("No Change.", "No Change!"));
   }
 }
