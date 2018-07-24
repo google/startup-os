@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.android;
+package com.google.startupos.examples.android;
 
 import android.app.Application;
 
@@ -24,7 +24,7 @@ import com.google.firebase.FirebaseApp;
 import android.util.Log;
 import org.json.JSONException;
 
-import com.google.startupos.android.FirestoreInitializer;
+import com.google.startupos.examples.android.FirestoreInitializer;
 
 public class MainApplication extends Application {
 
