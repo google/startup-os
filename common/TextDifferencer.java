@@ -20,13 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.TextChange.Type;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import javax.inject.Inject;
-import javax.swing.text.Segment;
 import java.util.LinkedList;
 
 /** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */

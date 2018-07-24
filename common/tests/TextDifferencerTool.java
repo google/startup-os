@@ -27,10 +27,6 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.TextDifferencer;
 import java.io.IOException;
 import com.google.startupos.common.TextChange;
-import com.google.startupos.common.TextChange.Type;
-import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
-import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
-import java.util.LinkedList;
 
 /** A tool for testing TextDifferencer. */
 @Singleton
