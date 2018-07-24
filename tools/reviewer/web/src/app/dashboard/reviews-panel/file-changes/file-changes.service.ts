@@ -78,7 +78,10 @@ export class FileChangesService {
       case 'xml': return 'xml';
       case 'py': return 'python';
 
-      default: return 'code';
+      default: return 'clean';
     }
+
+    // All supported languages:
+    // https://github.com/highlightjs/highlight.js/tree/master/src/languages
   }
 }
