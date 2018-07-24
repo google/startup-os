@@ -1,7 +1,3 @@
-// NOTICE: it's actually not a diff, it's a two files changes
-// TODO: rename the component and linked files
-// e.g. FileChangeComponent
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -20,15 +16,15 @@ import {
   LocalserverService,
   NotificationService,
 } from '@/shared/services';
-import { DiffService } from './diff.service';
+import { FileChangesService } from './file-changes.service';
 
 // The component implements a diff
 @Component({
-  selector: 'app-diff',
-  templateUrl: './diff.component.html',
-  styleUrls: ['./diff.component.scss'],
+  selector: 'file-changes',
+  templateUrl: './file-changes.component.html',
+  styleUrls: ['./file-changes.component.scss'],
 })
-export class DiffComponent implements OnInit, OnDestroy {
+export class FileChangesComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   textDiffResponse: TextDiffResponse;
   changes: number[];
@@ -43,17 +39,17 @@ export class DiffComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private differenceService: DifferenceService,
     private firebaseService: FirebaseService,
-    private diffService: DiffService,
+    private fileChangesService: FileChangesService,
     private localserverService: LocalserverService,
     private notificationService: NotificationService,
   ) {
-    this.addCommentSubscription = this.diffService.addCommentChanges
-      .subscribe(param => {
+    this.addCommentSubscription = this.fileChangesService
+      .addCommentChanges.subscribe(param => {
         this.addComment(param.lineNumber, param.comments);
       });
 
-    this.deleteCommentSubscription = this.diffService.deleteCommentChanges
-      .subscribe(isDeleteThread => {
+    this.deleteCommentSubscription = this.fileChangesService.
+      deleteCommentChanges.subscribe(isDeleteThread => {
         this.deleteComment(isDeleteThread);
       });
   }

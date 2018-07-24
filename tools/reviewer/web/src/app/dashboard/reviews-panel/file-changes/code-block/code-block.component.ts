@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { Comment, Thread } from '@/shared';
 import { HighlightService } from '@/shared/services';
-import { DiffService } from '../diff.service';
+import { FileChangesService } from '../file-changes.service';
 
 export interface Line {
   code: string; // Original code of the line
@@ -54,11 +54,11 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   constructor(
     private highlightService: HighlightService,
     private changeDetectorRef: ChangeDetectorRef,
-    private diffService: DiffService,
+    private fileChangesService: FileChangesService,
   ) {
     // Subscriptions on events
 
-    this.lineHeightChangesSubscription = this.diffService
+    this.lineHeightChangesSubscription = this.fileChangesService
       .lineHeightChanges.subscribe(param => {
         // Height of a comment block is changed
         this.lines[param.lineNumber].hasPlaceholder = true;
@@ -66,13 +66,13 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
         this.addPlaceholder(param.lineNumber);
       });
 
-    this.closeCommentsChangesSubscription = this.diffService
+    this.closeCommentsChangesSubscription = this.fileChangesService
       .closeCommentsChanges.subscribe(lineNumber => {
         // Request for closing a comment block
         this.closeCommentsBlock(lineNumber);
       });
 
-    this.openCommentsChangesSubscription = this.diffService
+    this.openCommentsChangesSubscription = this.fileChangesService
       .openCommentsChanges.subscribe(lineNumber => {
         // Request for opening a comment block
         if (!this.isNewCode) {
@@ -159,7 +159,7 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
 
     // Close empty threads
     for (const lineNumber of emptyThreads) {
-      this.diffService.closeComments(lineNumber);
+      this.fileChangesService.closeComments(lineNumber);
     }
   }
 

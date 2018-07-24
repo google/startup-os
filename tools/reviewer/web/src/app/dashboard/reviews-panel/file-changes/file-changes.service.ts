@@ -16,7 +16,7 @@ interface AddCommentResponse {
 // The service receives data from one place of
 // diff component (and children) and send to another.
 @Injectable()
-export class DiffService {
+export class FileChangesService {
   // A number of the line, where user cursor is hovering right now.
   private hoveredLine: number;
   // Is cursor hovering above new code?
@@ -62,7 +62,7 @@ export class DiffService {
   // filename.js -> javascript
   getLanguage(filename: string): string {
     const extensionRegExp: RegExp = /(?:\.([^.]+))?$/;
-    const extension: string =  extensionRegExp.exec(filename)[1];
+    const extension: string = extensionRegExp.exec(filename)[1];
 
     switch (extension) {
       case 'js': return 'javascript';
