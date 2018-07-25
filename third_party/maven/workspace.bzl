@@ -101,6 +101,8 @@ def list_dependencies():
     {"artifact": "com.google.protobuf:protobuf-java:3.6.0", "lang": "java", "sha1": "5333f7e422744d76840c08a106e28e519fbe3acd", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_google_protobuf_protobuf_java", "actual": "@com_google_protobuf_protobuf_java//jar", "bind": "jar/com/google/protobuf/protobuf_java"},
     {"artifact": "com.googlecode.javaewah:JavaEWAH:1.1.6", "lang": "java", "sha1": "94ad16d728b374d65bd897625f3fbb3da223a2b6", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_googlecode_javaewah_JavaEWAH", "actual": "@com_googlecode_javaewah_JavaEWAH//jar", "bind": "jar/com/googlecode/javaewah/JavaEWAH"},
     {"artifact": "com.jcraft:jsch:0.1.54", "lang": "java", "sha1": "da3584329a263616e277e15462b387addd1b208d", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_jcraft_jsch", "actual": "@com_jcraft_jsch//jar", "bind": "jar/com/jcraft/jsch"},
+    {"artifact": "com.squareup.okhttp:okhttp:2.7.5", "lang": "java", "sha1": "7a15a7db50f86c4b64aa3367424a60e3a325b8f1", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_squareup_okhttp_okhttp", "actual": "@com_squareup_okhttp_okhttp//jar", "bind": "jar/com/squareup/okhttp/okhttp"},
+    {"artifact": "com.squareup.okio:okio:1.15.0", "lang": "java", "sha1": "bc28b5a964c8f5721eb58ee3f3c47a9bcbf4f4d8", "repository": "https://repo.maven.apache.org/maven2/", "name": "com_squareup_okio_okio", "actual": "@com_squareup_okio_okio//jar", "bind": "jar/com/squareup/okio/okio"},
 # duplicates in com.squareup:javapoet promoted to 1.8.0
 # - com.google.auto.factory:auto-factory:1.0-beta5 wanted version 1.7.0
 # - com.google.dagger:dagger-compiler:2.15 wanted version 1.8.0

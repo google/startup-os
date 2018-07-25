@@ -84,6 +84,16 @@ dependencies:
       lang: java
       version: "0.1.54"
 
+  com.squareup.okhttp:
+    okhttp:
+      lang: java
+      version: "2.7.5"
+
+  com.squareup.okio:
+    okio:
+      lang: java
+      version: "1.15.0"
+
   commons-logging:
     commons-logging:
       lang: java
