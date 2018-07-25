@@ -36,7 +36,7 @@ import static org.junit.Assert.assertFalse;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class WorkspaceDepsWhiteListTest {
+public class WorkspaceDepsWhitelistTest {
   private Map<String, List<String>> whitelist;
   private List<String> workspace;
   private static Set<String> keysToValidate =
@@ -62,8 +62,9 @@ public class WorkspaceDepsWhiteListTest {
     List<String> validUrls = whitelist.get("workspace_dependencies");
 
     for (String line : workspace) {
-      String[] kv = line.split("=");
-      if (kv.length == 2) {
+      if (line.contains("=")) {
+        String[] kv = line.split("=");
+        assertTrue(String.format("Line %s should contain key and value", line), kv.length == 2);
         boolean isValidUrl = false;
 
         String key = kv[0].trim();

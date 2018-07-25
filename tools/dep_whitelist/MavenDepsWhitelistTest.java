@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.yaml.snakeyaml.Yaml;
 
-public class MavenDepsWhiteListTest {
+public class MavenDepsWhitelistTest {
   private Map<String, Map<String, Object>> dependencies;
   private Map<String, List<String>> whitelist;
 

@@ -1,11 +1,11 @@
 java_test(
     name = "MavenDepsWhitelistTest",
-    srcs = ["MavenDepsWhiteListTest.java"],
+    srcs = ["MavenDepsWhitelistTest.java"],
     data = [
         "//:dependencies.yaml",
         "//:whitelist.yaml",
     ],
-    test_class = "com.google.startupos.tools.dep_whitelist.MavenDepsWhiteListTest",
+    test_class = "com.google.startupos.tools.dep_whitelist.MavenDepsWhitelistTest",
     deps = [
         "//third_party/maven/org/yaml:snakeyaml",
     ],
@@ -13,12 +13,12 @@ java_test(
 
 java_test(
     name = "WorkspaceDepsWhitelistTest",
-    srcs = ["WorkspaceDepsWhiteListTest.java"],
+    srcs = ["WorkspaceDepsWhitelistTest.java"],
     data = [
         "//:WORKSPACE",
         "//:whitelist.yaml",
     ],
-    test_class = "com.google.startupos.tools.dep_whitelist.WorkspaceDepsWhiteListTest",
+    test_class = "com.google.startupos.tools.dep_whitelist.WorkspaceDepsWhitelistTest",
     deps = [
         "//third_party/maven/org/yaml:snakeyaml",
     ],
