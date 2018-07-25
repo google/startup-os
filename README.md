@@ -22,8 +22,7 @@ You can:
 * Use parts of it from your own repo. For an example of that, see https://github.com/hasadna/hasadna (look for `@startup_os` in BUILD files)
 
 ### Installation
-1. Install [Bazel](https://docs.bazel.build/versions/master/install.html)
-2. Run `npm install` (temporarily needed)
+Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's it!
 
 Now you can build any target you want. To build all targets and run all tests:
 
