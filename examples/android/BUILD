@@ -9,6 +9,8 @@ android_library(
 android_library(
     name = "firestore",
     exports = [
+        "//third_party/maven/com/squareup/okhttp",
+        "//third_party/maven/com/squareup/okio",
         "@com_android_support_support_annotations_27_0_2//jar",
         "@com_android_support_support_compat_27_0_2//aar",
         "@com_android_support_support_core_ui_27_0_2//aar",
@@ -23,8 +25,6 @@ android_library(
         "@com_google_firebase_firebase_common_11_8_0//aar",
         "@com_google_firebase_firebase_common_license_11_8_0//aar",
         "@com_google_firebase_firebase_firestore_11_8_0//aar",
-        "@com_squareup_okhttp_okhttp_2_7_2//jar",
-        "@com_squareup_okio_okio_1_6_0//jar",
     ],
 )
 

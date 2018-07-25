@@ -81,16 +81,6 @@ android_sdk_repository(
     build_tools_version = "27.0.3",
 )
 
-maven_jar(
-    name = "com_squareup_okhttp_okhttp_2_7_2",
-    artifact = "com.squareup.okhttp:okhttp:jar:2.7.2",
-)
-
-maven_jar(
-    name = "com_squareup_okio_okio_1_6_0",
-    artifact = "com.squareup.okio:okio:jar:1.6.0",
-)
-
 http_archive(
     name = "com_google_protobuf",
     sha256 = "e514c2e613dc47c062ea8df480efeec368ffbef98af0437ac00cdaadcb0d80d2",
