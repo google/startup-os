@@ -33,7 +33,8 @@ message TextChange {
   // would be 6.
   int64 second_string_index = 2;
 
-  // The string being changed. In the example of the two strings "Exampl" and "Example" it would be the last "e".
+  // The string being changed. In the example of the two strings "Exampl" and
+  // "Example" it would be the last "e".
   string text = 3;
 
   // The {@link Type} of the difference, i.e. what change has occurred. In the
