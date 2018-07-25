@@ -7,8 +7,6 @@
 RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
-npm install &>/dev/null
-
 bazel run //tools/formatter -- \
 	--path $(pwd) \
 	--java --python --proto --cpp --build \
