@@ -16,17 +16,17 @@ maven_dependencies:
   - org.objenesis
   - org.slf4j
   - org.yaml
+  - com.squareup.okhttp
+  - com.squareup.okio
 workspace_dependencies:
-    - com.squareup.okhttp
-    - com.squareup.okio
-    - https://github.com/abseil/abseil-cpp
-    - https://github.com/bazelbuild/
-    - https://github.com/gflags/gflags
-    - https://github.com/google/benchmark
-    - https://github.com/google/glog
-    - https://github.com/google/googletest
-    - https://github.com/google/protobuf
-    - https://github.com/grpc-ecosystem/polyglot
-    - https://github.com/grpc/grpc-java
-    - https://github.com/oferb/startupos-binaries
-    - https://github.com/open-source-parsers/jsoncpp
+  - https://github.com/abseil/abseil-cpp
+  - https://github.com/bazelbuild/
+  - https://github.com/gflags/gflags
+  - https://github.com/google/benchmark
+  - https://github.com/google/glog
+  - https://github.com/google/googletest
+  - https://github.com/google/protobuf
+  - https://github.com/grpc-ecosystem/polyglot
+  - https://github.com/grpc/grpc-java
+  - https://github.com/oferb/startupos-binaries
+  - https://github.com/open-source-parsers/jsoncpp
