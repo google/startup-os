@@ -16,8 +16,6 @@
 
 package com.google.startupos.common.repo;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import com.google.auto.factory.AutoFactory;
 import com.google.auto.factory.Provided;
 import com.google.common.collect.ImmutableList;
@@ -37,19 +35,13 @@ import java.util.stream.Collectors;
 import org.eclipse.jgit.api.AddCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
-import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.treewalk.TreeWalk;
 
 // TODO: Implement methods
 @AutoFactory
@@ -97,15 +89,25 @@ public class GitRepo implements Repo {
   }
 
   private CommandResult runCommand(String command) {
+    return runCommand(Arrays.asList(command.split(" ")));
+  }
+
+  private CommandResult runCommand(List<String> command) {
     CommandResult result = new CommandResult();
     try {
       List<String> fullCommand = new ArrayList<>(gitCommandBase);
-      fullCommand.addAll(Arrays.asList(command.split(" ")));
+      fullCommand.addAll(command);
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
       result.stdout = readLines(process.getInputStream());
       result.stderr = readLines(process.getErrorStream());
+      // If `clone` command is executed successfully, "Cloning into '<path_to_target_folder>'..."
+      // message is displayed in `Error Stream` instead `InputStream`
+      if (command.get(0).equals("clone")) {
+        String targetDirectory = command.get(2);
+        replaceStderrToStdoutForCloneCommand(result, targetDirectory);
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -114,6 +116,13 @@ public class GitRepo implements Repo {
     }
     commandLog.add(result);
     return result;
+  }
+
+  private void replaceStderrToStdoutForCloneCommand(CommandResult result, String targetDirectory) {
+    if (result.stderr.equals("Cloning into \'" + targetDirectory + "\'...\n")) {
+      result.stdout = result.stderr + result.stdout;
+      result.stderr = "";
+    }
   }
 
   private String formatError(CommandResult commandResult) {
