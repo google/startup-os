@@ -20,6 +20,7 @@ java_test(
     ],
     test_class = "com.google.startupos.tools.dep_whitelist.WorkspaceDepsWhitelistTest",
     deps = [
+        "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/yaml:snakeyaml",
     ],
 )

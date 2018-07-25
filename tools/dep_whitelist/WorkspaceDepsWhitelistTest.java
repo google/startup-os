@@ -36,6 +36,8 @@ import static org.junit.Assert.assertFalse;
 
 import org.yaml.snakeyaml.Yaml;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class WorkspaceDepsWhitelistTest {
   private Map<String, List<String>> whitelist;
   private List<String> workspace;
@@ -48,6 +50,10 @@ public class WorkspaceDepsWhitelistTest {
           add("artifact");
         }
       };
+
+  // Trim quotes, spaces, array brackets and trailing commas
+  // from parsed value
+  private static final String trimPattern = "[\\s\\[\\]\\,\"]";
 
   @Before
   public void setUp() throws Exception {
@@ -65,10 +71,13 @@ public class WorkspaceDepsWhitelistTest {
       if (line.contains("=")) {
         String[] kv = line.split("=");
         assertTrue(String.format("Line %s should contain key and value", line), kv.length == 2);
+        assertTrue(
+            String.format("Line %s should not contain :// more than once", line),
+            StringUtils.countMatches(line, "://") < 2);
         boolean isValidUrl = false;
 
         String key = kv[0].trim();
-        String value = kv[1].replaceAll("[\\s\\[\\]\\,\"]", "");
+        String value = kv[1].replaceAll(trimPattern, "");
         if (keysToValidate.contains(key)) {
 
           for (String validUrl : validUrls) {
@@ -83,6 +92,10 @@ public class WorkspaceDepsWhitelistTest {
           assertFalse(
               String.format("Value at key %s should not contain ://", key), value.contains("://"));
         }
+      } else {
+        assertFalse(
+            String.format("Line %s should not contain ://", line),
+            !line.startsWith("#") && line.contains("://"));
       }
     }
   }
