@@ -19,7 +19,7 @@ package com.google.startupos.tools.aa.commands;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos;
+import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
@@ -44,7 +44,7 @@ public class ReviewCommand implements AaCommand {
   @Inject
   public ReviewCommand(
       FileUtils utils,
-      Protos.Config config,
+      Config config,
       GitRepoFactory repoFactory,
       @Named("Current workspace name") String currentWorkspaceName,
       @Named("Current diff number") Integer currentDiffNumber) {
