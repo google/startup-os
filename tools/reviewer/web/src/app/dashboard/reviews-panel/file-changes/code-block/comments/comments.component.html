@@ -1,11 +1,17 @@
 <div id="line-comments" #commentsRef>
   <!-- User comments -->
   <div class="comments" *ngIf="comments.length">
-    <div class="comment" *ngFor="let comment of comments">
+    <div class="comment" *ngFor="let comment of comments; let i = index">
       <div class="username text">
         {{ authService.getUsername(comment.getCreatedBy()) }}
       </div>
       <pre class="message text">{{comment.getContent()}}</pre>
+      <div class="delete-button">
+        <button
+          mat-icon-button
+          (click)="deleteComment(i)"
+        ><mat-icon>delete_forever</mat-icon></button>
+      </div>
     </div>
   </div>
 

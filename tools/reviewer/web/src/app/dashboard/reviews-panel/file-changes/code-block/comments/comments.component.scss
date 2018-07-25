@@ -9,6 +9,7 @@ $comment-padding: 4px;
   .comments {
     margin-bottom: 15px;
     >.comment {
+      position: relative;
       background: white;
       border: 1px solid rgba(0,0,0,.3);
       border-radius: 2px;
@@ -24,6 +25,17 @@ $comment-padding: 4px;
       >.message {
         margin: 0;
         padding: 0;
+      }
+      >.delete-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        >button {
+          margin: 0;
+        }
+        mat-icon {
+          color: #777;
+        }
       }
     }
   }

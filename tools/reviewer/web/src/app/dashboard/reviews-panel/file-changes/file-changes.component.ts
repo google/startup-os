@@ -1,7 +1,3 @@
-// NOTICE: it's actually not a diff, it's a two files changes
-// TODO: rename the component and linked files
-// e.g. FileChangeComponent
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -20,21 +16,22 @@ import {
   LocalserverService,
   NotificationService,
 } from '@/shared/services';
-import { DiffService } from './diff.service';
+import { FileChangesService } from './file-changes.service';
 
 // The component implements a diff
 @Component({
-  selector: 'app-diff',
-  templateUrl: './diff.component.html',
-  styleUrls: ['./diff.component.scss'],
+  selector: 'file-changes',
+  templateUrl: './file-changes.component.html',
+  styleUrls: ['./file-changes.component.scss'],
 })
-export class DiffComponent implements OnInit, OnDestroy {
+export class FileChangesComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   textDiffResponse: TextDiffResponse;
   changes: number[];
   localThreads: Thread[];
   diff: Diff;
-  newCommentSubscription: Subscription;
+  addCommentSubscription: Subscription;
+  deleteCommentSubscription: Subscription;
   file: File = new File();
   branchInfo: BranchInfo;
 
@@ -42,15 +39,19 @@ export class DiffComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private differenceService: DifferenceService,
     private firebaseService: FirebaseService,
-    private diffService: DiffService,
+    private fileChangesService: FileChangesService,
     private localserverService: LocalserverService,
     private notificationService: NotificationService,
   ) {
-    this.newCommentSubscription = this.diffService.newComment.subscribe(
-      param => {
+    this.addCommentSubscription = this.fileChangesService
+      .addCommentChanges.subscribe(param => {
         this.addComment(param.lineNumber, param.comments);
-      },
-    );
+      });
+
+    this.deleteCommentSubscription = this.fileChangesService.
+      deleteCommentChanges.subscribe(isDeleteThread => {
+        this.deleteComment(isDeleteThread);
+      });
   }
 
   ngOnInit() {
@@ -129,8 +130,12 @@ export class DiffComponent implements OnInit, OnDestroy {
   addComment(lineNumber: number, comments: Comment[]): void {
     if (!this.file.getCommitId()) {
       // TODO: Add more UX behavior here
+      // For example:
+      // Remove button 'add comment' if it's an uncommitted file.
+      // Or open uncommitted files in a special readonly mode.
+      // etc
       this.notificationService
-        .error('Comment cannot be added to a uncommitted file');
+        .error('Comment cannot be added to an uncommitted file');
       return;
     }
 
@@ -140,7 +145,9 @@ export class DiffComponent implements OnInit, OnDestroy {
       this.diff.addThread(newThread);
     }
 
-    this.firebaseService.updateDiff(this.diff).subscribe();
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success('Comment is saved in firebase');
+    });
   }
 
   createNewThread(lineNumber: number, comments: Comment[]): Thread {
@@ -155,7 +162,24 @@ export class DiffComponent implements OnInit, OnDestroy {
     return newThread;
   }
 
+  deleteComment(isDeleteThread: boolean): void {
+    if (isDeleteThread) {
+      // Delete all threads without comments.
+      const threads: Thread[] = this.diff.getThreadList();
+      threads.forEach((thread, threadIndex) => {
+        if (thread.getCommentList().length === 0) {
+          threads.splice(threadIndex, 1);
+        }
+      });
+      this.diff.setThreadList(threads);
+    }
+
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success('Comment is deleted');
+    });
+  }
+
   ngOnDestroy() {
-    this.newCommentSubscription.unsubscribe();
+    this.addCommentSubscription.unsubscribe();
   }
 }

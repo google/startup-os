@@ -3,12 +3,13 @@
     {{ line.hasPlaceholder ? '' : 'closed-comment' }}
     {{ codeBlockViewService.lineBackground(line, isNewCode) }}"
     *ngFor="let line of lines; let i=index "
-    (mouseover)="diffService.mouseHover(i, isNewCode)"
-    (click)="diffService.openComments(i)"
+    (mouseover)="fileChangesService.mouseHover(i, isNewCode)"
+    (click)="fileChangesService.openComments(i)"
   >
     <div class="icon">
       <mat-icon
-        *ngIf="diffService.hoverCheck(i, isNewCode) && !line.hasPlaceholder"
+        *ngIf="fileChangesService.hoverCheck(i, isNewCode) &&
+               !line.hasPlaceholder"
       >add_box</mat-icon>
     </div>
     <div class="placeholder" [style.height.px]="line.height"></div>

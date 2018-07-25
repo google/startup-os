@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { DiffService } from '../../diff.service';
+import { FileChangesService } from '../../file-changes.service';
 import { CodeBlockViewService } from '../code-block-view.service';
 import { Line } from '../code-block.component';
 
@@ -17,7 +17,7 @@ export class AddCommentButtonsComponent {
   @Input() isNewCode: boolean;
 
   constructor(
-    public diffService: DiffService,
+    public fileChangesService: FileChangesService,
     public codeBlockViewService: CodeBlockViewService,
   ) { }
 }
