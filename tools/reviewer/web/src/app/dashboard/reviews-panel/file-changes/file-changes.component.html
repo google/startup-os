@@ -12,6 +12,7 @@
     [fileContent]="textDiffResponse.getLeftFileContents()"
     [isNewCode]="false"
     [changes]="changes"
+    [language]="fileChangesService.getLanguage(file.getFilename())"
   ></code-block>
 
   <!-- New code (right) -->
@@ -20,5 +21,6 @@
     [isNewCode]="true"
     [changes]="changes"
     [threads]="localThreads"
+    [language]="fileChangesService.getLanguage(file.getFilename())"
   ></code-block>
 </div>

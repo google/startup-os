@@ -10,7 +10,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
 import { AuthService, Comment } from '@/shared';
-import { DiffService } from '../../diff.service';
+import { FileChangesService } from '../../file-changes.service';
 
 // The component implements comments of code block
 @Component({
@@ -29,7 +29,7 @@ export class CommentsComponent implements OnInit {
   @Input() comments: Comment[];
 
   constructor(
-    private diffService: DiffService,
+    private fileChangesService: FileChangesService,
     private authService: AuthService,
   ) {
     // Detect view changes and send height of the component
@@ -78,28 +78,41 @@ export class CommentsComponent implements OnInit {
   }
 
   sendHeight(): void {
-    this.diffService.setLineHeight({
+    this.fileChangesService.setLineHeight({
       height: this.getHeight(),
       lineNumber: this.lineNumber,
     });
   }
 
   closeComments(): void {
-    this.diffService.closeComments(this.lineNumber);
+    this.fileChangesService.closeComments(this.lineNumber);
   }
 
   addComment(): void {
+    if (!this.textareaControl.value) {
+      // Blank comments are not allowed.
+      return;
+    }
+
     const comment: Comment = new Comment();
     comment.setContent(this.textareaControl.value);
     comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());
 
     this.comments.push(comment);
-    this.diffService.addComment({
+    this.fileChangesService.addComment({
       comments: this.comments,
       lineNumber: this.lineNumber,
     });
 
     this.textareaControl.reset();
+  }
+
+  deleteComment(index: number): void {
+    this.comments.splice(index, 1);
+
+    // Delete the thread if it doesn't contain comments.
+    const isDeleteThread: boolean = this.comments.length === 0;
+    this.fileChangesService.deleteComment(isDeleteThread);
   }
 }

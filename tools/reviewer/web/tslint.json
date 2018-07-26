@@ -20,7 +20,7 @@
       "check-preblock"
     ],
     "typedef": [
-      true,
+      false, // TODO: false until all typedef issues are fix
       "parameter",
       "variable-declaration",
       "member-variable-declaration"

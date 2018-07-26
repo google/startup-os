@@ -6,9 +6,9 @@ import {
   ChangesHighlightingComponent,
   CodeBlockComponent,
   CommentsComponent,
-  DiffComponent,
-  DiffService,
   EditablePropertyComponent,
+  FileChangesComponent,
+  FileChangesService,
   LineNumbersComponent,
   ReplyPopupComponent,
   ReviewComponent,
@@ -25,7 +25,7 @@ export const DashboardComponents = [
   CommentsComponent,
   ChangesHighlightingComponent,
   CodeBlockComponent,
-  DiffComponent,
+  FileChangesComponent,
   EditablePropertyComponent,
   LineNumbersComponent,
   ReplyPopupComponent,
@@ -40,4 +40,4 @@ export const DashboardComponents = [
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [DiffService, ReviewService];
+export const DashboardProviders = [FileChangesService, ReviewService];
