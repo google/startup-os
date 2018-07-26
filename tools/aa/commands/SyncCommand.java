@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.aa.commands;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
@@ -26,6 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class SyncCommand implements AaCommand {
+
+  private static final String TEMP_BRANCH_FOR_SYNC = "temp_branch_for_sync";
 
   private final FileUtils fileUtils;
   private final Config config;
@@ -65,6 +68,8 @@ public class SyncCommand implements AaCommand {
     }
     // then, do the sync for all workspaces
     String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    boolean wasTempBranchForSyncExisted =
+        repoFactory.create(workspacePath).listBranches().contains(TEMP_BRANCH_FOR_SYNC);
     try {
       fileUtils
           .listContents(workspacePath)
@@ -80,7 +85,7 @@ public class SyncCommand implements AaCommand {
                 System.out.println(
                     String.format(
                         "[%s/%s]: switching to temp branch", currentWorkspaceName, repoName));
-                repo.switchBranch("temp_branch_for_sync");
+                repo.switchBranch(TEMP_BRANCH_FOR_SYNC);
                 System.out.println(
                     String.format(
                         "[%s/%s]: committing all changes", currentWorkspaceName, repoName));
@@ -105,9 +110,18 @@ public class SyncCommand implements AaCommand {
                 repo.removeBranch("temp_branch_for_sync");
               });
     } catch (IOException e) {
+      revertChanges(workspacePath, wasTempBranchForSyncExisted);
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void revertChanges(String workspacePath, boolean wasTempBranchForSyncExist) {
+    GitRepo repo = repoFactory.create(workspacePath);
+    ImmutableList<String> branches = repo.listBranches();
+    if (branches.contains(TEMP_BRANCH_FOR_SYNC) && !wasTempBranchForSyncExist) {
+      repo.removeBranch(TEMP_BRANCH_FOR_SYNC);
+    }
   }
 }
 

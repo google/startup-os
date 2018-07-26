@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.aa.commands;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
@@ -24,6 +25,8 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /* A command to init a base folder.
  *
@@ -36,6 +39,11 @@ import javax.inject.Inject;
 public class InitCommand implements AaCommand {
   public static final String BASE_FILENAME = "BASE";
 
+  private static final String HEAD_FOLDERNAME = "head";
+  private static final String WS_FOLDERNAME = "ws";
+  private static final String LOCAL_FOLDERNAME = "local";
+  private static final String LOGS_FOLDERNAME = "logs";
+
   @FlagDesc(name = "base_path", description = "Base path", required = true)
   public static Flag<String> basePath = Flag.create("");
 
@@ -45,6 +53,8 @@ public class InitCommand implements AaCommand {
 
   private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
+  private ImmutableMap<String, Boolean> folderToWasExisted;
+  private boolean wasBaseFileExisted;
 
   @Inject
   public InitCommand(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
@@ -56,17 +66,18 @@ public class InitCommand implements AaCommand {
   public boolean run(String[] args) {
     // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
-
+    wasBaseFileExisted = fileUtils.fileExists(fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
+    folderToWasExisted = checkExistingFolders();
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath.get())) {
         System.out.println("Error: Base folder exists and is not empty");
         System.exit(1);
       }
       // Create folders
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "head"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "ws"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "local"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "logs"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), HEAD_FOLDERNAME));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), WS_FOLDERNAME));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), LOCAL_FOLDERNAME));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), LOGS_FOLDERNAME));
 
       // Write BASE file
       fileUtils.writeString("", fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
@@ -86,11 +97,42 @@ public class InitCommand implements AaCommand {
       System.out.println(e.getMessage());
       System.out.println("Input flags:");
       Flags.printUsage();
+      revertChanges();
       return false;
     } catch (Exception e) {
+      revertChanges();
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void revertChanges() {
+    if (!wasBaseFileExisted) {
+      fileUtils.deleteFileOrDirectoryIfExistsUnchecked(
+          fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
+    }
+    folderToWasExisted.forEach(
+        (path, wasExisted) -> {
+          if (!wasExisted) {
+            fileUtils.deleteDirectoryUnchecked(path);
+          }
+        });
+  }
+
+  private ImmutableMap<String, Boolean> checkExistingFolders() {
+    Map<String, Boolean> result = new HashMap<>();
+    String headPath = fileUtils.joinPaths(basePath.get(), HEAD_FOLDERNAME);
+    String wsPath = fileUtils.joinPaths(basePath.get(), WS_FOLDERNAME);
+    String localPath = fileUtils.joinPaths(basePath.get(), LOCAL_FOLDERNAME);
+    String logsPath = fileUtils.joinPaths(basePath.get(), LOGS_FOLDERNAME);
+
+    result.put(headPath, fileUtils.folderExists(headPath));
+    result.put(wsPath, fileUtils.folderExists(wsPath));
+    result.put(localPath, fileUtils.folderExists(localPath));
+    result.put(logsPath, fileUtils.folderExists(logsPath));
+    result.put(basePath.get(), fileUtils.folderExists(basePath.get()));
+
+    return ImmutableMap.copyOf(result);
   }
 }
 
