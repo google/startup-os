@@ -250,13 +250,6 @@ public class GitRepo implements Repo {
     return merge(branch, false);
   }
 
-  @Override
-  public boolean mergeTheirs(String branch) {
-    switchToMasterBranch();
-    CommandResult commandResult = runCommand("merge " + branch + " -s recursive -Xtheirs");
-    return commandResult.stderr.isEmpty();
-  }
-
   public boolean merge(String branch, boolean remote) {
     switchToMasterBranch();
     CommandResult mergeCommandResult;
@@ -358,7 +351,7 @@ public class GitRepo implements Repo {
 
   public boolean cloneRepo(String url, String path) {
     CommandResult commandResult =
-        runCommand("clone " + url + " " + fileUtils.joinPaths(path, ".git"));
+        runCommand("clone -q " + url + " " + fileUtils.joinPaths(path, ".git"));
     return commandResult.stderr.isEmpty();
   }
 }
