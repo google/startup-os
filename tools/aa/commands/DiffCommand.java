@@ -98,6 +98,9 @@ public class DiffCommand implements AaCommand {
             .addAllReviewer(getReviewers(reviewers.get()))
             .setId(response.getLastDiffId());
 
+    GitRepo gitRepo = this.gitRepoFactory.create(workspacePath);
+    String initialBranch = gitRepo.currentBranch();
+
     try {
       fileUtils
           .listContents(workspacePath)
@@ -114,6 +117,9 @@ public class DiffCommand implements AaCommand {
                 repo.switchBranch(branchName);
               });
     } catch (IOException e) {
+      if (!gitRepo.currentBranch().equals(initialBranch)) {
+        gitRepo.switchBranch(initialBranch);
+      }
       e.printStackTrace();
     }
     return diffBuilder.build();
