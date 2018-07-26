@@ -247,9 +247,7 @@ public class CodeReviewServiceTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    assertEquals(getExpectedResponse(tempFix), response);
+    assertEquals(getExpectedResponse(TEST_FILE_CONTENTS), response);
   }
 
   // Committed, workspace doesn't exist
@@ -279,9 +277,7 @@ public class CodeReviewServiceTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    assertEquals(getExpectedResponse(tempFix), response);
+    assertEquals(getExpectedResponse(TEST_FILE_CONTENTS), response);
   }
 
   // File in head
@@ -295,9 +291,7 @@ public class CodeReviewServiceTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    assertEquals(getExpectedResponse(tempFix), response);
+    assertEquals(getExpectedResponse(TEST_FILE_CONTENTS), response);
   }
 
   // ADD, locally modified, workspace exists, new file
@@ -313,9 +307,7 @@ public class CodeReviewServiceTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    assertEquals(getExpectedResponse(tempFix), response);
+    assertEquals(getExpectedResponse(TEST_FILE_CONTENTS), response);
   }
 
   // ADD, locally modified, workspace doesn't exist, new file
@@ -363,9 +355,7 @@ public class CodeReviewServiceTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    assertEquals(getExpectedResponse(tempFix), response);
+    assertEquals(getExpectedResponse(TEST_FILE_CONTENTS), response);
   }
 
   // COPY, locally modified, workspace exists, previously committed
@@ -381,9 +371,7 @@ public class CodeReviewServiceTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    // TODO: Once we fix the stripping of the last newline in FileUtils.readFile(), remove tempFix.
-    String tempFix = TEST_FILE_CONTENTS.substring(0, 23);
-    assertEquals(getExpectedResponse(tempFix), response);
+    assertEquals(getExpectedResponse(TEST_FILE_CONTENTS), response);
   }
 
   // DELETE, any file
@@ -401,3 +389,4 @@ public class CodeReviewServiceTest {
     assertEquals(getExpectedResponse(""), response);
   }
 }
+
