@@ -38,6 +38,12 @@ import org.yaml.snakeyaml.Yaml;
 
 import org.apache.commons.lang3.StringUtils;
 
+/*
+  Test verifies whether all external dependencies
+  (Maven, git_repository, http_file) all whitelisted
+  (contained in list for key `workspace_dependencies`
+  in whitelist.yaml)
+*/
 public class WorkspaceDepsWhitelistTest {
   private Map<String, List<String>> whitelist;
   private List<String> workspace;
@@ -53,7 +59,7 @@ public class WorkspaceDepsWhitelistTest {
 
   // Trim quotes, spaces, array brackets and trailing commas
   // from parsed value
-  private static final String trimPattern = "[\\s\\[\\]\\,\"]";
+  private static final String TRIM_PATTERN = "[\\s\\[\\]\\,\"]";
 
   @Before
   public void setUp() throws Exception {
@@ -77,7 +83,7 @@ public class WorkspaceDepsWhitelistTest {
         boolean isValidUrl = false;
 
         String key = kv[0].trim();
-        String value = kv[1].replaceAll(trimPattern, "");
+        String value = kv[1].replaceAll(TRIM_PATTERN, "");
         if (keysToValidate.contains(key)) {
 
           for (String validUrl : validUrls) {
