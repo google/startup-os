@@ -22,15 +22,11 @@
     </span>
   </div>
 
-  <div class="review-status" fxFlex="100%">
-    <span>
-      <span [ngClass]="statusList[diff.getStatus()].spanClass">
-        <mat-icon [ngClass]="statusList[diff.getStatus()].iconClass">
-          {{ statusList[diff.getStatus()].icon }}
-        </mat-icon>
-      </span>
-      {{ statusList[diff.getStatus()].label }}
-    </span>
+  <div class="review-status" fxFlex>
+    <mat-icon [style.color]="statusList[diff.getStatus()].color">
+      {{ statusList[diff.getStatus()].icon }}
+    </mat-icon>
+    {{ statusList[diff.getStatus()].label }}
   </div>
 
   <div class="action-buttons" 

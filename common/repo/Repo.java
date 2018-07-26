@@ -23,7 +23,7 @@ import com.google.startupos.common.repo.Protos.File;
 /**
  * An interface for a code repository that uses Trunk-based development. In particular, this means
  * all branches start from master and merge to master. Underlying repo could be Git, Mercurial, or a
- * MemoryRepo for testing.
+ * memory repo for testing.
  *
  * <p>Where possible, if an action fails or takes a long time (and can be cancelled by the user),
  * the implementation should do them in a way that has no side-effect (e.g doing operations on a
@@ -38,6 +38,8 @@ public interface Repo {
   ImmutableList<Commit> getCommits(String branch);
   /** Gets all uncommited files. This includes new, modified and deleted files. */
   ImmutableList<File> getUncommittedFiles();
+  /** Does commit exist. */
+  boolean commitExists(String commitId);
   /** Gets files in commit. */
   ImmutableList<File> getFilesInCommit(String commitId);
   /** Commits files to current branch and returns commit */

@@ -9,6 +9,7 @@ import {
   MatListModule,
   MatProgressSpinnerModule,
   MatSnackBarModule,
+  MatTableModule,
   MatToolbarModule,
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
@@ -24,6 +25,7 @@ const SHARED_MODULES = [
   MatProgressSpinnerModule,
   MatSnackBarModule,
   MatToolbarModule,
+  MatTableModule,
 ];
 
 @NgModule({
