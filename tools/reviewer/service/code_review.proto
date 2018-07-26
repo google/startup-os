@@ -100,7 +100,8 @@ message Author {
   bool needs_attention = 2;
 }
 
-// Comment thread. Note that for whole-diff threads, some fields will be empty (e.g repo_id, commit_id).
+// Comment thread. Note that for whole-diff threads, some fields will be empty
+// (e.g repo_id, commit_id).
 message Thread {
   string repo_id = 1;
   string commit_id = 2;
