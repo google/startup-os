@@ -50,3 +50,11 @@ container_push(
     repository = "startup-os/hello-server",
     tag = "latest",
 )
+
+sh_binary(
+    name = "test",
+    srcs = ["test.sh"],
+    data = [
+        ":hello_server",
+    ],
+)
