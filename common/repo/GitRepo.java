@@ -102,12 +102,6 @@ public class GitRepo implements Repo {
       Process process = Runtime.getRuntime().exec(fullCommandArray);
       result.stdout = readLines(process.getInputStream());
       result.stderr = readLines(process.getErrorStream());
-      // If `clone` command is executed successfully, "Cloning into '<path_to_target_folder>'..."
-      // message is displayed in `Error Stream` instead `InputStream`
-      if (command.get(0).equals("clone")) {
-        String targetDirectory = command.get(2);
-        replaceStderrToStdoutForCloneCommand(result, targetDirectory);
-      }
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -116,13 +110,6 @@ public class GitRepo implements Repo {
     }
     commandLog.add(result);
     return result;
-  }
-
-  private void replaceStderrToStdoutForCloneCommand(CommandResult result, String targetDirectory) {
-    if (result.stderr.equals("Cloning into \'" + targetDirectory + "\'...\n")) {
-      result.stdout = result.stderr + result.stdout;
-      result.stderr = "";
-    }
   }
 
   private String formatError(CommandResult commandResult) {
@@ -396,7 +383,7 @@ public class GitRepo implements Repo {
 
   public boolean cloneRepo(String url, String path) {
     CommandResult commandResult =
-        runCommand("clone " + url + " " + fileUtils.joinPaths(path, ".git"));
+        runCommand("clone -q " + url + " " + fileUtils.joinPaths(path, ".git"));
     return commandResult.stderr.isEmpty();
   }
 }
