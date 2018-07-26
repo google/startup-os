@@ -92,7 +92,15 @@ public class GitRepo implements Repo {
     return runCommand(Arrays.asList(command.split(" ")));
   }
 
+  private CommandResult runCommand(String command, boolean throwException) {
+    return runCommand(Arrays.asList(command.split(" ")), throwException);
+  }
+
   private CommandResult runCommand(List<String> command) {
+    return runCommand(command, true);
+  }
+
+  private CommandResult runCommand(List<String> command, boolean throwException) {
     CommandResult result = new CommandResult();
     try {
       List<String> fullCommand = new ArrayList<>(gitCommandBase);
