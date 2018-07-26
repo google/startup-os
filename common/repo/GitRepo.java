@@ -69,7 +69,15 @@ public class GitRepo implements Repo {
     return runCommand(Arrays.asList(command.split(" ")));
   }
 
+  private CommandResult runCommand(String command, boolean throwException) {
+    return runCommand(Arrays.asList(command.split(" ")), throwException);
+  }
+
   private CommandResult runCommand(List<String> command) {
+    return runCommand(command, true);
+  }
+
+  private CommandResult runCommand(List<String> command, boolean throwException) {
     CommandResult result = new CommandResult();
     try {
       List<String> fullCommand = new ArrayList<>(gitCommandBase);
@@ -82,7 +90,7 @@ public class GitRepo implements Repo {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    if (!result.stderr.isEmpty()) {
+    if (!result.stderr.isEmpty() && throwException) {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
@@ -169,6 +177,7 @@ public class GitRepo implements Repo {
       action:ADD, filename:package/untracked.txt
       */
       File.Action action = getAction(parts[0]);
+      // TODO: Set original_filename for RENAME and COPY
       String filename = action.equals(File.Action.RENAME) ? parts[3] : parts[1];
       files.add(File.newBuilder().setAction(action).setFilename(filename).build());
     }
@@ -196,6 +205,12 @@ public class GitRepo implements Repo {
       default:
         throw new IllegalStateException("Unknown change type " + changeType);
     }
+  }
+
+  @Override
+  public boolean commitExists(String commitId) {
+    CommandResult commandResult = runCommand("cat-file -t " + commitId, false);
+    return commandResult.stdout.trim().startsWith("commit");
   }
 
   @Override

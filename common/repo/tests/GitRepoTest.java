@@ -16,6 +16,13 @@
 
 package com.google.startupos.common.repo.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
@@ -27,15 +34,8 @@ import com.google.startupos.common.repo.Repo;
 import dagger.Component;
 import org.junit.Before;
 import org.junit.Test;
-
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 public class GitRepoTest {
   private static final String TEST_BRANCH = "test_branch";
@@ -46,6 +46,7 @@ public class GitRepoTest {
   private GitRepoFactory gitRepoFactory;
   private Repo repo;
   private GitRepo gitRepo;
+  private String initialCommit;
   private String repoFolder;
   private FileUtils fileUtils;
 
@@ -62,7 +63,7 @@ public class GitRepoTest {
     // We need one commit to make the repo have a master branch.
     fileUtils.writeStringUnchecked(
         "initial commit", fileUtils.joinPaths(repoFolder, "initial_commit.txt"));
-    repo.commit(repo.getUncommittedFiles(), "Initial commit");
+    initialCommit = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
   }
 
   @Singleton
@@ -167,6 +168,7 @@ public class GitRepoTest {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
+    List<File> uncom = repo.getUncommittedFiles();
     assertEquals(1, repo.getUncommittedFiles().size());
   }
 
@@ -320,6 +322,16 @@ public class GitRepoTest {
     assertEquals("master", repo.currentBranch());
     repo.switchBranch(TEST_BRANCH);
     assertEquals(TEST_BRANCH, repo.currentBranch());
+  }
+
+  @Test
+  public void testCommitExists() {
+    assertTrue(repo.commitExists(initialCommit));
+  }
+
+  @Test
+  public void testCommitExists_fakeCommit() {
+    assertFalse(repo.commitExists("123245"));
   }
 }
 
