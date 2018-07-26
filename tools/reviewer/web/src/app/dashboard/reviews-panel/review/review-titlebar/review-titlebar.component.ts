@@ -5,7 +5,7 @@ import {
   FirebaseService,
   NotificationService } from '@/shared/services';
 import { Author, Diff } from '@/shared/shell';
-import { statusList, StatusUI } from './status-ui';
+import { Status, statusList } from '../../status-list';
 
 @Component({
   selector: 'review-titlebar',
@@ -13,7 +13,7 @@ import { statusList, StatusUI } from './status-ui';
   styleUrls: ['./review-titlebar.component.scss'],
 })
 export class ReviewTitlebarComponent implements OnInit {
-  statusList: Array<StatusUI> = statusList;
+  statusList: Status[] = statusList;
   isLoading: boolean = true;
   isReplyDialogShown: boolean = false;
   @Input() diff: Diff;
