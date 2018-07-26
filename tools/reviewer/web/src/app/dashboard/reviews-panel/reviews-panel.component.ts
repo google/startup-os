@@ -1,8 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AuthService, FirebaseService, Lists } from '@/shared';
+import { AuthService, FirebaseService } from '@/shared';
 import { Diff, Reviewer } from '@/shared/shell';
+import { Status, statusList } from './status-list';
+
+export enum DiffGroups {
+  NeedAttention,
+  Incoming,
+  Outgoing,
+  CC,
+  Draft,
+  Pending,
+  Submitted,
+}
 
 @Component({
   selector: 'app-reviews-panel',
@@ -12,12 +23,30 @@ import { Diff, Reviewer } from '@/shared/shell';
 export class ReviewsPanelComponent implements OnInit {
   isLoading: boolean = true;
   diffGroups: Diff[][] = [];
+  displayedColumns: string[] = [
+    'id',
+    'author',
+    'status',
+    'action',
+    'reviewers',
+    'description',
+  ];
+  diffGroupNameList: string[] = [];
+  statusList: Status[] = statusList;
 
   constructor(
     private firebaseService: FirebaseService,
     private authService: AuthService,
     private router: Router,
-  ) { }
+  ) {
+    this.diffGroupNameList[DiffGroups.NeedAttention] = 'Need Attention';
+    this.diffGroupNameList[DiffGroups.Incoming] = 'Incoming Diffs';
+    this.diffGroupNameList[DiffGroups.Outgoing] = 'Outgoing Diffs';
+    this.diffGroupNameList[DiffGroups.CC] = "CC'ed Diffs";
+    this.diffGroupNameList[DiffGroups.Draft] = 'Draft Diffs';
+    this.diffGroupNameList[DiffGroups.Pending] = 'Pending Diffs';
+    this.diffGroupNameList[DiffGroups.Submitted] = 'Submitted Diffs';
+  }
 
   ngOnInit() {
     const urlEmail: string = this.router
@@ -38,10 +67,13 @@ export class ReviewsPanelComponent implements OnInit {
     this.firebaseService.getDiffs().subscribe(
       diffs => {
         // Diffs are categorized in 4 different lists
-        this.diffGroups[Lists.NeedAttention] = [];
-        this.diffGroups[Lists.CcedOn] = [];
-        this.diffGroups[Lists.DraftReviews] = [];
-        this.diffGroups[Lists.SubmittedReviews] = [];
+        this.diffGroups[DiffGroups.NeedAttention] = [];
+        this.diffGroups[DiffGroups.Incoming] = [];
+        this.diffGroups[DiffGroups.Outgoing] = [];
+        this.diffGroups[DiffGroups.CC] = [];
+        this.diffGroups[DiffGroups.Draft] = [];
+        this.diffGroups[DiffGroups.Pending] = [];
+        this.diffGroups[DiffGroups.Submitted] = [];
 
         // Iterate over each object in res
         // and create Diff from proto and categorize
@@ -55,34 +87,34 @@ export class ReviewsPanelComponent implements OnInit {
 
           if (diff.getAuthor().getEmail() === userEmail) {
             // Current user is an author of the diff
+            this.diffGroups[DiffGroups.Incoming].push(diff);
+
             switch (diff.getStatus()) {
               case Diff.Status.SUBMITTED:
                 // Submitted Review
-                this.diffGroups[Lists.SubmittedReviews].push(diff);
+                this.diffGroups[DiffGroups.Submitted].push(diff);
                 break;
               case Diff.Status.REVIEW_NOT_STARTED:
                 // Draft Review
-                this.diffGroups[Lists.DraftReviews].push(diff);
+                this.diffGroups[DiffGroups.Draft].push(diff);
                 break;
             }
             // Attention of current user as an author is requested
             if (diff.getAuthor().getNeedsAttention()) {
-              this.diffGroups[Lists.NeedAttention].push(diff);
+              this.diffGroups[DiffGroups.NeedAttention].push(diff);
             }
           } else if (needAttentionOfList.includes(userEmail)) {
             // Need attention of user
-            this.diffGroups[Lists.NeedAttention].push(diff);
+            this.diffGroups[DiffGroups.NeedAttention].push(diff);
+            this.diffGroups[DiffGroups.Outgoing].push(diff);
           } else if (diff.getCcList().includes(userEmail)) {
             // User is cc'ed on this
-            this.diffGroups[Lists.CcedOn].push(diff);
+            this.diffGroups[DiffGroups.CC].push(diff);
           }
         }
 
         this.sortDiffs();
         this.isLoading = false;
-      },
-      () => {
-        // Permission Denied
       },
     );
   }
@@ -97,7 +129,7 @@ export class ReviewsPanelComponent implements OnInit {
   }
 
   // Navigate to a Diff
-  diffClicked(diffId: number): void {
+  openDiff(diffId: number): void {
     this.router.navigate(['diff/', diffId]);
   }
 
