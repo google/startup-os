@@ -20,9 +20,10 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.GitRepoFactory;
+
 import javax.inject.Inject;
-import java.nio.file.Paths;
-import org.eclipse.jgit.api.Git;
 
 /* A command to init a base folder.
  *
@@ -42,11 +43,13 @@ public class InitCommand implements AaCommand {
   public static Flag<String> startuposRepo =
       Flag.create("https://github.com/google/startup-os.git");
 
+  private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
 
   @Inject
-  public InitCommand(FileUtils fileUtils) {
+  public InitCommand(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
     this.fileUtils = fileUtils;
+    this.gitRepoFactory = gitRepoFactory;
   }
 
   @Override
@@ -72,10 +75,8 @@ public class InitCommand implements AaCommand {
         // Clone StartupOS repo into head:
         String startupOsPath = fileUtils.joinPaths(basePath.get(), "head", "startup-os");
         System.out.println("Cloning StartupOS into " + startupOsPath);
-        Git.cloneRepository()
-            .setURI(startuposRepo.get())
-            .setDirectory(Paths.get(startupOsPath).toFile())
-            .call();
+        GitRepo repo = this.gitRepoFactory.create(startupOsPath);
+        repo.cloneRepo(startuposRepo.get(), startupOsPath);
         System.out.println("Completed Cloning");
       } else {
         System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");

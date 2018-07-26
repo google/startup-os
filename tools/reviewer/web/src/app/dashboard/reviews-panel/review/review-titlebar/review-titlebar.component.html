@@ -9,7 +9,7 @@
       }"
     ><button mat-raised-button 
         class="add-to-list"
-        *ngIf="editable"
+        *ngIf="isEditable"
         (click)="changeAttentionOfAuthor()"
       >
         {{ 
@@ -22,15 +22,11 @@
     </span>
   </div>
 
-  <div class="review-status" fxFlex="100%">
-    <span>
-      <span [ngClass]="statusList[diff.getStatus()].spanClass">
-        <mat-icon [ngClass]="statusList[diff.getStatus()].iconClass">
-          {{ statusList[diff.getStatus()].icon }}
-        </mat-icon>
-      </span>
-      {{ statusList[diff.getStatus()].label }}
-    </span>
+  <div class="review-status" fxFlex>
+    <mat-icon [style.color]="statusList[diff.getStatus()].color">
+      {{ statusList[diff.getStatus()].icon }}
+    </mat-icon>
+    {{ statusList[diff.getStatus()].label }}
   </div>
 
   <div class="action-buttons" 
@@ -38,12 +34,22 @@
     fxLayoutGap="20px"
     fxFlex="212px"
     fxLayoutAlign="end end">
-    <!-- TODO: add some action for the buttons -->
     <div class="submit">
       <button>Submit</button>
     </div>
     <div class="reply">
-      <button>Reply</button>
+      <button (click)="isReplyDialogShown = true">Reply</button>
+    </div>
+    <div *ngIf="isReplyDialogShown" class="reply-popup">
+      <div>
+        <reply-popup [diff]="diff" (submitted)="replySubmitted()"></reply-popup>
+      </div>
     </div>
   </div>
+</div>
+
+<div 
+  class="reply-popup-overlay"
+  *ngIf="isReplyDialogShown"
+  (click)="isReplyDialogShown = false">
 </div>

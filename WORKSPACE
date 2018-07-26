@@ -81,16 +81,6 @@ android_sdk_repository(
     build_tools_version = "27.0.3",
 )
 
-maven_jar(
-    name = "com_squareup_okhttp_okhttp_2_7_2",
-    artifact = "com.squareup.okhttp:okhttp:jar:2.7.2",
-)
-
-maven_jar(
-    name = "com_squareup_okio_okio_1_6_0",
-    artifact = "com.squareup.okio:okio:jar:1.6.0",
-)
-
 http_archive(
     name = "com_google_protobuf",
     sha256 = "e514c2e613dc47c062ea8df480efeec368ffbef98af0437ac00cdaadcb0d80d2",
@@ -167,25 +157,27 @@ http_archive(
 
 http_archive(
     name = "io_bazel_rules_webtesting",
-    strip_prefix = "rules_webtesting-master",
-    urls = [
-        "https://github.com/bazelbuild/rules_webtesting/archive/master.tar.gz",
-    ],
+    url = "https://github.com/bazelbuild/rules_webtesting/archive/ca7b8062d9cf4ef2fde9193c7d37a0764c4262d7.zip",
+    strip_prefix = "rules_webtesting-ca7b8062d9cf4ef2fde9193c7d37a0764c4262d7",
+    sha256 = "28c73cf9d310fa6dba30e66bdb98071341c99c3feb8662f2d3883a632de97d72",
 )
 
-git_repository(
+http_archive(
     name = "build_bazel_rules_nodejs",
-    remote = "https://github.com/bazelbuild/rules_nodejs.git",
-    tag = "0.9.1",
+    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.8.0.zip",
+    strip_prefix = "rules_nodejs-0.8.0",
+    sha256 = "4e40dd49ae7668d245c3107645f2a138660fcfd975b9310b91eda13f0c973953",
 )
 
 load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
 
 node_repositories(package_json = ["//:package.json"])
 
-local_repository(
+http_archive(
     name = "build_bazel_rules_typescript",
-    path = "node_modules/@bazel/typescript",
+    url = "https://github.com/bazelbuild/rules_typescript/archive/v0.13.0.zip",
+    strip_prefix = "rules_typescript-0.13.0",
+    sha256 = "8f2767ff56ad68c80c62e9a1cdc2ba2c2ba0b19d350f713365e5333045df02e3",
 )
 
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")

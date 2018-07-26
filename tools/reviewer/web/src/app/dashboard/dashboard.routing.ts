@@ -1,5 +1,9 @@
 import { RouterModule, Routes } from '@angular/router';
-import { DiffComponent, ReviewComponent, ReviewsPanelComponent } from './';
+import {
+  FileChangesComponent,
+  ReviewComponent,
+  ReviewsPanelComponent,
+} from './';
 
 const routes: Routes = [
   {
@@ -16,7 +20,7 @@ const routes: Routes = [
       },
       {
         path: 'diff',
-        children: [{ path: '**', component: DiffComponent }],
+        children: [{ path: '**', component: FileChangesComponent }],
       },
     ],
   },

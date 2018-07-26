@@ -1,3 +1,54 @@
-.loading {
-  padding: 20px;
+:host {
+  >.loading {
+    margin-top: 25vh;
+  }
+  >.diff-groups {
+    >.diff-group {
+      >.diff-group-title {
+        padding: 8px 23px;
+        background: #cdecff;
+        border: solid 1px #c1c1c1;
+        >span {
+          font-size: 20px;
+        }
+        >.group-name {
+          font-weight: bold;
+        }
+      }
+      >.diff-list {
+        >.mat-header-row {
+          background: #f3f3f3;
+          padding: 0 23px;
+          min-height: 40px;
+          >.mat-header-cell {
+            font-size: 16px;
+          }
+        }
+        >.mat-row {
+          cursor: pointer;
+        }
+        .mat-column-id {
+          flex: 0 0 120px;
+        }
+        .mat-column-author {
+          flex: 0 0 250px;
+        }
+        .mat-column-status {
+          flex: 0 0 250px;
+          display: flex;
+          align-items: center;
+          >.mat-icon {
+            margin-right: 5px;
+          }
+        }
+        .mat-column-action {
+          flex: 0 0 250px;
+        }
+      }
+      >.placeholder {
+        background: #f3f3f3;
+        height: 14px;
+      }
+    }
+  }
 }

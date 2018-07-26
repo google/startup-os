@@ -1,77 +1,80 @@
-<div class="loading" *ngIf="isLoading">
-  <mat-spinner></mat-spinner>
+<!-- Loading -->
+<div 
+  class="loading"
+  fxLayoutAlign="center"
+  *ngIf="isLoading">
+  <mat-spinner [diameter]="70"></mat-spinner>
 </div>
 
-<div fxLayout="column" fxLayoutGap="5%" *ngIf="!isLoading">
-  <!-- Container for each list -->
-  <ng-container *ngFor="let list of diffGroups; let listIndex = index;">
-    <div fxFlex>
-      <mat-list class="diff-list">
-        <!-- Select list title based on the index of list -->
-        <ng-container [ngSwitch]="listIndex">
-          <h3 mat-subheader *ngSwitchCase="0">
-            Need Attention - {{ diffGroups[0].length }}
-          </h3>
-          <h3 mat-subheader *ngSwitchCase="1">
-            CC'ed on - {{ diffGroups[1].length }}
-          </h3>
-          <h3 mat-subheader *ngSwitchCase="2">
-            Draft Reviews - {{ diffGroups[2].length }}
-          </h3>
-          <h3 mat-subheader *ngSwitchCase="3">
-            Submitted Reviews - {{ diffGroups[3].length }}
-          </h3>
-        </ng-container>
-        <mat-list-item class="header-row">
-          <div fxFlex="7%">Diff id</div>
-          <div fxFlex="10%">Author</div>
-          <div fxFlex="18%">Status</div>
-          <div fxFlex="20%">Last Action</div>
-          <div fxFlex="20%">Reviewers</div>
-          <div fxFlex="25%">Description</div>
-        </mat-list-item>
-        <!-- Iterate over each item in a list and print it out -->
-        <mat-list-item
-          *ngFor="let diff of list; let i = index; let last = last"
-          (click)="diffClicked(diff.getId())"
-          [class.last-item]="last">
-          <div fxFlex="7%">{{ diff.getId() }}</div>
-          <div fxFlex="10%">
-            {{ authService.getUsername(diff.getAuthor().getEmail()) }}
-          </div>
-          <div fxFlex="18%">
-            <ng-container [ngSwitch]="diff.getStatus()">
-              <span *ngSwitchCase="'0'">Review Not Started</span>
-              <span *ngSwitchCase="'1'">Needs More Work</span>
-              <span *ngSwitchCase="2">Under Review</span>
-              <span *ngSwitchCase="'3'">Accepted</span>
-              <span *ngSwitchCase="'4'">Submitted</span>
-              <span *ngSwitchCase="5">Reverted</span>
-            </ng-container>
-          </div>
-          <div fxFlex="20%">
-            {{ diff.getModifiedTimestamp() | date: 'mediumDate' }}
-          </div>
-          <div fxFlex="20%">
-            <!-- Print out reviewer's list -->
-            <a>
-              {{ getUsernames(diff.getReviewerList()) }}
-            </a>
-            <!-- If no reviewers are present -->
-            <ng-container *ngIf="diff.getReviewerList().length === 0">
-              <span>
-                Not available
-              </span>
-            </ng-container>
-          </div>
-          <!-- If description doesn't exist print out 'Not Available' -->
-          <div class="description" fxFlex="25%">{{
-            diff.getDescription() ?
-              diff.getDescription() :
-              'Not available'
-          }}</div>
-        </mat-list-item>
-      </mat-list>
+<!-- Diff groups -->
+<div class="diff-groups" *ngIf="!isLoading">
+  <div
+    class="diff-group"
+    *ngFor="let diffGroup of diffGroups; let i = index;"
+  >
+    <!-- Title of diff group -->
+    <div class="diff-group-title">
+      <span class="group-name">{{ diffGroupNameList[i] }}</span>
+      <span class="diff-amount"> - {{ diffGroup.length }}</span>
     </div>
-  </ng-container>
+    <!-- Diff list inside a group -->
+    <mat-table
+      class="diff-list"
+      [dataSource]="diffGroup"
+      *ngIf="diffGroup.length > 0"
+    >
+      <!-- Columns -->
+
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef> Diff </mat-header-cell>
+        <mat-cell *matCellDef="let diff"> {{ diff.getId() }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="author">
+        <mat-header-cell *matHeaderCellDef> Author </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ authService.getUsername(diff.getAuthor().getEmail()) }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          <mat-icon [style.color]="statusList[diff.getStatus()].color">
+            {{ statusList[diff.getStatus()].icon }}
+          </mat-icon>
+          {{ statusList[diff.getStatus()].label }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getModifiedTimestamp() | date: 'mediumDate' }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="reviewers">
+        <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ getUsernames(diff.getReviewerList()) }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getDescription() }}
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row
+        *matRowDef="let diff; columns: displayedColumns;"
+        (click)="openDiff(diff.getId())"
+      ></mat-row>
+    </mat-table>
+    <!-- Show the placeholder, if group contains no diffs -->
+    <div class="placeholder" *ngIf="diffGroup.length === 0"></div>
+  </div>
 </div>

@@ -1,12 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { FirebaseService, NotificationService } from '@/shared/services';
-
 import {
   AuthService,
-} from '@/shared/services';
-import { Diff } from '@/shared/shell';
-import { statusList } from './status-ui';
+  FirebaseService,
+  NotificationService } from '@/shared/services';
+import { Author, Diff } from '@/shared/shell';
+import { Status, statusList } from '../../status-list';
 
 @Component({
   selector: 'review-titlebar',
@@ -14,10 +13,11 @@ import { statusList } from './status-ui';
   styleUrls: ['./review-titlebar.component.scss'],
 })
 export class ReviewTitlebarComponent implements OnInit {
-  statusList = statusList;
+  statusList: Status[] = statusList;
   isLoading: boolean = true;
+  isReplyDialogShown: boolean = false;
   @Input() diff: Diff;
-  @Input() editable;
+  @Input() isEditable: boolean;
 
   constructor(
     public authService: AuthService,
@@ -31,7 +31,7 @@ export class ReviewTitlebarComponent implements OnInit {
 
   // Request or cancel attention of the author
   changeAttentionOfAuthor(): void {
-    const author = this.diff.getAuthor();
+    const author: Author = this.diff.getAuthor();
     author.setNeedsAttention(!author.getNeedsAttention());
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
@@ -42,5 +42,10 @@ export class ReviewTitlebarComponent implements OnInit {
     }, () => {
       this.notificationService.error('Error');
     });
+  }
+
+  // Hide the Reply form when it's submitted successfully
+  replySubmitted(): void {
+    this.isReplyDialogShown = false;
   }
 }

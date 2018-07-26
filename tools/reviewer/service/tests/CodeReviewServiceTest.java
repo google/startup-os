@@ -401,4 +401,3 @@ public class CodeReviewServiceTest {
     assertEquals(getExpectedResponse(""), response);
   }
 }
-

@@ -6,14 +6,16 @@ import {
   ChangesHighlightingComponent,
   CodeBlockComponent,
   CommentsComponent,
-  DiffComponent,
-  DiffService,
   EditablePropertyComponent,
+  FileChangesComponent,
+  FileChangesService,
   LineNumbersComponent,
+  ReplyPopupComponent,
   ReviewComponent,
   ReviewDiscussionComponent,
   ReviewerListComponent,
   ReviewFilesComponent,
+  ReviewService,
   ReviewsPanelComponent,
   ReviewTitlebarComponent,
 } from './reviews-panel/';
@@ -23,9 +25,10 @@ export const DashboardComponents = [
   CommentsComponent,
   ChangesHighlightingComponent,
   CodeBlockComponent,
-  DiffComponent,
+  FileChangesComponent,
   EditablePropertyComponent,
   LineNumbersComponent,
+  ReplyPopupComponent,
   ReviewerListComponent,
   CCListComponent,
   ReviewComponent,
@@ -37,4 +40,4 @@ export const DashboardComponents = [
 
 export const DashboardEntryComponents = [];
 
-export const DashboardProviders = [DiffService];
+export const DashboardProviders = [FileChangesService, ReviewService];

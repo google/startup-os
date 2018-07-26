@@ -58,8 +58,10 @@ public class GitRepo implements Repo {
   private final Repository jGitRepo;
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
+  private final FileUtils fileUtils;
 
   GitRepo(@Provided FileUtils fileUtils, String repoPath) {
+    this.fileUtils = fileUtils;
     gitCommandBase =
         Arrays.asList(
             "git", "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"), "--work-tree=" + repoPath);
@@ -106,7 +108,6 @@ public class GitRepo implements Repo {
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
-      process.waitFor();
       result.stdout = readLines(process.getInputStream());
       result.stderr = readLines(process.getErrorStream());
     } catch (Exception e) {
@@ -374,7 +375,7 @@ public class GitRepo implements Repo {
 
   @Override
   public String getFileContents(String commitId, String path) {
-    CommandResult commandResult = runCommand("show " + commitId + ":" + path);
+    CommandResult commandResult = runCommand("--no-pager show " + commitId + ":" + path);
     String result = commandResult.stdout;
     int lastIndexOfNewLineSymbol = result.lastIndexOf("\n");
     if (lastIndexOfNewLineSymbol >= 0) {
@@ -392,6 +393,12 @@ public class GitRepo implements Repo {
 
   public String currentBranch() {
     return runCommand("rev-parse --abbrev-ref HEAD").stdout.trim();
+  }
+
+  public boolean cloneRepo(String url, String path) {
+    CommandResult commandResult =
+        runCommand("clone " + url + " " + fileUtils.joinPaths(path, ".git"));
+    return commandResult.stderr.isEmpty();
   }
 }
 
