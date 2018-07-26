@@ -22,14 +22,12 @@ import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import com.google.startupos.tools.localserver.service.AuthService;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import dagger.Component;
 import org.junit.Before;
 import org.junit.After;
-import org.junit.Test;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.aa.AaModule;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
@@ -41,17 +39,13 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.common.repo.Repo;
 import com.google.startupos.common.flags.Flags;
 import javax.inject.Named;
-import dagger.Module;
 import dagger.Provides;
 import java.nio.file.FileSystems;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import com.google.startupos.common.TextDifferencer;
-import com.google.startupos.common.repo.Protos.Commit;
 import io.grpc.Server;
 import io.grpc.ManagedChannel;
 import java.util.concurrent.TimeUnit;
@@ -96,11 +90,10 @@ public class CodeReviewServiceTest {
   private String fileInHeadCommitId;
   private GitRepo repo;
   private FileUtils fileUtils;
-  private TextDifferencer textDifferencer;
-  TestComponent component;
-  Server server;
-  ManagedChannel channel;
-  CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
+  private TestComponent component;
+  private Server server;
+  private ManagedChannel channel;
+  private CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
 
   @Before
   public void setup() throws IOException {
@@ -207,13 +200,13 @@ public class CodeReviewServiceTest {
     return joinPaths(aaBaseFolder, "ws", workspace);
   }
 
-  TextDiffResponse getResponse(File file) {
+  private TextDiffResponse getResponse(File file) {
     final TextDiffRequest request =
         TextDiffRequest.newBuilder().setLeftFile(file).setRightFile(file).build();
     return blockingStub.getTextDiff(request);
   }
 
-  TextDiffResponse getExpectedResponse(String contents) {
+  private TextDiffResponse getExpectedResponse(String contents) {
     return TextDiffResponse.newBuilder()
         .addAllChanges(component.getTextDifferencer().getAllTextChanges(contents, contents))
         .setLeftFileContents(contents)
@@ -221,23 +214,23 @@ public class CodeReviewServiceTest {
         .build();
   }
 
-  void writeFile(String contents) {
+  private void writeFile(String contents) {
     writeFile(TEST_FILE, contents);
   }
 
-  void writeFile(String filename, String contents) {
+  private void writeFile(String filename, String contents) {
     fileUtils.writeStringUnchecked(
         contents, fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
   }
 
-  void deleteFile(String filename) {
+  private void deleteFile(String filename) {
     fileUtils.deleteFileOrDirectoryIfExistsUnchecked(
         fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
   }
 
   // Committed, workspace exists
   @Test
-  public void testTextDiff_committedAndWorkspaceExists() throws Exception {
+  public void testTextDiff_committedAndWorkspaceExists() {
     File file =
         File.newBuilder()
             .setRepoId("startup-os")
@@ -252,7 +245,7 @@ public class CodeReviewServiceTest {
 
   // Committed, workspace doesn't exist
   @Test
-  public void testTextDiff_committedAndWorkspaceNotExists() throws Exception {
+  public void testTextDiff_committedAndWorkspaceNotExists() {
     File file =
         File.newBuilder()
             .setRepoId("startup-os")
@@ -267,7 +260,7 @@ public class CodeReviewServiceTest {
 
   // Committed, workspace doesn't exist (pushed)
   @Test
-  public void testTextDiff_committedAndWorkspaceNotExists_pushed() throws Exception {
+  public void testTextDiff_committedAndWorkspaceNotExists_pushed() {
     File file =
         File.newBuilder()
             .setRepoId("startup-os")
@@ -282,7 +275,7 @@ public class CodeReviewServiceTest {
 
   // File in head
   @Test
-  public void testTextDiff_fileInHead() throws Exception {
+  public void testTextDiff_fileInHead() {
     File file =
         File.newBuilder()
             .setRepoId("startup-os")
@@ -296,7 +289,7 @@ public class CodeReviewServiceTest {
 
   // ADD, locally modified, workspace exists, new file
   @Test
-  public void testTextDiff_locallyModifiedWorkspaceExistsNewFile() throws Exception {
+  public void testTextDiff_locallyModifiedWorkspaceExistsNewFile() {
     writeFile("somefile.txt", TEST_FILE_CONTENTS);
     writeFile(TEST_FILE_CONTENTS);
     File file =
@@ -327,7 +320,7 @@ public class CodeReviewServiceTest {
 
   // MODIFY, locally modified, workspace exists, previously committed
   @Test
-  public void testTextDiff_locallyModifiedWorkspaceExistsPreviouslyCommitted() throws Exception {
+  public void testTextDiff_locallyModifiedWorkspaceExistsPreviouslyCommitted() {
     writeFile("Some changes");
 
     File file =
@@ -343,7 +336,7 @@ public class CodeReviewServiceTest {
 
   // RENAME, locally modified, workspace exists, previously committed
   @Test
-  public void renamedWorkspaceExistsPreviouslyCommitted() throws Exception {
+  public void renamedWorkspaceExistsPreviouslyCommitted() {
     writeFile("renamed.txt", TEST_FILE_CONTENTS);
     deleteFile(TEST_FILE);
 
@@ -360,7 +353,7 @@ public class CodeReviewServiceTest {
 
   // COPY, locally modified, workspace exists, previously committed
   @Test
-  public void copiedWorkspaceExistsPreviouslyCommitted() throws Exception {
+  public void copiedWorkspaceExistsPreviouslyCommitted() {
     writeFile("copied.txt", TEST_FILE_CONTENTS);
 
     File file =
@@ -376,7 +369,7 @@ public class CodeReviewServiceTest {
 
   // DELETE, any file
   @Test
-  public void testTextDiff_deletedFile() throws Exception {
+  public void testTextDiff_deletedFile() {
     File file =
         File.newBuilder()
             .setRepoId("startup-os")
