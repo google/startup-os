@@ -216,8 +216,8 @@ public abstract class Flag<T> {
     if ((prevValue != null) && !prevValue.equals(value)) {
       log.atSevere()
           .log(
-              "Flag value has changed between get() calls. Previous value is %s and current is %s",
-              prevValue, value);
+              "Flag %s value has changed between get() calls. Previous value is %s and current is %s",
+              name, prevValue, value);
     }
     if (required && value.equals(Flags.getDefaultFlagValue(name))) {
       throw new IllegalArgumentException(

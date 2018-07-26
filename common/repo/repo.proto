@@ -32,6 +32,8 @@ message File {
   }
   // Includes the path + filename, relative to repo
   string filename = 1;
+  // Original filename in case of rename and copy
+  string original_filename = 7;
   // Empty if referring to base/head or current user
   string user = 2;
   // Empty if referring to base/head
