@@ -50,13 +50,13 @@ public class DiffCommand implements AaCommand {
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
   @FlagDesc(name = "reviewers", description = "Reviewers (split by comma)")
-  public static Flag<String> reviewers = Flag.create("");
+  static Flag<String> reviewers = Flag.create("");
 
   @FlagDesc(name = "description", description = "Description")
-  public static Flag<String> description = Flag.create("");
+  static Flag<String> description = Flag.create("");
 
   @FlagDesc(name = "buglink", description = "Buglink")
-  public static Flag<String> buglink = Flag.create("");
+  static Flag<String> buglink = Flag.create("");
 
   @Inject
   public DiffCommand(
