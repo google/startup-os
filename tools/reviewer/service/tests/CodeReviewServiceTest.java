@@ -155,6 +155,7 @@ public class CodeReviewServiceTest {
     fileUtils.mkdirs(initialRepoFolder);
     GitRepo repo = gitRepoFactory.create(initialRepoFolder);
     repo.init();
+    repo.setFakeUsersData();
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinPaths(initialRepoFolder, FILE_IN_HEAD));
     fileInHeadCommitId = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
@@ -177,6 +178,7 @@ public class CodeReviewServiceTest {
     workspaceCommand.run(args);
     repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
+    repo.setFakeUsersData();
   }
 
   private void createBlockingStub() throws IOException {
