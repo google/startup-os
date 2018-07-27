@@ -28,7 +28,6 @@ java_library(
         "//third_party/maven/com/jcraft:jsch",
         "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
         "//tools/reviewer/service:code_review_java_proto",
     ],
 )
