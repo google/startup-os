@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
   private final List<String> gitCommandBase;
@@ -292,6 +291,7 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean isMerged(String branch) {
+    // TODO: Implement method
     throw new UnsupportedOperationException("Not implemented");
   }
 
