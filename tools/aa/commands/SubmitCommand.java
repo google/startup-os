@@ -19,7 +19,6 @@ package com.google.startupos.tools.aa.commands;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
@@ -38,7 +37,7 @@ public class SubmitCommand implements AaCommand {
   private final FileUtils fileUtils;
   private final GitRepoFactory gitRepoFactory;
   private String workspacePath;
-  private Integer currentDiffNumber;
+  private Integer diffNumber;
 
   private static final Integer GRPC_PORT = 8001;
 
@@ -47,14 +46,13 @@ public class SubmitCommand implements AaCommand {
   @Inject
   public SubmitCommand(
       FileUtils utils,
-      Protos.Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName,
-      @Named("Current diff number") Integer currentDiffNumber) {
+      @Named("Workspace path") String workspacePath,
+      @Named("Diff number") Integer diffNumber) {
     this.fileUtils = utils;
     this.gitRepoFactory = repoFactory;
-    this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
-    this.currentDiffNumber = currentDiffNumber;
+    this.workspacePath = workspacePath;
+    this.diffNumber = diffNumber;
 
     ManagedChannel channel =
         ManagedChannelBuilder.forAddress("localhost", GRPC_PORT).usePlaintext().build();
@@ -63,7 +61,7 @@ public class SubmitCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    if (currentDiffNumber == -1) {
+    if (diffNumber == -1) {
       System.out.println(
           RED_ERROR + "Workspace has no diff to submit (git branch has no D# branch)");
       return false;
@@ -71,14 +69,14 @@ public class SubmitCommand implements AaCommand {
 
     final Diff.Builder diffBuilder =
         codeReviewBlockingStub
-            .getDiff(DiffRequest.newBuilder().setDiffId(currentDiffNumber).build())
+            .getDiff(DiffRequest.newBuilder().setDiffId(diffNumber).build())
             .toBuilder();
 
     boolean hasApprovedReviews =
         diffBuilder.getReviewerList().stream().anyMatch(Reviewer::getApproved);
 
     if (!hasApprovedReviews) {
-      System.out.println(RED_ERROR + String.format("D%d is not approved yet", currentDiffNumber));
+      System.out.println(RED_ERROR + String.format("D%d is not approved yet", diffNumber));
       return false;
     }
 

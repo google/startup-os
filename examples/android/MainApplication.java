@@ -17,14 +17,9 @@
 package com.google.startupos.examples.android;
 
 import android.app.Application;
-
 import java.io.IOException;
-
-import com.google.firebase.FirebaseApp;
 import android.util.Log;
 import org.json.JSONException;
-
-import com.google.startupos.examples.android.FirestoreInitializer;
 
 public class MainApplication extends Application {
 
