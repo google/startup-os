@@ -22,7 +22,6 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos.Config;
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,13 +37,10 @@ public class PatchCommand implements AaCommand {
 
   @Inject
   public PatchCommand(
-      FileUtils utils,
-      Config config,
-      GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName) {
+      FileUtils utils, GitRepoFactory repoFactory, @Named("Workspace path") String workspacePath) {
     this.fileUtils = utils;
     this.gitRepoFactory = repoFactory;
-    this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    this.workspacePath = workspacePath;
   }
 
   @Override

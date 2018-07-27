@@ -52,9 +52,8 @@ public class AaModule {
   }
 
   @Provides
-  @Named("Current workspace name")
-  public static String getCurrentWorkspaceName(
-      FileUtils fileUtils, @Named("Base path") String basePath) {
+  @Named("Workspace name")
+  public static String getWorkspaceName(FileUtils fileUtils, @Named("Base path") String basePath) {
     Path currentFolder = Paths.get(fileUtils.getCurrentWorkingDirectory());
     Path wsFolder = Paths.get(fileUtils.joinPaths(basePath, "ws"));
     try {
@@ -67,6 +66,21 @@ public class AaModule {
     } catch (IllegalArgumentException ex) {
       throw new RuntimeException("You're not in a workspace");
     }
+  }
+
+  @Provides
+  @Named("Workspace path")
+  public static String getWorkspacePath(
+      FileUtils fileUtils,
+      @Named("Base path") String basePath,
+      @Named("Workspace name") String workspaceName) {
+    return fileUtils.joinPaths(basePath, "ws", workspaceName);
+  }
+
+  @Provides
+  @Named("Head path")
+  public static String getHeadPath(FileUtils fileUtils, @Named("Base path") String basePath) {
+    return fileUtils.joinPaths(basePath, "head");
   }
 
   /**
@@ -84,13 +98,11 @@ public class AaModule {
   }
 
   @Provides
-  @Named("Current diff number")
-  public static Integer currentDiffNumber(
+  @Named("Diff number")
+  public static Integer diffNumber(
       FileUtils fileUtils,
-      @Named("Current workspace name") String currentWorkspaceName,
-      GitRepoFactory gitRepoFactory,
-      Config config) {
-    String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+      @Named("Workspace path") String workspacePath,
+      GitRepoFactory gitRepoFactory) {
     try {
       String firstWorkspacePath =
           fileUtils

@@ -24,7 +24,6 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.AaModule;
-import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import dagger.Component;
