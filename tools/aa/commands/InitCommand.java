@@ -36,11 +36,6 @@ import javax.inject.Inject;
 public class InitCommand implements AaCommand {
   public static final String BASE_FILENAME = "BASE";
 
-  private static final String HEAD_FOLDERNAME = "head";
-  private static final String WS_FOLDERNAME = "ws";
-  private static final String LOCAL_FOLDERNAME = "local";
-  private static final String LOGS_FOLDERNAME = "logs";
-
   @FlagDesc(name = "base_path", description = "Base path", required = true)
   public static Flag<String> basePath = Flag.create("");
 
@@ -50,7 +45,7 @@ public class InitCommand implements AaCommand {
 
   private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
-  private boolean wasBaseFolderExisted = true;
+  private boolean baseFolderExistedBefore = true;
 
   @Inject
   public InitCommand(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
@@ -67,12 +62,12 @@ public class InitCommand implements AaCommand {
         System.out.println("Error: Base folder exists and is not empty");
         System.exit(1);
       }
-      wasBaseFolderExisted = fileUtils.folderExists(basePath.get());
+      baseFolderExistedBefore = fileUtils.folderExists(basePath.get());
       // Create folders
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), HEAD_FOLDERNAME));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), WS_FOLDERNAME));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), LOCAL_FOLDERNAME));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), LOGS_FOLDERNAME));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "head"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "ws"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "local"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "logs"));
 
       // Write BASE file
       fileUtils.writeString("", fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
@@ -102,7 +97,7 @@ public class InitCommand implements AaCommand {
   }
 
   private void revertChanges() {
-    if (wasBaseFolderExisted) {
+    if (baseFolderExistedBefore) {
       fileUtils.clearDirectoryUnchecked(basePath.get());
     } else {
       fileUtils.deleteDirectoryUnchecked(basePath.get());

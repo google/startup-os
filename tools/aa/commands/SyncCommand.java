@@ -68,8 +68,8 @@ public class SyncCommand implements AaCommand {
     }
     // then, do the sync for all workspaces
     String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
-    boolean wasTempBranchForSyncExisted =
-        repoFactory.create(workspacePath).listBranches().contains(TEMP_BRANCH_FOR_SYNC);
+    GitRepo gitRepo = this.repoFactory.create(workspacePath);
+    String initialBranch = gitRepo.currentBranch();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -110,18 +110,12 @@ public class SyncCommand implements AaCommand {
                 repo.removeBranch("temp_branch_for_sync");
               });
     } catch (IOException e) {
-      revertChanges(workspacePath, wasTempBranchForSyncExisted);
+      if (!gitRepo.currentBranch().equals(initialBranch)) {
+        gitRepo.switchBranch(initialBranch);
+      }
       e.printStackTrace();
     }
     return true;
-  }
-
-  private void revertChanges(String workspacePath, boolean wasTempBranchForSyncExist) {
-    GitRepo repo = repoFactory.create(workspacePath);
-    ImmutableList<String> branches = repo.listBranches();
-    if (branches.contains(TEMP_BRANCH_FOR_SYNC) && !wasTempBranchForSyncExist) {
-      repo.removeBranch(TEMP_BRANCH_FOR_SYNC);
-    }
   }
 }
 
