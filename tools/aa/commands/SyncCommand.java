@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos.Config;
 import java.io.IOException;
 import java.nio.file.Paths;
 import javax.inject.Inject;
@@ -31,26 +30,27 @@ public class SyncCommand implements AaCommand {
   private static final String TEMP_BRANCH_FOR_SYNC = "temp_branch_for_sync";
 
   private final FileUtils fileUtils;
-  private final Config config;
   private GitRepoFactory repoFactory;
-  private String currentWorkspaceName;
+  private String headPath;
+  private String workspaceName;
+  private String workspacePath;
 
   @Inject
   public SyncCommand(
       FileUtils utils,
-      Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName) {
+      @Named("Head path") String headPath,
+      @Named("Workspace name") String workspaceName,
+      @Named("Workspace path") String workspacePath) {
     this.fileUtils = utils;
-    this.config = config;
     this.repoFactory = repoFactory;
-    this.currentWorkspaceName = currentWorkspaceName;
+    this.headPath = headPath;
+    this.workspaceName = workspaceName;
+    this.workspacePath = workspacePath;
   }
 
   @Override
   public boolean run(String[] args) {
-    String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
-
     // Pull all repos in head
     try {
       fileUtils
@@ -67,7 +67,6 @@ public class SyncCommand implements AaCommand {
       e.printStackTrace();
     }
     // then, do the sync for all workspaces
-    String workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
     GitRepo gitRepo = this.repoFactory.create(workspacePath);
     String initialBranch = gitRepo.currentBranch();
     try {
@@ -80,33 +79,30 @@ public class SyncCommand implements AaCommand {
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 System.out.println(
-                    String.format("[%s/%s]: Performing sync", currentWorkspaceName, repoName));
+                    String.format("[%s/%s]: Performing sync", workspaceName, repoName));
                 GitRepo repo = repoFactory.create(path);
                 System.out.println(
-                    String.format(
-                        "[%s/%s]: switching to temp branch", currentWorkspaceName, repoName));
-                repo.switchBranch(TEMP_BRANCH_FOR_SYNC);
+                    String.format("[%s/%s]: switching to temp branch", workspaceName, repoName));
+                repo.switchBranch("temp_branch_for_sync");
                 System.out.println(
-                    String.format(
-                        "[%s/%s]: committing all changes", currentWorkspaceName, repoName));
+                    String.format("[%s/%s]: committing all changes", workspaceName, repoName));
                 repo.commit(repo.getUncommittedFiles(), "Sync: temporary commit");
                 System.out.println(
-                    String.format("[%s/%s]: switching to master", currentWorkspaceName, repoName));
+                    String.format("[%s/%s]: switching to master", workspaceName, repoName));
                 repo.switchBranch("master");
-                System.out.println(
-                    String.format("[%s/%s]: pulling", currentWorkspaceName, repoName));
+                System.out.println(String.format("[%s/%s]: pulling", workspaceName, repoName));
                 repo.pull();
                 System.out.println(
-                    String.format("[%s/%s]: merging changes", currentWorkspaceName, repoName));
+                    String.format("[%s/%s]: merging changes", workspaceName, repoName));
                 boolean mergeResult = repo.merge("temp_branch_for_sync");
                 if (!mergeResult) {
                   System.out.println(
                       String.format(
                           "[%s/%s]: manual merge required, check files for conflicts",
-                          currentWorkspaceName, repoName));
+                          workspaceName, repoName));
                 }
                 System.out.println(
-                    String.format("[%s/%s]: removing temp branch", currentWorkspaceName, repoName));
+                    String.format("[%s/%s]: removing temp branch", workspaceName, repoName));
                 repo.removeBranch("temp_branch_for_sync");
               });
     } catch (IOException e) {

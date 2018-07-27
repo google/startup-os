@@ -19,7 +19,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.common.repo.Protos.File;
 import io.grpc.ManagedChannel;
@@ -41,13 +40,12 @@ public class SnapshotCommand implements AaCommand {
   @Inject
   public SnapshotCommand(
       FileUtils fileUtils,
-      Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName,
-      @Named("Current diff number") Integer diffNumber) {
+      @Named("Workspace path") String workspacePath,
+      @Named("Diff number") Integer diffNumber) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = repoFactory;
-    this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    this.workspacePath = workspacePath;
     this.diffNumber = diffNumber;
 
     ManagedChannel channel =

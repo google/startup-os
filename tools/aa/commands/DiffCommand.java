@@ -23,7 +23,6 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos.Config;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
@@ -42,35 +41,35 @@ import java.util.stream.Collectors;
 public class DiffCommand implements AaCommand {
   private final FileUtils fileUtils;
   private final GitRepoFactory gitRepoFactory;
-  private String currentWorkspaceName;
+  private String workspaceName;
   private String workspacePath;
-  private Integer currentDiffNumber;
+  private Integer diffNumber;
 
   private static final Integer GRPC_PORT = 8001;
 
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
   @FlagDesc(name = "reviewers", description = "Reviewers (split by comma)")
-  public static Flag<String> reviewers = Flag.create("");
+  static Flag<String> reviewers = Flag.create("");
 
   @FlagDesc(name = "description", description = "Description")
-  public static Flag<String> description = Flag.create("");
+  static Flag<String> description = Flag.create("");
 
   @FlagDesc(name = "buglink", description = "Buglink")
-  public static Flag<String> buglink = Flag.create("");
+  static Flag<String> buglink = Flag.create("");
 
   @Inject
   public DiffCommand(
       FileUtils utils,
-      Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName,
-      @Named("Current diff number") Integer currentDiffNumber) {
+      @Named("Workspace name") String workspaceName,
+      @Named("Workspace path") String workspacePath,
+      @Named("Diff number") Integer diffNumber) {
     this.fileUtils = utils;
     this.gitRepoFactory = repoFactory;
-    this.currentWorkspaceName = currentWorkspaceName;
-    this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
-    this.currentDiffNumber = currentDiffNumber;
+    this.workspaceName = workspaceName;
+    this.workspacePath = workspacePath;
+    this.diffNumber = diffNumber;
 
     ManagedChannel channel =
         ManagedChannelBuilder.forAddress("localhost", GRPC_PORT).usePlaintext().build();
@@ -92,7 +91,7 @@ public class DiffCommand implements AaCommand {
 
     Diff.Builder diffBuilder =
         Diff.newBuilder()
-            .setWorkspace(currentWorkspaceName)
+            .setWorkspace(workspaceName)
             .setDescription(description.get())
             .setBug(buglink.get())
             .addAllReviewer(getReviewers(reviewers.get()))
@@ -112,8 +111,7 @@ public class DiffCommand implements AaCommand {
                 String repoName = Paths.get(path).getFileName().toString();
                 GitRepo repo = this.gitRepoFactory.create(path);
                 System.out.println(
-                    String.format(
-                        "[%s/%s]: switching to diff branch", currentWorkspaceName, repoName));
+                    String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
                 repo.switchBranch(branchName);
               });
     } catch (IOException e) {
@@ -164,7 +162,7 @@ public class DiffCommand implements AaCommand {
   public boolean run(String[] args) {
     Flags.parse(args, this.getClass().getPackage());
 
-    Diff diff = (currentDiffNumber == -1) ? createDiff() : updateDiff(currentDiffNumber);
+    Diff diff = (diffNumber == -1) ? createDiff() : updateDiff(diffNumber);
     CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
     codeReviewBlockingStub.createDiff(request);
     return true;

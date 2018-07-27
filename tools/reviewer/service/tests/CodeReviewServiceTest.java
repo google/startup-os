@@ -85,7 +85,6 @@ public class CodeReviewServiceTest {
 
   private GitRepoFactory gitRepoFactory;
   private String aaBaseFolder;
-  private String repoPath;
   private String testFileCommitId;
   private String fileInHeadCommitId;
   private GitRepo repo;
@@ -176,7 +175,7 @@ public class CodeReviewServiceTest {
     WorkspaceCommand workspaceCommand = component.getWorkspaceCommand();
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
-    repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
     repo.setFakeUsersData();
   }

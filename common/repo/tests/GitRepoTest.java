@@ -43,7 +43,6 @@ public class GitRepoTest {
   private static final String TEST_FILE_CONTENTS = "Some test file contents\n";
   private static final String COMMIT_MESSAGE = "Some commit message";
 
-  private GitRepoFactory gitRepoFactory;
   private Repo repo;
   private GitRepo gitRepo;
   private String initialCommit;
@@ -53,7 +52,7 @@ public class GitRepoTest {
   @Before
   public void setup() throws IOException {
     TestComponent component = DaggerGitRepoTest_TestComponent.create();
-    gitRepoFactory = component.getFactory();
+    GitRepoFactory gitRepoFactory = component.getFactory();
     fileUtils = component.getFileUtils();
     repoFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
     gitRepo = gitRepoFactory.create(repoFolder);
