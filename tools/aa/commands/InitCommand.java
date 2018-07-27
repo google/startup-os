@@ -16,7 +16,6 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
@@ -25,8 +24,6 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 /* A command to init a base folder.
  *
@@ -53,8 +50,7 @@ public class InitCommand implements AaCommand {
 
   private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
-  private ImmutableMap<String, Boolean> folderToWasExisted;
-  private boolean wasBaseFileExisted;
+  private boolean wasBaseFolderExisted = true;
 
   @Inject
   public InitCommand(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
@@ -66,13 +62,12 @@ public class InitCommand implements AaCommand {
   public boolean run(String[] args) {
     // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
-    wasBaseFileExisted = fileUtils.fileExists(fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
-    folderToWasExisted = checkExistingFolders();
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath.get())) {
         System.out.println("Error: Base folder exists and is not empty");
         System.exit(1);
       }
+      wasBaseFolderExisted = fileUtils.folderExists(basePath.get());
       // Create folders
       fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), HEAD_FOLDERNAME));
       fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), WS_FOLDERNAME));
@@ -107,32 +102,11 @@ public class InitCommand implements AaCommand {
   }
 
   private void revertChanges() {
-    if (!wasBaseFileExisted) {
-      fileUtils.deleteFileOrDirectoryIfExistsUnchecked(
-          fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
+    if (wasBaseFolderExisted) {
+      fileUtils.clearDirectoryUnchecked(basePath.get());
+    } else {
+      fileUtils.deleteDirectoryUnchecked(basePath.get());
     }
-    folderToWasExisted.forEach(
-        (path, wasExisted) -> {
-          if (!wasExisted) {
-            fileUtils.deleteDirectoryUnchecked(path);
-          }
-        });
-  }
-
-  private ImmutableMap<String, Boolean> checkExistingFolders() {
-    Map<String, Boolean> result = new HashMap<>();
-    String headPath = fileUtils.joinPaths(basePath.get(), HEAD_FOLDERNAME);
-    String wsPath = fileUtils.joinPaths(basePath.get(), WS_FOLDERNAME);
-    String localPath = fileUtils.joinPaths(basePath.get(), LOCAL_FOLDERNAME);
-    String logsPath = fileUtils.joinPaths(basePath.get(), LOGS_FOLDERNAME);
-
-    result.put(headPath, fileUtils.folderExists(headPath));
-    result.put(wsPath, fileUtils.folderExists(wsPath));
-    result.put(localPath, fileUtils.folderExists(localPath));
-    result.put(logsPath, fileUtils.folderExists(logsPath));
-    result.put(basePath.get(), fileUtils.folderExists(basePath.get()));
-
-    return ImmutableMap.copyOf(result);
   }
 }
 
