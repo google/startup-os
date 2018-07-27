@@ -17,6 +17,8 @@
 package com.google.startupos.common.repo.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,6 +46,7 @@ public class GitRepoTest {
   private GitRepoFactory gitRepoFactory;
   private Repo repo;
   private GitRepo gitRepo;
+  private String initialCommit;
   private String repoFolder;
   private FileUtils fileUtils;
 
@@ -57,7 +60,7 @@ public class GitRepoTest {
     gitRepo.init();
     repo = gitRepo;
     // We need one commit to make the repo have a master branch.
-    repo.commit(repo.getUncommittedFiles(), "Initial commit");
+    initialCommit = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
   }
 
   @Singleton
@@ -155,6 +158,16 @@ public class GitRepoTest {
                         .build())
                 .build()),
         repo.getCommits(TEST_BRANCH));
+  }
+
+  @Test
+  public void testCommitExists() {
+    assertTrue(repo.commitExists(initialCommit));
+  }
+
+  @Test
+  public void testCommitExists_fakeCommit() {
+    assertFalse(repo.commitExists("123245"));
   }
 }
 
