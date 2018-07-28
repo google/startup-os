@@ -60,25 +60,38 @@ public class FirestoreClient {
     return getCreateDocumentUrl(user, null);
   }
 
+  private String getDocumentResponse(String path) throws IOException {
+    StringBuilder response = new StringBuilder();
+    URL url = new URL(getGetUrl(path));
+    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    connection.setRequestMethod("GET");
+    connection.setRequestProperty("Authorization", "Bearer " + token);
+    try (BufferedReader reader =
+        new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        response.append(line);
+      }
+    }
+    if (connection.getResponseCode() != HTTP_OK) {
+      throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
+    }
+    return response.toString();
+  }
+
+  public Message getDocument(String path, Message.Builder proto) {
+    try {
+      FirestoreJsonFormat.parser().merge(getDocumentResponse(path), proto);
+      return proto.build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public Message getProtoDocument(String path, Message.Builder proto) {
     try {
-      StringBuilder response = new StringBuilder();
-      URL url = new URL(getGetUrl(path));
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod("GET");
-      connection.setRequestProperty("Authorization", "Bearer " + token);
-      try (BufferedReader reader =
-          new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          response.append(line);
-        }
-      }
-      if (connection.getResponseCode() != HTTP_OK) {
-        throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
-      }
       ProtoDocument.Builder protoDocument = ProtoDocument.newBuilder();
-      FirestoreJsonFormat.parser().merge(response.toString(), protoDocument);
+      FirestoreJsonFormat.parser().merge(getDocumentResponse(path), protoDocument);
       byte[] protoBytes = Base64.getDecoder().decode(protoDocument.getProto());
 
       // We just need the proto Message to get a parser

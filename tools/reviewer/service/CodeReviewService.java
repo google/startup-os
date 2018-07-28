@@ -219,7 +219,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
         new FirestoreClient(authService.getProjectId(), authService.getToken());
     DiffNumberResponse diffNumberResponse =
         (DiffNumberResponse)
-            client.getProtoDocument(
+            client.getDocument(
                 firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
                 DiffNumberResponse.newBuilder());
     diffNumberResponse =
