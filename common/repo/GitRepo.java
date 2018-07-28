@@ -257,7 +257,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void pull() {
-    runCommand("pull");
+    runCommand("pull -q");
   }
 
   @Override
