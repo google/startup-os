@@ -307,7 +307,7 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean branchExists(String name) {
-  // Note: Can also be done directly using 'git rev-parse --verify -q <branch name>'
+    // Note: Can also be done directly using 'git rev-parse --verify -q <branch name>'
     return listBranches().contains(name);
   }
 

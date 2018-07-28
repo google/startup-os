@@ -331,7 +331,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
                 } else {
                   ImmutableList<Commit> commits = ImmutableList.of();
                   if (repo.branchExists(branch)) {
-                    commits = addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
+                    commits =
+                        addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
                   } else {
                     logger.atInfo().log("Branch %s does not exist in %s head", branch, workspace);
                   }
