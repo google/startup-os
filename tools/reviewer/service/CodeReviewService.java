@@ -289,10 +289,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     String workspacePath;
     String workspace;
     String branch;
+    boolean isHead;
     if (workspaceExists(request.getWorkspace())) {
       workspacePath = getWorkspacePath(request.getWorkspace());
       workspace = request.getWorkspace();
       branch = "D" + request.getDiffId();
+      isHead = false;
     } else {
       logger
           .atInfo()
@@ -300,6 +302,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       workspacePath = fileUtils.joinPaths(basePath, "head");
       workspace = "";
       branch = "remotes/origin/D" + request.getDiffId();
+      isHead = true;
     }
 
     DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
@@ -313,17 +316,32 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 Repo repo = repoFactory.create(path);
-                ImmutableList<Commit> commits =
-                    addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
-                ImmutableList<File> uncommittedFiles =
-                    addWorkspaceAndRepoToFiles(repo.getUncommittedFiles(), workspace, repoName);
-                response.addBranchInfo(
-                    BranchInfo.newBuilder()
-                        .setDiffId(request.getDiffId())
-                        .setRepoId(repoName)
-                        .addAllCommit(commits)
-                        .addAllUncommittedFile(uncommittedFiles)
-                        .build());
+                if (!isHead) {
+                  ImmutableList<Commit> commits =
+                      addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
+                  ImmutableList<File> uncommittedFiles =
+                      addWorkspaceAndRepoToFiles(repo.getUncommittedFiles(), workspace, repoName);
+                  response.addBranchInfo(
+                      BranchInfo.newBuilder()
+                          .setDiffId(request.getDiffId())
+                          .setRepoId(repoName)
+                          .addAllCommit(commits)
+                          .addAllUncommittedFile(uncommittedFiles)
+                          .build());
+                } else {
+                  ImmutableList<Commit> commits = ImmutableList.of();
+                  if (repo.branchExists(branch)) {
+                    commits = addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
+                  } else {
+                    logger.atInfo().log("Branch %s does not exist in %s head", branch, workspace);
+                  }
+                  response.addBranchInfo(
+                      BranchInfo.newBuilder()
+                          .setDiffId(request.getDiffId())
+                          .setRepoId(repoName)
+                          .addAllCommit(commits)
+                          .build());
+                }
               });
     } catch (IOException e) {
       e.printStackTrace();
