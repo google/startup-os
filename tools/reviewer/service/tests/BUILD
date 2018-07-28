@@ -24,7 +24,7 @@ java_test(
         "CodeReviewServiceTextDiffTest.java",
     ],
     local = 1,
-    test_class = "com.google.startupos.tools.reviewer.service.tests.CodeReviewServiceTest",
+    test_class = "com.google.startupos.tools.reviewer.service.tests.CodeReviewServiceTextDiffTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
