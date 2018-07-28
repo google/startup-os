@@ -60,9 +60,9 @@ public class FirestoreClient {
     return getCreateDocumentUrl(user, null);
   }
 
-  public Message getDocument(String path, Message.Builder proto) {
+  public Message getProtoDocument(String path, Message.Builder proto) {
     try {
-      StringBuilder result = new StringBuilder();
+      StringBuilder response = new StringBuilder();
       URL url = new URL(getGetUrl(path));
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
@@ -71,14 +71,18 @@ public class FirestoreClient {
           new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
         String line;
         while ((line = reader.readLine()) != null) {
-          result.append(line);
+          response.append(line);
         }
       }
       if (connection.getResponseCode() != HTTP_OK) {
         throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
       }
-      FirestoreJsonFormat.parser().merge(result.toString(), proto);
-      return proto.build();
+      ProtoDocument.Builder protoDocument = ProtoDocument.newBuilder();
+      FirestoreJsonFormat.parser().merge(response.toString(), protoDocument);
+      byte[] protoBytes = Base64.getDecoder().decode(protoDocument.getProto());
+
+      // We just need the proto Message to get a parser
+      return proto.build().getParserForType().parseFrom(protoBytes);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

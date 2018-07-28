@@ -219,7 +219,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
         new FirestoreClient(authService.getProjectId(), authService.getToken());
     DiffNumberResponse diffNumberResponse =
         (DiffNumberResponse)
-            client.getDocument(
+            client.getProtoDocument(
                 firestoreReviewRoot.get() + "/" + DOCUMENT_FOR_LAST_DIFF_NUMBER,
                 DiffNumberResponse.newBuilder());
     diffNumberResponse =
@@ -237,11 +237,10 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void getDiff(DiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
     FirestoreClient client =
         new FirestoreClient(authService.getProjectId(), authService.getToken());
-
     String diffPath =
         fileUtils.joinPaths(
             firestoreReviewRoot.get(), "data/diff", String.valueOf(request.getDiffId()));
-    Diff diff = (Diff) client.getDocument(diffPath, Diff.newBuilder());
+    Diff diff = (Diff) client.getProtoDocument(diffPath, Diff.newBuilder());
 
     responseObserver.onNext(diff);
     responseObserver.onCompleted();
