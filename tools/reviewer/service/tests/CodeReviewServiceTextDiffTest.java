@@ -76,7 +76,7 @@ import javax.inject.Singleton;
  * - Any deleted file should return ""
  */
 @RunWith(JUnit4.class)
-public class CodeReviewServiceTest {
+public class CodeReviewServiceTextDiffTest {
   private static final String TEST_FILE = "test_file.txt";
   private static final String TEST_FILE_CONTENTS = "Some test file contents\n";
   private static final String FILE_IN_HEAD = "im_in_head.txt";
@@ -103,7 +103,7 @@ public class CodeReviewServiceTest {
     aaBaseFolder = joinPaths(testFolder, "base_folder");
 
     component =
-        DaggerCodeReviewServiceTest_TestComponent.builder()
+        DaggerCodeReviewServiceTextDiffTest_TestComponent.builder()
             .aaModule(
                 new AaModule() {
                   @Provides
@@ -306,7 +306,7 @@ public class CodeReviewServiceTest {
 
   // ADD, locally modified, workspace doesn't exist, new file
   @Test(expected = StatusRuntimeException.class)
-  public void testTextDiff_locallyModifiedWorkspaceNotExistsNewFile() throws Exception {
+  public void testTextDiff_locallyModifiedWorkspaceNotExistsNewFile() {
     writeFile("somefile.txt", TEST_FILE_CONTENTS);
     writeFile(TEST_FILE_CONTENTS);
     File file =

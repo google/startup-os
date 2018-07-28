@@ -21,7 +21,7 @@ java_binary(
 java_test(
     name = "CodeReviewServiceTest",
     srcs = [
-        "CodeReviewServiceTest.java",
+        "CodeReviewServiceTextDiffTest.java",
     ],
     local = 1,
     test_class = "com.google.startupos.tools.reviewer.service.tests.CodeReviewServiceTest",
