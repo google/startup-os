@@ -73,12 +73,6 @@ public class TestTool {
             repo.merge(branch);
             break;
           }
-        case "mergeTheirs":
-          {
-            String branch = args[1];
-            repo.mergeTheirs(branch);
-            break;
-          }
         case "isMerged":
           {
             String branch = args[1];

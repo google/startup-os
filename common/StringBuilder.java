@@ -144,8 +144,8 @@ public class StringBuilder {
     return this;
   }
 
-  public StringBuilder append(StringBuffer sb) {
-    sb = sb.append(sb);
+  public StringBuilder append(StringBuffer other) {
+    sb = sb.append(other);
     return this;
   }
 

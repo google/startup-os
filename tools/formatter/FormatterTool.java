@@ -157,8 +157,7 @@ class FormatterTool {
             || (isPython(file) && python.get())
             || (isCpp(file) && cpp.get())
             || (isBuild(file) && build.get()));
-    boolean inIgnoredDirectory =
-        ignoredDirectories.stream().anyMatch(ignoredDir -> file.startsWith(ignoredDir));
+    boolean inIgnoredDirectory = ignoredDirectories.stream().anyMatch(file::startsWith);
     return formatByExtension && !inIgnoredDirectory;
   }
 

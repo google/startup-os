@@ -20,7 +20,6 @@ import static java.net.HttpURLConnection.HTTP_OK;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
-import com.google.protobuf.util.JsonFormat;
 import com.google.startupos.common.firestore.Protos.ProtoDocument;
 import java.io.BufferedReader;
 import java.io.IOException;

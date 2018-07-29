@@ -39,20 +39,20 @@ public class ReviewCommand implements AaCommand {
   private String workspacePath;
 
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
-  private final Integer currentDiffNumber;
+  private final Integer diffNumber;
 
   @Inject
   public ReviewCommand(
       FileUtils utils,
       Config config,
       GitRepoFactory repoFactory,
-      @Named("Current workspace name") String currentWorkspaceName,
-      @Named("Current diff number") Integer currentDiffNumber) {
+      @Named("Workspace path") String workspacePath,
+      @Named("Diff number") Integer diffNumber) {
     this.fileUtils = utils;
     this.gitRepoFactory = repoFactory;
-    this.workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", currentWorkspaceName);
+    this.workspacePath = workspacePath;
 
-    this.currentDiffNumber = currentDiffNumber;
+    this.diffNumber = diffNumber;
     ManagedChannel channel =
         ManagedChannelBuilder.forAddress("localhost", GRPC_PORT).usePlaintext().build();
     codeReviewBlockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
@@ -60,17 +60,17 @@ public class ReviewCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    if (currentDiffNumber == -1) {
+    if (diffNumber == -1) {
       System.out.println(
           RED_ERROR + "Workspace has no diff to review (git branch has no D# branch)");
       return false;
     }
     Diff.Builder diffBuilder =
         codeReviewBlockingStub
-            .getDiff(DiffRequest.newBuilder().setDiffId(currentDiffNumber).build())
+            .getDiff(DiffRequest.newBuilder().setDiffId(diffNumber).build())
             .toBuilder();
     if (diffBuilder.getReviewerCount() == 0) {
-      System.out.println(String.format("D%d has no reviewers", currentDiffNumber));
+      System.out.println(String.format("D%d has no reviewers", diffNumber));
       return false;
     }
     for (int i = 0; i < diffBuilder.getReviewerCount(); i++) {
