@@ -76,7 +76,7 @@ import javax.inject.Singleton;
  * - Any deleted file should return ""
  */
 @RunWith(JUnit4.class)
-public class CodeReviewServiceTest {
+public class CodeReviewServiceTextDiffTest {
   private static final String TEST_FILE = "test_file.txt";
   private static final String TEST_FILE_CONTENTS = "Some test file contents\n";
   private static final String FILE_IN_HEAD = "im_in_head.txt";
@@ -85,7 +85,6 @@ public class CodeReviewServiceTest {
 
   private GitRepoFactory gitRepoFactory;
   private String aaBaseFolder;
-  private String repoPath;
   private String testFileCommitId;
   private String fileInHeadCommitId;
   private GitRepo repo;
@@ -104,7 +103,7 @@ public class CodeReviewServiceTest {
     aaBaseFolder = joinPaths(testFolder, "base_folder");
 
     component =
-        DaggerCodeReviewServiceTest_TestComponent.builder()
+        DaggerCodeReviewServiceTextDiffTest_TestComponent.builder()
             .aaModule(
                 new AaModule() {
                   @Provides
@@ -155,6 +154,7 @@ public class CodeReviewServiceTest {
     fileUtils.mkdirs(initialRepoFolder);
     GitRepo repo = gitRepoFactory.create(initialRepoFolder);
     repo.init();
+    repo.setFakeUsersData();
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinPaths(initialRepoFolder, FILE_IN_HEAD));
     fileInHeadCommitId = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
@@ -175,8 +175,9 @@ public class CodeReviewServiceTest {
     WorkspaceCommand workspaceCommand = component.getWorkspaceCommand();
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
-    repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
+    repo.setFakeUsersData();
   }
 
   private void createBlockingStub() throws IOException {
@@ -305,7 +306,7 @@ public class CodeReviewServiceTest {
 
   // ADD, locally modified, workspace doesn't exist, new file
   @Test(expected = StatusRuntimeException.class)
-  public void testTextDiff_locallyModifiedWorkspaceNotExistsNewFile() throws Exception {
+  public void testTextDiff_locallyModifiedWorkspaceNotExistsNewFile() {
     writeFile("somefile.txt", TEST_FILE_CONTENTS);
     writeFile(TEST_FILE_CONTENTS);
     File file =

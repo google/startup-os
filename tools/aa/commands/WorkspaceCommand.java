@@ -51,7 +51,6 @@ public class WorkspaceCommand implements AaCommand {
 
   // set by processArgs
   private ActionMode mode;
-  private String workspaceName;
   private String workspacePath;
 
   @Inject
@@ -128,7 +127,7 @@ public class WorkspaceCommand implements AaCommand {
       return false;
     }
 
-    workspaceName = args[args.length - 1];
+    String workspaceName = args[args.length - 1];
     workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", workspaceName);
 
     if (workspaceName.startsWith("-")) {

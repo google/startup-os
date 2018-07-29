@@ -18,36 +18,24 @@ package com.google.startupos.common.repo;
 
 import com.google.auto.factory.AutoFactory;
 import com.google.auto.factory.Provided;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.ResetCommand.ResetType;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.NoFilepatternException;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.merge.MergeStrategy;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
-// TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
-  private final Git jGit;
-  private final Repository jGitRepo;
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
   private final FileUtils fileUtils;
@@ -57,18 +45,6 @@ public class GitRepo implements Repo {
     gitCommandBase =
         Arrays.asList(
             "git", "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"), "--work-tree=" + repoPath);
-    FileRepositoryBuilder builder = new FileRepositoryBuilder();
-    try {
-      jGitRepo =
-          builder
-              .setGitDir(Paths.get(repoPath, ".git").toFile())
-              .readEnvironment() // Scan environment GIT_* variables
-              .findGitDir() // Scan up the file system tree
-              .build();
-      jGit = new Git(jGitRepo);
-    } catch (IOException e) {
-      throw new RuntimeException("Error initializing Git", e);
-    }
   }
 
   private class CommandResult {
@@ -135,16 +111,14 @@ public class GitRepo implements Repo {
     return result.toString();
   }
 
+  @Override
   public void switchBranch(String branch) {
     runCommand("checkout --quiet -B " + branch);
   }
 
+  @Override
   public void tagHead(String name) {
-    try {
-      jGit.tag().setName(name).call();
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
-    }
+    runCommand("tag " + name);
   }
 
   private ImmutableList<String> splitLines(String string) {
@@ -166,6 +140,7 @@ public class GitRepo implements Repo {
         .build();
   }
 
+  @Override
   public ImmutableList<Commit> getCommits(String branch) {
     ImmutableList<String> commits = getCommitIds(branch);
     ImmutableList.Builder<Commit> result = ImmutableList.builder();
@@ -182,25 +157,28 @@ public class GitRepo implements Repo {
 
   @Override
   public ImmutableList<File> getUncommittedFiles() {
-    String TWO_WHITE_SPACES = "\\s{2}";
     ImmutableList.Builder<File> files = ImmutableList.builder();
-    CommandResult commandResult = runCommand("status --short");
+    CommandResult commandResult = runCommand("status --porcelain");
     ImmutableList<String> lines = splitLines(commandResult.stdout);
     for (String line : lines) {
-      String[] parts;
-      if (!line.trim().startsWith("M")
-          || !line.trim().startsWith("RM")
-          || !line.trim().startsWith("??")) {
-        line = line.replaceFirst(TWO_WHITE_SPACES, " ");
-      }
-      parts = line.trim().split(" ");
-
-      File.Builder fileBuilder = File.newBuilder();
-      fileBuilder.setAction(getAction(parts[0]));
+      line = line.replaceFirst("  ", " ");
+      String[] parts = line.trim().split(" ");
+      /* We extract the action and filename from line. Here are some example lines:
+      D  deleted.txt
+      action:DELETE, filename:deleted.txt
+       M modified.txt
+      action:MODIFY, filename:modified.txt
+      A  package/new.txt
+      action:ADD, filename:package/new.txt
+      R  old_name.txt -> new_name.txt
+      action:RENAME, filename:new_name.txt
+      ?? package/untracked.txt
+      action:ADD, filename:package/untracked.txt
+      */
+      File.Action action = getAction(parts[0]);
       // TODO: Set original_filename for RENAME and COPY
-      fileBuilder.setFilename(
-          fileBuilder.getAction().equals(File.Action.RENAME) ? parts[3] : parts[1]);
-      files.add(fileBuilder.build());
+      String filename = action.equals(File.Action.RENAME) ? parts[3] : parts[1];
+      files.add(File.newBuilder().setAction(action).setFilename(filename).build());
     }
     return files.build();
   }
@@ -228,11 +206,13 @@ public class GitRepo implements Repo {
     }
   }
 
+  @Override
   public boolean commitExists(String commitId) {
     CommandResult commandResult = runCommand("cat-file -t " + commitId, false);
     return commandResult.stdout.trim().startsWith("commit");
   }
 
+  @Override
   public ImmutableList<File> getFilesInCommit(String commitId) {
     CommandResult commandResult =
         runCommand("diff-tree --no-commit-id --name-status -r " + commitId);
@@ -255,107 +235,69 @@ public class GitRepo implements Repo {
     return result.build();
   }
 
+  @Override
   public Commit commit(ImmutableList<File> files, String message) {
     Commit.Builder commitBuilder = Commit.newBuilder();
-    try {
-      for (File file : files) {
-        jGit.add().addFilepattern(file.getFilename()).call();
-      }
-      RevCommit revCommit = jGit.commit().setMessage(message).call();
-      String commitId = revCommit.toObjectId().name();
-      for (File file : files) {
-        commitBuilder.addFile(file.toBuilder().setCommitId(commitId));
-      }
-      return commitBuilder.setId(commitId).build();
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
+    for (File file : files) {
+      addFile(file.getFilename());
     }
+    runCommand(Arrays.asList("commit", "-m", "\"" + message + "\""));
+    String commitId = getHeadCommitId();
+    for (File file : files) {
+      commitBuilder.addFile(file.toBuilder().setCommitId(commitId));
+    }
+    return commitBuilder.setId(commitId).build();
   }
 
+  @Override
   public void pushAll() {
-    try {
-      jGit.push().setPushAll().setAtomic(true).call();
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
-    }
+    runCommand("push --all --atomic origin");
   }
 
+  @Override
   public void pull() {
-    try {
-      jGit.pull().call();
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
-    }
+    runCommand("pull");
   }
 
-  public boolean merge(String branch, boolean remote) {
-    try {
-      Ref current = jGitRepo.exactRef(jGitRepo.getFullBranch());
-      Ref ref;
-      boolean successfulMerge = true;
-      if (remote) {
-        ref = jGitRepo.exactRef("refs/remotes/origin/" + branch);
-      } else {
-        ref = jGitRepo.exactRef("refs/heads/" + branch);
-      }
-      AddCommand addCommand = jGit.add();
-      jGit.merge().include(ref).call();
-      for (String conflictingFile : jGit.status().call().getConflicting()) {
-        successfulMerge = false;
-        addCommand = addCommand.addFilepattern(conflictingFile);
-      }
-      if (!successfulMerge) {
-        addCommand.call();
-        jGit.commit().call();
-      }
-      jGit.reset().setRef(current.getObjectId().toObjectId().name()).call();
-      return successfulMerge;
-    } catch (GitAPIException | IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
+  @Override
   public boolean merge(String branch) {
     return merge(branch, false);
   }
 
-  @Override
-  public boolean mergeTheirs(String branch) {
-    try {
-      Ref current = jGitRepo.exactRef(jGitRepo.getFullBranch());
-      Ref ref = jGitRepo.exactRef("refs/heads/" + branch);
-      jGit.merge().setStrategy(MergeStrategy.THEIRS).include(ref).call();
-      jGit.reset().setRef(current.getObjectId().toObjectId().name()).call();
-      AddCommand add = jGit.add();
-      for (String file : jGit.status().call().getUntracked()) {
-        add.addFilepattern(file);
+  public boolean merge(String branch, boolean remote) {
+    switchToMasterBranch();
+    CommandResult mergeCommandResult;
+    if (remote) {
+      CommandResult fetchCommandResult = runCommand("fetch origin " + branch);
+      if (!fetchCommandResult.stderr.isEmpty()) {
+        throw new IllegalStateException(
+            "Failed to fetch remote branch before merging \'"
+                + branch
+                + "\': "
+                + fetchCommandResult.stderr);
       }
-      try {
-        add.call();
-        jGit.commit().setAll(true).setMessage("Updated changes").call();
-        return true;
-      } catch (NoFilepatternException e) {
-        // Nothing to commit
-        return true;
-      }
-    } catch (GitAPIException | IOException e) {
-      throw new RuntimeException(e);
+      mergeCommandResult =
+          runCommand(
+              "merge origin/"
+                  + branch
+                  + " -m Merge_remote-tracking_branch_\'origin/"
+                  + branch
+                  + "\'");
+    } else {
+      mergeCommandResult = runCommand("merge " + branch);
     }
+    return mergeCommandResult.stderr.isEmpty();
   }
 
+  @Override
   public boolean isMerged(String branch) {
+    // TODO: Implement method
     throw new UnsupportedOperationException("Not implemented");
   }
 
+  @Override
   public void reset(String ref) {
-    try {
-      // MIXED type means that HEAD pointer would be
-      // reset to `ref` and all changes introduced after it
-      // would be marked as unstaged but saved in working tree
-      jGit.reset().setMode(ResetType.MIXED).setRef(ref).call();
-    } catch (GitAPIException e) {
-      throw new RuntimeException(e);
-    }
+    runCommand("reset " + ref);
   }
 
   @Override
@@ -387,12 +329,39 @@ public class GitRepo implements Repo {
     return result;
   }
 
+  @Override
+  public String currentBranch() {
+    return runCommand("rev-parse --abbrev-ref HEAD").stdout.trim();
+  }
+
   public void init() {
     runCommand("init");
   }
 
-  public String currentBranch() {
-    return runCommand("rev-parse --abbrev-ref HEAD").stdout.trim();
+  public void addFile(String path) {
+    runCommand("add " + path);
+  }
+
+  public String getHeadCommitId() {
+    CommandResult commandResult = runCommand("rev-parse HEAD");
+    return commandResult.stdout.trim().replace("\n", "");
+  }
+
+  private void switchToMasterBranch() {
+    if (!currentBranch().equals("master")) {
+      switchBranch("master");
+    }
+  }
+
+  @VisibleForTesting
+  public ImmutableList<String> getTagList() {
+    return splitLines(runCommand("tag").stdout);
+  }
+
+  @VisibleForTesting
+  public void setFakeUsersData() {
+    runCommand("config user.email \"test@test.test\"");
+    runCommand("config user.name \"test\"");
   }
 
   public boolean cloneRepo(String url, String path) {
