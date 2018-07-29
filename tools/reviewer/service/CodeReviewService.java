@@ -91,6 +91,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   private String readTextFile(File file) throws IOException {
+    if (file.getFilename().isEmpty()) {
+      throw new IllegalArgumentException("File does not have a filename:\n" + file);
+    }
     if (file.getAction() == Action.DELETE) {
       return "";
     }
