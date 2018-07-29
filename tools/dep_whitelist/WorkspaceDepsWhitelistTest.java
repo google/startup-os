@@ -16,33 +16,33 @@
 
 package com.google.startupos.tools.dep_whitelist;
 
-import org.junit.Test;
-import org.junit.Before;
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
+import java.io.File;
+import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import java.io.FileInputStream;
-import java.io.File;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-
-import org.yaml.snakeyaml.Yaml;
-
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.yaml.snakeyaml.Yaml;
 
 /*
   Test verifies whether all external dependencies
   (Maven, git_repository, http_file) all whitelisted
   (contained in list for key `workspace_dependencies`
   in whitelist.yaml)
+
+  To simplify the test, we make the following assumptions:
+  - '://' appears only once in each line
+  - '://' always appears in the same line as '='
 */
 public class WorkspaceDepsWhitelistTest {
   private Map<String, List<String>> whitelist;
