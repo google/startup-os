@@ -7,11 +7,15 @@
 RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
+bazel run @bazel_deps//:parse -- format-deps \
+  --overwrite \
+  --deps $(pwd)/dependencies.yaml
+
 bazel run //tools/formatter -- \
-	--path $(pwd) \
-	--java --python --proto --cpp --build \
-	--ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
-	&>/dev/null
+  --path $(pwd) \
+  --java --python --proto --cpp --build \
+  --ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
+  &>/dev/null
 
 # Prints out an error only if both conditions are satisfied:
 # * we are on CircleCI
@@ -19,6 +23,6 @@ bazel run //tools/formatter -- \
 # When ran locally it silently fixes everything.
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
 	echo "$RED[!] Source files are not formatted$RESET";
-	echo "Please run ''./fix_formatting.sh'' to fix it"
+	echo "Please run ''$0'' to fix it"
 	exit 1
 fi

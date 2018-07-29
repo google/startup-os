@@ -38,8 +38,14 @@ jobs:
           <<: *post_checkout
       - restore_cache:
           key: "v3-bazel_cache"
+          key: dep-check-{{ checksum "dependencies.yaml" }}
       - run: './pre-commit.sh'
+      - run: './check_dependencies.sh'
       - run: './fix_formatting.sh'
+      - save_cache:
+          key: dep-check-{{ checksum "dependencies.yaml" }}
+          paths:
+            - "/home/circleci/bazel_deps_cache/"
 
   build:
     <<: *job_defaults

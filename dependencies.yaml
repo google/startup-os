@@ -176,12 +176,12 @@ dependencies:
       lang: java
       version: "2.6"
 
-  org.yaml:
-    snakeyaml:
-      lang: java
-      version: "1.21"
-
   org.slf4j:
     slf4j-simple:
       lang: java
       version: "1.7.25"
+
+  org.yaml:
+    snakeyaml:
+      lang: java
+      version: "1.21"
