@@ -75,7 +75,7 @@ public class FileUtilsTest {
 
   @Before
   public void setup() {
-    fileSystem = Jimfs.newFileSystem(fileSystemConfig);//FileSystems.getDefault();
+    fileSystem = Jimfs.newFileSystem(fileSystemConfig); // FileSystems.getDefault();
     CommonComponent commonComponent =
         DaggerCommonComponent.builder()
             .commonModule(
@@ -546,13 +546,14 @@ public class FileUtilsTest {
     Files.createDirectories(testPath.getParent());
     Files.write(
         testPath,
-            ("int32_field: 123\n" +
-            "string_field: \"foo\"\n" +
-            "map_field {\n" +
-            "key: \"foo\"\n" +
-            "value: 123\n" +
-            "}\n" +
-            "enum_field: YES").getBytes(UTF_8));
+        ("int32_field: 123\n"
+                + "string_field: \"foo\"\n"
+                + "map_field {\n"
+                + "key: \"foo\"\n"
+                + "value: 123\n"
+                + "}\n"
+                + "enum_field: YES")
+            .getBytes(UTF_8));
     TestMessage actual =
         (TestMessage) fileUtils.readPrototxt(TEST_PROTOTXT_FILE_PATH, TestMessage.newBuilder());
     TestMessage expected =
