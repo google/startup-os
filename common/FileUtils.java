@@ -92,15 +92,15 @@ public class FileUtils {
 
   /** Writes a string to file. */
   public void writeString(String text, String path) throws IOException {
+    File file = new File(path);	
+    if (file.getParent() != null) {	
+      mkdirs(file.getParent());	
+    }
     Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes(UTF_8));
   }
 
   /** Writes a string to file, rethrows exceptions as unchecked. */
   public void writeStringUnchecked(String text, String path) {
-    File file = new File(path);	
-    if (file.getParent() != null) {	
-      mkdirs(file.getParent());	
-    }    
     try {
       writeString(text, path);
     } catch (Exception e) {

@@ -243,7 +243,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     fileUtils.writeString("hello world\n", TEST_FILE_PATH);
-    assertEquals(Arrays.asList("hello world", ""), Files.readAllLines(testPath, UTF_8));
+    assertEquals("hello world\n", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test
@@ -253,7 +253,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     fileUtils.writeString("hello world\n\n", TEST_FILE_PATH);
-    assertEquals(Arrays.asList("hello world", "", ""), Files.readAllLines(testPath, UTF_8));
+    assertEquals("hello world\n\n", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test
