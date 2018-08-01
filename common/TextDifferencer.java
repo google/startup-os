@@ -17,61 +17,137 @@
 package com.google.startupos.common;
 
 import com.google.common.collect.ImmutableList;
-import com.google.startupos.common.TextChange.Type;
+import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
+import com.google.startupos.common.Protos.TextDiff;
+import com.google.startupos.common.Protos.TextChange;
+import com.google.startupos.common.Protos.DiffPatchMatchChange;
 import javax.inject.Inject;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.lang.Math;
+import java.lang.StringBuilder;
 
-/** An implementation of text difference based on the Longest Common Subsequence (LCS) problem. */
+/** Text differencer for finding the diff between 2 text documents. */
 public class TextDifferencer {
 
   @Inject
   public TextDifferencer() {}
 
-  /**
-   * Return all the text differences between two strings.
-   *
-   * @param firstString The first string.
-   * @param secondString The second string.
-   * @return A list of text changes.
-   */
-  public ImmutableList<TextChange> getAllTextChanges(String firstString, String secondString) {
+  private DiffPatchMatchChange convertToProto(DiffMatchPatch.Diff diff) {
+    return DiffPatchMatchChange.newBuilder()
+        .setText(diff.text)
+        .setType(getChangeType(diff.operation))
+        .build();
+  }
+
+  private ImmutableList<TextChange> getSingleSideChanges(
+      LinkedList<DiffMatchPatch.Diff> diffs, Operation sideOperation) {
+    if (diffs.isEmpty()) {
+      return ImmutableList.of();
+    }
     ImmutableList.Builder<TextChange> result = ImmutableList.builder();
-    DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(firstString, secondString);
-    diffMatchPatch.diff_cleanupSemantic(diffs);
-    int firstIndex = 0;
-    int secondIndex = 0;
+    StringBuilder sb = new StringBuilder();
+    int lineNumber = 0;
+    int globalIndex = 0;
+    int lineIndex = 0;
+    int nextGlobalStartIndex = 0;
+
     for (DiffMatchPatch.Diff diff : diffs) {
-      TextChange.Builder textChange =
-          TextChange.newBuilder().setText(diff.text).setType(getType(diff.operation));
-      if (diff.operation == Operation.EQUAL) {
-        textChange.setFirstStringIndex(firstIndex);
-        textChange.setSecondStringIndex(secondIndex);
-        firstIndex += diff.text.length();
-        secondIndex += diff.text.length();
-      } else if (diff.operation == Operation.INSERT) {
-        textChange.setFirstStringIndex(-1);
-        textChange.setSecondStringIndex(secondIndex);
-        secondIndex += diff.text.length();
-      } else if (diff.operation == Operation.DELETE) {
-        textChange.setFirstStringIndex(firstIndex);
-        textChange.setSecondStringIndex(-1);
-        firstIndex += diff.text.length();
+      Operation operation = diff.operation;
+      for (int i = 0; i < diff.text.length(); i++) {
+        if (diff.text.charAt(i) == '\n') {
+          if (operation == Operation.EQUAL || operation == sideOperation) {
+            result.add(
+                TextChange.newBuilder()
+                    .setText(sb.toString())
+                    .setType(getChangeType(operation))
+                    .setLineNumber(lineNumber)
+                    .setGlobalStartIndex(nextGlobalStartIndex)
+                    .setGlobalEndIndex(globalIndex)
+                    .setStartIndex(lineIndex - sb.toString().length())
+                    .setEndIndex(lineIndex)
+                    .build());
+            // We add 1 to skip the newline
+            nextGlobalStartIndex = globalIndex + 1;
+          } else {
+            result.add(
+                TextChange.newBuilder()
+                    .setType(ChangeType.LINE_PLACEHOLDER)
+                    .setLineNumber(lineNumber)
+                    .build());
+          }
+          lineNumber++;
+          sb = new StringBuilder();
+          lineIndex = 0;
+        } else { // char != '/n'
+          if (operation == Operation.EQUAL || operation == sideOperation) {
+            lineIndex++;
+          }
+          sb.append(diff.text.charAt(i));
+        }
+        if (operation == Operation.EQUAL || operation == sideOperation) {
+          globalIndex++;
+        }
       }
-      result.add(textChange.build());
+      // Check for leftover from last line
+      if (sb.length() > 0) {
+        if (operation == Operation.EQUAL || operation == sideOperation) {
+          result.add(
+              TextChange.newBuilder()
+                  .setText(sb.toString())
+                  .setType(getChangeType(diff.operation))
+                  .setLineNumber(lineNumber)
+                  .setGlobalStartIndex(nextGlobalStartIndex)
+                  .setGlobalEndIndex(globalIndex)
+                  .setStartIndex(lineIndex - sb.toString().length())
+                  .setEndIndex(lineIndex)
+                  .build());
+          nextGlobalStartIndex = globalIndex;
+        }
+      }
+
+      sb = new StringBuilder();
+    }
+    // A last newline is added separately since no subsequent character will add a TextDiff for it.
+    if (diffs.get(diffs.size() - 1).text.endsWith("\n")) {
+      result.add(
+          TextChange.newBuilder()
+              .setType(ChangeType.LINE_PLACEHOLDER)
+              .setLineNumber(lineNumber)
+              .build());
+    }
+    if (result.build().isEmpty()) {
+      result.add(TextChange.newBuilder().setType(ChangeType.LINE_PLACEHOLDER).build());
     }
     return result.build();
   }
 
-  private Type getType(Operation operation) {
+  public TextDiff getTextDiff(String leftContents, String rightContents) {
+    if (leftContents.isEmpty() && rightContents.isEmpty()) {
+      return TextDiff.getDefaultInstance();
+    }
+    DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
+    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(leftContents, rightContents);
+
+    return TextDiff.newBuilder()
+        .addAllLeftChange(getSingleSideChanges(diffs, Operation.DELETE))
+        .addAllRightChange(getSingleSideChanges(diffs, Operation.INSERT))
+        .setLeftFileContents(leftContents)
+        .setRightFileContents(rightContents)
+        .build();
+  }
+
+  private ChangeType getChangeType(Operation operation) {
     if (operation == Operation.EQUAL) {
-      return Type.NO_CHANGE;
+      return ChangeType.NO_CHANGE;
     } else if (operation == Operation.INSERT) {
-      return Type.ADD;
+      return ChangeType.ADD;
     } else if (operation == Operation.DELETE) {
-      return Type.DELETE;
+      return ChangeType.DELETE;
     } else {
       throw new IllegalArgumentException("Unknown Operation enum: " + operation);
     }

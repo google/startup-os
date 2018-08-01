@@ -3,42 +3,73 @@ syntax = "proto3";
 package com.google.startupos.common;
 
 option java_package = "com.google.startupos.common";
-option java_multiple_files = true;
+option java_outer_classname = "Protos";
 
-// Holds information about a text change.
+/** Describes the type of the difference. */
+enum ChangeType {
+  // Unused.
+  TYPE_UNUSED = 0;
+
+  // No change has occurred. The source is equal to the
+  // destination.
+  NO_CHANGE = 1;
+
+  // A new character was added to the source. Only for right-side change.
+  ADD = 2;
+
+  // A character was deleted from the source. Only for left-side change.
+  DELETE = 3;
+
+  // An empty line for an addition/deletion on the other side. Note that
+  // this is not a newline in the original file.
+  LINE_PLACEHOLDER = 4;
+}
+
+message TextDiff {
+  repeated com.google.startupos.common.TextChange left_change = 1;
+  repeated com.google.startupos.common.TextChange right_change = 2;
+  string left_file_contents = 3;
+  string right_file_contents = 4;
+}
+
 message TextChange {
-  /** Describes the type of the difference. */
-  enum Type {
-    // Unused.
-    TYPE_UNUSED = 0;
+  // The string being changed. Used for debugging purposes.
+  string text = 1;
 
-    // No change has occurred. The source is equal to the
-    // destination.
-    NO_CHANGE = 1;
+  // The {@link Type} of the difference.
+  ChangeType type = 2;
 
-    // A new character was added to the source.
-    ADD = 2;
+  int32 lineNumber = 3;
 
-    // A character was deleted from the source.
-    DELETE = 3;
-  }
+  // Coordinates of a change in one line.
+  // Leave it empty, if whole line was changed.
+  int32 start_index = 4;
+  int32 end_index = 5;
+  // Indices relative to whole document
+  int32 global_start_index = 6;
+  int32 global_end_index = 7;
 
-  // The index in which the difference has occurred in the first string. For
-  // example, if we have the two strings, "Exampl" and "Example", the index
-  // would be 5.
-  int64 first_string_index = 1;
+  // Number of placeholder lines, used for Type.LINE_PLACEHOLDER.
+  int32 placeholder_line_count = 8;
+}
 
-  // The index in which the difference has occurred in the second string. For
-  // example, if we have the two strings, "Exampl" and "Example", the index
-  // would be 6.
-  int64 second_string_index = 2;
+message DiffPatchMatchDiff2 {
+  repeated DiffPatchMatchChange left_change = 1;
+  repeated DiffPatchMatchChange right_change = 2;
+}
 
-  // The string being changed. In the example of the two strings "Exampl" and
-  // "Example" it would be the last "e".
-  string text = 3;
+// Intermediate proto for DiffPatchMatch change.
+message DiffPatchMatchChange2 {
+  string text = 1;
+  ChangeType type = 2;
+  int32 global_left_start_index = 3;
+  int32 global_left_end_index = 4;
+  int32 global_right_start_index = 5;
+  int32 global_right_end_index = 6;
+}
 
-  // The {@link Type} of the difference, i.e. what change has occurred. In the
-  // example of the two strings "Exampl" and "Example" it would be {@link
-  // Type.ADD}.
-  Type type = 4;
+// Intermediate proto for DiffPatchMatch change.
+message DiffPatchMatchChange {
+  string text = 1;
+  ChangeType type = 2;
 }
