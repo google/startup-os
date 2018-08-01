@@ -9,6 +9,12 @@ if [[ $1 != "build" && $1 != "test" ]]; then
   exit 1
 fi
 
+if [ -z "$ANDROID_HOME" ]; then
+  echo "$RED""Set ANDROID_HOME variable to valid Android SDK location$RESET"
+  echo "$RED""Run ./tools/get-android-sdk.sh to download it$RESET"
+  exit 2
+fi
+
 # On CircleCI we ignore packages that depend on
 # @com_google_protobuf//:protobuf (cpp library),
 # which leads to inability to use prebuilt binaries
