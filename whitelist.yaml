@@ -1,0 +1,32 @@
+maven_dependencies:
+  - com.google
+  - com.jcraft
+  - commons-logging
+  - io.grpc
+  - io.opencensus
+  - javax.annotation
+  - javax.inject
+  - junit
+  - org.apache
+  - org.eclipse
+  - org.javassist
+  - org.json
+  - org.jsoup
+  - org.mockito
+  - org.objenesis
+  - org.slf4j
+  - org.yaml
+  - com.squareup.okhttp
+  - com.squareup.okio
+workspace_dependencies:
+  - https://github.com/abseil/abseil-cpp
+  - https://github.com/bazelbuild/
+  - https://github.com/gflags/gflags
+  - https://github.com/google/benchmark
+  - https://github.com/google/glog
+  - https://github.com/google/googletest
+  - https://github.com/google/protobuf
+  - https://github.com/grpc-ecosystem/polyglot
+  - https://github.com/grpc/grpc-java
+  - https://github.com/oferb/startupos-binaries
+  - https://github.com/open-source-parsers/jsoncpp
