@@ -42,8 +42,6 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 
 @RunWith(Parameterized.class)
 public class FileUtilsTest {
@@ -75,7 +73,7 @@ public class FileUtilsTest {
 
   @Before
   public void setup() {
-    fileSystem = Jimfs.newFileSystem(fileSystemConfig); // FileSystems.getDefault();
+    fileSystem = Jimfs.newFileSystem(fileSystemConfig);
     CommonComponent commonComponent =
         DaggerCommonComponent.builder()
             .commonModule(
@@ -233,7 +231,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     fileUtils.writeString("hello world", TEST_FILE_PATH);
-    assertEquals(Collections.singletonList("hello world"), Files.readAllLines(testPath, UTF_8));
+    assertEquals("hello world", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test
@@ -263,9 +261,8 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_FILE_PATH);
     Files.createDirectories(testPath.getParent());
-    fileUtils.writeString("first line\nsecond line\n\n", TEST_FILE_PATH);
-    assertEquals(
-        Arrays.asList("first line", "second line", ""), Files.readAllLines(testPath, UTF_8));
+    fileUtils.writeString("first line\nsecond line\n", TEST_FILE_PATH);
+    assertEquals("first line\nsecond line\n", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test
@@ -277,7 +274,7 @@ public class FileUtilsTest {
     Files.createDirectories(testPath.getParent());
     Files.write(testPath, "first line".getBytes(UTF_8));
     fileUtils.writeString("second line", TEST_FILE_PATH);
-    assertEquals(Collections.singletonList("second line"), Files.readAllLines(testPath, UTF_8));
+    assertEquals("second line", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test
@@ -287,7 +284,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath(TEST_DIR_PATH);
     fileUtils.writeString("hello world", TEST_DIR_PATH);
-    assertEquals(Collections.singletonList("hello world"), Files.readAllLines(testPath, UTF_8));
+    assertEquals("hello world", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test
@@ -297,7 +294,7 @@ public class FileUtilsTest {
     }
     Path testPath = fileSystem.getPath("/foo.txt");
     fileUtils.writeString("hello world", "/foo.txt");
-    assertEquals(Collections.singletonList("hello world"), Files.readAllLines(testPath, UTF_8));
+    assertEquals("hello world", new String(Files.readAllBytes(testPath), UTF_8));
   }
 
   @Test(expected = RuntimeException.class)
@@ -587,17 +584,14 @@ public class FileUtilsTest {
             .setEnumField(TestMessage.BooleanEnum.YES)
             .build();
     fileUtils.writePrototxt(message, TEST_PROTOTXT_FILE_PATH);
-    ImmutableList<String> actual =
-        ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(TEST_PROTOTXT_FILE_PATH)));
-    ImmutableList<String> expected =
-        ImmutableList.of(
-            "int32_field: 123",
-            "string_field: \"foo\"",
-            "map_field {",
-            "  key: \"foo\"",
-            "  value: 123",
-            "}",
-            "enum_field: YES");
+    String actual = new String(Files.readAllBytes(fileSystem.getPath(TEST_PROTOTXT_FILE_PATH)), UTF_8);
+    String expected = "int32_field: 123\n" + 
+            "string_field: \"foo\"\n" +
+            "map_field {\n" +
+            "  key: \"foo\"\n" +
+            "  value: 123\n" +
+            "}\n" +
+            "enum_field: YES\n";
     assertEquals(expected, actual);
   }
 
