@@ -42,7 +42,6 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertFalse;
 
-
 @RunWith(Parameterized.class)
 public class FileUtilsTest {
 
@@ -584,14 +583,16 @@ public class FileUtilsTest {
             .setEnumField(TestMessage.BooleanEnum.YES)
             .build();
     fileUtils.writePrototxt(message, TEST_PROTOTXT_FILE_PATH);
-    String actual = new String(Files.readAllBytes(fileSystem.getPath(TEST_PROTOTXT_FILE_PATH)), UTF_8);
-    String expected = "int32_field: 123\n" + 
-            "string_field: \"foo\"\n" +
-            "map_field {\n" +
-            "  key: \"foo\"\n" +
-            "  value: 123\n" +
-            "}\n" +
-            "enum_field: YES\n";
+    String actual =
+        new String(Files.readAllBytes(fileSystem.getPath(TEST_PROTOTXT_FILE_PATH)), UTF_8);
+    String expected =
+        "int32_field: 123\n"
+            + "string_field: \"foo\"\n"
+            + "map_field {\n"
+            + "  key: \"foo\"\n"
+            + "  value: 123\n"
+            + "}\n"
+            + "enum_field: YES\n";
     assertEquals(expected, actual);
   }
 
