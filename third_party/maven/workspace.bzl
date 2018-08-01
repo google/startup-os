@@ -194,6 +194,7 @@ def list_dependencies():
     {"artifact": "org.slf4j:slf4j-api:1.7.25", "lang": "java", "sha1": "da76ca59f6a57ee3102f8f9bd9cee742973efa8a", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_slf4j_slf4j_api", "actual": "@org_slf4j_slf4j_api//jar", "bind": "jar/org/slf4j/slf4j_api"},
     {"artifact": "org.slf4j:slf4j-simple:1.7.25", "lang": "java", "sha1": "8dacf9514f0c707cbbcdd6fd699e8940d42fb54e", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_slf4j_slf4j_simple", "actual": "@org_slf4j_slf4j_simple//jar", "bind": "jar/org/slf4j/slf4j_simple"},
     {"artifact": "org.threeten:threetenbp:1.3.3", "lang": "java", "sha1": "3ea31c96676ff12ab56be0b1af6fff61d1a4f1f2", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_threeten_threetenbp", "actual": "@org_threeten_threetenbp//jar", "bind": "jar/org/threeten/threetenbp"},
+    {"artifact": "org.yaml:snakeyaml:1.21", "lang": "java", "sha1": "18775fdda48574784f40b47bf478ab0593f92e4d", "repository": "https://repo.maven.apache.org/maven2/", "name": "org_yaml_snakeyaml", "actual": "@org_yaml_snakeyaml//jar", "bind": "jar/org/yaml/snakeyaml"},
     ]
 
 def maven_dependencies(callback = declare_maven):
