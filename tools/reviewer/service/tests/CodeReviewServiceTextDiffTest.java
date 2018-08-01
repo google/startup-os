@@ -208,11 +208,7 @@ public class CodeReviewServiceTextDiffTest {
   }
 
   private TextDiffResponse getExpectedResponse(String contents) {
-    return TextDiffResponse.newBuilder()
-        .addAllChanges(component.getTextDifferencer().getAllTextChanges(contents, contents))
-        .setLeftFileContents(contents)
-        .setRightFileContents(contents)
-        .build();
+    return TextDiffResponse.newBuilder().setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents)).build();
   }
 
   private void writeFile(String contents) {

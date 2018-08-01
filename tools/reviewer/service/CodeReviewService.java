@@ -200,9 +200,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       String rightFileContents = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .addAllChanges(textDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
-              .setLeftFileContents(leftFileContents)
-              .setRightFileContents(rightFileContents)
+              .setTextDiff(textDifferencer.getTextDiff(leftFileContents, rightFileContents))
               .build());
     } catch (IOException e) {
       responseObserver.onError(
