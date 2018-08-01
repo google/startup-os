@@ -78,13 +78,6 @@ public class FileUtils {
   /** Writes a proto to file. */
   public void writePrototxt(Message proto, String path) throws IOException {
     String fileContent = TextFormat.printToUnicodeString(proto);
-    if (!fileContent.isEmpty()) {
-      String lastSymbol = fileContent.substring(fileContent.length() - 1);
-      // TODO: Add support for '/r/n' for Windows.
-      if (lastSymbol.equals("\n")) {
-        fileContent = fileContent.substring(0, fileContent.length() - 1);
-      }
-    }
     writeString(fileContent, path);
   }
 
@@ -102,14 +95,6 @@ public class FileUtils {
     File file = new File(path);
     if (file.getParent() != null) {
       mkdirs(file.getParent());
-    }
-    if (!text.isEmpty()) {
-      String lastSymbol = text.substring(text.length() - 1);
-      // TODO: Add support for '/r/n' for Windows.
-      if (lastSymbol.equals("\n")) {
-        Files.write(fileSystem.getPath(expandHomeDirectory(path)), (text + "\n").getBytes(UTF_8));
-        return;
-      }
     }
     Files.write(fileSystem.getPath(expandHomeDirectory(path)), text.getBytes(UTF_8));
   }
@@ -204,15 +189,7 @@ public class FileUtils {
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    ImmutableList<String> lines =
-        ImmutableList.copyOf(Files.readAllLines(fileSystem.getPath(expandHomeDirectory(path))));
-    if (lines.isEmpty()) {
-      return "";
-    } else {
-      String lastLine = lines.get(lines.size() - 1);
-      // TODO: Add support for '/r/n' for Windows.
-      return lastLine.equals("\n") ? String.join("\n", lines) + "\n" : String.join("\n", lines);
-    }
+    return new String(Files.readAllBytes(fileSystem.getPath(expandHomeDirectory(path))));
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */

@@ -35,12 +35,7 @@ message TextDiffRequest {
   com.google.startupos.common.repo.File right_file = 2;
 }
 
-message TextDiffResponse {
-  // The changes of the second file.
-  repeated com.google.startupos.common.TextChange changes = 1;
-  string left_file_contents = 2;
-  string right_file_contents = 3;
-}
+message TextDiffResponse { com.google.startupos.common.TextDiff text_diff = 1; }
 
 message DiffFilesRequest {
   string workspace = 1;

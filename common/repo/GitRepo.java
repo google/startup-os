@@ -317,16 +317,7 @@ public class GitRepo implements Repo {
 
   @Override
   public String getFileContents(String commitId, String path) {
-    CommandResult commandResult = runCommand("--no-pager show " + commitId + ":" + path);
-    String result = commandResult.stdout;
-    int lastIndexOfNewLineSymbol = result.lastIndexOf("\n");
-    if (lastIndexOfNewLineSymbol >= 0) {
-      result =
-          new StringBuilder(result)
-              .replace(lastIndexOfNewLineSymbol, lastIndexOfNewLineSymbol + 1, "")
-              .toString();
-    }
-    return result;
+    return runCommand("--no-pager show " + commitId + ":" + path).stdout;
   }
 
   @Override
