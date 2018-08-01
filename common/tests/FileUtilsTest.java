@@ -35,7 +35,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.assertEquals;
