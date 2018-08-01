@@ -58,8 +58,8 @@ int main(int argc, char **argv) {
   // file.
   root["output"] = cpp_info.output_file();
 
-  // Path to the current sandbox. This path is not valid after the extra action
-  // completes.
+// Path to the current sandbox. This path is not valid after the extra action
+// completes.
 
 #ifdef _GNU_SOURCE
   root["directory"] = get_current_dir_name();
