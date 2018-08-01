@@ -35,9 +35,7 @@ message TextDiffRequest {
   com.google.startupos.common.repo.File right_file = 2;
 }
 
-message TextDiffResponse {
-  com.google.startupos.common.TextDiff text_diff = 1;
-}
+message TextDiffResponse { com.google.startupos.common.TextDiff text_diff = 1; }
 
 message DiffFilesRequest {
   string workspace = 1;
