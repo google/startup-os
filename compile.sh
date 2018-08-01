@@ -9,5 +9,11 @@ if [[ $1 != "build" && $1 != "test" ]]; then
   exit 1
 fi
 
-bazel $1 //...
+if [ -z "$ANDROID_HOME" ]; then
+  echo "$RED""Set ANDROID_HOME variable to valid Android SDK location$RESET"
+  echo "$RED""Run ./tools/get-android-sdk.sh to download it$RESET"
+  exit 2
+fi
+
+bazel $1 $DELETED_PACKAGES //...
 exit $?

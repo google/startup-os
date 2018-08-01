@@ -39,6 +39,9 @@ jobs:
       - restore_cache:
           key: "v3-bazel_cache"
       - run: './pre-commit.sh'
+      - run: sudo apt update
+      - run: sudo apt -y install yapf3 clang-format python3-pkg-resources
+      - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
       - run: './fix_formatting.sh'
 
   build:
@@ -58,7 +61,7 @@ jobs:
 
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
-      - run: bash .circleci/get-android-sdk.sh
+      - run: './tools/get-android-sdk.sh'
       - run:
           command: ./compile.sh build
           environment:
