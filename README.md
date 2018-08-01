@@ -22,11 +22,18 @@ You can:
 * Use parts of it from your own repo. For an example of that, see https://github.com/hasadna/hasadna (look for `@startup_os` in BUILD files)
 
 ### Installation
-Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's it!
+Install [Bazel](https://docs.bazel.build/versions/master/install.html).
+If you already have Android SDK (i.e. you installed Android Studio),
+set environment variable `export ANDROID_HOME=<…>` (
+for macOS: `$HOME/Library/Android/sdk/`). Otherwise, start from executing
+`./get-android-sdk.sh`
 
-Now you can build any target you want. To build all targets and run all tests:
+Now you can build any target you want.
+To build all targets:
+  `./compile.sh build`
 
-`bazel query //... | grep -v ^\/\/third_party | grep -v *node_modules | xargs bazel test`
+To run all tests:
+`./compile.sh test`
 
 ### Milestones
 #### ✓ Milestone I

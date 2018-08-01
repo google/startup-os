@@ -58,7 +58,7 @@ jobs:
 
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
-      - run: bash .circleci/get-android-sdk.sh
+      - run: './get-android-sdk.sh'
       - run:
           command: ./compile.sh build
           environment:
