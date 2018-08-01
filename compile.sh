@@ -11,7 +11,7 @@ fi
 
 if [ -z "$ANDROID_HOME" ]; then
   echo "$RED""Set ANDROID_HOME variable to valid Android SDK location$RESET"
-  echo "$RED""Run ./get-android-sdk.sh to download it$RESET"
+  echo "$RED""Run ./tools/get-android-sdk.sh to download it$RESET"
   exit 2
 fi
 
