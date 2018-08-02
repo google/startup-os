@@ -1,10 +1,5 @@
 <!-- Loading -->
-<div 
-  class="loading"
-  fxLayoutAlign="center"
-  *ngIf="isLoading">
-  <mat-spinner [diameter]="70"></mat-spinner>
-</div>
+<page-loading [isLoading]="isLoading"></page-loading>
 
 <!-- Diff groups -->
 <div class="diff-groups" *ngIf="!isLoading">
@@ -13,7 +8,7 @@
     *ngFor="let diffGroup of diffGroups; let i = index;"
   >
     <!-- Title of diff group -->
-    <div class="diff-group-title">
+    <div class="cr-titlebar diff-group-title">
       <span class="group-name">{{ diffGroupNameList[i] }}</span>
       <span class="diff-amount"> - {{ diffGroup.length }}</span>
     </div>
@@ -40,10 +35,7 @@
       <ng-container matColumnDef="status">
         <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          <mat-icon [style.color]="statusList[diff.getStatus()].color">
-            {{ statusList[diff.getStatus()].icon }}
-          </mat-icon>
-          {{ statusList[diff.getStatus()].label }}
+          <diff-status [diff]="diff"></diff-status>
         </mat-cell>
       </ng-container>
 
@@ -68,13 +60,16 @@
         </mat-cell>
       </ng-container>
 
-      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-header-row
+        class="cr-header"
+        *matHeaderRowDef="displayedColumns"
+      ></mat-header-row>
       <mat-row
         *matRowDef="let diff; columns: displayedColumns;"
         (click)="openDiff(diff.getId())"
       ></mat-row>
     </mat-table>
     <!-- Show the placeholder, if group contains no diffs -->
-    <div class="placeholder" *ngIf="diffGroup.length === 0"></div>
+    <div class="cr-header placeholder" *ngIf="diffGroup.length === 0"></div>
   </div>
 </div>

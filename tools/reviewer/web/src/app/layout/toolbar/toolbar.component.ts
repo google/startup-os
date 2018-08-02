@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./toolbar.component.scss'],
 })
 export class ToolbarComponent {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   logout(): void {
     this.authService.logout();

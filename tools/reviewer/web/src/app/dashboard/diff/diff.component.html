@@ -1,82 +1,15 @@
-<div class="single-review" *ngIf="!isLoading">
-  
-  <!-- Title bar -->
-  <review-titlebar 
-    [diff]="diff"
-    [isEditable]="isEditable"
-  ></review-titlebar>
+<!-- Loading -->
+<page-loading [isLoading]="isLoading"></page-loading>
 
-  <!-- Details of the review -->
-  <div class="review-details">
-    
-    <div fxLayout="row" fxLayoutGap="10%">
-      <div fxLayout="column" fxLayoutGap="20px" fxFlex="45%">
-  
-        <!-- Reviewers -->
-        <reviewer-list [diff]="diff" [editable]="isEditable"></reviewer-list>
-  
-        <!-- CC list -->
-        <cc-list [diff]="diff"></cc-list>
-  
-        <!-- Bug property of Diff that is a link to related Github Issue -->
-        <div>
-          <app-editable-property
-          [diff]="diff"
-          [property]="'bug'"
-          [editable]="isEditable"
-          ></app-editable-property>
-        </div>
-  
-        <!-- Created At timestamp -->
-        <div fxLayout="row" 
-          fxLayout.xs="column" 
-          fxLayoutGap.xs="10px">
-          <div fxFlex="150px" fxFlex.xs=""
-            fxFlexAlign="center" 
-            class="property">
-            Created:
-          </div>
-          <div fxFlex class="timestamp">
-            {{ diff.getCreatedTimestamp() | date:'medium' }}
-          </div>
-        </div>
-  
-        <!-- Modified timestamp -->
-        <div fxLayout="row" 
-          fxLayout.xs="column" 
-          fxLayoutGap.xs="10px">
-          <div fxFlex="150px" fxFlex.xs="" 
-            fxFlexAlign="center"
-            class="property">
-            Modified:
-          </div>
-          <div fxFlex 
-            class="timestamp">
-            {{ diff.getModifiedTimestamp() | date:'medium' }}
-          </div>
-        </div>
-
-        
-      </div>
-
-      <div fxFlex="45%">
-        <!-- Review Description -->
-        <div>
-          <app-editable-property
-            [diff]="diff"
-            [property]="'description'"
-            [editable]="isEditable"
-          ></app-editable-property>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Files -->
-  <review-files [files]="files" [diffId]="diff.getId()"></review-files>
-
-  <!-- Review Comments -->
-  <review-discussion [diff]="diff"></review-discussion>
-  
-</div>
+<!-- Diff-->
+<ng-container *ngIf="!isLoading">
+  <diff-header [diff]="diff"></diff-header>
+  <diff-files
+    [files]="files"
+    [diffId]="diff.getId()"
+  ></diff-files>
+  <diff-discussion
+    [threads]="diff.getThreadList()"
+    [diffId]="diff.getId()"
+  ></diff-discussion>
+</ng-container>

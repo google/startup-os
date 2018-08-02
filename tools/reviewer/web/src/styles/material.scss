@@ -1,0 +1,23 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+$material-primary: mat-palette($mat-light-blue, 500);
+$material-accent:  mat-palette($mat-amber, 400);
+$material-warn:    mat-palette($mat-blue, 800);
+
+$material-theme: mat-light-theme(
+  $material-primary, $material-accent, $material-warn
+);
+@include angular-material-theme($material-theme);
+
+.mat-header-row {
+  padding: 0 23px;
+  min-height: 40px !important;
+  >.mat-header-cell {
+    font-size: 16px;
+  }
+}
+
+.mat-checkbox-frame {
+  background: white !important;
+}

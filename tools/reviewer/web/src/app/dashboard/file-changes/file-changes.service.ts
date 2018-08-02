@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
-import { Comment } from '@/shared';
+import { Comment } from '@/shared/proto';
 
 interface HeightResponse {
   height: number;

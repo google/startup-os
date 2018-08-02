@@ -1,4 +1,4 @@
-import { Diff } from '@/shared/shell';
+import { Diff } from '@/shared/proto';
 
 export interface Status {
   label: string;

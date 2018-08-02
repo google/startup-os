@@ -7,9 +7,9 @@ import {
   Comment,
   Diff,
   File,
-  TextDiffResponse,
+  TextDiff,
   Thread,
-} from '@/shared';
+} from '@/shared/proto';
 import {
   DifferenceService,
   FirebaseService,
@@ -26,7 +26,7 @@ import { FileChangesService } from './file-changes.service';
 })
 export class FileChangesComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
-  textDiffResponse: TextDiffResponse;
+  textDiff: TextDiff;
   changes: number[];
   localThreads: Thread[];
   diff: Diff;
@@ -114,12 +114,12 @@ export class FileChangesComponent implements OnInit, OnDestroy {
     this.localserverService
       .getFileChanges(leftFile, rightFile)
       .subscribe(textDiffResponse => {
-        this.textDiffResponse = textDiffResponse;
+        this.textDiff = textDiffResponse.getTextDiff();
 
-        // TODO: use textDiffResponse.getChangesList() instead
+        // TODO: use changes from localserver instead
         this.changes = this.differenceService.compare(
-          textDiffResponse.getLeftFileContents(),
-          textDiffResponse.getRightFileContents(),
+          this.textDiff.getLeftFileContents(),
+          this.textDiff.getRightFileContents(),
         );
 
         this.isLoading = false;

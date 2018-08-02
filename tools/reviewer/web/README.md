@@ -2,7 +2,8 @@
 Run `ng install` for the first time.
 
 Run `npm run protoc` to generate proto functions.
-You need installed google-protobuf proto3 on your computer.
+You need installed google-protobuf version 3.5 or above on your computer.
+Supported on Linux and Mac machines only.
 
 ## Development
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. 

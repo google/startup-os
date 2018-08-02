@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AuthService, FirebaseService } from '@/shared';
-import { Diff, Reviewer } from '@/shared/shell';
-import { Status, statusList } from './status-list';
+import { Diff, Reviewer } from '@/shared/proto';
 
 export enum DiffGroups {
   NeedAttention,
@@ -16,11 +15,11 @@ export enum DiffGroups {
 }
 
 @Component({
-  selector: 'app-reviews-panel',
-  templateUrl: './reviews-panel.component.html',
-  styleUrls: ['./reviews-panel.component.scss'],
+  selector: 'cr-diffs',
+  templateUrl: './diffs.component.html',
+  styleUrls: ['./diffs.component.scss'],
 })
-export class ReviewsPanelComponent implements OnInit {
+export class DiffsComponent implements OnInit {
   isLoading: boolean = true;
   diffGroups: Diff[][] = [];
   displayedColumns: string[] = [
@@ -32,7 +31,6 @@ export class ReviewsPanelComponent implements OnInit {
     'description',
   ];
   diffGroupNameList: string[] = [];
-  statusList: Status[] = statusList;
 
   constructor(
     private firebaseService: FirebaseService,

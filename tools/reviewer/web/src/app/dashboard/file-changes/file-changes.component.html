@@ -1,15 +1,17 @@
+<!-- Loading -->
+<page-loading [isLoading]="isLoading"></page-loading>
+
+<!-- Header -->
 <div class="file-header" *ngIf="!isLoading">
   <div><a routerLink="/diff/{{ diff.getId() }}">Back</a></div>
-  <div><span>{{filePath}}</span></div>
+  <div><span>{{ file.getFilename() }}</span></div>
 </div>
 
-<div class="loading" *ngIf="isLoading">
-  <mat-spinner></mat-spinner>
-</div>
+<!-- Code changes -->
 <div class="split-code" *ngIf="!isLoading">
   <!-- Old code (left) -->
   <code-block
-    [fileContent]="textDiffResponse.getLeftFileContents()"
+    [fileContent]="textDiff.getLeftFileContents()"
     [isNewCode]="false"
     [changes]="changes"
     [language]="fileChangesService.getLanguage(file.getFilename())"
@@ -17,7 +19,7 @@
 
   <!-- New code (right) -->
   <code-block
-    [fileContent]="textDiffResponse.getRightFileContents()"
+    [fileContent]="textDiff.getRightFileContents()"
     [isNewCode]="true"
     [changes]="changes"
     [threads]="localThreads"

@@ -1,0 +1,68 @@
+<div class="header-content cr-header">
+  <div class="info" fxFlex="50%">
+    <table>
+      <tr>
+        <td>Reviewers</td>
+        <td>
+          <user-popup
+            *ngFor="let reviewer of diff.getReviewerList()"
+            [email]="reviewer.getEmail()"
+            [isAttentionRequired]="reviewer.getNeedsAttention()"
+            [isChangeAttention]="true"
+            (changeAttentionEmitter)="changeAttention($event)"
+            [isRemoveFromList]="true"
+            (removeFromListEmitter)="removeFromReviewerList($event)"
+          ><span [ngClass]="{'bold': reviewer.getNeedsAttention()}">
+            {{ authService.getUsername(reviewer.getEmail()) }}
+          </span></user-popup>
+        </td>
+        <td>
+          <button mat-icon-button color="warn" (click)="addReviewer()">
+            <mat-icon>add_box</mat-icon>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>CC</td>
+        <td>
+          <user-popup
+            *ngFor="let email of diff.getCcList()"
+            [email]="email"
+            [isRemoveFromList]="true"
+            (removeFromListEmitter)="removeFromCcList($event)"
+          ><span>{{ authService.getUsername(email) }}</span></user-popup>
+        </td>
+        <td>
+          <button mat-icon-button color="warn" (click)="addCC()">
+            <mat-icon>add_box</mat-icon>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>Bug</td>
+        <td>{{ diff.getBug() }}</td>
+      </tr>
+      <tr>
+        <td>Workspace</td>
+        <td>{{ diff.getWorkspace() }}</td>
+      </tr>
+      <tr>
+        <td>Created</td>
+        <td>{{ diff.getCreatedTimestamp() | date:'medium' }}</td>
+      </tr>
+      <tr>
+        <td>Modified</td>
+        <td>{{ diff.getModifiedTimestamp() | date:'medium' }}</td>
+      </tr>
+    </table>
+  </div>
+  <div class="description">
+    <textarea
+      matInput
+      matTextareaAutosize
+      matAutosizeMinRows="9"
+      placeholder="Description"
+      [formControl]="textareaControl"
+    ></textarea>
+  </div>
+</div>

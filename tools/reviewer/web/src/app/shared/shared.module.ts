@@ -3,6 +3,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   MatButtonModule,
   MatCardModule,
+  MatCheckboxModule,
+  MatDialogModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
@@ -14,7 +16,9 @@ import {
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
-const SHARED_MODULES = [
+import { DirectiveList } from './directives';
+
+const SharedModules = [
   FlexLayoutModule,
   MatButtonModule,
   MatCardModule,
@@ -26,11 +30,13 @@ const SHARED_MODULES = [
   MatSnackBarModule,
   MatToolbarModule,
   MatTableModule,
+  MatDialogModule,
+  MatCheckboxModule,
 ];
 
 @NgModule({
-  imports: [RouterModule, ...SHARED_MODULES],
-  exports: SHARED_MODULES,
-  providers: [],
+  imports: [RouterModule, ...SharedModules],
+  exports: [SharedModules, ...DirectiveList],
+  declarations: [...DirectiveList],
 })
-export class SharedModule {}
+export class SharedModule { }

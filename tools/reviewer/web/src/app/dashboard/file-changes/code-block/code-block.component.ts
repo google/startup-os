@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Comment, Thread } from '@/shared';
+import { Comment, Thread } from '@/shared/proto';
 import { HighlightService } from '@/shared/services';
 import { FileChangesService } from '../file-changes.service';
 

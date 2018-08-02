@@ -9,7 +9,8 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 
-import { AuthService, Comment } from '@/shared';
+import { Comment } from '@/shared/proto';
+import { AuthService } from '@/shared/services';
 import { FileChangesService } from '../../file-changes.service';
 
 // The component implements comments of code block

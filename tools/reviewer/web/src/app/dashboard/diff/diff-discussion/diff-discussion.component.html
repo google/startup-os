@@ -1,0 +1,53 @@
+<!-- Title -->
+<div class="cr-titlebar">
+  <div class="title">
+    <span class="bold">Discussion</span>
+  </div>
+  <div class="buttons" fxFlex>
+    <button
+      class="cr-light-button"
+      mat-raised-button
+      color="primary"
+    >Expand</button>
+  </div>
+</div>
+<div class="cr-header">
+  <mat-table [dataSource]="threads">
+      <ng-container matColumnDef="discussions">
+        <mat-header-cell *matHeaderCellDef>
+          General discussions
+          ({{getAmountOfComments()}} comments,
+          {{getAmountOfComments()}} unresolved)
+        </mat-header-cell>
+        <!-- Discussions -->
+        <mat-cell *matCellDef="let thread">
+          <div class="thread-title">
+            {{ thread.getFile().getFilename() }}
+            ({{ thread.getCommentList().length }} comments)
+          </div>
+          <div
+            class="comment"
+            *ngFor="let comment of thread.getCommentList()"
+          >
+            <div class="username">{{ comment.getContent() }}</div>
+            <div class="message">
+              by <span class="bold">{{ getUsername(comment) }}</span>
+              on {{ comment.getTimestamp() | date:'medium' }} 
+            </div>
+          </div>
+          <div class="line-number">
+            Line number: {{ thread.getLineNumber() }}
+          </div>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        class="cr-header"
+        *matHeaderRowDef="displayedColumns"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="let thread; columns: displayedColumns;"
+        (click)="openFile(thread)"
+      ></mat-row>
+    </mat-table>
+</div>
