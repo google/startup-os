@@ -16,17 +16,19 @@
 
 package com.google.startupos.tools.reviewer.service.tests;
 
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.StatusRuntimeException;
-import java.util.concurrent.TimeUnit;
+import com.google.startupos.tools.reviewer.service.Protos;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
-import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.TextDiffResponse;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
+
+import java.util.concurrent.TimeUnit;
 
 /* Test tool for CodeReviewService.
  *
@@ -96,6 +98,21 @@ public class TestTool {
 
   public void runGetFile() {
     System.out.println(getFile("WORKSPACE"));
+  }
+
+  public Protos.DiffFilesResponse getDiffFiles(String workspace, long diffNumber) {
+    Protos.DiffFilesRequest request =
+        Protos.DiffFilesRequest.newBuilder().setWorkspace(workspace).setDiffId(diffNumber).build();
+    try {
+      return blockingStub.getDiffFiles(request);
+    } catch (StatusRuntimeException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public void runGetDiffFiles(String workspace, long diffNumber) {
+    System.out.println(getDiffFiles(workspace, diffNumber));
   }
 
   public static void main(String[] args) {
