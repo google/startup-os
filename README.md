@@ -5,6 +5,14 @@
 
 > Working examples for using Google's Open Source tools and deploying to the cloud.
 
+### Hands-on experience
+Try cloning the repo in Google Cloud Shell and look at the tutorials:
+```
+$ ls tutorials/
+$ teachme <tutorial_name.md>
+```
+[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Fgoogle%2Fstartup-os&page=shell)
+
 ### StartupOS includes
 * Google's open source libraries and tools, integrated together
 * Easy Cloud setup and deployment
