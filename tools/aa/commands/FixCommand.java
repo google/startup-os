@@ -20,15 +20,26 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.tools.aa.commands.checks.DummyCheck;
 import com.google.startupos.tools.aa.commands.checks.FailingDummyCheck;
 import com.google.startupos.tools.aa.commands.checks.FixCommandCheck;
+import com.google.startupos.tools.aa.commands.checks.FormattingCheck;
+import java.util.List;
 import javax.inject.Inject;
+import dagger.Lazy;
 
 public class FixCommand implements AaCommand {
 
-  ImmutableList<FixCommandCheck> checks =
-      ImmutableList.of(new DummyCheck(), new FailingDummyCheck());
+  List<FixCommandCheck> checks;
 
   @Inject
-  public FixCommand() {}
+  public FixCommand(
+      Lazy<FormattingCheck> formattingCheck,
+      Lazy<DummyCheck> dummyCheck,
+      Lazy<FailingDummyCheck> failingDummyCheck) {
+    ImmutableList.Builder builder = ImmutableList.builder();
+    builder.add(formattingCheck.get());
+    builder.add(dummyCheck.get());
+    builder.add(failingDummyCheck.get());
+    checks = builder.build();
+  }
 
   @Override
   public boolean run(String[] args) {

@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class FormatterTool {
+public class FormatterTool {
 
   static String readFile(Path path) throws IOException {
     return String.join(System.lineSeparator(), Files.readAllLines(path));

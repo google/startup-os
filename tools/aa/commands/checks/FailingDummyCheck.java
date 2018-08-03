@@ -15,7 +15,13 @@
  */
 package com.google.startupos.tools.aa.commands.checks;
 
+import javax.inject.Inject;
+
 public class FailingDummyCheck implements FixCommandCheck {
+
+  @Inject
+  public FailingDummyCheck() {}
+
   @Override
   public boolean perform() {
     System.err.println("performing a check: unsuccessful");
