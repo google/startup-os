@@ -15,6 +15,7 @@
  */
 
 // TODO: refactor getting the formatter for file
+// TODO: Move formatting logic from FormatterTool to a new Formatter class.
 
 package com.google.startupos.tools.formatter;
 

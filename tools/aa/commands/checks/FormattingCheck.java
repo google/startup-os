@@ -15,17 +15,13 @@
  */
 package com.google.startupos.tools.aa.commands.checks;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import com.google.startupos.tools.formatter.FormatterTool;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.util.stream.Collectors;
-import java.lang.String;
 
 public class FormattingCheck implements FixCommandCheck {
 
@@ -53,8 +49,6 @@ public class FormattingCheck implements FixCommandCheck {
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
-
-    System.err.println("curdir: " + this.workspacePath);
 
     FormatterTool.main(
         new String[] {
