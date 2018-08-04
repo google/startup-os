@@ -45,7 +45,7 @@ public interface Repo {
   /** Commits files to current branch and returns commit */
   Commit commit(ImmutableList<File> files, String message);
   /** Pushes all branches to remote repo */
-  void pushAll();
+  void push();
   /** Pulls all branches from remote repo */
   void pull();
   /** Merges branch to master, keeping conflicting changes in tree. * Returns true on success. */
