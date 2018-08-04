@@ -88,7 +88,7 @@ public class ReviewCommand implements AaCommand {
           .forEach(
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
-                repo.pushAll();
+                repo.push();
               });
     } catch (IOException e) {
       e.printStackTrace();
