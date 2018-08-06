@@ -5,44 +5,44 @@ load("@io_bazel_rules_sass//sass:sass.bzl", "sass_binary")
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library", "ts_web_test_suite")
 
 sass_binary(
-  name = "brick-1-styles",
-  src = "brick-1.component.scss",
+    name = "brick-1-styles",
+    src = "brick-1.component.scss",
 )
 
 ng_module(
-  name = "brick-1",
-  srcs = [
-    "brick-1.component.ts",
-    "brick-1.module.ts",
-  ],
-  assets = [
-    ":brick-1.component.html",
-    ":brick-1-styles",
-  ],
-  tsconfig = "//src:tsconfig.json",
-  deps = [
-    "@rxjs",
-  ],
+    name = "brick-1",
+    srcs = [
+        "brick-1.component.ts",
+        "brick-1.module.ts",
+    ],
+    assets = [
+        ":brick-1.component.html",
+        ":brick-1-styles",
+    ],
+    tsconfig = "//src:tsconfig.json",
+    deps = [
+        "@rxjs",
+    ],
 )
 
 ts_library(
-  name = "test_lib",
-  testonly = 1,
-  srcs = glob(["*.spec.ts"]),
-  deps = [
-    ":brick-1",
-  ],
+    name = "test_lib",
+    testonly = 1,
+    srcs = glob(["*.spec.ts"]),
+    deps = [
+        ":brick-1",
+    ],
 )
 
 ts_web_test_suite(
-  name = "test",
-  bootstrap = ["//:node_modules/zone.js/dist/zone-testing-bundle.js"],
-  browsers = [
-    "@io_bazel_rules_webtesting//browsers:chromium-local",
-  ],
-  deps = [
-    ":test_lib",
-    "//:angular_bundles",
-    "//:angular_test_bundles",
-  ],
+    name = "test",
+    bootstrap = ["//:node_modules/zone.js/dist/zone-testing-bundle.js"],
+    browsers = [
+        "@io_bazel_rules_webtesting//browsers:chromium-local",
+    ],
+    deps = [
+        ":test_lib",
+        "//:angular_bundles",
+        "//:angular_test_bundles",
+    ],
 )

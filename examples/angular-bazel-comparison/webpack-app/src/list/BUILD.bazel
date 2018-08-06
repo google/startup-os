@@ -20,9 +20,8 @@ ng_module(
     ],
     tsconfig = "//src:tsconfig.json",
     deps = [
-        "//src/services",
-        "@rxjs",
         "//src/bricks/brick-1",
+        "//src/bricks/brick-10",
         "//src/bricks/brick-2",
         "//src/bricks/brick-3",
         "//src/bricks/brick-4",
@@ -31,6 +30,7 @@ ng_module(
         "//src/bricks/brick-7",
         "//src/bricks/brick-8",
         "//src/bricks/brick-9",
-        "//src/bricks/brick-10",
+        "//src/services",
+        "@rxjs",
     ],
 )
