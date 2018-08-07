@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-# Run it before committing to verify that dependency tree
-# at third_party/maven/ corresponds to dependencies.yaml
-# Execute from repo root or, if using aa from base/head/startup-os
+# This tool updates dependencies at third_party/maven with dependencies.yaml.
+# If run from CircleCI, it prints out an error if dependencies are not synced.
 
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
@@ -26,21 +25,20 @@ if [[ ! -z "$CIRCLECI" ]]; then
   fi
 fi
 
+# Regenerate dependencies
 bazel run @bazel_deps//:parse -- generate \
   -r $(pwd) \
   -s third_party/maven/workspace.bzl \
   -d dependencies.yaml \
   &>/dev/null
 
+# Format generated BUILD files
 bazel run //tools/formatter -- \
   --path $(pwd)/third_party/maven/ \
   --build \
   &>/dev/null
 
-# Prints out an error only if both conditions are satisfied:
-# * we are on CircleCI
-# * working tree contains unstaged changes
-# When ran locally it silently fixes everything.
+# Print error if on CircleCI
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
   echo "$RED[!] Dependency tree does not match dependencies.yaml$RESET"
   echo "Please run ''$0'' to fix it"
