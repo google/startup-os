@@ -18,8 +18,10 @@ package com.google.startupos.tools.aa.commands.checks;
 import com.google.startupos.tools.formatter.FormatterTool;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,11 +39,11 @@ public class FormattingCheck implements FixCommandCheck {
 
     String ignoredNodeModulesDirs;
 
-    try {
+    try (Stream<Path> stream = Files.walk(Paths.get(""))) {
       ignoredNodeModulesDirs =
           String.join(
               ",",
-              Files.walk(Paths.get(""))
+              stream
                   .filter(Files::isDirectory)
                   .filter(p -> p.getFileName().toString().equals("node_modules"))
                   .map(p -> p.toAbsolutePath().toString())
