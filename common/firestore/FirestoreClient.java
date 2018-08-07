@@ -18,6 +18,7 @@ package com.google.startupos.common.firestore;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
+import com.google.auto.factory.AutoFactory;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.startupos.common.firestore.Protos.ProtoDocument;
@@ -31,6 +32,7 @@ import java.net.URL;
 import java.util.Base64;
 
 // TODO: Fix open Firestore rules
+@AutoFactory
 public class FirestoreClient {
   // Base path formatted by project name and path, that starts with a /.
   private static final String BASE_PATH =

@@ -209,9 +209,7 @@ public class CodeReviewServiceTextDiffTest {
 
   private TextDiffResponse getExpectedResponse(String contents) {
     return TextDiffResponse.newBuilder()
-        .addAllChanges(component.getTextDifferencer().getAllTextChanges(contents, contents))
-        .setLeftFileContents(contents)
-        .setRightFileContents(contents)
+        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents))
         .build();
   }
 
