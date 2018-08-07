@@ -16,8 +16,8 @@
       <ng-container matColumnDef="discussions">
         <mat-header-cell *matHeaderCellDef>
           General discussions
-          ({{getAmountOfComments()}} comments,
-          {{getAmountOfComments()}} unresolved)
+          ({{ threads.length }} threads,
+          {{ getUnresolvedthreads() }} unresolved)
         </mat-header-cell>
         <!-- Discussions -->
         <mat-cell *matCellDef="let thread">
@@ -29,8 +29,8 @@
             class="comment"
             *ngFor="let comment of thread.getCommentList()"
           >
-            <div class="username">{{ comment.getContent() }}</div>
-            <div class="message">
+            <div class="message">{{ comment.getContent() }}</div>
+            <div class="username">
               by <span class="bold">{{ getUsername(comment) }}</span>
               on {{ comment.getTimestamp() | date:'medium' }} 
             </div>

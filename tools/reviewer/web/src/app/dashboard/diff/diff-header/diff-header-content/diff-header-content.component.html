@@ -1,6 +1,11 @@
 <div class="header-content cr-header">
+  <!--
+    Block with main information of the diff
+    Reviewers, CC list, workspace, created time, etc.
+  -->
   <div class="info" fxFlex="50%">
     <table>
+      <!-- Reviewer List -->
       <tr>
         <td>Reviewers</td>
         <td>
@@ -22,6 +27,8 @@
           </button>
         </td>
       </tr>
+
+      <!-- CC List -->
       <tr>
         <td>CC</td>
         <td>
@@ -38,6 +45,8 @@
           </button>
         </td>
       </tr>
+
+      <!-- Text info -->
       <tr>
         <td>Bug</td>
         <td>{{ diff.getBug() }}</td>
@@ -56,13 +65,50 @@
       </tr>
     </table>
   </div>
+
+  <!-- Description of the diff -->
   <div class="description">
-    <textarea
-      matInput
-      matTextareaAutosize
-      matAutosizeMinRows="9"
-      placeholder="Description"
-      [formControl]="textareaControl"
-    ></textarea>
+    <div class="titlebar">
+      <div class="title">Description</div>
+      <div class="edit-button">
+        <!-- Buttons to start editing  -->
+        <button
+          class="cr-light-button"
+          *ngIf="!isDescriptionEditMode"
+          mat-button
+          (click)="startDescriptionEditMode()"
+        >Edit</button>
+      </div>
+    </div>
+
+    <!-- Description readonly/textarea -->
+    <div class="description-text" *ngIf="!isDescriptionEditMode">
+      <pre class="description-value" [HTML]="description"></pre>
+    </div>
+    <div class="description-textarea" *ngIf="isDescriptionEditMode">
+      <textarea
+        class="description-text description-value"
+        matInput
+        matTextareaAutosize
+        matAutosizeMinRows="5"
+        placeholder="Leave a comment"
+        [(ngModel)]="description"
+      ></textarea>
+    </div>
+
+    <div class="buttons" *ngIf="isDescriptionEditMode">
+      <!-- Buttons to stop editing -->
+      <button
+        class="cr-light-button"
+        mat-raised-button
+        color="primary"
+        (click)="saveDescription()"
+      >Save</button>
+      <button
+        class="cr-light-button"
+        mat-button
+        (click)="stopDescriptionEditMode()"
+      >Cancel</button>
+    </div>
   </div>
 </div>

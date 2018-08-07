@@ -4,6 +4,8 @@ import { Comment, Thread } from '@/shared/proto';
 import { AuthService } from '@/shared/services';
 import { DiffService } from '../diff.service';
 
+// The component implements UI of thread list of the diff
+// How it looks: "/src/assets/design-blocks/diff-discussion.jpg"
 @Component({
   selector: 'diff-discussion',
   templateUrl: './diff-discussion.component.html',
@@ -20,12 +22,8 @@ export class DiffDiscussionComponent {
     public authService: AuthService,
   ) { }
 
-  getAmountOfComments(): number {
-    let amount: number = 0;
-    for (const thread of this.threads) {
-      amount += thread.getCommentList().length;
-    }
-    return amount;
+  getUnresolvedthreads(): number {
+    return this.threads.filter(thread => !thread.getIsDone()).length;
   }
 
   openFile(thread: Thread): void {

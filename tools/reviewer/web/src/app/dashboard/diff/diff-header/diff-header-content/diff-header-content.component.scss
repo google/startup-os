@@ -1,3 +1,6 @@
+$transparent-grey: rgba(0,0,0,0.54);
+$default-font: 'Heebo', sans-serif;
+
 .header-content {
   display: flex;
   padding: 15px 24px;
@@ -6,7 +9,7 @@
     tr {
       height: 30px;
       td:first-child {
-        color: rgba(0,0,0,0.54);
+        color: $transparent-grey;
         width: 120px;
       }
       td:nth-child(3) {
@@ -21,12 +24,36 @@
   }
   >.description {
     width: 100%;
-    textarea {
-      resize: none;
-      width: calc(100% - 14px);
-      padding: 10px 7px 0 7px;
-      border-radius: 4px;
-      background: white;
+    >.titlebar {
+      margin-bottom: 10px;
+      display: flex;
+      >.title {
+        color: $transparent-grey;
+        margin-top: 4px;
+      }
+      >.edit-button {
+        margin-left: 20px;
+      }
+    }
+    >.description-text {
+      >.description-value {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: $default-font;
+      }
+    }
+    >.description-textarea {
+      margin-bottom: 15px;
+      >textarea {
+        resize: none;
+        width: calc(100% - 14px);
+        padding: 10px 7px 0 7px;
+        border-radius: 4px;
+        background: white;
+        vertical-align: bottom;
+      }
+    }
+    .description-value {
       font-size: 14px;
     }
   }

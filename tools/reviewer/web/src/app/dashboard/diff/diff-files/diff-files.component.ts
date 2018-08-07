@@ -3,6 +3,8 @@ import { Component, Input } from '@angular/core';
 import { File } from '@/shared/proto';
 import { DiffService } from '../diff.service';
 
+// The component implements UI of file list of the diff
+// How it looks: "/src/assets/design-blocks/diff-files.jpg"
 @Component({
   selector: 'diff-files',
   templateUrl: './diff-files.component.html',

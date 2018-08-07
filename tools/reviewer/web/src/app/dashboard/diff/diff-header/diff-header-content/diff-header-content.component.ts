@@ -1,7 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { Diff, Reviewer } from '@/shared/proto';
 import {
@@ -12,6 +10,8 @@ import {
 import { AddUserDialogComponent } from '../add-user-dialog';
 import { DiffHeaderService } from '../diff-header.service';
 
+// The component implements content of the header
+// How it looks: "/src/assets/design-blocks/header-content.jpg"
 @Component({
   selector: 'diff-header-content',
   templateUrl: './diff-header-content.component.html',
@@ -19,7 +19,8 @@ import { DiffHeaderService } from '../diff-header.service';
   providers: [DiffHeaderService],
 })
 export class DiffHeaderContentComponent implements OnInit {
-  textareaControl: FormControl = new FormControl();
+  description: string = '';
+  isDescriptionEditMode: boolean = false;
   @Input() diff: Diff;
 
   constructor(
@@ -28,23 +29,10 @@ export class DiffHeaderContentComponent implements OnInit {
     public notificationService: NotificationService,
     public diffHeaderService: DiffHeaderService,
     public dialog: MatDialog,
-  ) {
-    // Save description when it's changed
-    this.textareaControl.valueChanges
-      .pipe(
-        // But not save the same value
-        distinctUntilChanged(),
-        // Do not save more than once a second
-        debounceTime(1000),
-      )
-      .subscribe((description: string) => {
-        this.diff.setDescription(description);
-        this.firebaseService.updateDiff(this.diff).subscribe();
-      });
-  }
+  ) { }
 
   ngOnInit() {
-    this.textareaControl.setValue(this.diff.getDescription());
+    this.description = this.diff.getDescription();
   }
 
   changeAttention(email: string): void {
@@ -73,7 +61,7 @@ export class DiffHeaderContentComponent implements OnInit {
     });
   }
 
-  // Is the email is present in the CC list?
+  // Is the email present in the CC list?
   isCcAlreadyPresent(diff: Diff, email: string): boolean {
     for (const cc of diff.getCcList()) {
       if (cc === email) {
@@ -129,8 +117,6 @@ export class DiffHeaderContentComponent implements OnInit {
     this.updateUserListInFirebase(email, 'removed');
   }
 
-  // To make code more DRY
-  // saveUserToFirebase and removeUserFromFirebase use the method
   updateUserListInFirebase(email: string, action: string): void {
     const username: string = this.authService.getUsername(email);
 
@@ -139,5 +125,24 @@ export class DiffHeaderContentComponent implements OnInit {
     }, () => {
       this.notificationService.error(username + " isn't " + action);
     });
+  }
+
+  startDescriptionEditMode(): void {
+    this.isDescriptionEditMode = true;
+  }
+
+  stopDescriptionEditMode(): void {
+    this.description = this.diff.getDescription();
+    this.isDescriptionEditMode = false;
+  }
+
+  saveDescription(): void {
+    this.diff.setDescription(this.description);
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      this.notificationService.success('Description is saved');
+    }, () => {
+      this.notificationService.error("Description isn't saved");
+    });
+    this.isDescriptionEditMode = false;
   }
 }

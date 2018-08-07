@@ -6,10 +6,11 @@ import {
   Output,
 } from '@angular/core';
 
-// Popup, which can be seen, when a user is hovered.
+// Popup, which can be seen, when a username is hovered.
 // It provides an ability to add/remove a user from user list,
 // and change attention of the user.
 // Also displays email of the user.
+// How it looks: "/src/assets/design-blocks/user-popup.jpg"
 @Component({
   selector: 'user-popup',
   templateUrl: './user-popup.component.html',

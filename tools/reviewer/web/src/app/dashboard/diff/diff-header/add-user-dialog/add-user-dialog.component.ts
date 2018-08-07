@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 
+// The dialog appears when "Add new user" button is pushed.
+// How it looks: "/src/assets/design-blocks/user-dialog.jpg"
 @Component({
   selector: 'add-user-dialog',
   templateUrl: './add-user-dialog.component.html',
@@ -29,8 +31,8 @@ export class AddUserDialogComponent {
       return false;
     }
 
-    // Example: my_super-name@flip-flop.com
-    const emailValidation: RegExp = /^[\w-.]+@[\w-]+\.[\w]+$/;
+    // Javascript email regex from https://emailregex.com/
+    const emailValidation: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return emailValidation.test(email.toLowerCase());
   }
 
@@ -40,7 +42,7 @@ export class AddUserDialogComponent {
 
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
-    // Hide error when user's typing something
+    // Hide error when user is typing something
     this.hideError();
 
     // If enter is pressed then return data
