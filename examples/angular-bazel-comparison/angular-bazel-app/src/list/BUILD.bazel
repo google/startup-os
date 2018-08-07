@@ -1,0 +1,46 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@angular//:index.bzl", "ng_module")
+load("@io_bazel_rules_sass//sass:sass.bzl", "sass_binary")
+
+sass_binary(
+    name = "list-styles",
+    src = "list.component.scss",
+)
+
+ng_module(
+    name = "list",
+    srcs = [
+        "list.component.ts",
+        "list.module.ts",
+    ],
+    assets = [
+        ":list.component.html",
+        ":list-styles",
+    ],
+    tsconfig = "//src:tsconfig.json",
+    deps = [
+        "//src/bricks/brick-1",
+        "//src/bricks/brick-10",
+        "//src/bricks/brick-11",
+        "//src/bricks/brick-12",
+        "//src/bricks/brick-13",
+        "//src/bricks/brick-14",
+        "//src/bricks/brick-15",
+        "//src/bricks/brick-16",
+        "//src/bricks/brick-17",
+        "//src/bricks/brick-18",
+        "//src/bricks/brick-19",
+        "//src/bricks/brick-2",
+        "//src/bricks/brick-20",
+        "//src/bricks/brick-3",
+        "//src/bricks/brick-4",
+        "//src/bricks/brick-5",
+        "//src/bricks/brick-6",
+        "//src/bricks/brick-7",
+        "//src/bricks/brick-8",
+        "//src/bricks/brick-9",
+        "//src/services",
+        "@rxjs",
+    ],
+)

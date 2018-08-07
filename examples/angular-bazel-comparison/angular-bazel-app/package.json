@@ -1,0 +1,44 @@
+{
+    "name": "example",
+    "version": "0.0.1",
+    "description": "Demo of bazel rules for angular",
+    "license": "Apache 2.0",
+    "dependencies": {
+        "@angular/animations": "6.0.4",
+        "@angular/common": "6.0.4",
+        "@angular/core": "6.0.4",
+        "@angular/forms": "6.0.4",
+        "@angular/platform-browser": "6.0.4",
+        "@angular/router": "6.0.4",
+        "@angular/upgrade": "6.0.4",
+        "@ngrx/store": "6.1.0",
+        "rxjs": "6.2.2",
+        "zone.js": "0.8.26"
+    },
+    "devDependencies": {
+        "@angular/bazel": "6.0.4",
+        "@angular/compiler": "6.0.4",
+        "@angular/compiler-cli": "6.0.4",
+        "@angular/platform-browser-dynamic": "6.0.4",
+        "@bazel/benchmark-runner": "0.1.0",
+        "@bazel/ibazel": "0.4.0",
+        "@types/jasmine": "2.8.8",
+        "clang-format": "1.2.3",
+        "concurrently": "3.6.1",
+        "husky": "0.14.3",
+        "protractor": "5.4.0",
+        "typescript": "2.7.2"
+    },
+    "scripts": {
+        "postinstall": "concurrently \"webdriver-manager update $CHROMEDRIVER_VERSION_ARG\" \"ngc -p postinstall.tsconfig.json\"",
+        "serve": "ibazel run //src:devserver",
+        "pree2e": "bazel build test/...",
+        "e2e": "yarn e2e-prodserver && yarn e2e-devserver",
+        "e2e-prodserver": "concurrently \"bazel run //src:prodserver\" \"while ! nc -z 127.0.0.1 5432; do sleep 1; done && protractor\" --kill-others --success first",
+        "e2e-devserver": "concurrently \"bazel run //src:devserver\" \"while ! nc -z 127.0.0.1 5432; do sleep 1; done && protractor\" --kill-others --success first",
+        "prebuildifier": "bazel build @com_github_bazelbuild_buildtools//buildifier",
+        "buildifier": "find . -type f \\( -name BUILD -or -name BUILD.bazel \\) ! -path \"./node_modules/*\" | xargs $(bazel info bazel-bin)/external/com_github_bazelbuild_buildtools/buildifier/*/buildifier",
+        "format": "git-clang-format",
+        "precommit": "check-clang-format \"yarn format\""
+    }
+}

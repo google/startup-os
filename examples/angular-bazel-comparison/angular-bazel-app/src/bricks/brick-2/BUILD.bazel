@@ -1,0 +1,48 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@angular//:index.bzl", "ng_module")
+load("@io_bazel_rules_sass//sass:sass.bzl", "sass_binary")
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_library", "ts_web_test_suite")
+
+sass_binary(
+    name = "brick-2-styles",
+    src = "brick-2.component.scss",
+)
+
+ng_module(
+    name = "brick-2",
+    srcs = [
+        "brick-2.component.ts",
+        "brick-2.module.ts",
+    ],
+    assets = [
+        ":brick-2.component.html",
+        ":brick-2-styles",
+    ],
+    tsconfig = "//src:tsconfig.json",
+    deps = [
+        "@rxjs",
+    ],
+)
+
+ts_library(
+    name = "test_lib",
+    testonly = 1,
+    srcs = glob(["*.spec.ts"]),
+    deps = [
+        ":brick-2",
+    ],
+)
+
+ts_web_test_suite(
+    name = "test",
+    bootstrap = ["//:node_modules/zone.js/dist/zone-testing-bundle.js"],
+    browsers = [
+        "@io_bazel_rules_webtesting//browsers:chromium-local",
+    ],
+    deps = [
+        ":test_lib",
+        "//:angular_bundles",
+        "//:angular_test_bundles",
+    ],
+)

@@ -1,0 +1,26 @@
+// WORKAROUND https://github.com/angular/angular/issues/18810
+// This file is required to run ngc on angular and other libraries,
+// to write files like node_modules/@angular/core/core.ngsummary.json
+{
+    "compilerOptions": {
+        "lib": [
+            "dom",
+            "es2015"
+        ],
+        "experimentalDecorators": true,
+        "types": []
+    },
+    "include": [
+        "node_modules/@angular/**/*",
+        "node_modules/@ngrx/**/*"
+    ],
+    "exclude": [
+        "node_modules/@angular/bazel/**",
+        "node_modules/@angular/compiler-cli/**",
+        "node_modules/@angular/tsc-wrapped/**",
+        "node_modules/@angular/*/testing/**",
+        "node_modules/@ngrx/store/migrations/**",
+        "node_modules/@ngrx/store/schematics/**",
+        "node_modules/@ngrx/store/schematics-core/**"
+    ]
+}

@@ -1,0 +1,68 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@angular//:index.bzl", "ng_module")
+
+ng_module(
+    name = "src",
+    srcs = glob(["*.ts"]),
+    assets = [
+        ":app.component.html",
+    ],
+    tsconfig = ":tsconfig.json",
+    deps = [
+        "//src/data-input",
+        "//src/hello-world",
+        "//src/list",
+        "//src/services",
+    ],
+)
+
+load("@build_bazel_rules_typescript//:defs.bzl", "ts_devserver")
+
+ts_devserver(
+    name = "devserver",
+    additional_root_paths = [
+        "bazel_app/node_modules/zone.js/dist",
+        "bazel_app/node_modules/@ngrx/store/bundles",
+    ],
+    entry_module = "bazel_app/src/main",
+    scripts = [
+        ":require.config.js",
+        "//:angular_bundles",
+    ],
+    serving_path = "/bundle.min.js",
+    static_files = [
+        "//:node_modules/zone.js/dist/zone.min.js",
+        "//:node_modules/@ngrx/store/bundles/store.umd.min.js",
+        "index.html",
+    ],
+    deps = ["//src"],
+)
+
+load("@build_bazel_rules_nodejs//:defs.bzl", "nodejs_binary", "rollup_bundle")
+
+rollup_bundle(
+    name = "bundle",
+    entry_point = "src/main",
+    deps = ["//src"],
+)
+
+# Needed because the prodserver only loads static files that appear under this
+# package.
+genrule(
+    name = "zonejs",
+    srcs = ["//:node_modules/zone.js/dist/zone.min.js"],
+    outs = ["zone.min.js"],
+    cmd = "cp $< $@",
+)
+
+load("//tools/history-server:index.bzl", "history_server")
+
+history_server(
+    name = "prodserver",
+    data = [
+        "index.html",
+        ":bundle",
+        ":zonejs",
+    ],
+)
