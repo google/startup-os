@@ -1,5 +1,5 @@
 java_library(
-    name = "log4j",
+    name = "JavaEWAH",
     licenses = [
         "permissive",
     ],
@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/log4j/log4j",
+        "//external:jar/com/googlecode/javaewah/JavaEWAH",
     ],
 )

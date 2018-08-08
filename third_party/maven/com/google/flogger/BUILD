@@ -1,36 +1,32 @@
 java_library(
     name = "flogger",
-    exports = [
-        "//external:jar/com/google/flogger/flogger"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/com/google/code/findbugs:jsr305"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
-)
-
-
-
-java_library(
-    name = "flogger_system_backend",
-    exports = [
-        "//external:jar/com/google/flogger/flogger_system_backend"
+        "//visibility:public",
     ],
-    licenses = [
-        "permissive"
+    exports = [
+        "//external:jar/com/google/flogger/flogger",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
-        ":flogger"
     ],
-    visibility = [
-        "//visibility:public"
-    ]
 )
 
-
+java_library(
+    name = "flogger_system_backend",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/flogger/flogger_system_backend",
+    ],
+    runtime_deps = [
+        ":flogger",
+        "//third_party/maven/com/google/code/findbugs:jsr305",
+    ],
+)

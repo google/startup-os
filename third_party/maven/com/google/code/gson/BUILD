@@ -1,14 +1,12 @@
 java_library(
     name = "gson",
-    exports = [
-        "//external:jar/com/google/code/gson/gson"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/com/google/code/gson/gson",
+    ],
 )
-
-
