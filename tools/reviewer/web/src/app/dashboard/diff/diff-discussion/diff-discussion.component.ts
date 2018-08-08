@@ -22,7 +22,7 @@ export class DiffDiscussionComponent {
     public authService: AuthService,
   ) { }
 
-  getUnresolvedthreads(): number {
+  getUnresolvedThreads(): number {
     return this.threads.filter(thread => !thread.getIsDone()).length;
   }
 
