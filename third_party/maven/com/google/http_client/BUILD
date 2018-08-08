@@ -1,77 +1,87 @@
 java_library(
     name = "google_http_client",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client",
+        "//external:jar/com/google/http_client/google_http_client"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
-        "//third_party/maven/org/apache/httpcomponents:httpclient",
+        "//third_party/maven/org/apache/httpcomponents:httpclient"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "google_http_client_appengine",
+    exports = [
+        "//external:jar/com/google/http_client/google_http_client_appengine"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/com/google/http_client/google_http_client_appengine",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "google_http_client_gson",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_gson",
+        "//external:jar/com/google/http_client/google_http_client_gson"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/com/google/code/gson",
+        "//third_party/maven/com/google/code/gson:gson"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "google_http_client_jackson",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_jackson",
+        "//external:jar/com/google/http_client/google_http_client_jackson"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/org/codehaus/jackson:jackson_core_asl",
+        "//third_party/maven/org/codehaus/jackson:jackson_core_asl"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "google_http_client_jackson2",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_jackson2",
+        "//external:jar/com/google/http_client/google_http_client_jackson2"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/com/fasterxml/jackson/core:jackson_core",
+        "//third_party/maven/com/fasterxml/jackson/core:jackson_core"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

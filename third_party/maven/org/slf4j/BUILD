@@ -1,28 +1,32 @@
 java_library(
     name = "slf4j_api",
+    exports = [
+        "//external:jar/org/slf4j/slf4j_api"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/org/slf4j/slf4j_api",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "slf4j_simple",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/org/slf4j/slf4j_simple",
+        "//external:jar/org/slf4j/slf4j_simple"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":slf4j_api",
+        ":slf4j_api"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+

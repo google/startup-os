@@ -1,12 +1,14 @@
 java_library(
     name = "okio",
+    exports = [
+        "//external:jar/com/squareup/okio/okio"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/com/squareup/okio/okio",
-    ],
+        "//visibility:public"
+    ]
 )
+
+
