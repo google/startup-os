@@ -4,10 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { SharedModule } from '@/shared';
-import {
-  DiffStatusComponent,
-  PageLoadingComponent,
-} from './';
+import { DiffStatusComponent } from './';
 import { DashboardRoutes } from './dashboard.routing';
 import {
   AddUserDialogComponent,
@@ -34,7 +31,6 @@ import {
     ...DiffComponentList,
     ...FileChangesComponentList,
     DiffStatusComponent,
-    PageLoadingComponent,
   ],
   providers: [
     ...FileChangesServiceList,

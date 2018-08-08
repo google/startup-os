@@ -5,7 +5,7 @@ import { Diff, File } from '@/shared/proto';
 import { FirebaseService, LocalserverService } from '@/shared/services';
 
 // The component implements diff page
-// How it looks: "/src/assets/design-blocks/diff-page.jpg"
+// How it looks: https://i.imgur.com/nBGrGuc.jpg
 @Component({
   selector: 'cr-diff',
   templateUrl: './diff.component.html',

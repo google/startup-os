@@ -12,8 +12,9 @@
     border: 1px solid #{$popup-border-color};
     border-radius: 5px;
     z-index: 3;
-    >.title {
+    >.titlebar {
       display: flex;
+      height: 20px;
       margin-bottom: 15px;
       >span {
         opacity: 0.85;

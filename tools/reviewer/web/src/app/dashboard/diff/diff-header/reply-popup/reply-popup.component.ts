@@ -14,7 +14,7 @@ import {
 import { DiffHeaderService } from '../diff-header.service';
 
 // The popup appears when "Reply" button is pushed.
-// How it looks: "/src/assets/design-blocks/reply-popup.jpg"
+// How it looks: https://i.imgur.com/C8nXqyU.jpg
 @Component({
   selector: 'reply-popup',
   templateUrl: './reply-popup.component.html',

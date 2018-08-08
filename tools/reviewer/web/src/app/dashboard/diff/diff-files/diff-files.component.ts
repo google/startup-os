@@ -4,7 +4,7 @@ import { File } from '@/shared/proto';
 import { DiffService } from '../diff.service';
 
 // The component implements UI of file list of the diff
-// How it looks: "/src/assets/design-blocks/diff-files.jpg"
+// How it looks: https://i.imgur.com/8vZfGTc.jpg
 @Component({
   selector: 'diff-files',
   templateUrl: './diff-files.component.html',

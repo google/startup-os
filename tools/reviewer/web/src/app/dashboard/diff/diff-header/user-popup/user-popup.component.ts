@@ -10,7 +10,7 @@ import {
 // It provides an ability to add/remove a user from user list,
 // and change attention of the user.
 // Also displays email of the user.
-// How it looks: "/src/assets/design-blocks/user-popup.jpg"
+// How it looks: https://i.imgur.com/3zf9Dpu.jpg
 @Component({
   selector: 'user-popup',
   templateUrl: './user-popup.component.html',

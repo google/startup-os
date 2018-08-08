@@ -11,7 +11,7 @@ import { AddUserDialogComponent } from '../add-user-dialog';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements content of the header
-// How it looks: "/src/assets/design-blocks/header-content.jpg"
+// How it looks: https://i.imgur.com/TgqzvTW.jpg
 @Component({
   selector: 'diff-header-content',
   templateUrl: './diff-header-content.component.html',

@@ -2,7 +2,7 @@ import { Component, HostListener } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 
 // The dialog appears when "Add new user" button is pushed.
-// How it looks: "/src/assets/design-blocks/user-dialog.jpg"
+// How it looks: https://i.imgur.com/HnZnth5.jpg
 @Component({
   selector: 'add-user-dialog',
   templateUrl: './add-user-dialog.component.html',

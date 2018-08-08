@@ -9,7 +9,7 @@ import {
 import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements titlebar of the header
-// How it looks: "/src/assets/design-blocks/header-titlebar.jpg"
+// How it looks: https://i.imgur.com/vVmTgnq.jpg
 @Component({
   selector: 'diff-header-titlebar',
   templateUrl: './diff-header-titlebar.component.html',

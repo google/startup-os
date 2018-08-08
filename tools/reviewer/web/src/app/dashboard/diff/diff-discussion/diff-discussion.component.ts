@@ -5,7 +5,7 @@ import { AuthService } from '@/shared/services';
 import { DiffService } from '../diff.service';
 
 // The component implements UI of thread list of the diff
-// How it looks: "/src/assets/design-blocks/diff-discussion.jpg"
+// How it looks: https://i.imgur.com/cc6XITV.jpg
 @Component({
   selector: 'diff-discussion',
   templateUrl: './diff-discussion.component.html',
