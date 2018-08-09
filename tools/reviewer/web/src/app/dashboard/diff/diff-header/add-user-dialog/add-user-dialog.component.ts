@@ -30,10 +30,10 @@ export class AddUserDialogComponent {
     if (!email) {
       return false;
     }
-
-    // Javascript email regex from https://emailregex.com/
-    const emailValidation: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return emailValidation.test(email.toLowerCase());
+    // <something>@<something>
+    // e.g. "username@domain.com"
+    const emailValidation: RegExp = /^.+?@.+?$/;
+    return emailValidation.test(email);
   }
 
   hideError() {

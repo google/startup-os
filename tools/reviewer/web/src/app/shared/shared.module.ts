@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   MatButtonModule,
@@ -17,8 +17,8 @@ import {
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
-import { DirectiveList } from './directives';
 import { PageLoadingComponent } from '@/page-loading';
+import { DirectiveList } from './directives';
 
 const SharedModules = [
   FlexLayoutModule,
@@ -38,21 +38,21 @@ const SharedModules = [
 
 const Declarations = [
   ...DirectiveList,
-  PageLoadingComponent
+  PageLoadingComponent,
 ];
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule,
-    ...SharedModules
+    ...SharedModules,
   ],
   exports: [
     SharedModules,
-    ...Declarations
+    ...Declarations,
   ],
   declarations: [
-    ...Declarations
+    ...Declarations,
   ],
 })
 export class SharedModule { }

@@ -8,10 +8,7 @@
     "no-var-keyword": true,
     "quotemark": [true, "single", "avoid-escape"],
     "semicolon": [true, "always", "ignore-bound-class-methods"],
-    "max-line-length": [true, {
-      "limit": 79,
-      "ignore-pattern": "^(.+?)$"
-    }],
+    "max-line-length": [true, 79],
     "whitespace": [
       true,
       "check-branch",
