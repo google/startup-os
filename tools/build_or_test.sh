@@ -11,7 +11,7 @@ RESET=$(tput sgr0)
 
 # Warn if ANDROID_HOME is not set.
 if [[ -z "$ANDROID_HOME" ]]; then
-  echo "$RED""ANDROID_HOME not set, skipping Android targets. See examples/android for more details$RESET"
+  echo "$RED""ANDROID_HOME not set, skipping Android targets. See examples/android for more details.$RESET"
 fi
 
 # Check we have (build|test) param
