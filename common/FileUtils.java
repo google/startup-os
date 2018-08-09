@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /** File utils */
-//TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
+// TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
 @Singleton
 public class FileUtils {
   private final String userHome;
