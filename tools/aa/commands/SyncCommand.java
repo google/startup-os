@@ -16,7 +16,6 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
@@ -26,8 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class SyncCommand implements AaCommand {
-
-  private static final String TEMP_BRANCH_FOR_SYNC = "temp_branch_for_sync";
 
   private final FileUtils fileUtils;
   private GitRepoFactory repoFactory;
