@@ -60,7 +60,8 @@ public class SnapshotCommand implements AaCommand {
       return false;
     }
     String branchName = String.format("D%d", diffNumber);
-
+    GitRepo gitRepo = this.gitRepoFactory.create(workspacePath);
+    String initialBranch = gitRepo.currentBranch();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -85,6 +86,9 @@ public class SnapshotCommand implements AaCommand {
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });
     } catch (IOException e) {
+      if (!gitRepo.currentBranch().equals(initialBranch)) {
+        gitRepo.switchBranch(initialBranch);
+      }
       e.printStackTrace();
     }
     return true;
