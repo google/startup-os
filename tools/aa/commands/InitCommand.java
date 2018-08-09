@@ -45,6 +45,7 @@ public class InitCommand implements AaCommand {
 
   private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
+  private boolean baseFolderExistedBefore = true;
 
   @Inject
   public InitCommand(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
@@ -56,12 +57,12 @@ public class InitCommand implements AaCommand {
   public boolean run(String[] args) {
     // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
-
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath.get())) {
         System.out.println("Error: Base folder exists and is not empty");
         System.exit(1);
       }
+      baseFolderExistedBefore = fileUtils.folderExists(basePath.get());
       // Create folders
       fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "head"));
       fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "ws"));
@@ -86,11 +87,21 @@ public class InitCommand implements AaCommand {
       System.out.println(e.getMessage());
       System.out.println("Input flags:");
       Flags.printUsage();
+      revertChanges();
       return false;
     } catch (Exception e) {
+      revertChanges();
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void revertChanges() {
+    if (baseFolderExistedBefore) {
+      fileUtils.clearDirectoryUnchecked(basePath.get());
+    } else {
+      fileUtils.deleteDirectoryUnchecked(basePath.get());
+    }
   }
 }
 
