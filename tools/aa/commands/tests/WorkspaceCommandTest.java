@@ -137,18 +137,8 @@ public class WorkspaceCommandTest {
     fileUtils.writeString("aaa", "/base/head/repo_name/file.txt");
     String[] args = {"workspace", "-f", "workspace_name"};
     workspaceCommand.run(args);
-
-    // For some reason, in the tests, fileUtils.copyDirectoryToDirectory() throws:
-    // NoSuchFileException: /base/head
-    // It might be a bug in jimfs, since it works in practice.
-    // For this reason, we're not checking the copying of the repos from head to workspace and cd:
-    // assertEquals("cd /base/ws/workspace_name\n", outContent.toString());
-
-    // TODO Find a way to fix throwing the exception in test and uncomment asserts. Currently, this
-    // test does not test anything
-    // assertTrue(fileUtils.folderExists("/base/ws/workspace_name"));
-    // assertTrue(fileUtils.folderExists("/base/ws/workspace_name/file.txt"));
-
+    assertTrue(fileUtils.folderExists("/base/ws/workspace_name"));
+    assertTrue(fileUtils.fileExists("/base/ws/workspace_name/repo_name/file.txt"));
   }
 }
 

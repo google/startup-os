@@ -17,6 +17,7 @@
 package com.google.startupos.tools.reviewer.service;
 
 import com.google.common.flogger.FluentLogger;
+import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.tools.reviewer.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
@@ -70,6 +71,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private final GitRepoFactory repoFactory;
   private final String basePath;
   private final TextDifferencer textDifferencer;
+  private final FirestoreClientFactory firestoreClientFactory;
 
   @Inject
   public CodeReviewService(
@@ -77,12 +79,14 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       FileUtils fileUtils,
       @Named("Base path") String basePath,
       GitRepoFactory repoFactory,
-      TextDifferencer textDifferencer) {
+      TextDifferencer textDifferencer,
+      FirestoreClientFactory firestoreClientFactory) {
     this.authService = authService;
     this.fileUtils = fileUtils;
     this.basePath = basePath;
     this.repoFactory = repoFactory;
     this.textDifferencer = textDifferencer;
+    this.firestoreClientFactory = firestoreClientFactory;
   }
 
   private Repo getHeadRepo(String repoId) {
@@ -91,6 +95,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   private String readTextFile(File file) throws IOException {
+    if (file.getFilename().isEmpty()) {
+      throw new IllegalArgumentException("File does not have a filename:\n" + file);
+    }
     if (file.getAction() == Action.DELETE) {
       return "";
     }
@@ -178,7 +185,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
     FirestoreClient client =
-        new FirestoreClient(authService.getProjectId(), authService.getToken());
+        firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     String diffPath = fileUtils.joinPaths(firestoreReviewRoot.get(), "data/diff");
     Diff diff =
         req.getDiff()
@@ -197,9 +204,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       String rightFileContents = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .addAllChanges(textDifferencer.getAllTextChanges(leftFileContents, rightFileContents))
-              .setLeftFileContents(leftFileContents)
-              .setRightFileContents(rightFileContents)
+              .setTextDiff(textDifferencer.getTextDiff(leftFileContents, rightFileContents))
               .build());
     } catch (IOException e) {
       responseObserver.onError(
@@ -216,7 +221,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void getAvailableDiffNumber(
       Empty request, StreamObserver<DiffNumberResponse> responseObserver) {
     FirestoreClient client =
-        new FirestoreClient(authService.getProjectId(), authService.getToken());
+        firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     DiffNumberResponse diffNumberResponse =
         (DiffNumberResponse)
             client.getDocument(
@@ -236,12 +241,11 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getDiff(DiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
     FirestoreClient client =
-        new FirestoreClient(authService.getProjectId(), authService.getToken());
-
+        firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     String diffPath =
         fileUtils.joinPaths(
             firestoreReviewRoot.get(), "data/diff", String.valueOf(request.getDiffId()));
-    Diff diff = (Diff) client.getDocument(diffPath, Diff.newBuilder());
+    Diff diff = (Diff) client.getProtoDocument(diffPath, Diff.newBuilder());
 
     responseObserver.onNext(diff);
     responseObserver.onCompleted();
@@ -290,10 +294,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     String workspacePath;
     String workspace;
     String branch;
+    boolean isHead;
     if (workspaceExists(request.getWorkspace())) {
       workspacePath = getWorkspacePath(request.getWorkspace());
       workspace = request.getWorkspace();
       branch = "D" + request.getDiffId();
+      isHead = false;
     } else {
       logger
           .atInfo()
@@ -301,6 +307,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       workspacePath = fileUtils.joinPaths(basePath, "head");
       workspace = "";
       branch = "remotes/origin/D" + request.getDiffId();
+      isHead = true;
     }
 
     DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
@@ -314,17 +321,33 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 Repo repo = repoFactory.create(path);
-                ImmutableList<Commit> commits =
-                    addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
-                ImmutableList<File> uncommittedFiles =
-                    addWorkspaceAndRepoToFiles(repo.getUncommittedFiles(), workspace, repoName);
-                response.addBranchInfo(
-                    BranchInfo.newBuilder()
-                        .setDiffId(request.getDiffId())
-                        .setRepoId(repoName)
-                        .addAllCommit(commits)
-                        .addAllUncommittedFile(uncommittedFiles)
-                        .build());
+                if (!isHead) {
+                  ImmutableList<Commit> commits =
+                      addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
+                  ImmutableList<File> uncommittedFiles =
+                      addWorkspaceAndRepoToFiles(repo.getUncommittedFiles(), workspace, repoName);
+                  response.addBranchInfo(
+                      BranchInfo.newBuilder()
+                          .setDiffId(request.getDiffId())
+                          .setRepoId(repoName)
+                          .addAllCommit(commits)
+                          .addAllUncommittedFile(uncommittedFiles)
+                          .build());
+                } else {
+                  ImmutableList<Commit> commits = ImmutableList.of();
+                  if (repo.branchExists(branch)) {
+                    commits =
+                        addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
+                  } else {
+                    logger.atInfo().log("Branch %s does not exist in %s head", branch, workspace);
+                  }
+                  response.addBranchInfo(
+                      BranchInfo.newBuilder()
+                          .setDiffId(request.getDiffId())
+                          .setRepoId(repoName)
+                          .addAllCommit(commits)
+                          .build());
+                }
               });
     } catch (IOException e) {
       e.printStackTrace();

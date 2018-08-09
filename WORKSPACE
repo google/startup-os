@@ -60,13 +60,11 @@ grpc_java_repositories(
 )
 
 # Google Maven Repository
-GMAVEN_TAG = "20180513-1"
-
 http_archive(
     name = "gmaven_rules",
     sha256 = "da44017f6d7bc5148a73cfd9bf8dbb1ee5a1301a596edad9181c5dc7648076ae",
-    strip_prefix = "gmaven_rules-%s" % GMAVEN_TAG,
-    url = "https://github.com/bazelbuild/gmaven_rules/archive/%s.tar.gz" % GMAVEN_TAG,
+    strip_prefix = "gmaven_rules-20180513-1",
+    url = "https://github.com/bazelbuild/gmaven_rules/archive/20180513-1.tar.gz",
 )
 
 load("@gmaven_rules//:gmaven.bzl", "gmaven_rules")
@@ -79,13 +77,6 @@ android_sdk_repository(
     name = "androidsdk",
     api_level = 27,
     build_tools_version = "27.0.3",
-)
-
-http_archive(
-    name = "com_google_protobuf",
-    sha256 = "e514c2e613dc47c062ea8df480efeec368ffbef98af0437ac00cdaadcb0d80d2",
-    strip_prefix = "protobuf-3.6.0",
-    urls = ["https://github.com/google/protobuf/archive/v3.6.0.zip"],
 )
 
 http_file(
@@ -183,34 +174,6 @@ http_archive(
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
 ts_setup_workspace()
 
-http_archive(
-    name = "com_github_gflags_gflags",
-    sha256 = "7d17922978692175c67ef5786a014df44bfbfe3b48b30937cca1413d4ff65f75",
-    strip_prefix = "gflags-e292e0452fcfd5a8ae055b59052fc041cbab4abf",
-    urls = ["https://github.com/gflags/gflags/archive/e292e0452fcfd5a8ae055b59052fc041cbab4abf.zip"],
-)
-
-http_archive(
-    name = "com_github_google_glog",
-    sha256 = "ae86d645a282137007420c280494a51cc1eb8729cd095348de0953a444705f45",
-    strip_prefix = "glog-2faa186e62d544e930305ffd8f8e507b2054cc9b",
-    urls = ["https://github.com/google/glog/archive/2faa186e62d544e930305ffd8f8e507b2054cc9b.zip"],
-)
-
-new_http_archive(
-    name = "startupos_external_jsoncpp",
-    strip_prefix = "jsoncpp-cfab607c0d6d4f4cab7bdde69769964c558913cb",
-    urls = ["https://github.com/open-source-parsers/jsoncpp/archive/cfab607c0d6d4f4cab7bdde69769964c558913cb.zip"],
-    sha256 = "0e0abc6b521a6df8eec5b32593781aa2f2f6f24ea71f8b9d3b504e966c849176",
-    build_file="third_party/BUILD.jsoncpp",
-)
-
-http_archive(
-    name = "io_bazel",
-    sha256 = "b0269e75b40d87ff87886e5f3432cbf88f70c96f907ab588e6c21b2922d72db0",
-    url = "https://github.com/bazelbuild/bazel/releases/download/0.13.1/bazel-0.13.1-dist.zip",
-)
-
 # Rules for examples/docker/
 
 http_archive(
@@ -219,10 +182,7 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.4.0.tar.gz"],
 )
 
-load(
-    "@io_bazel_rules_docker//java:image.bzl",
-    _java_image_repos = "repositories",
-)
+load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
 
 _java_image_repos()
 

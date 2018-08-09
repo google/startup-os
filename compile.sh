@@ -9,19 +9,10 @@ if [[ $1 != "build" && $1 != "test" ]]; then
   exit 1
 fi
 
-# On CircleCI we ignore packages that depend on
-# @com_google_protobuf//:protobuf (cpp library),
-# which leads to inability to use prebuilt binaries
-# and significantly increases build time
-
-# TODO: compile C++ targets using prebuilt binaries
-# this requires having cc_import of
-# already-built @com_google_protobuf//:protobuf
-
-if [[ -z "$CIRCLECI" ]]; then
-  DELETED_PACKAGES="";
-else
-  DELETED_PACKAGES="--deleted_packages $(cat .circleci/ignored_bazel_packages.txt)";
+if [ -z "$ANDROID_HOME" ]; then
+  echo "$RED""Set ANDROID_HOME variable to valid Android SDK location$RESET"
+  echo "$RED""Run ./tools/get-android-sdk.sh to download it$RESET"
+  exit 2
 fi
 
 bazel $1 $DELETED_PACKAGES //...

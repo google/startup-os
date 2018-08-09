@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: Implement methods
 @AutoFactory
 public class GitRepo implements Repo {
   private final List<String> gitCommandBase;
@@ -251,13 +250,13 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public void pushAll() {
+  public void push() {
     runCommand("push --all --atomic origin");
   }
 
   @Override
   public void pull() {
-    runCommand("pull");
+    runCommand("pull -q");
   }
 
   @Override
@@ -292,6 +291,7 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean isMerged(String branch) {
+    // TODO: Implement method
     throw new UnsupportedOperationException("Not implemented");
   }
 
@@ -306,6 +306,12 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public boolean branchExists(String name) {
+    // Note: Can also be done directly using 'git rev-parse --verify -q <branch name>'
+    return listBranches().contains(name);
+  }
+
+  @Override
   public ImmutableList<String> listBranches() {
     CommandResult commandResult = runCommand("branch");
     return ImmutableList.copyOf(
@@ -317,16 +323,7 @@ public class GitRepo implements Repo {
 
   @Override
   public String getFileContents(String commitId, String path) {
-    CommandResult commandResult = runCommand("--no-pager show " + commitId + ":" + path);
-    String result = commandResult.stdout;
-    int lastIndexOfNewLineSymbol = result.lastIndexOf("\n");
-    if (lastIndexOfNewLineSymbol >= 0) {
-      result =
-          new StringBuilder(result)
-              .replace(lastIndexOfNewLineSymbol, lastIndexOfNewLineSymbol + 1, "")
-              .toString();
-    }
-    return result;
+    return runCommand("--no-pager show " + commitId + ":" + path).stdout;
   }
 
   @Override

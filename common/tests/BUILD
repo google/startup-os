@@ -59,6 +59,7 @@ java_binary(
         "//common:text_differencer",
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/slf4j:slf4j_simple",
     ],

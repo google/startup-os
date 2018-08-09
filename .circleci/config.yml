@@ -37,9 +37,12 @@ jobs:
       - checkout:
           <<: *post_checkout
       - restore_cache:
-          key: "v2-bazel_cache"
+          key: "v3-bazel_cache"
       - run: './pre-commit.sh'
-      - run: './fix_formatting.sh'
+      - run: sudo apt update
+      - run: sudo apt -y install yapf3 clang-format python3-pkg-resources
+      - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
+      - run: './tools/fix_formatting.sh'
 
   build:
     <<: *job_defaults
@@ -54,12 +57,11 @@ jobs:
           key: "android_sdk"
 
       - restore_cache:
-          key: "v2-bazel_cache"
+          key: "v3-bazel_cache"
 
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
-      - run: npm install
-      - run: bash .circleci/get-android-sdk.sh
+      - run: './tools/get-android-sdk.sh'
       - run:
           command: ./compile.sh build
           environment:
@@ -77,7 +79,7 @@ jobs:
           key: "android_sdk"
           paths:
             - "/home/circleci/android_sdk"
-          key: "v2-bazel_cache"
+          key: "v3-bazel_cache"
           paths:
             - "/home/circleci/.cache/bazel/"
 
