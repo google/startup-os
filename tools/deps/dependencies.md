@@ -11,7 +11,7 @@ Different languages have different package managers. Here's a few:
 * Rust: Cargo
 * Swift and Objective-C: CocoaPods
 
-Package managers work with package repositories, such as www.npmjs.com for npm, mvnrepository.com for Maven, and pypi.org for pip. They do 3 important things:
+Package managers work with package repositories, such as www.npmjs.com for npm, [mvnrepository.com](https://mvnrepository.com) for Maven, and [pypi.org](https://pypi.org) for pip. They do 3 important things:
 1. Find transitive dependencies - the tree of packages (and their versions) a given package depends on.
 2. Resolve dependency conflicts, such as if two packages depend on different versions of the same package.
 3. Download these dependencies and place them in an appropriate place on your machine.
