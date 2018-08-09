@@ -1,0 +1,19 @@
+<div class="email-input">
+  <mat-form-field>
+    <input matInput placeholder="Email" [(ngModel)]="email">
+  </mat-form-field>
+</div>
+<div class="buttons">
+  <button
+    class="cr-light-button"
+    mat-raised-button
+    color="primary"
+    (click)="add()"
+  >
+    Add
+  </button>
+  <button class="cr-light-button" mat-button (click)="close()">Cancel</button>
+</div>
+<div class="error-message" *ngIf="isEmailInvalid">
+  Email is invalid
+</div>

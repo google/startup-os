@@ -10,7 +10,7 @@ import {
   File,
   TextDiffRequest,
   TextDiffResponse,
-} from '@/shared/shell';
+} from '@/shared/proto';
 import { EncodingService } from './encoding.service';
 import { NotificationService } from './notification.service';
 

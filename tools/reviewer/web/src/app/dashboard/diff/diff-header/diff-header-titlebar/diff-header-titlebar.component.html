@@ -1,0 +1,31 @@
+<div class="cr-titlebar titlebar">
+  <div class="title">
+    <span class="bold">Diff {{ diff.getId() }}</span>
+    <span>by</span>
+    <user-popup
+      [email]="diff.getAuthor().getEmail()"
+      [isAttentionRequired]="diff.getAuthor().getNeedsAttention()"
+      [isChangeAttention]="true"
+      (changeAttentionEmitter)="changeAttention()"
+    ><span [ngClass]="{
+      'username': true,
+      'bold': diff.getAuthor().getNeedsAttention()
+    }">
+      {{ getAuthor() }}
+    </span></user-popup>
+  </div>
+  <diff-status [diff]="diff"></diff-status>
+  <div class="buttons" fxFlex>
+    <button
+      class="cr-light-button"
+      mat-raised-button
+      color="accent"
+      (click)="clickReplyButton()"
+    >Reply</button>
+    <button
+      class="cr-light-button"
+      mat-raised-button
+      color="primary"
+    >Submit</button>
+  </div>
+</div>

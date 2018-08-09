@@ -1,0 +1,16 @@
+:host {
+  position: relative;
+  >.user-popup {
+    left: 0;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    >.user-email {
+      color: #777;
+      font-size: 15px;
+      margin-bottom: 15px;
+    }
+  }
+}
