@@ -11,7 +11,7 @@ To get it running:
 There are 2 options for configuring the Android SDK.
 ### Downloading an Android SDK
 Set `ANDROID_HOME` to your desired SDK location, then run:
-`./tools/get-android-sdk.sh`
+`./tools/get_android_sdk.sh`
 
 ### Working with an existing Android SDK
 If you already have Android SDK on your machine (i.e. you've installed Android Studio), and you want to use it, then
