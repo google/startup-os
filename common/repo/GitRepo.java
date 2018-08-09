@@ -250,13 +250,13 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public void pushAll() {
+  public void push() {
     runCommand("push --all --atomic origin");
   }
 
   @Override
   public void pull() {
-    runCommand("pull");
+    runCommand("pull -q");
   }
 
   @Override
@@ -303,6 +303,12 @@ public class GitRepo implements Repo {
   @Override
   public void removeBranch(String branch) {
     runCommand("branch --quiet -D " + branch);
+  }
+
+  @Override
+  public boolean branchExists(String name) {
+    // Note: Can also be done directly using 'git rev-parse --verify -q <branch name>'
+    return listBranches().contains(name);
   }
 
   @Override

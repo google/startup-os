@@ -24,19 +24,6 @@ java_library(
 )
 
 java_library(
-    name = "git",
-    srcs = [
-        "Git.java",
-    ],
-    deps = [
-        "//third_party/maven/com/google/guava",
-        "//third_party/maven/com/google/protobuf:protobuf_java",
-        "//third_party/maven/com/jcraft:jsch",
-        "//third_party/maven/org/eclipse/jgit:org_eclipse_jgit",
-    ],
-)
-
-java_library(
     name = "text_differencer",
     srcs = [
         "TextDifferencer.java",

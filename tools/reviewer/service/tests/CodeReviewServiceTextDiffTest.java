@@ -18,6 +18,7 @@ package com.google.startupos.tools.reviewer.service.tests;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import com.google.startupos.tools.localserver.service.AuthService;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -93,6 +94,7 @@ public class CodeReviewServiceTextDiffTest {
   private Server server;
   private ManagedChannel channel;
   private CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
+  private CodeReviewService codeReviewService;
 
   @Before
   public void setup() throws IOException {
@@ -115,8 +117,16 @@ public class CodeReviewServiceTextDiffTest {
                   }
                 })
             .build();
-    gitRepoFactory = component.getFactory();
+    gitRepoFactory = component.getGitRepoFactory();
     fileUtils = component.getFileUtils();
+    codeReviewService =
+        new CodeReviewService(
+            component.getAuthService(),
+            fileUtils,
+            aaBaseFolder,
+            gitRepoFactory,
+            component.getTextDifferencer(),
+            component.getFirestoreClientFactory());
 
     createInitialRepo(initialRepoFolder);
     initAaBase(initialRepoFolder, aaBaseFolder);
@@ -137,9 +147,11 @@ public class CodeReviewServiceTextDiffTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   interface TestComponent {
-    CodeReviewService getCodeReviewService();
+    FirestoreClientFactory getFirestoreClientFactory();
 
-    GitRepoFactory getFactory();
+    AuthService getAuthService();
+
+    GitRepoFactory getGitRepoFactory();
 
     InitCommand getInitCommand();
 
@@ -186,7 +198,7 @@ public class CodeReviewServiceTextDiffTest {
     server =
         InProcessServerBuilder.forName(serverName)
             .directExecutor()
-            .addService(component.getCodeReviewService())
+            .addService(codeReviewService)
             .build()
             .start();
     channel = InProcessChannelBuilder.forName(serverName).directExecutor().build();

@@ -138,11 +138,7 @@ public class WorkspaceCommandTest {
     String[] args = {"workspace", "-f", "workspace_name"};
     workspaceCommand.run(args);
     assertTrue(fileUtils.folderExists("/base/ws/workspace_name"));
-    // For some reason, in the tests, fileUtils.copyDirectoryToDirectory() throws:
-    // NoSuchFileException: /base/head
-    // It might be a bug in jimfs, since it works in practice.
-    // For this reason, we're not checking the copying of the repos from head to workspace and cd:
-    // assertEquals("cd /base/ws/workspace_name\n", outContent.toString());
+    assertTrue(fileUtils.fileExists("/base/ws/workspace_name/repo_name/file.txt"));
   }
 }
 
