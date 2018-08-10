@@ -59,11 +59,7 @@ jobs:
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
 
-      # If we get this far, save the node_modules directory for use next time.
       - save_cache:
-          key: *cache_key
-          paths:
-            - "node_modules"
           key: "android_sdk"
           paths:
             - "/home/circleci/android_sdk"
