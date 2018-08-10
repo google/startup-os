@@ -6,15 +6,6 @@ version: 2
 # the environment is portable and reproducible on your local machine.
 var_1: &docker_image angular/ngcontainer:0.3.2
 
-# CircleCI lets us pick the key for storing one or more caches, to speed up subsequent builds.
-# We can use this to avoid re-fetching our dependencies from npm on every build.
-# To ensure we don't load a stale cache, we invalidate it based on the entries in the key:
-# - the checksum of Yarn's lock file
-# - the branch we are on, which really shouldn't be needed since the yarn lock file should be hermetic
-# - the docker image tag, working around an issue we saw where changing docker images causes permission
-#   errors when restoring the cache, like when the user we run as changes
-var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.3.2
-
 # Each job will inherit these defaults
 anchor_1: &job_defaults
   working_directory: ~/ng
@@ -51,9 +42,6 @@ jobs:
           <<: *post_checkout
 
       - restore_cache:
-          key: *cache_key
-
-      - restore_cache:
           key: "android_sdk"
 
       - restore_cache:
@@ -71,11 +59,7 @@ jobs:
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
 
-      # If we get this far, save the node_modules directory for use next time.
       - save_cache:
-          key: *cache_key
-          paths:
-            - "node_modules"
           key: "android_sdk"
           paths:
             - "/home/circleci/android_sdk"
