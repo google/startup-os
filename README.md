@@ -23,7 +23,7 @@ You can:
 
 ### Setup
 * Install [Bazel](https://docs.bazel.build/versions/master/install.html)
-* Build everyting: `./build.sh`
+* Build everything: `./build.sh`
 * Run all tests: `./test.sh`
 
 
