@@ -18,7 +18,7 @@ package com.google.startupos.tools.aa.commands;
 
 public interface AaCommand {
   String ANSI_RED = "\u001B[31m";
-  String ANSI_YELLOW = "\u001B[33m";
+  String ANSI_YELLOW = "\u001B[33m<new code>";
   String ANSI_BOLD = "\u001b[1m";
   String ANSI_RESET = "\u001B[0m";
   String RED_ERROR = ANSI_RED + ANSI_BOLD + "ERROR: " + ANSI_RESET;

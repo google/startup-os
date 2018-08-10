@@ -23,7 +23,7 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.aa.Protos.Config;
+import ;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Diff;
