@@ -105,11 +105,19 @@ public class DiffCommand implements AaCommand {
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
-                String repoName = Paths.get(path).getFileName().toString();
-                GitRepo repo = this.gitRepoFactory.create(path);
-                System.out.println(
-                    String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
-                repo.switchBranch(branchName);
+                try {
+                  String repoName = Paths.get(path).getFileName().toString();
+                  GitRepo repo = this.gitRepoFactory.create(path);
+                  String initialBranch = gitRepo.currentBranch();
+                  System.out.println(
+                      String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
+                  repo.switchBranch(branchName);
+                } catch (IOException e) {
+                  if (!repo.currentBranch().equals(initialBranch)) {
+                    repo.switchBranch(initialBranch);
+                  }
+                  e.printStackTrace();
+                }
               });
     } catch (IOException e) {
       e.printStackTrace();
