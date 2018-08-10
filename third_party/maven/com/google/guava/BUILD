@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/guava/guava",
+        "//external:jar/mvncom/google/guava/guava",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",

@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/jcraft/jsch",
+        "//external:jar/mvncom/jcraft/jsch",
     ],
 )

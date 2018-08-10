@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/objenesis/objenesis",
+        "//external:jar/mvnorg/objenesis/objenesis",
     ],
 )

@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/auth/google_auth_library_credentials",
+        "//external:jar/mvncom/google/auth/google_auth_library_credentials",
     ],
 )
 
@@ -20,7 +20,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/auth/google_auth_library_oauth2_http",
+        "//external:jar/mvncom/google/auth/google_auth_library_oauth2_http",
     ],
     runtime_deps = [
         ":google_auth_library_credentials",

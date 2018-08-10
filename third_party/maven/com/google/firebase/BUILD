@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/firebase/firebase_admin",
+        "//external:jar/mvncom/google/firebase/firebase_admin",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/api:api_common",

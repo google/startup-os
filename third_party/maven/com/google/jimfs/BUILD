@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/jimfs/jimfs",
+        "//external:jar/mvncom/google/jimfs/jimfs",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/guava",

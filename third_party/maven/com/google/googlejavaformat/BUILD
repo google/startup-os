@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/googlejavaformat/google_java_format",
+        "//external:jar/mvncom/google/googlejavaformat/google_java_format",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/errorprone:javac_shaded",
