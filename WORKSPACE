@@ -16,7 +16,7 @@ git_repository(
     remote = "https://github.com/oferb/startupos-binaries",
 )
 
-load("//third_party/maven:workspace.bzl", "maven_dependencies")
+load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
 
