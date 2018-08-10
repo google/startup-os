@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '@/shared';
 
 @Component({
-  selector: 'app-login',
+  selector: 'cr-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })

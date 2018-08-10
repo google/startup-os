@@ -21,11 +21,12 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.aa.Protos.Config;
+
+import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.inject.Inject;
 
 /**
  * This command is used to switch between workspaces and create new ones.
@@ -90,6 +91,7 @@ public class WorkspaceCommand implements AaCommand {
         fileUtils.copyDirectoryToDirectory(
             fileUtils.joinPaths(config.getBasePath(), "head"), workspacePath, "^bazel-.*$");
       } catch (IOException e) {
+        fileUtils.deleteDirectoryUnchecked(workspacePath);
         e.printStackTrace();
         return false;
       }

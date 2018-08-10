@@ -17,18 +17,21 @@
 package com.google.startupos.tools.aa.commands;
 
 import com.google.common.collect.ImmutableList;
-import com.google.startupos.tools.aa.commands.checks.DummyCheck;
-import com.google.startupos.tools.aa.commands.checks.FailingDummyCheck;
 import com.google.startupos.tools.aa.commands.checks.FixCommandCheck;
+import com.google.startupos.tools.aa.commands.checks.FormattingCheck;
+import java.util.List;
 import javax.inject.Inject;
 
 public class FixCommand implements AaCommand {
 
-  ImmutableList<FixCommandCheck> checks =
-      ImmutableList.of(new DummyCheck(), new FailingDummyCheck());
+  List<FixCommandCheck> checks;
 
   @Inject
-  public FixCommand() {}
+  public FixCommand(FormattingCheck formattingCheck) {
+    ImmutableList.Builder builder = ImmutableList.builder();
+    builder.add(formattingCheck);
+    checks = builder.build();
+  }
 
   @Override
   public boolean run(String[] args) {

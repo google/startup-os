@@ -30,7 +30,6 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
@@ -40,6 +39,7 @@ import java.util.stream.Stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /** File utils */
+// TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
 @Singleton
 public class FileUtils {
   private final String userHome;
@@ -240,8 +240,8 @@ public class FileUtils {
    */
   public void copyDirectoryToDirectory(String source, String destination, String ignored)
       throws IOException {
-    final Path sourcePath = Paths.get(source);
-    final Path targetPath = Paths.get(destination);
+    final Path sourcePath = fileSystem.getPath(source);
+    final Path targetPath = fileSystem.getPath(destination);
     Files.walkFileTree(
         sourcePath,
         new SimpleFileVisitor<Path>() {

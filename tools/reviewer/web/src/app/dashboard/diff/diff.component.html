@@ -1,0 +1,15 @@
+<!-- Loading -->
+<page-loading [isLoading]="isLoading"></page-loading>
+
+<!-- Diff-->
+<ng-container *ngIf="!isLoading">
+  <diff-header [diff]="diff"></diff-header>
+  <diff-files
+    [files]="files"
+    [diffId]="diff.getId()"
+  ></diff-files>
+  <diff-discussion
+    [threads]="diff.getThreadList()"
+    [diffId]="diff.getId()"
+  ></diff-discussion>
+</ng-container>
