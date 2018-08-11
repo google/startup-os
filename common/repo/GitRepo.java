@@ -367,3 +367,4 @@ public class GitRepo implements Repo {
     return commandResult.stderr.isEmpty();
   }
 }
+
