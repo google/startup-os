@@ -32,7 +32,7 @@ Some examples of `package-lock` files:
 ## Examples in this repo
 
 ### Java
-We keep a [`dependencies.yaml`](https://github.com/google/startup-os/blob/master/dependencies.yaml) list of user-defined packages. Every time we modify this list, we need to run a command to update `package-lock.bzl` and BUILD files under `third_party/maven`. These commands do this update:
+We keep a [`dependencies.yaml`](https://github.com/google/startup-os/blob/master/dependencies.yaml) list of user-defined packages. Every time we modify this list, we need to run a command to update `package-lock.bzl` and BUILD files under `third_party/maven` (see issue [#238](https://github.com/google/startup-os/issues/238) on `mvncom` prefix). These commands do this update:
 * For adding a new dependency to `dependencies.yaml`, use [`tools/deps/add_maven_deps.sh`](https://github.com/google/startup-os/tree/master/tools/deps/add_maven_dep.sh).
 * After modifying or deleting dependencies in `dependencies.yaml`, use [`tools/deps/update_maven_deps.sh`](https://github.com/google/startup-os/tree/master/tools/deps/update_maven_dep.sh).
 
