@@ -33,9 +33,11 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DiffCommand implements AaCommand {
@@ -97,9 +99,7 @@ public class DiffCommand implements AaCommand {
             .addAllReviewer(getReviewers(reviewers.get()))
             .setId(response.getLastDiffId());
 
-    GitRepo gitRepo = this.gitRepoFactory.create(workspacePath);
-    String initialBranch = gitRepo.currentBranch();
-
+    Map<GitRepo, String> repoToInitialBranch = new HashMap<>();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -108,22 +108,20 @@ public class DiffCommand implements AaCommand {
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
-                try {
-                  String repoName = Paths.get(path).getFileName().toString();
-                  GitRepo repo = this.gitRepoFactory.create(path);
-                  String initialBranch = gitRepo.currentBranch();
-                  System.out.println(
-                      String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
-                  repo.switchBranch(branchName);
-                } catch (IOException e) {
-                  if (!repo.currentBranch().equals(initialBranch)) {
-                    repo.switchBranch(initialBranch);
-                  }
-                  e.printStackTrace();
-                }
+                String repoName = Paths.get(path).getFileName().toString();
+                GitRepo repo = this.gitRepoFactory.create(path);
+                repoToInitialBranch.put(repo, repo.currentBranch());
+                System.out.println(
+                    String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
+                repo.switchBranch(branchName);
               });
     } catch (IOException e) {
-      e.printStackTrace();
+      repoToInitialBranch.forEach(
+          (repo, initialBranch) -> {
+            if (!repo.currentBranch().equals(initialBranch)) {
+              repo.switchBranch(initialBranch);
+            }
+          });
     }
     return diffBuilder.build();
   }
