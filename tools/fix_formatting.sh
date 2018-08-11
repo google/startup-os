@@ -7,11 +7,15 @@
 RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
+bazel run @startupos_binaries//:bazel_deps -- format-deps \
+  --overwrite \
+  --deps $(pwd)/dependencies.yaml
+
 bazel run //tools/formatter -- \
-	--path $(pwd) \
-	--java --python --proto --cpp --build \
-	--ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
-	&>/dev/null
+  --path $(pwd) \
+  --java --python --proto --cpp --build \
+  --ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
+  &>/dev/null
 
 # Prints out an error only if both conditions are satisfied:
 # * we are on CircleCI
