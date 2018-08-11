@@ -12,7 +12,7 @@ if [ $? -eq 0 ]
 then
   echo "$RED[!] ""dependencies.yaml was modified, running the check$RESET"
 else
-  echo "$GREEN[!] ""dependencies.yaml was not modified, exittin (exit code $?) $RESET"
+  echo "$GREEN[!] ""dependencies.yaml was not modified, exiting (code $?) $RESET"
   exit 0
 fi
 
@@ -29,7 +29,7 @@ bazel run //tools/formatter -- \
   --build \
   &>/dev/null
 
-# Print error if on CircleCI
+# Print error if on CircleCI and dependencies were not up-to-date
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
   echo "$RED[!] Dependency tree does not match dependencies.yaml$RESET"
   echo "Please run ''$0'' to fix it"
