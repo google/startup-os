@@ -1,8 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   MatButtonModule,
   MatCardModule,
+  MatCheckboxModule,
+  MatDialogModule,
   MatFormFieldModule,
   MatIconModule,
   MatInputModule,
@@ -14,7 +17,10 @@ import {
 } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
-const SHARED_MODULES = [
+import { PageLoadingComponent } from '@/page-loading';
+import { DirectiveList } from './directives';
+
+const SharedModules = [
   FlexLayoutModule,
   MatButtonModule,
   MatCardModule,
@@ -26,11 +32,27 @@ const SHARED_MODULES = [
   MatSnackBarModule,
   MatToolbarModule,
   MatTableModule,
+  MatDialogModule,
+  MatCheckboxModule,
+];
+
+const Declarations = [
+  ...DirectiveList,
+  PageLoadingComponent,
 ];
 
 @NgModule({
-  imports: [RouterModule, ...SHARED_MODULES],
-  exports: SHARED_MODULES,
-  providers: [],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ...SharedModules,
+  ],
+  exports: [
+    SharedModules,
+    ...Declarations,
+  ],
+  declarations: [
+    ...Declarations,
+  ],
 })
-export class SharedModule {}
+export class SharedModule { }

@@ -256,7 +256,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void pull() {
-    runCommand("pull");
+    runCommand("pull -q");
   }
 
   @Override
@@ -306,8 +306,14 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public boolean branchExists(String name) {
+    // Note: Can also be done directly using 'git rev-parse --verify -q <branch name>'
+    return listBranches().contains(name);
+  }
+
+  @Override
   public ImmutableList<String> listBranches() {
-    CommandResult commandResult = runCommand("branch");
+    CommandResult commandResult = runCommand("branch -a");
     return ImmutableList.copyOf(
         splitLines(commandResult.stdout)
             .stream()

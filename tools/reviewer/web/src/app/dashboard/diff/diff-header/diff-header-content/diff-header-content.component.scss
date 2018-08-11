@@ -1,0 +1,60 @@
+$transparent-grey: rgba(0,0,0,0.54);
+$default-font: 'Heebo', sans-serif;
+
+.header-content {
+  display: flex;
+  padding: 15px 24px;
+  >.info {
+    padding-right: 20px;
+    tr {
+      height: 30px;
+      td:first-child {
+        color: $transparent-grey;
+        width: 120px;
+      }
+      td:nth-child(3) {
+        >.mat-icon-button {
+          float: left;
+        }
+      }
+    }
+    user-popup {
+      margin-right: 5px;
+    }
+  }
+  >.description {
+    width: 100%;
+    >.titlebar {
+      margin-bottom: 10px;
+      display: flex;
+      >.title {
+        color: $transparent-grey;
+        margin-top: 4px;
+      }
+      >.edit-button {
+        margin-left: 20px;
+      }
+    }
+    >.description-text {
+      >.description-value {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: $default-font;
+      }
+    }
+    >.description-textarea {
+      margin-bottom: 15px;
+      >textarea {
+        resize: none;
+        width: calc(100% - 14px);
+        padding: 10px 7px 0 7px;
+        border-radius: 4px;
+        background: white;
+        vertical-align: bottom;
+      }
+    }
+    .description-value {
+      font-size: 14px;
+    }
+  }
+}

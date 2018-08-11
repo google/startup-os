@@ -4,7 +4,7 @@
 /dist
 /tmp
 /out-tsc
-/src/app/shared/shell/proto
+/src/app/shared/proto/functions
 
 # dependencies
 /node_modules

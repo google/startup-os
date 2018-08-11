@@ -1,8 +1,9 @@
 import { RouterModule, Routes } from '@angular/router';
+
 import {
+  DiffComponent,
+  DiffsComponent,
   FileChangesComponent,
-  ReviewComponent,
-  ReviewsPanelComponent,
 } from './';
 
 const routes: Routes = [
@@ -12,11 +13,11 @@ const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'diffs' },
       {
         path: 'diffs',
-        component: ReviewsPanelComponent,
+        component: DiffsComponent,
       },
       {
         path: 'diff/:id',
-        component: ReviewComponent,
+        component: DiffComponent,
       },
       {
         path: 'diff',
