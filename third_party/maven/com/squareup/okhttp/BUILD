@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/squareup/okhttp/okhttp",
+        "//external:jar/mvncom/squareup/okhttp/okhttp",
     ],
     runtime_deps = [
         "//third_party/maven/com/squareup/okio",

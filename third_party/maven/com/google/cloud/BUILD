@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/cloud/google_cloud_core",
+        "//external:jar/mvncom/google/cloud/google_cloud_core",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/api:gax",
@@ -27,7 +27,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/cloud/google_cloud_core_grpc",
+        "//external:jar/mvncom/google/cloud/google_cloud_core_grpc",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/protobuf:protobuf_java",
@@ -45,7 +45,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/cloud/google_cloud_core_http",
+        "//external:jar/mvncom/google/cloud/google_cloud_core_http",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/api:gax_httpjson",
@@ -63,7 +63,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/cloud/google_cloud_firestore",
+        "//external:jar/mvncom/google/cloud/google_cloud_firestore",
     ],
     runtime_deps = [
         ":google_cloud_core_grpc",
@@ -85,7 +85,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/cloud/google_cloud_storage",
+        "//external:jar/mvncom/google/cloud/google_cloud_storage",
     ],
     runtime_deps = [
         ":google_cloud_core",

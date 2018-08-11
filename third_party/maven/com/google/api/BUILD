@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/api/api_common",
+        "//external:jar/mvncom/google/api/api_common",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
@@ -24,7 +24,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/api/gax",
+        "//external:jar/mvncom/google/api/gax",
     ],
 )
 
@@ -37,7 +37,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/api/gax_grpc",
+        "//external:jar/mvncom/google/api/gax_grpc",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/auto/value:auto_value",
@@ -54,6 +54,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/api/gax_httpjson",
+        "//external:jar/mvncom/google/api/gax_httpjson",
     ],
 )

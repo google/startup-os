@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/json/json",
+        "//external:jar/mvnorg/json/json",
     ],
 )

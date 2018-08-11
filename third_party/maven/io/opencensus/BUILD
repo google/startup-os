@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/io/opencensus/opencensus_api",
+        "//external:jar/mvnio/opencensus/opencensus_api",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/guava",
@@ -24,7 +24,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/io/opencensus/opencensus_contrib_grpc_metrics",
+        "//external:jar/mvnio/opencensus/opencensus_contrib_grpc_metrics",
     ],
     runtime_deps = [
         ":opencensus_api",

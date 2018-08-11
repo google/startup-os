@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/org/checkerframework/checker_compat_qual",
+        "//external:jar/mvnorg/checkerframework/checker_compat_qual",
     ],
 )

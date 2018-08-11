@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/javax/annotation/javax_annotation_api",
+        "//external:jar/mvnjavax/annotation/javax_annotation_api",
     ],
 )
 
@@ -20,6 +20,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/javax/annotation/jsr250_api",
+        "//external:jar/mvnjavax/annotation/jsr250_api",
     ],
 )

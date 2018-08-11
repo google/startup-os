@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/auto/auto_common",
+        "//external:jar/mvncom/google/auto/auto_common",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/guava",
