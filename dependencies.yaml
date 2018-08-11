@@ -1,6 +1,7 @@
 options:
   languages: [ "java" ]
   licenses: [ "permissive" ]
+  namePrefix: "mvn"
   resolvers:
     - id: "mavencentral"
       type: "default"
@@ -8,7 +9,6 @@ options:
   thirdPartyDirectory: "third_party/maven/"
   transitivity: runtime_deps
   versionConflictPolicy: highest
-  namePrefix: "mvn"
 
 dependencies:
   com.google.api:

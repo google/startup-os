@@ -29,17 +29,12 @@ jobs:
           <<: *post_checkout
       - restore_cache:
           key: "v3-bazel_cache"
-          key: dep-check-{{ checksum "dependencies.yaml" }}
       - run: './pre-commit.sh'
       - run: sudo apt update
       - run: sudo apt -y install yapf3 clang-format python3-pkg-resources
       - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
-      - run: './check_dependencies.sh'
+      - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
-      - save_cache:
-          key: dep-check-{{ checksum "dependencies.yaml" }}
-          paths:
-            - "/home/circleci/bazel_deps_cache/"
 
   build:
     <<: *job_defaults
