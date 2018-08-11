@@ -24,3 +24,16 @@ java_test(
         "//third_party/maven/org/yaml:snakeyaml",
     ],
 )
+
+java_test(
+    name = "PackageLockWhitelistTest",
+    srcs = ["PackageLockWhitelistTest.java"],
+    data = [
+        "//:whitelist.yaml",
+        "//third_party/maven:package-lock.bzl",
+    ],
+    test_class = "com.google.startupos.tools.dep_whitelist.PackageLockWhitelistTest",
+    deps = [
+        "//third_party/maven/org/yaml:snakeyaml",
+    ],
+)
