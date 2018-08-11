@@ -129,7 +129,8 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<String> getCommitIds(String branch) {
-    CommandResult commandResult = runCommand("log --pretty=%H refs/heads/master..refs/heads/" + branch);
+    CommandResult commandResult =
+        runCommand("log --pretty=%H refs/heads/master..refs/heads/" + branch);
     // We reverse to return by chronological order
     ImmutableList<String> commits = splitLines(commandResult.stdout).reverse();
     // Get last commit on master branch
