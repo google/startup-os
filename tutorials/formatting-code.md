@@ -3,7 +3,23 @@
 To keep code in `startup-os` consistently formatted,
 we've developed a tool called `FormatterTool`.
 It works for C++, Java, Python, BUILD 
-and `dependencies.yaml` file. 
+and `dependencies.yaml` file.
+
+## Ensuring Bazel has correct version
+To make use of the tutorial, `bazel`'s version should be
+equal or more than `0.16.1rc2`
+
+To check the version, execute
+```bash
+bazel version
+```
+
+To upgrade, execute
+```bash
+wget https://releases.bazel.build/0.16.1/rc2/bazel_0.16.1rc2-linux-x86_64.deb &&
+sudo dpkg -i bazel_0.16.1rc2-linux-x86_64.deb && 
+rm bazel_0.16.1rc2-linux-x86_64.deb
+```
 
 ## Listing available targets
 
