@@ -132,6 +132,7 @@ public class TextDifferencer {
     }
     DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
     LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(leftContents, rightContents);
+    diffMatchPatch.diff_cleanupSemantic(diffs);
 
     return TextDiff.newBuilder()
         .addAllLeftChange(getSingleSideChanges(diffs, Operation.DELETE))
