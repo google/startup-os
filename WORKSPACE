@@ -1,15 +1,6 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
-# bazel-deps-deploy is a prebuilt version of johnynek/bazel-deps
-# we cannot use it via http_archive directly for the moment
-# relevant issue: https://github.com/johnynek/bazel-deps/issues/126
-git_repository(
-    name = "bazel_deps",
-    commit = "89922f54a6abc59d8000b5118ae339d9e81120f4",
-    remote = "https://github.com/oferb/startupos-binaries",
-)
-
 git_repository(
     name = "startupos_binaries",
     commit = "3eaa31c93ca9ecb22ad8c348649d1ba4f61f332c",

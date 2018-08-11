@@ -1,6 +1,7 @@
 options:
   languages: [ "java" ]
   licenses: [ "permissive" ]
+  namePrefix: "mvn"
   resolvers:
     - id: "mavencentral"
       type: "default"
@@ -8,7 +9,6 @@ options:
   thirdPartyDirectory: "third_party/maven/"
   transitivity: runtime_deps
   versionConflictPolicy: highest
-  namePrefix: "mvn"
 
 dependencies:
   com.google.api:
@@ -172,12 +172,12 @@ dependencies:
       lang: java
       version: "2.6"
 
-  org.yaml:
-    snakeyaml:
-      lang: java
-      version: "1.21"
-
   org.slf4j:
     slf4j-simple:
       lang: java
       version: "1.7.25"
+
+  org.yaml:
+    snakeyaml:
+      lang: java
+      version: "1.21"
