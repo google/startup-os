@@ -313,7 +313,7 @@ public class GitRepo implements Repo {
 
   @Override
   public ImmutableList<String> listBranches() {
-    CommandResult commandResult = runCommand("branch");
+    CommandResult commandResult = runCommand("branch -a");
     return ImmutableList.copyOf(
         splitLines(commandResult.stdout)
             .stream()
@@ -367,4 +367,3 @@ public class GitRepo implements Repo {
     return commandResult.stderr.isEmpty();
   }
 }
-

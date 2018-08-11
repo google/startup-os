@@ -339,7 +339,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
                     commits =
                         addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
                   } else {
-                    logger.atInfo().log("Branch %s does not exist in %s head", branch, workspace);
+                    logger.atInfo().log("Branch %s does not exist in head", branch);
                   }
                   response.addBranchInfo(
                       BranchInfo.newBuilder()
@@ -364,4 +364,3 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onCompleted();
   }
 }
-
