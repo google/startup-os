@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/squareup/javapoet",
+        "//external:jar/mvncom/squareup/javapoet",
     ],
 )

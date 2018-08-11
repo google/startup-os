@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/protobuf/protobuf_java",
+        "//external:jar/mvncom/google/protobuf/protobuf_java",
     ],
 )
 
@@ -20,7 +20,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/protobuf/protobuf_java_util",
+        "//external:jar/mvncom/google/protobuf/protobuf_java_util",
     ],
     runtime_deps = [
         ":protobuf_java",

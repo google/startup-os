@@ -63,7 +63,9 @@ public class SyncCommand implements AaCommand {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    // Then, do the sync for all workspaces
+    // then, do the sync for all workspaces
+    GitRepo gitRepo = this.repoFactory.create(workspacePath);
+    String initialBranch = gitRepo.currentBranch();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -101,6 +103,9 @@ public class SyncCommand implements AaCommand {
                 repo.removeBranch("temp_branch_for_sync");
               });
     } catch (IOException e) {
+      if (!gitRepo.currentBranch().equals(initialBranch)) {
+        gitRepo.switchBranch(initialBranch);
+      }
       e.printStackTrace();
     }
     return true;

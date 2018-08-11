@@ -1,0 +1,23 @@
+$comments-background: #f1f8ff;
+
+mat-table {
+  .mat-row {
+    cursor: pointer;
+  }
+  .mat-cell {
+    padding: 15px 0;
+    >.thread-title {
+      margin-bottom: 15px;
+    }
+    >.comment {
+      max-width: 600px;
+      padding: 10px;
+      border: 1px solid rgba(0,0,0,.3);
+      background: $comments-background;
+      margin-bottom: 10px;
+      >.message {
+        margin-bottom: 10px;
+      }
+    }
+  }
+}

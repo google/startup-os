@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/javax/inject/javax_inject",
+        "//external:jar/mvnjavax/inject/javax_inject",
     ],
 )

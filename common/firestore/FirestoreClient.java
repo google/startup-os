@@ -18,6 +18,7 @@ package com.google.startupos.common.firestore;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
+import com.google.auto.factory.AutoFactory;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.startupos.common.firestore.Protos.ProtoDocument;
@@ -31,6 +32,7 @@ import java.net.URL;
 import java.util.Base64;
 
 // TODO: Fix open Firestore rules
+@AutoFactory
 public class FirestoreClient {
   // Base path formatted by project name and path, that starts with a /.
   private static final String BASE_PATH =
@@ -60,25 +62,42 @@ public class FirestoreClient {
     return getCreateDocumentUrl(user, null);
   }
 
+  private String getDocumentResponse(String path) throws IOException {
+    StringBuilder response = new StringBuilder();
+    URL url = new URL(getGetUrl(path));
+    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    connection.setRequestMethod("GET");
+    connection.setRequestProperty("Authorization", "Bearer " + token);
+    try (BufferedReader reader =
+        new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        response.append(line);
+      }
+    }
+    if (connection.getResponseCode() != HTTP_OK) {
+      throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
+    }
+    return response.toString();
+  }
+
   public Message getDocument(String path, Message.Builder proto) {
     try {
-      StringBuilder result = new StringBuilder();
-      URL url = new URL(getGetUrl(path));
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod("GET");
-      connection.setRequestProperty("Authorization", "Bearer " + token);
-      try (BufferedReader reader =
-          new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-        String line;
-        while ((line = reader.readLine()) != null) {
-          result.append(line);
-        }
-      }
-      if (connection.getResponseCode() != HTTP_OK) {
-        throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
-      }
-      FirestoreJsonFormat.parser().merge(result.toString(), proto);
+      FirestoreJsonFormat.parser().merge(getDocumentResponse(path), proto);
       return proto.build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Message getProtoDocument(String path, Message.Builder proto) {
+    try {
+      ProtoDocument.Builder protoDocument = ProtoDocument.newBuilder();
+      FirestoreJsonFormat.parser().merge(getDocumentResponse(path), protoDocument);
+      byte[] protoBytes = Base64.getDecoder().decode(protoDocument.getProto());
+
+      // We just need the proto Message to get a parser
+      return proto.build().getParserForType().parseFrom(protoBytes);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

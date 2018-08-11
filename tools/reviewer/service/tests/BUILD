@@ -29,6 +29,7 @@ java_test(
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common:text_differencer",
+        "//common/firestore",
         "//common/flags",
         "//common/repo",
         "//common/repo:repo_java_proto",

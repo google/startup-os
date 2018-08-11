@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/dagger/dagger",
+        "//external:jar/mvncom/google/dagger/dagger",
     ],
     runtime_deps = [
         "//third_party/maven/javax/inject:javax_inject",
@@ -23,7 +23,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/dagger/dagger_compiler",
+        "//external:jar/mvncom/google/dagger/dagger_compiler",
     ],
     runtime_deps = [
         ":dagger",
@@ -46,7 +46,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/dagger/dagger_producers",
+        "//external:jar/mvncom/google/dagger/dagger_producers",
     ],
     runtime_deps = [
         "//third_party/maven/org/checkerframework:checker_compat_qual",
@@ -62,6 +62,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/dagger/dagger_spi",
+        "//external:jar/mvncom/google/dagger/dagger_spi",
     ],
 )

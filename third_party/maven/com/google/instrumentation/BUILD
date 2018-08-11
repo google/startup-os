@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/instrumentation/instrumentation_api",
+        "//external:jar/mvncom/google/instrumentation/instrumentation_api",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",

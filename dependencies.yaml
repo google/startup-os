@@ -8,6 +8,7 @@ options:
   thirdPartyDirectory: "third_party/maven/"
   transitivity: runtime_deps
   versionConflictPolicy: highest
+  namePrefix: "mvn"
 
 dependencies:
   com.google.api:
@@ -145,11 +146,6 @@ dependencies:
     pdfbox:
       lang: java
       version: "2.0.8"
-
-  org.eclipse.jgit:
-    org.eclipse.jgit:
-      lang: java
-      version: "4.10.0.201712302008-r"
 
   org.javassist:
     javassist:

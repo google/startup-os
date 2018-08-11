@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/flogger/flogger",
+        "//external:jar/mvncom/google/flogger/flogger",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
@@ -23,7 +23,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/flogger/flogger_system_backend",
+        "//external:jar/mvncom/google/flogger/flogger_system_backend",
     ],
     runtime_deps = [
         ":flogger",

@@ -1,0 +1,54 @@
+@import 'reply-popup-variables';
+@import 'reply-popup-speech-bubble';
+
+:host {
+  position: absolute;
+  right: 15px;
+  top: 120px;
+  z-index: 2;
+  >.mat-card {
+    background: $popup-background-color;
+    width: 600px;
+    border: 1px solid #{$popup-border-color};
+    border-radius: 5px;
+    z-index: 3;
+    >.titlebar {
+      display: flex;
+      height: 20px;
+      margin-bottom: 15px;
+      >span {
+        opacity: 0.85;
+        font-weight: bold;
+        margin-right: 15px;
+      }
+    }
+    >.message {
+      margin-bottom: 10px;
+      textarea {
+        resize: none;
+        width: 100%;
+        padding: 5px;
+        font-size: 14px;
+        background: white;
+      }
+    }
+    >.buttons {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+      >.mat-checkbox {
+        margin-top: 5px;
+        margin-right: 15px;
+      }
+    }
+  }
+  .reply-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: black;
+    opacity: .2;
+  }
+}

@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/j2objc/j2objc_annotations",
+        "//external:jar/mvncom/google/j2objc/j2objc_annotations",
     ],
 )

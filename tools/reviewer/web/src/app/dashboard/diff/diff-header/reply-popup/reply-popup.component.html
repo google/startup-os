@@ -1,0 +1,37 @@
+<mat-card>
+  <div class="titlebar">
+    <span>Reply</span>
+    <mat-spinner [diameter]="20" *ngIf="isLoading"></mat-spinner>
+  </div>
+  <div class="message">
+    <textarea
+      matInput
+      matTextareaAutosize
+      matAutosizeMinRows="3"
+      [(ngModel)]="message"
+    ></textarea>
+  </div>
+  <div class="action-checkbox">
+    <mat-checkbox
+      color="primary"
+      [(ngModel)]="actionRequired"
+    >Action Required</mat-checkbox>
+  </div>
+  <div class="buttons">
+    <!-- Hide Approved checkbox when Author is the current user -->
+    <mat-checkbox
+      color="primary"
+      *ngIf="authService.userEmail !== diff.getAuthor().getEmail()"
+      [(ngModel)]="approved" 
+    >Approved</mat-checkbox>
+    
+    <button
+      class="cr-light-button"
+      mat-raised-button
+      color="accent"
+      (click)="reply()"
+      [disabled]="isLoading"
+    >Reply</button>
+  </div>
+</mat-card>
+<div class="reply-popup-overlay" (click)="closeReplyPopup()"></div>

@@ -15,6 +15,7 @@
  */
 
 // TODO: refactor getting the formatter for file
+// TODO: Move formatting logic from FormatterTool to a new Formatter class.
 
 package com.google.startupos.tools.formatter;
 
@@ -36,7 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-class FormatterTool {
+public class FormatterTool {
 
   static String readFile(Path path) throws IOException {
     return String.join(System.lineSeparator(), Files.readAllLines(path));
@@ -189,7 +190,6 @@ class FormatterTool {
               System.out.println(
                   String.format("Intending to format: %s", path.toAbsolutePath().toString()));
             } else {
-              System.out.println(String.format("Formatting: %s", path.toAbsolutePath().toString()));
               formatters.get(getExtension(path)).format(path);
             }
           }

@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/apache/commons/commons_csv",
+        "//external:jar/mvnorg/apache/commons/commons_csv",
     ],
 )
 
@@ -20,6 +20,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/apache/commons/commons_lang3",
+        "//external:jar/mvnorg/apache/commons/commons_lang3",
     ],
 )

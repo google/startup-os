@@ -6,15 +6,6 @@ version: 2
 # the environment is portable and reproducible on your local machine.
 var_1: &docker_image angular/ngcontainer:0.3.2
 
-# CircleCI lets us pick the key for storing one or more caches, to speed up subsequent builds.
-# We can use this to avoid re-fetching our dependencies from npm on every build.
-# To ensure we don't load a stale cache, we invalidate it based on the entries in the key:
-# - the checksum of Yarn's lock file
-# - the branch we are on, which really shouldn't be needed since the yarn lock file should be hermetic
-# - the docker image tag, working around an issue we saw where changing docker images causes permission
-#   errors when restoring the cache, like when the user we run as changes
-var_2: &cache_key angular-{{ .Branch }}-{{ checksum "yarn.lock" }}-0.3.2
-
 # Each job will inherit these defaults
 anchor_1: &job_defaults
   working_directory: ~/ng
@@ -44,7 +35,7 @@ jobs:
       - run: sudo apt -y install yapf3 clang-format python3-pkg-resources
       - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
       - run: './check_dependencies.sh'
-      - run: './fix_formatting.sh'
+      - run: './tools/fix_formatting.sh'
       - save_cache:
           key: dep-check-{{ checksum "dependencies.yaml" }}
           paths:
@@ -57,9 +48,6 @@ jobs:
           <<: *post_checkout
 
       - restore_cache:
-          key: *cache_key
-
-      - restore_cache:
           key: "android_sdk"
 
       - restore_cache:
@@ -67,21 +55,17 @@ jobs:
 
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
-      - run: './tools/get-android-sdk.sh'
+      - run: './tools/get_android_sdk.sh'
       - run:
-          command: ./compile.sh build
+          command: ./build.sh
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
       - run:
-          command: ./compile.sh test
+          command: ./test.sh
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
 
-      # If we get this far, save the node_modules directory for use next time.
       - save_cache:
-          key: *cache_key
-          paths:
-            - "node_modules"
           key: "android_sdk"
           paths:
             - "/home/circleci/android_sdk"

@@ -129,11 +129,12 @@ public class GitRepo implements Repo {
   }
 
   public ImmutableList<String> getCommitIds(String branch) {
-    CommandResult commandResult = runCommand("log --pretty=%H master.." + branch);
+    CommandResult commandResult =
+        runCommand("log --pretty=%H refs/heads/master..refs/heads/" + branch);
     // We reverse to return by chronological order
     ImmutableList<String> commits = splitLines(commandResult.stdout).reverse();
     // Get last commit on master branch
-    commandResult = runCommand("merge-base master " + branch);
+    commandResult = runCommand("merge-base refs/heads/master refs/heads/" + branch);
     return ImmutableList.<String>builder()
         .addAll(splitLines(commandResult.stdout))
         .addAll(commits)
@@ -256,7 +257,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void pull() {
-    runCommand("pull");
+    runCommand("pull -q");
   }
 
   @Override
@@ -306,8 +307,14 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public boolean branchExists(String name) {
+    // Note: Can also be done directly using 'git rev-parse --verify -q <branch name>'
+    return listBranches().contains(name);
+  }
+
+  @Override
   public ImmutableList<String> listBranches() {
-    CommandResult commandResult = runCommand("branch");
+    CommandResult commandResult = runCommand("branch -a");
     return ImmutableList.copyOf(
         splitLines(commandResult.stdout)
             .stream()

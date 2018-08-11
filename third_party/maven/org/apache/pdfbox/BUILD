@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/apache/pdfbox/fontbox",
+        "//external:jar/mvnorg/apache/pdfbox/fontbox",
     ],
     runtime_deps = [
         "//third_party/maven/commons_logging",
@@ -23,7 +23,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/apache/pdfbox/pdfbox",
+        "//external:jar/mvnorg/apache/pdfbox/pdfbox",
     ],
     runtime_deps = [
         ":fontbox",

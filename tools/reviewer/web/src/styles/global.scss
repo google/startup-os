@@ -3,8 +3,51 @@ body {
   color: #2a2a2a;
   height: 100%;
   margin: 0px;
-  font-family: 'Heebo', sans-serif;
+  font-family: $default-font;
 }
-.bold-text {
-  font-weight: bold !important;
+
+textarea {
+  font-family: $default-font !important;
+  border: solid 1px $palette-2 !important;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.cr-titlebar {
+  height: 46px;
+  background: $palette-1;
+  border-bottom: solid 1px $palette-2;
+  padding: 0 23px;
+  display: flex;
+  align-items: center;
+  >.title {
+    >span {
+      font-size: 20px;
+    }
+  }
+  >.buttons {
+    user-select: none;
+    direction: rtl;
+    padding-bottom: 2px;
+    >button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.cr-header {
+  background: $palette-3;
+}
+
+.cr-light-button {
+  height: 30px;
+  width: 100px;
+  line-height: 0 !important;
+  border-radius: 5px !important;
+  >span {
+    font-size: 15px;
+    font-family: $default-font;
+  }
 }

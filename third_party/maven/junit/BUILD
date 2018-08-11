@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/junit/junit",
+        "//external:jar/mvnjunit/junit",
     ],
     runtime_deps = [
         "//third_party/maven/org/hamcrest:hamcrest_core",
