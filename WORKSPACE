@@ -197,6 +197,22 @@ http_file(
     urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
 )
 
+# clang-format tool download, to be used by Formatter tool
+
+http_file(
+    name = "clang_format_bin",
+    executable = True,
+    sha256 = "cc99fda45b4c740f35d0a367985a2bf55491065a501e2dd5d1ad3f97dcac89da",
+    urls = ["https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz"]
+)
+
+http_file(
+    name = "clang_format_bin_osx",
+    executable = True,
+    sha256 = "0ef8e99e9c9b262a53ab8f2821e2391d041615dd3f3ff36fdf5370916b0f4268",
+    urls = ["https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz"]
+)
+
 """
 We use proto_compiler and proto_java_toolchain bindings to avoid
 compilation of protoc. To turn off prebuilt binaries, replace

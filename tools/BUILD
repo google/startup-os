@@ -48,3 +48,12 @@ proto_lang_toolchain(
     runtime = "//third_party/maven/com/google/protobuf:protobuf_java",
     visibility = ["//visibility:public"],
 )
+
+sh_binary(
+    name = "clang_format",
+    srcs = ["clang-format.sh"],
+    data = [
+        "@clang_format_bin//file",
+        "@clang_format_bin_osx//file",
+    ],
+)
