@@ -5,7 +5,7 @@
 # so you won't fail early on review
 # Either do it manually or by creating a symlink
 # To do this, execute, from repo root
-# ln -s $(pwd)/pre-commit.sh $(pwd)/.git/hooks/pre-commit
+# ln -s $(pwd)/tools/pre-commit.sh $(pwd)/.git/hooks/pre-commit
 
 rm -f /tmp/check_apache_header
 rm -f /tmp/check_java_package

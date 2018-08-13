@@ -1,9 +1,14 @@
+exports_files([
+    "whitelist.yaml",
+])
+
+
 java_test(
     name = "MavenDepsWhitelistTest",
     srcs = ["MavenDepsWhitelistTest.java"],
     data = [
         "//:dependencies.yaml",
-        "//:whitelist.yaml",
+        "//tools/deps:whitelist.yaml",
     ],
     test_class = "com.google.startupos.tools.dep_whitelist.MavenDepsWhitelistTest",
     deps = [
@@ -16,7 +21,7 @@ java_test(
     srcs = ["WorkspaceDepsWhitelistTest.java"],
     data = [
         "//:WORKSPACE",
-        "//:whitelist.yaml",
+        "//tools/deps:whitelist.yaml",
     ],
     test_class = "com.google.startupos.tools.dep_whitelist.WorkspaceDepsWhitelistTest",
     deps = [
