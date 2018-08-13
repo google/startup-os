@@ -63,7 +63,7 @@ public class WorkspaceDepsWhitelistTest {
 
   @Before
   public void setUp() throws Exception {
-    whitelist = new Yaml().load(new FileInputStream(new File("whitelist.yaml")));
+    whitelist = new Yaml().load(new FileInputStream(new File("tools/deps/whitelist.yaml")));
     try (Stream<String> stream = Files.lines(Paths.get("WORKSPACE"))) {
       workspace = stream.collect(Collectors.toList());
     }
