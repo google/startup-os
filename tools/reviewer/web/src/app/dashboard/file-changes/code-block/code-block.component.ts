@@ -107,14 +107,21 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
   // Highlitght code, split it by lines.
   // Bootstrap method.
   initLines(fileContent: string): void {
-    const highlightedCode: string = this.highlightService.highlight(
+    // Add spans, which highlight the code
+    let highlightedCode: string = this.highlightService.highlight(
       fileContent,
       this.language,
     );
 
-    const FileLines: string[] = fileContent.split('\n');
+    // Make the spans inline
+    highlightedCode = this.makeHighlightingInline(highlightedCode);
+    if (this.isNewCode) {
+      console.log(highlightedCode);
+    }
+
+    const fileLines: string[] = fileContent.split('\n');
     this.highlightedLines = highlightedCode.split('\n');
-    FileLines.forEach((code, i) => {
+    fileLines.forEach((code, i) => {
       this.lines.push({
         code: code,
         hasPlaceholder: false,
@@ -125,6 +132,45 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
         isCommentsVisible: false,
       });
     });
+  }
+
+  makeHighlightingInline(highlightedCode: string): string {
+    // Make object from html string
+    const parser: DOMParser = new DOMParser();
+    const htmlDocument: Document = parser.parseFromString(
+      highlightedCode,
+      'text/html',
+    );
+
+    // Get spans, which aren't closed on the same line, where they're opened
+    const spans: NodeListOf<HTMLSpanElement> = htmlDocument
+      .getElementsByTagName('span');
+    let multilineSpanList: HTMLSpanElement[] = [];
+    Array.from(spans).forEach(span => {
+      const innerLines: string[] = span.innerHTML.split('\n');
+      if (innerLines.length > 1) {
+        multilineSpanList.push(span);
+      }
+    });
+    // Reverse, to make children first
+    multilineSpanList = multilineSpanList.reverse();
+
+    // Replace each line of each multiline span with inline span
+    for (const multilineSpan of multilineSpanList) {
+      const innerLines: string[] = multilineSpan.innerHTML.split('\n');
+      const inlineSpanList: string[] = [];
+      for (const line of innerLines) {
+        const inlineSpan: HTMLSpanElement = document.createElement('span');
+        inlineSpan.innerHTML = line;
+        inlineSpan.className = multilineSpan.className;
+        inlineSpanList.push(inlineSpan.outerHTML);
+      }
+
+      // Replace the multiline span with several inline spans
+      multilineSpan.outerHTML = inlineSpanList.join('\n');
+    }
+
+    return htmlDocument.getElementsByTagName('body')[0].innerHTML;
   }
 
   // Set which lines are changed
