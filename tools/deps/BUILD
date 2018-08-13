@@ -2,7 +2,6 @@ exports_files([
     "whitelist.yaml",
 ])
 
-
 java_test(
     name = "MavenDepsWhitelistTest",
     srcs = ["MavenDepsWhitelistTest.java"],
