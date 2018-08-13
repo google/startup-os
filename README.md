@@ -1,60 +1,62 @@
+
+
 # StartupOS
 
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
 [![CircleCI](https://circleci.com/gh/google/startup-os/tree/master.svg?style=svg)](https://circleci.com/gh/google/startup-os/tree/master)
 
-> Working examples for using Google's Open Source tools and deploying to the cloud.
+> Examples for Google's Open Source stack and deploying to the cloud.
 
-### StartupOS includes
-* Google's open source libraries and tools, integrated together
-* Easy Cloud setup and deployment
-* Ready-to-run examples of Android and iOS native apps and Angular web apps.
+The main technologies in the stack are 
+* [Angular](https://angular.io/)
+* [Protol Buffers](https://developers.google.com/protocol-buffers/)
+* [gRPC](https://grpc.io/)
+* [Bazel](https://bazel.build/)
 
-### How can StartupOS help me?
-Compared to example repos (e.g https://github.com/googlesamples), which typically have a very specific example, usually for one tool or technology, this repo shows how to integrate multiple technologies together. Often, when trying to use several tools, you run into dependency issues, integration issues, or just wonder what's the best practice for working with them together.
+## Supported languages
 
-StartupOS can help you with working examples and best-practices that "just work" across multiple tools and technologies.
+Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Java and Typescript, but there's support for many other languages:
+* Google supports gRPC and Protocol Buffers in C++, Java (and Android Java), Python, Go, C#, Objective-C, PHP, Dart, Ruby, JavaScript (incl. Node.js).
+* Google supports Bazel in Java (incl. Android builds), Objective-C (incl. iOS builds), C++ and Go, Dart, Rust, Sass, Scala
+* The cummonity has added support for many others languages. See [this list](https://github.com/google/protobuf/blob/master/docs/third_party.md) for Protocol Buffers and gRPC, and [this one](https://github.com/jin/awesome-bazel#rules) for Bazel.
 
-### How to use StartupOS
-You can:
-* Clone this repo, and then adapt it to your needs.
-* Use it as a reference and copy-paste parts of it to your own repo.
-* Use parts of it from your own repo. For an example of that, see https://github.com/hasadna/hasadna (look for `@startup_os` in BUILD files)
+## Top examples
+* Lots of [Protocol Buffer examples]([examples](https://github.com/search?utf8=%E2%9C%93&q=repo%3Agoogle%2Fstartup-os+extension%3Aproto&type=Code&ref=advsearch&l=&l=)).
+* gRPC [server](https://github.com/oferb/startup-os-example/tree/master/app/local_server) with js [client](https://github.com/oferb/startup-os-example/tree/master/app/client): Both server and client use gRPC auto-generated stubs to handle communication.
+* gRPC [microservices example](https://github.com/google/startup-os/blob/master/tools/local_server/LocalServer.java).
+* Docker: building containers using Bazel (no dockerfile needed!): See [here](https://github.com/google/startup-os/tree/master/examples/docker)
+* Kubernetes: a config file showing how to run the container on k8s, see [here](https://github.com/google/startup-os/tree/master/examples/k8s).
+* Continuous Integration: Using CircleCI to run and test all Bazel targets, see config [here](https://github.com/google/startup-os/tree/master/.circleci).
+* [Firebase](https://firebase.google.com): Java client for storing Protocol Buffers [here](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreClient.java).
+* [Dagger](https://github.com/google/dagger): Java Dependency Injection framework  ("Next gen Guice"), see examples [here](https://github.com/google/startup-os/tree/master/examples/dagger).
+* [Flogger](https://github.com/google/flogger): Java logger with fluent API, see examples [here](https://github.com/google/startup-os/search?q=com.google.common.flogger.FluentLogger&unscoped_q=com.google.common.flogger.FluentLogger).
 
-### Setup
-* Install [Bazel](https://docs.bazel.build/versions/master/install.html)
+## Tools
+There are several useful tools in the [tools section](https://github.com/google/startup-os/tree/master/tools).
+
+## How to use StartupOS
+You can treat StartupOS as a "developer image" with a pre-built setup and tools.
+
+You can either:
+* Clone this repo and evolve it on your own.
+* Treat it as a dependency to your own repo. An example for that is here: https://github.com/oferb/startup-os-example
+
+## Installation
+Install [Bazel](https://docs.bazel.build/versions/master/install.html)
+That's it!
+
+## Build & Test
 * Build everything: `./build.sh`
 * Run all tests: `./test.sh`
 
+## About monorepos
+A monorepo is a software development approach where all code is stored in a single repository.
+StartupOS doesn't require you to work with a monorepo, but some things, such as sharing a proto file across front-end and backend, are easier to do in a monorepo.
 
-### Milestones
-#### ✓ Milestone I
-Working examples of:
-* ✓ [Bazel](https://bazel.build)
-* ✓ [Protocol Buffers](https://developers.google.com/protocol-buffers): See [examples](https://github.com/search?utf8=%E2%9C%93&q=repo%3Agoogle%2Fstartup-os+extension%3Aproto&type=Code&ref=advsearch&l=&l=).
-* ✓ [gRPC](https://grpc.io): Example [server](https://github.com/google/startup-os/blob/master/tools/local_server/LocalServer.java).
-* ✓ [Dagger](https://github.com/google/dagger): See [examples](https://github.com/google/startup-os/tree/master/examples/dagger).
-* ✓ [Flogger](https://github.com/google/flogger): See [examples](https://github.com/google/startup-os/search?q=com.google.common.flogger.FluentLogger&unscoped_q=com.google.common.flogger.FluentLogger).
-* ✓ [Firebase](https://firebase.google.com) integration with Protocol Buffers, e.g [Java client](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreClient.java) for REST API.
+Some good reads about the monorepo approach:
+* [https://trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
+* [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext#FNF)
 
-#### Milestone II
-Working examples of:
-* ✓ Bazel building Docker containers: See [here](https://github.com/google/startup-os/tree/master/examples/docker)
-* ✓ Continuous Integration: Using CircleCI, see [config](https://github.com/google/startup-os/tree/master/.circleci).
-* ✓ [Error Prone](https://github.com/google/error-prone): Error Prone is actually already [integrated](https://blog.bazel.build/2015/06/25/ErrorProne.html) into Bazel.
-* ✓ [Google Java Formatter](https://github.com/google/google-java-format): Integrated into the CI.
-* [ABC](http://g.co/ng/abc) (Angular Bazel Closure)
-* [j2objc](https://developers.google.com/j2objc)
-* [Kubernetes](https://kubernetes.io)
-* [Dagger on Android](https://google.github.io/dagger/android.html)
-* More goodies...
-
-## Other repos
-Here are some other repos with examples of Bazel, gRPC and other related technologies:
-* Go, C++, Java: https://github.com/lucperkins/colossus
-* Go: https://github.com/Staffjoy/v2
-* Java and also some C++ and Python: https://github.com/apache/incubator-heron
-
-## Feedback
-If you're interested in StartupOS, please let us know!
-You can fill in this form: https://goo.gl/forms/jfAH0wLgedE8GoWg2
+## Contributing
+You're welcome to contribute and in doing so, learn these technologies.
+You can have a look at the issues list, or at the project [milestones](docs/milestones.md).
