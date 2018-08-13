@@ -17,16 +17,16 @@ The main technologies in the stack are
 
 Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Java and Typescript, but there's support for many other languages:
 * Google supports gRPC and Protocol Buffers in C++, Java (and Android Java), Python, Go, C#, Objective-C, PHP, Dart, Ruby, JavaScript (incl. Node.js).
-* Google supports Bazel in Java (incl. Android builds), Objective-C (incl. iOS builds), C++ and Go, Dart, Rust, Sass, Scala
-* The cummonity has added support for many others languages. See [this list](https://github.com/google/protobuf/blob/master/docs/third_party.md) for Protocol Buffers and gRPC, and [this one](https://github.com/jin/awesome-bazel#rules) for Bazel.
+* Google supports Bazel in Java (incl. Android builds), Objective-C (incl. iOS builds), C++ and Go, Dart, Rust, Sass and Scala
+* The community has added support for many others languages. See [this list](https://github.com/google/protobuf/blob/master/docs/third_party.md) for Protocol Buffers and gRPC, and [this one](https://github.com/jin/awesome-bazel#rules) for Bazel.
 
 ## Top examples
-* Lots of [Protocol Buffer examples]([examples](https://github.com/search?utf8=%E2%9C%93&q=repo%3Agoogle%2Fstartup-os+extension%3Aproto&type=Code&ref=advsearch&l=&l=)).
-* gRPC [server](https://github.com/oferb/startup-os-example/tree/master/app/local_server) with js [client](https://github.com/oferb/startup-os-example/tree/master/app/client): Both server and client use gRPC auto-generated stubs to handle communication.
+* Lots of [Protocol Buffer examples](https://github.com/search?utf8=%E2%9C%93&q=repo%3Agoogle%2Fstartup-os+extension%3Aproto&type=Code&ref=advsearch&l=&l=).
+* gRPC [server](https://github.com/oferb/startup-os-example/tree/master/app/local_server) with [js client](https://github.com/oferb/startup-os-example/tree/master/app/client): Both server and client use gRPC auto-generated stubs to handle communication.
 * gRPC [microservices example](https://github.com/google/startup-os/blob/master/tools/local_server/LocalServer.java).
-* Docker: building containers using Bazel (no dockerfile needed!): See [here](https://github.com/google/startup-os/tree/master/examples/docker)
-* Kubernetes: a config file showing how to run the container on k8s, see [here](https://github.com/google/startup-os/tree/master/examples/k8s).
-* Continuous Integration: Using CircleCI to run and test all Bazel targets, see config [here](https://github.com/google/startup-os/tree/master/.circleci).
+* [Docker example](https://github.com/google/startup-os/tree/master/examples/docker): building containers using Bazel (no dockerfile needed!).
+* [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run the container on k8s.
+* [CI example](https://github.com/google/startup-os/tree/master/.circleci): Using CircleCI to run CI (continuous integration) and test all Bazel targets.
 * [Firebase](https://firebase.google.com): Java client for storing Protocol Buffers [here](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreClient.java).
 * [Dagger](https://github.com/google/dagger): Java Dependency Injection framework  ("Next gen Guice"), see examples [here](https://github.com/google/startup-os/tree/master/examples/dagger).
 * [Flogger](https://github.com/google/flogger): Java logger with fluent API, see examples [here](https://github.com/google/startup-os/search?q=com.google.common.flogger.FluentLogger&unscoped_q=com.google.common.flogger.FluentLogger).
