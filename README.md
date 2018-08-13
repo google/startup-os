@@ -54,7 +54,7 @@ A monorepo is a software development approach where all code is stored in a sing
 StartupOS doesn't require you to work with a monorepo, but some things, such as sharing a proto file across front-end and backend, are easier to do in a monorepo.
 
 Some good reads about the monorepo approach:
-* [https://trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
+* [runkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
 * [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext#FNF)
 
 ## Contributing
