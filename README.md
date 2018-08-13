@@ -5,9 +5,9 @@
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
 [![CircleCI](https://circleci.com/gh/google/startup-os/tree/master.svg?style=svg)](https://circleci.com/gh/google/startup-os/tree/master)
 
-> Examples for Google's Open Source stack and deploying to the cloud.
+> Examples for Google's Open Source stack and deploying it to the cloud.
 
-The main technologies in the stack are 
+The main technologies in the stack are:
 * [Angular](https://angular.io/)
 * [Protol Buffers](https://developers.google.com/protocol-buffers/)
 * [gRPC](https://grpc.io/)
@@ -16,8 +16,8 @@ The main technologies in the stack are
 ## Supported languages
 
 Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Java and Typescript, but there's support for many other languages:
-* Google supports gRPC and Protocol Buffers in C++, Java (and Android Java), Python, Go, C#, Objective-C, PHP, Dart, Ruby, JavaScript (incl. Node.js).
-* Google supports Bazel in Java (incl. Android builds), Objective-C (incl. iOS builds), C++ and Go, Dart, Rust, Sass and Scala
+* gRPC and Protocol Buffers are supported by Google in C++, Java (and Android Java), Python, Go, C#, Objective-C, PHP, Dart, Ruby and JavaScript (incl. Node.js).
+* Bazel is supported by Google in Java (incl. Android builds), Objective-C (incl. iOS builds), C++, Go, Dart, Rust, Sass and Scala.
 * The community has added support for many others languages. See [this list](https://github.com/google/protobuf/blob/master/docs/third_party.md) for Protocol Buffers and gRPC, and [this one](https://github.com/jin/awesome-bazel#rules) for Bazel.
 
 ## Top examples
@@ -25,7 +25,7 @@ Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Jav
 * gRPC [server](https://github.com/oferb/startup-os-example/tree/master/app/local_server) with [js client](https://github.com/oferb/startup-os-example/tree/master/app/client): Both server and client use gRPC auto-generated stubs to handle communication.
 * gRPC [microservices example](https://github.com/google/startup-os/blob/master/tools/local_server/LocalServer.java).
 * [Docker example](https://github.com/google/startup-os/tree/master/examples/docker): building containers using Bazel (no dockerfile needed!).
-* [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run the container on k8s.
+* [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run a container on k8s.
 * [CI example](https://github.com/google/startup-os/tree/master/.circleci): Using CircleCI to run CI (continuous integration) and test all Bazel targets.
 * [Firebase](https://firebase.google.com): Java client for storing Protocol Buffers [here](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreClient.java).
 * [Dagger](https://github.com/google/dagger): Java Dependency Injection framework  ("Next gen Guice"), see examples [here](https://github.com/google/startup-os/tree/master/examples/dagger).
@@ -35,15 +35,14 @@ Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Jav
 There are several useful tools in the [tools section](https://github.com/google/startup-os/tree/master/tools).
 
 ## How to use StartupOS
-You can treat StartupOS as a "developer image" with a pre-built setup and tools.
+You can treat StartupOS as a "developer image" with a pre-built setup and associated tools.
 
 You can either:
 * Clone this repo and evolve it on your own.
 * Treat it as a dependency to your own repo. An example for that is here: https://github.com/oferb/startup-os-example
 
 ## Installation
-Install [Bazel](https://docs.bazel.build/versions/master/install.html)
-That's it!
+Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's it!
 
 ## Build & Test
 * Build everything: `./build.sh`
