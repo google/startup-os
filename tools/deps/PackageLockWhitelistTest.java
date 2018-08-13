@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.dep_whitelist;
+package com.google.startupos.tools.deps;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.google.protobuf.util.JsonFormat;
+import com.google.startupos.tools.deps.Protos.Dependency;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,18 +37,20 @@ import org.yaml.snakeyaml.Yaml;
 public class PackageLockWhitelistTest {
   private Map<String, List<String>> whitelist;
   private List<String> packageLockLines;
+  private List<Dependency> parsedDependencies;
 
   private Pattern MAVEN_ARTIFACT_LINE = Pattern.compile("[\\s\\{]+\"artifact\":\\s+\"([^\"]+).*$");
+  private String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
 
   @Before
   public void setUp() throws Exception {
     whitelist = new Yaml().load(new FileInputStream(new File("whitelist.yaml")));
     packageLockLines = Files.readAllLines(Paths.get("third_party/maven/package-lock.bzl"));
+    parsedDependencies = new ArrayList();
   }
 
   @Test
-  public void packageLockMatchesWhitelist() throws Exception {
-    List<String> validPackageGroups = whitelist.get("maven_dependencies");
+  public void parseDependencies() throws Exception {
     boolean depListStarted = false;
     for (String line : packageLockLines) {
       if (line.equals("def list_dependencies():")) {
@@ -56,23 +62,33 @@ public class PackageLockWhitelistTest {
         break;
       }
 
-      if (depListStarted) {
-        Matcher m = MAVEN_ARTIFACT_LINE.matcher(line);
-        if (m.matches()) {
-          String artifact = m.group(1);
+      if (depListStarted && line.contains("://")) {
+        Dependency.Builder message = Dependency.newBuilder();
+        JsonFormat.parser().merge(line, message);
+        parsedDependencies.add(message.build());
+      }
+    }
+    assertFalse("Parsed dependencies list should not be empty", parsedDependencies.isEmpty());
+  }
 
-          boolean isValidPackage = false;
-          for (String validPackageGroup : validPackageGroups) {
-            if (artifact.startsWith(validPackageGroup)) {
-              isValidPackage = true;
-              break;
-            }
-          }
+  @Test
+  public void validateDependencies() throws Exception {
+    List<String> validPackageGroups = whitelist.get("maven_dependencies");
+    for (Dependency dep : parsedDependencies) {
 
-          assertTrue(
-              String.format("Artifact %s is not in the whitelist", artifact), isValidPackage);
+      assertEquals(
+          MAVEN_CENTRAL_URL, dep.getRepository(), "Artifact %s is not in the Maven Central");
+
+      boolean isValidPackage = false;
+      for (String validPackageGroup : validPackageGroups) {
+        if (dep.getArtifact().startsWith(validPackageGroup)) {
+          isValidPackage = true;
+          break;
         }
       }
+
+      assertTrue(
+          String.format("Artifact %s is not in the whitelist", dep.getArtifact()), isValidPackage);
     }
   }
 }

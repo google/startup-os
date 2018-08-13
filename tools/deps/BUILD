@@ -1,3 +1,13 @@
+proto_library(
+    name = "dependencies_proto",
+    srcs = ["dependencies.proto"],
+)
+
+java_proto_library(
+    name = "dependencies_java_proto",
+    deps = [":dependencies_proto"],
+)
+
 java_test(
     name = "MavenDepsWhitelistTest",
     srcs = ["MavenDepsWhitelistTest.java"],
@@ -32,8 +42,10 @@ java_test(
         "//:whitelist.yaml",
         "//third_party/maven:package-lock.bzl",
     ],
-    test_class = "com.google.startupos.tools.dep_whitelist.PackageLockWhitelistTest",
+    test_class = "com.google.startupos.tools.deps.PackageLockWhitelistTest",
     deps = [
+        ":dependencies_java_proto",
+        "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/org/yaml:snakeyaml",
     ],
 )
