@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/org/slf4j/slf4j_api",
+        "//external:jar/mvnorg/slf4j/slf4j_api",
     ],
 )
 
@@ -20,7 +20,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/slf4j/slf4j_simple",
+        "//external:jar/mvnorg/slf4j/slf4j_simple",
     ],
     runtime_deps = [
         ":slf4j_api",

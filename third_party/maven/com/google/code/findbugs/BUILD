@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/code/findbugs/jsr305",
+        "//external:jar/mvncom/google/code/findbugs/jsr305",
     ],
 )

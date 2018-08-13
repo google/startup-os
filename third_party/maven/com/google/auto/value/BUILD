@@ -10,7 +10,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/auto/value/auto_value",
+        "//external:jar/mvncom/google/auto/value/auto_value",
     ],
 )
 
@@ -24,6 +24,6 @@ java_plugin(
         "//visibility:public",
     ],
     deps = [
-        "//external:jar/com/google/auto/value/auto_value",
+        "//external:jar/mvncom/google/auto/value/auto_value",
     ],
 )

@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/javassist/javassist",
+        "//external:jar/mvnorg/javassist/javassist",
     ],
 )

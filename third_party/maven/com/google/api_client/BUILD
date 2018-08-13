@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/api_client/google_api_client",
+        "//external:jar/mvncom/google/api_client/google_api_client",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/http_client:google_http_client_jackson2",
@@ -24,7 +24,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/api_client/google_api_client_gson",
+        "//external:jar/mvncom/google/api_client/google_api_client_gson",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/http_client:google_http_client_gson",

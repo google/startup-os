@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/code/gson/gson",
+        "//external:jar/mvncom/google/code/gson/gson",
     ],
 )
