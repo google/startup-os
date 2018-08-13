@@ -1,3 +1,7 @@
+exports_files([
+    "whitelist.yaml",
+])
+
 proto_library(
     name = "dependencies_proto",
     srcs = ["dependencies.proto"],
@@ -13,7 +17,7 @@ java_test(
     srcs = ["MavenDepsWhitelistTest.java"],
     data = [
         "//:dependencies.yaml",
-        "//:whitelist.yaml",
+        "//tools/deps:whitelist.yaml",
     ],
     test_class = "com.google.startupos.tools.dep_whitelist.MavenDepsWhitelistTest",
     deps = [
@@ -26,7 +30,7 @@ java_test(
     srcs = ["WorkspaceDepsWhitelistTest.java"],
     data = [
         "//:WORKSPACE",
-        "//:whitelist.yaml",
+        "//tools/deps:whitelist.yaml",
     ],
     test_class = "com.google.startupos.tools.dep_whitelist.WorkspaceDepsWhitelistTest",
     deps = [
@@ -39,8 +43,8 @@ java_test(
     name = "PackageLockWhitelistTest",
     srcs = ["PackageLockWhitelistTest.java"],
     data = [
-        "//:whitelist.yaml",
         "//third_party/maven:package-lock.bzl",
+        "//tools/deps:whitelist.yaml",
     ],
     test_class = "com.google.startupos.tools.deps.PackageLockWhitelistTest",
     deps = [

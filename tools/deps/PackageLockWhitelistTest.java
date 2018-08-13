@@ -44,7 +44,7 @@ public class PackageLockWhitelistTest {
 
   @Before
   public void setUp() throws Exception {
-    whitelist = new Yaml().load(new FileInputStream(new File("whitelist.yaml")));
+    whitelist = new Yaml().load(new FileInputStream(new File("tools/deps/whitelist.yaml")));
     packageLockLines = Files.readAllLines(Paths.get("third_party/maven/package-lock.bzl"));
     parsedDependencies = new ArrayList();
   }

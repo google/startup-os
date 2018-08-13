@@ -9,7 +9,7 @@ and verify it in CI (see [here](https://github.com/google/startup-os/blob/6f55f4
   * [buildifier](https://github.com/bazelbuild/buildtools/blob/master/buildifier/README.md) - For formatting BUILD files
   * [buildozer](https://github.com/bazelbuild/buildtools/blob/master/buildozer/README.md) - For doing command-line operations on these files (e.g add dependency to target).
   * [unused_deps](https://github.com/bazelbuild/buildtools/tree/master/unused_deps) - For finding unneeded dependencies in java_library rules.
-* Precommit checks: https://github.com/google/startup-os/blob/master/pre-commit.sh
+* Precommit checks: https://github.com/google/startup-os/blob/master/tools/pre-commit.sh
 * [check-formatting.sh](https://github.com/google/startup-os/blob/master/check-formatting.sh) to check all code is formatted correctly.
 * [fix-formatting.sh](https://github.com/google/startup-os/blob/master/fix-formatting.sh) to format all code.
 * CI (using CircleCI) to enforce above formatting and checks, and to compile and run tests (see [here](https://github.com/google/startup-os/tree/master/.circleci))
