@@ -39,45 +39,37 @@ public class PackageLockWhitelistTest {
   private List<String> packageLockLines;
   private List<Dependency> parsedDependencies;
 
-  private Pattern MAVEN_ARTIFACT_LINE = Pattern.compile("[\\s\\{]+\"artifact\":\\s+\"([^\"]+).*$");
   private String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
 
   @Before
   public void setUp() throws Exception {
     whitelist = new Yaml().load(new FileInputStream(new File("tools/deps/whitelist.yaml")));
     packageLockLines = Files.readAllLines(Paths.get("third_party/maven/package-lock.bzl"));
-    parsedDependencies = new ArrayList();
+    parsedDependencies = parseDependencies();
   }
 
-  @Test
-  public void parseDependencies() throws Exception {
+  private List<Dependency> parseDependencies() throws Exception {
+    List<Dependency> parsedDependencies = new ArrayList();
     boolean depListStarted = false;
     for (String line : packageLockLines) {
-      if (line.equals("def list_dependencies():")) {
-        depListStarted = true;
-        continue;
-      }
-
-      if (line.equals("def maven_dependencies(callback = declare_maven)")) {
-        break;
-      }
-
-      if (depListStarted && line.contains("://")) {
+      if (!line.startsWith("#") && line.contains("://")) {
         Dependency.Builder message = Dependency.newBuilder();
         JsonFormat.parser().merge(line, message);
         parsedDependencies.add(message.build());
       }
     }
-    assertFalse("Parsed dependencies list should not be empty", parsedDependencies.isEmpty());
+    return parsedDependencies;
   }
 
   @Test
   public void validateDependencies() throws Exception {
+    assertFalse("Parsed dependencies list should not be empty", parsedDependencies.isEmpty());
+
     List<String> validPackageGroups = whitelist.get("maven_dependencies");
     for (Dependency dep : parsedDependencies) {
 
       assertEquals(
-          MAVEN_CENTRAL_URL, dep.getRepository(), "Artifact %s is not in the Maven Central");
+          "Artifact %s is not in the Maven Central", MAVEN_CENTRAL_URL, dep.getRepository());
 
       boolean isValidPackage = false;
       for (String validPackageGroup : validPackageGroups) {
