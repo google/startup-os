@@ -5,7 +5,7 @@
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
 [![CircleCI](https://circleci.com/gh/google/startup-os/tree/master.svg?style=svg)](https://circleci.com/gh/google/startup-os/tree/master)
 
-> Examples for Google's Open Source stack and deploying it to the cloud.
+> Examples for Google's Open Source stack and deployment to the cloud.
 
 The main technologies in the stack are:
 * [Angular](https://angular.io/)
