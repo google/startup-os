@@ -17,6 +17,7 @@
 package com.google.startupos.tools.reviewer.service.tests;
 
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.service.Protos;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -99,9 +100,24 @@ public class TestTool {
     System.out.println(getFile("WORKSPACE"));
   }
 
+  public Protos.DiffFilesResponse getDiffFiles(String workspace, long diffNumber) {
+    Protos.DiffFilesRequest request =
+        Protos.DiffFilesRequest.newBuilder().setWorkspace(workspace).setDiffId(diffNumber).build();
+    try {
+      return blockingStub.getDiffFiles(request);
+    } catch (StatusRuntimeException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public void runGetDiffFiles(String workspace, long diffNumber) {
+    System.out.println(getDiffFiles(workspace, diffNumber));
+  }
+
   public static void main(String[] args) {
     TestTool tool = new TestTool();
-    tool.runGetTextDiff();
+    tool.runGetDiffFiles("ws", 65);
   }
 }
 
