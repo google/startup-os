@@ -49,6 +49,9 @@ java_library(
         "//external:jar/mvncom/google/dagger/dagger_producers",
     ],
     runtime_deps = [
+        ":dagger",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/checkerframework:checker_compat_qual",
     ],
 )
@@ -63,5 +66,11 @@ java_library(
     ],
     exports = [
         "//external:jar/mvncom/google/dagger/dagger_spi",
+    ],
+    runtime_deps = [
+        ":dagger",
+        ":dagger_producers",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
     ],
 )

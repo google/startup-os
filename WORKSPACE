@@ -1,10 +1,11 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
+# Replace with oferb/startupos_binaries once it's updated
 git_repository(
     name = "startupos_binaries",
-    commit = "3eaa31c93ca9ecb22ad8c348649d1ba4f61f332c",
-    remote = "https://github.com/oferb/startupos-binaries",
+    commit = "6f3a658b052138a7d0b5146a62be2b236bd7e283",
+    remote = "https://github.com/vmax/startupos-binaries",
 )
 
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
