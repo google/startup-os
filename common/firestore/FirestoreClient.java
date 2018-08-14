@@ -32,7 +32,7 @@ import java.net.URL;
 import java.util.Base64;
 
 // TODO: Fix open Firestore rules
-@AutoFactory
+@AutoFactory (allowSubclasses = true)
 public class FirestoreClient {
   // Base path formatted by project name and path, that starts with a /.
   private static final String BASE_PATH =
@@ -161,6 +161,11 @@ public class FirestoreClient {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  // TODO Delete this method
+  public long sum(long a, long b) {
+    return a + b;
   }
 }
 
