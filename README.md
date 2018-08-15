@@ -55,7 +55,7 @@ StartupOS doesn't require you to work with a monorepo, but some things, such as 
 
 Some good reads about the monorepo approach:
 * [trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
-* [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext#FNF)
+* [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
 
 ## Contributing
 You're welcome to contribute and in doing so, learn these technologies.
