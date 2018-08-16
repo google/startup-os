@@ -27,7 +27,7 @@
         (mouseover)="fileChangesService.mouseHover(i, isNewCode)"
         (dblclick)="fileChangesService.openComments(i)"
       >
-        <pre [HTML]="line.code"></pre>
+        <pre>{{line.code}}</pre>
         
         <!-- Comments -->
         <line-comments
