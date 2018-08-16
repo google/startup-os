@@ -89,7 +89,10 @@ public class WorkspaceCommand implements AaCommand {
       fileUtils.mkdirs(workspacePath);
       try {
         fileUtils.copyDirectoryToDirectory(
-            fileUtils.joinPaths(config.getBasePath(), "head"), workspacePath, "^bazel-.*$");
+            fileUtils.joinPaths(config.getBasePath(), "head"),
+            workspacePath,
+            "^bazel-.*$",
+            "tools/local_server/web_login/node_modules");
       } catch (IOException e) {
         fileUtils.deleteDirectoryUnchecked(workspacePath);
         e.printStackTrace();
