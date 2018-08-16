@@ -32,11 +32,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toList;
 
 /** File utils */
 // TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
@@ -183,7 +187,7 @@ public class FileUtils {
             fileSystem.getPath(expandHomeDirectory(path)),
             100000, // Folder depth
             (unused, unused2) -> true)) {
-      return ImmutableList.sortedCopyOf(paths.map(Path::toString).collect(Collectors.toList()));
+      return ImmutableList.sortedCopyOf(paths.map(Path::toString).collect(toList()));
     }
   }
 
@@ -238,19 +242,39 @@ public class FileUtils {
    * Copies a directory to another directory. Creates target directory if needed and doesn't copy
    * symlinks.
    */
-  public void copyDirectoryToDirectory(String source, String destination, String ignored)
+  public void copyDirectoryToDirectory(String source, String destination, String... ignored)
       throws IOException {
     final Path sourcePath = fileSystem.getPath(source);
     final Path targetPath = fileSystem.getPath(destination);
+
+    List<String> allFilesForIgnore = new ArrayList<>();
+    List<String> allFoldersForIgnore = new ArrayList<>();
+    for (String itemForIgnore : ignored) {
+      String itemForIgnorePath = joinPaths(source, itemForIgnore);
+      if (folderExists(itemForIgnorePath)) {
+        allFilesForIgnore.addAll(getListAllFilesFromFolder(itemForIgnorePath));
+        List<String> paths = Arrays.asList(itemForIgnore.split("/"));
+        allFoldersForIgnore.add(paths.get(paths.size() - 1));
+      } else if (fileExists(itemForIgnorePath)) {
+        allFilesForIgnore.add(itemForIgnore);
+      }
+    }
+
     Files.walkFileTree(
         sourcePath,
         new SimpleFileVisitor<Path>() {
           @Override
           public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
               throws IOException {
-            if (ignored != null) {
-              if (Pattern.matches(ignored, dir.getFileName().toString())) {
-                return FileVisitResult.CONTINUE;
+            final String dirName = dir.getFileName().toString();
+            if (ignored.length != 0) {
+              for (String itemForIgnore : ignored) {
+                if (Pattern.matches(itemForIgnore, dirName)) {
+                  return FileVisitResult.CONTINUE;
+                }
+                if (allFoldersForIgnore.contains(dirName)) {
+                  return FileVisitResult.CONTINUE;
+                }
               }
             }
             Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
@@ -260,12 +284,18 @@ public class FileUtils {
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
-            if (ignored != null) {
-              if (Pattern.matches(ignored, file.getFileName().toString())) {
-                return FileVisitResult.CONTINUE;
+            final String fileName = file.getFileName().toString();
+            if (ignored.length != 0) {
+              for (String itemForIgnore : ignored) {
+                if (Pattern.matches(itemForIgnore, fileName)) {
+                  return FileVisitResult.CONTINUE;
+                }
               }
             }
             if (Files.isSymbolicLink(file)) {
+              return FileVisitResult.CONTINUE;
+            }
+            if (allFilesForIgnore.contains(fileName)) {
               return FileVisitResult.CONTINUE;
             }
             Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
@@ -275,7 +305,20 @@ public class FileUtils {
   }
 
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
-    copyDirectoryToDirectory(source, destination, null);
+    copyDirectoryToDirectory(source, destination, new String[0]);
+  }
+
+  private ImmutableList<String> getListAllFilesFromFolder(String path) throws IOException {
+    List<String> result;
+    try (Stream<Path> stream = Files.walk(fileSystem.getPath(expandHomeDirectory(path)))) {
+      result =
+          stream
+              .filter(Files::isRegularFile)
+              .map((file -> file.getFileName().toString()))
+              .sorted()
+              .collect(toList());
+    }
+    return ImmutableList.copyOf(result);
   }
 
   /** Deletes all files and folders in directory. Target directory is deleted. */
