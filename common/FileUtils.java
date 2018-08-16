@@ -249,14 +249,16 @@ public class FileUtils {
 
     List<String> allFilesForIgnore = new ArrayList<>();
     List<String> allFoldersForIgnore = new ArrayList<>();
-    for (String itemForIgnore : ignored) {
-      String itemForIgnorePath = joinPaths(source, itemForIgnore);
-      if (folderExists(itemForIgnorePath)) {
-        allFilesForIgnore.addAll(getListAllFilesFromFolder(itemForIgnorePath));
-        List<String> paths = Arrays.asList(itemForIgnore.split("/"));
-        allFoldersForIgnore.add(paths.get(paths.size() - 1));
-      } else if (fileExists(itemForIgnorePath)) {
-        allFilesForIgnore.add(itemForIgnore);
+    if (ignored.length != 0) {
+      for (String itemForIgnore : ignored) {
+        String itemForIgnorePath = joinPaths(source, itemForIgnore);
+        if (folderExists(itemForIgnorePath)) {
+          allFilesForIgnore.addAll(getListAllFilesFromFolder(itemForIgnorePath));
+          List<String> paths = Arrays.asList(itemForIgnore.split("/"));
+          allFoldersForIgnore.add(paths.get(paths.size() - 1));
+        } else if (fileExists(itemForIgnorePath)) {
+          allFilesForIgnore.add(itemForIgnore);
+        }
       }
     }
 
