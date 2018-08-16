@@ -38,7 +38,7 @@ public class MavenDepsWhitelistTest {
   @Before
   public void setUp() throws Exception {
     dependencies = new Yaml().load(new FileInputStream(new File("dependencies.yaml")));
-    whitelist = new Yaml().load(new FileInputStream(new File("whitelist.yaml")));
+    whitelist = new Yaml().load(new FileInputStream(new File("tools/deps/whitelist.yaml")));
   }
 
   @Test

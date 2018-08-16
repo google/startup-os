@@ -31,11 +31,12 @@ import com.google.startupos.tools.reviewer.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DiffCommand implements AaCommand {
@@ -97,6 +98,7 @@ public class DiffCommand implements AaCommand {
             .addAllReviewer(getReviewers(reviewers.get()))
             .setId(response.getLastDiffId());
 
+    Map<GitRepo, String> repoToInitialBranch = new HashMap<>();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -107,11 +109,18 @@ public class DiffCommand implements AaCommand {
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 GitRepo repo = this.gitRepoFactory.create(path);
+                repoToInitialBranch.put(repo, repo.currentBranch());
                 System.out.println(
                     String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
                 repo.switchBranch(branchName);
               });
-    } catch (IOException e) {
+    } catch (Exception e) {
+      repoToInitialBranch.forEach(
+          (repo, initialBranch) -> {
+            if (!repo.currentBranch().equals(initialBranch)) {
+              repo.switchBranch(initialBranch);
+            }
+          });
       e.printStackTrace();
     }
     return diffBuilder.build();
