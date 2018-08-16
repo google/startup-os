@@ -115,9 +115,6 @@ export class CodeBlockComponent implements OnInit, OnDestroy {
 
     // Make the spans inline
     highlightedCode = this.makeHighlightingInline(highlightedCode);
-    if (this.isNewCode) {
-      console.log(highlightedCode);
-    }
 
     const fileLines: string[] = fileContent.split('\n');
     this.highlightedLines = highlightedCode.split('\n');
