@@ -117,7 +117,7 @@ public class TestTool {
 
   public static void main(String[] args) {
     TestTool tool = new TestTool();
-    tool.runGetDiffFiles("ws", 65);
+    tool.runGetTextDiff();
   }
 }
 
