@@ -25,7 +25,6 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.aa.AaModule;
-import com.google.startupos.tools.aa.commands.DiffCommand;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import com.google.startupos.tools.localserver.service.AuthService;
@@ -56,6 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+// TODO Add tests for copied and modified files
 @RunWith(JUnit4.class)
 public class CodeReviewServiceGetDiffFilesTest {
   private static final String TEST_FILE = "test_file.txt";
@@ -64,6 +64,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   private static final String TEST_WORKSPACE = "ws1";
   private static final String COMMIT_MESSAGE = "Some commit message";
   private static final String REPO_ID = "startup-os";
+  private static final int DIFF_ID = 2;
 
   private GitRepoFactory gitRepoFactory;
   private String aaBaseFolder;
@@ -124,6 +125,27 @@ public class CodeReviewServiceGetDiffFilesTest {
     createBlockingStub();
     writeFile(TEST_FILE_CONTENTS);
     testFileCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
+    mockFirestoreClientMethods();
+  }
+
+  private void mockFirestoreClientMethods() {
+    when(firestoreClient.getDocument("reviewer/data/diff/2", Protos.DiffFilesResponse.newBuilder()))
+        .thenReturn(
+            Protos.DiffFilesResponse.newBuilder()
+                .addAllBranchInfo(
+                    Collections.singleton(
+                        com.google.startupos.common.repo.Protos.BranchInfo.newBuilder()
+                            .setDiffId(DIFF_ID)
+                            .setRepoId(REPO_ID)
+                            .addCommit(
+                                com.google.startupos.common.repo.Protos.Commit.newBuilder()
+                                    .setId(fileInHeadCommitId))
+                            .build()))
+                .build());
+
+    when(firestoreClient.getDocument(
+            "/reviewer/data/last_diff_id", Protos.DiffNumberResponse.newBuilder()))
+        .thenReturn(Protos.DiffNumberResponse.newBuilder().setLastDiffId(1).build());
   }
 
   @After
@@ -148,8 +170,6 @@ public class CodeReviewServiceGetDiffFilesTest {
     FileUtils getFileUtils();
 
     TextDifferencer getTextDifferencer();
-
-    DiffCommand getDiffCommand();
   }
 
   private void createInitialRepo(String initialRepoFolder) {
@@ -180,6 +200,7 @@ public class CodeReviewServiceGetDiffFilesTest {
     String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
     repo.setFakeUsersData();
+    repo.switchBranch("D" + DIFF_ID);
   }
 
   private void createBlockingStub() throws IOException {
@@ -195,7 +216,7 @@ public class CodeReviewServiceGetDiffFilesTest {
     blockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
-  public String joinPaths(String first, String... more) {
+  private String joinPaths(String first, String... more) {
     return FileSystems.getDefault().getPath(first, more).toAbsolutePath().toString();
   }
 
@@ -212,48 +233,171 @@ public class CodeReviewServiceGetDiffFilesTest {
         contents, fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
   }
 
-  private Protos.DiffFilesResponse getExpectedResponse(String commitId) {
-    return Protos.DiffFilesResponse.newBuilder()
-        .addAllBranchInfo(
-            Collections.singleton(
-                com.google.startupos.common.repo.Protos.BranchInfo.newBuilder()
-                    .setDiffId(2)
-                    .setRepoId(REPO_ID)
-                    .addCommit(
-                        com.google.startupos.common.repo.Protos.Commit.newBuilder().setId(commitId))
-                    .build()))
-        .build();
-  }
-
-  private Protos.DiffFilesResponse getResponse(String workspace, long diffNumber) {
+  private Protos.DiffFilesResponse getResponse() {
     Protos.DiffFilesRequest request =
-        Protos.DiffFilesRequest.newBuilder().setWorkspace(workspace).setDiffId(diffNumber).build();
+        Protos.DiffFilesRequest.newBuilder()
+            .setWorkspace(TEST_WORKSPACE)
+            .setDiffId(DIFF_ID)
+            .build();
 
     return blockingStub.getDiffFiles(request);
   }
 
-  @Test
-  public void testFirestoreClientMock() {
-    when(firestoreClient.sum(2, 2)).thenReturn(5L);
-    assertEquals(5, codeReviewService.sum(2, 2));
+  private Protos.DiffFilesResponse getExpectedResponse(
+      com.google.startupos.common.repo.Protos.Commit commit) {
+    com.google.startupos.common.repo.Protos.BranchInfo.Builder builder =
+        com.google.startupos.common.repo.Protos.BranchInfo.newBuilder();
+    builder
+        .setDiffId(DIFF_ID)
+        .setRepoId(REPO_ID)
+        .addCommit(
+            com.google.startupos.common.repo.Protos.Commit.newBuilder()
+                .setId(fileInHeadCommitId)
+                .build())
+        .addCommit(
+            com.google.startupos.common.repo.Protos.Commit.newBuilder()
+                .setId(testFileCommitId)
+                .addFile(
+                    com.google.startupos.common.repo.Protos.File.newBuilder()
+                        .setFilename("test_file.txt")
+                        .setWorkspace("ws1")
+                        .setRepoId(REPO_ID)
+                        .setCommitId(testFileCommitId)
+                        .build())
+                .build());
+    if (commit != null) {
+      builder.addCommit(commit);
+    }
+    return Protos.DiffFilesResponse.newBuilder()
+        .addAllBranchInfo(Collections.singleton(builder.build()))
+        .build();
   }
 
   @Test
-  public void testFirst() {
-    // switch workspace
-//    WorkspaceCommand workspaceCommand = component.getWorkspaceCommand();
-//    String[] args = {"workspace", TEST_WORKSPACE};
-//    workspaceCommand.run(args);
+  public void testGetDiffFiles_withoutChangesInWorkspace() {
+    assertEquals(getExpectedResponse(null), getResponse());
+  }
 
-    when(firestoreClient.getDocument(
-            "reviewer/data/diff/2", Protos.DiffFilesResponse.newBuilder()))
-        .thenReturn(getExpectedResponse(testFileCommitId));
-    when(firestoreClient.getDocument(
-        "/reviewer/data/last_diff_id", Protos.DiffNumberResponse.newBuilder()))
-        .thenReturn(Protos.DiffNumberResponse.newBuilder().setLastDiffId(1).build());
+  @Test
+  public void testGetDiffFiles_whenFileIsModified() {
+    writeFile("new_file_content");
+    final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
 
-    component.getDiffCommand().run(new String[] {"diff"});
-    assertEquals(getExpectedResponse(testFileCommitId), getResponse(TEST_WORKSPACE, 2));
+    com.google.startupos.common.repo.Protos.Commit lastCommit =
+        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+            .setId(lastCommitId)
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("test_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .setAction(com.google.startupos.common.repo.Protos.File.Action.MODIFY)
+                    .build())
+            .build();
+
+    assertEquals(getExpectedResponse(lastCommit), getResponse());
+  }
+
+  @Test
+  public void testGetDiffFiles_whenNewFileIsAdded() {
+    writeFile("new_file.txt", "file content");
+    final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
+
+    com.google.startupos.common.repo.Protos.Commit lastCommit =
+        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+            .setId(lastCommitId)
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("new_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .build())
+            .build();
+
+    assertEquals(getExpectedResponse(lastCommit), getResponse());
+  }
+
+  @Test
+  public void testGetDiffFiles_whenNewFileIsDeleted() throws IOException {
+    fileUtils.deleteFileOrDirectoryIfExists(
+        fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
+    final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
+
+    com.google.startupos.common.repo.Protos.Commit lastCommit =
+        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+            .setId(lastCommitId)
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("test_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .setAction(com.google.startupos.common.repo.Protos.File.Action.DELETE)
+                    .build())
+            .build();
+
+    assertEquals(getExpectedResponse(lastCommit), getResponse());
+  }
+
+  @Test
+  public void testGetDiffFiles_whenFileIsModifiedAndNewFileIsAdded() {
+    writeFile("new_file_content");
+    writeFile("new_file.txt", "file content");
+    final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
+
+    com.google.startupos.common.repo.Protos.Commit lastCommit =
+        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+            .setId(lastCommitId)
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("new_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .build())
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("test_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .setAction(com.google.startupos.common.repo.Protos.File.Action.MODIFY)
+                    .build())
+            .build();
+
+    assertEquals(getExpectedResponse(lastCommit), getResponse());
+  }
+
+  @Test
+  public void testGetDiffFiles_whenFileIsDeletedAndNewFileIsAdded() throws IOException {
+    writeFile("new_file.txt", "file content");
+    fileUtils.deleteFileOrDirectoryIfExists(
+        fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
+    final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
+
+    com.google.startupos.common.repo.Protos.Commit lastCommit =
+        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+            .setId(lastCommitId)
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("new_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .build())
+            .addFile(
+                com.google.startupos.common.repo.Protos.File.newBuilder()
+                    .setFilename("test_file.txt")
+                    .setWorkspace("ws1")
+                    .setRepoId(REPO_ID)
+                    .setCommitId(lastCommitId)
+                    .setAction(com.google.startupos.common.repo.Protos.File.Action.DELETE)
+                    .build())
+            .build();
+
+    assertEquals(getExpectedResponse(lastCommit), getResponse());
   }
 }
 

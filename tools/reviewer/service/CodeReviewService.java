@@ -363,12 +363,5 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
     responseObserver.onCompleted();
   }
-
-  // TODO Delete this method
-  public long sum(long a, long b) {
-    FirestoreClient client =
-        firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
-    return client.sum(a, b);
-  }
 }
 
