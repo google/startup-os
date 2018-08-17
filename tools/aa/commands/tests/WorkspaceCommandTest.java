@@ -17,6 +17,7 @@
 package com.google.startupos.tools.aa.commands.tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
@@ -139,6 +140,36 @@ public class WorkspaceCommandTest {
     workspaceCommand.run(args);
     assertTrue(fileUtils.folderExists("/base/ws/workspace_name"));
     assertTrue(fileUtils.fileExists("/base/ws/workspace_name/repo_name/file.txt"));
+  }
+
+  @Test
+  public void forcedWorkspaceCommandTestWithIgnoredFolders() throws Exception {
+    fileUtils.mkdirs("/base/head/startup-os");
+    fileUtils.writeString("aaa", "/base/head/startup-os/file.txt");
+    fileUtils.mkdirs("/base/head/startup-os/bazel-bin");
+    fileUtils.mkdirs("/base/head/startup-os/bazel-genfiles");
+    fileUtils.mkdirs("/base/head/startup-os/bazel-out");
+    fileUtils.mkdirs("/base/head/startup-os/bazel-startup-os");
+    fileUtils.mkdirs("/base/head/startup-os/bazel-testlogs");
+    fileUtils.mkdirs("/base/head/startup-os/tools/local_server/web_login/node_modules");
+    fileUtils.writeString(
+        "aaaa", "/base/head/startup-os/tools/local_server/web_login/node_modules/file2.txt");
+
+    String[] args = {"workspace", "-f", "workspace_name"};
+    workspaceCommand.run(args);
+    assertTrue(fileUtils.folderExists("/base/ws/workspace_name"));
+    assertTrue(fileUtils.fileExists("/base/ws/workspace_name/startup-os/file.txt"));
+    assertFalse(
+        fileUtils.folderExists(
+            "/base/ws/workspace_name/startup-os/tools/local_server/web_login/node_modules"));
+    assertFalse(
+        fileUtils.fileExists(
+            "/base/ws/workspace_name/startup-os/tools/local_server/web_login/node_modules/file2.txt"));
+    assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-bin"));
+    assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-genfiles"));
+    assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-out"));
+    assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-startup-os"));
+    assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-testlogs"));
   }
 }
 

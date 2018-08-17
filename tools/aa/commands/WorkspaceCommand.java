@@ -92,7 +92,7 @@ public class WorkspaceCommand implements AaCommand {
             fileUtils.joinPaths(config.getBasePath(), "head"),
             workspacePath,
             "^bazel-.*$",
-            "tools/local_server/web_login/node_modules");
+            "startup-os/tools/local_server/web_login/node_modules");
       } catch (IOException e) {
         fileUtils.deleteDirectoryUnchecked(workspacePath);
         e.printStackTrace();
