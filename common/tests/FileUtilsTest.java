@@ -835,6 +835,8 @@ public class FileUtilsTest {
     Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/some_folder"));
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_folder/some_file.txt"));
     Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore"));
+    Files.createDirectories(
+        fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore/internal_folder"));
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore/file2.txt"));
 
     fileUtils.copyDirectoryToDirectory(
@@ -846,6 +848,10 @@ public class FileUtilsTest {
             fileSystem.getPath("destination_folder" + "/some_folder/some_file.txt")));
     assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path")));
     assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to")));
+    assertFalse(
+        Files.isDirectory(
+            fileSystem.getPath(
+                "destination_folder" + "/path/to/folder_for_ignore/internal_folder")));
     assertFalse(
         Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore")));
     assertFalse(

@@ -33,7 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -247,16 +246,13 @@ public class FileUtils {
     final Path sourcePath = fileSystem.getPath(source);
     final Path targetPath = fileSystem.getPath(destination);
 
-    List<String> allFilesForIgnore = new ArrayList<>();
-    List<String> allFoldersForIgnore = new ArrayList<>();
+    List<String> allFilesAndFoldersForIgnore = new ArrayList<>();
     if (ignored.length != 0) {
       for (String itemForIgnore : ignored) {
         String itemForIgnorePath = joinPaths(source, itemForIgnore);
-        if (folderExists(itemForIgnorePath)) {
-          allFilesForIgnore.addAll(getListAllFilesFromFolder(itemForIgnorePath));
-          allFoldersForIgnore.add(itemForIgnorePath);
-        } else if (fileExists(itemForIgnorePath)) {
-          allFilesForIgnore.add(itemForIgnorePath);
+        if (folderExists(itemForIgnorePath) || fileExists(itemForIgnorePath)) {
+          allFilesAndFoldersForIgnore.addAll(
+              getListContentsWithAbsolutePath(itemForIgnorePath));
         }
       }
     }
@@ -273,7 +269,7 @@ public class FileUtils {
                 if (Pattern.matches(itemForIgnore, dir.getFileName().toString())) {
                   return FileVisitResult.CONTINUE;
                 }
-                if (allFoldersForIgnore.contains(dirPath)) {
+                if (allFilesAndFoldersForIgnore.contains(dirPath)) {
                   return FileVisitResult.CONTINUE;
                 }
               }
@@ -291,7 +287,7 @@ public class FileUtils {
                 if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
                   return FileVisitResult.CONTINUE;
                 }
-                if (allFilesForIgnore.contains(filePath)) {
+                if (allFilesAndFoldersForIgnore.contains(filePath)) {
                   return FileVisitResult.CONTINUE;
                 }
               }
@@ -309,12 +305,18 @@ public class FileUtils {
     copyDirectoryToDirectory(source, destination, new String[0]);
   }
 
-  private ImmutableList<String> getListAllFilesFromFolder(String path) throws IOException {
-    List<String> result;
+  private ImmutableList<String> getListContentsWithAbsolutePath(String path)
+      throws IOException {
+    List<String> files;
     try (Stream<Path> stream = Files.walk(fileSystem.getPath(expandHomeDirectory(path)))) {
-      result = stream.filter(Files::isRegularFile).map((Path::toString)).sorted().collect(toList());
+      files = stream.filter(Files::isRegularFile).map((Path::toString)).sorted().collect(toList());
     }
-    return ImmutableList.copyOf(result);
+    List<String> folders;
+    try (Stream<Path> stream = Files.walk(fileSystem.getPath(expandHomeDirectory(path)))) {
+      folders = stream.filter(Files::isDirectory).map((Path::toString)).sorted().collect(toList());
+    }
+    return ImmutableList.copyOf(
+        Stream.concat(files.stream(), folders.stream()).collect(Collectors.toList()));
   }
 
   /** Deletes all files and folders in directory. Target directory is deleted. */
