@@ -254,10 +254,9 @@ public class FileUtils {
         String itemForIgnorePath = joinPaths(source, itemForIgnore);
         if (folderExists(itemForIgnorePath)) {
           allFilesForIgnore.addAll(getListAllFilesFromFolder(itemForIgnorePath));
-          List<String> paths = Arrays.asList(itemForIgnore.split("/"));
-          allFoldersForIgnore.add(paths.get(paths.size() - 1));
+          allFoldersForIgnore.add(itemForIgnorePath);
         } else if (fileExists(itemForIgnorePath)) {
-          allFilesForIgnore.add(itemForIgnore);
+          allFilesForIgnore.add(itemForIgnorePath);
         }
       }
     }
@@ -268,13 +267,13 @@ public class FileUtils {
           @Override
           public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
               throws IOException {
-            final String dirName = dir.getFileName().toString();
+            final String dirPath = dir.toString();
             if (ignored.length != 0) {
               for (String itemForIgnore : ignored) {
-                if (Pattern.matches(itemForIgnore, dirName)) {
+                if (Pattern.matches(itemForIgnore, dir.getFileName().toString())) {
                   return FileVisitResult.CONTINUE;
                 }
-                if (allFoldersForIgnore.contains(dirName)) {
+                if (allFoldersForIgnore.contains(dirPath)) {
                   return FileVisitResult.CONTINUE;
                 }
               }
@@ -286,18 +285,18 @@ public class FileUtils {
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
-            final String fileName = file.getFileName().toString();
+            final String filePath = file.toString();
             if (ignored.length != 0) {
               for (String itemForIgnore : ignored) {
-                if (Pattern.matches(itemForIgnore, fileName)) {
+                if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
+                  return FileVisitResult.CONTINUE;
+                }
+                if (allFilesForIgnore.contains(filePath)) {
                   return FileVisitResult.CONTINUE;
                 }
               }
             }
             if (Files.isSymbolicLink(file)) {
-              return FileVisitResult.CONTINUE;
-            }
-            if (allFilesForIgnore.contains(fileName)) {
               return FileVisitResult.CONTINUE;
             }
             Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
@@ -313,12 +312,7 @@ public class FileUtils {
   private ImmutableList<String> getListAllFilesFromFolder(String path) throws IOException {
     List<String> result;
     try (Stream<Path> stream = Files.walk(fileSystem.getPath(expandHomeDirectory(path)))) {
-      result =
-          stream
-              .filter(Files::isRegularFile)
-              .map((file -> file.getFileName().toString()))
-              .sorted()
-              .collect(toList());
+      result = stream.filter(Files::isRegularFile).map((Path::toString)).sorted().collect(toList());
     }
     return ImmutableList.copyOf(result);
   }

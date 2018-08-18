@@ -809,16 +809,21 @@ public class FileUtilsTest {
     Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_file.txt"));
     Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/file_for_ignore1.txt"));
-    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/file_for_ignore2.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/file_for_ignore2.txt"));
 
     fileUtils.copyDirectoryToDirectory(
-        TEST_DIR_PATH, "destination_folder", "file_for_ignore1.txt", "file_for_ignore2.txt");
+        TEST_DIR_PATH,
+        "destination_folder",
+        "file_for_ignore1.txt",
+        "path/to/file_for_ignore2.txt");
 
     assertTrue(Files.isRegularFile(fileSystem.getPath("destination_folder" + "/some_file.txt")));
     assertFalse(
         Files.isRegularFile(fileSystem.getPath("destination_folder" + "/file_for_ignore1.txt")));
     assertFalse(
-        Files.isRegularFile(fileSystem.getPath("destination_folder" + "/file_for_ignore2.txt")));
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "path/to/file_for_ignore2.txt")));
   }
 
   @Test
