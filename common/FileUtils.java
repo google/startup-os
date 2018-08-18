@@ -251,8 +251,7 @@ public class FileUtils {
       for (String itemForIgnore : ignored) {
         String itemForIgnorePath = joinPaths(source, itemForIgnore);
         if (folderExists(itemForIgnorePath) || fileExists(itemForIgnorePath)) {
-          allFilesAndFoldersForIgnore.addAll(
-              getListContentsWithAbsolutePath(itemForIgnorePath));
+          allFilesAndFoldersForIgnore.addAll(getListContentsWithAbsolutePath(itemForIgnorePath));
         }
       }
     }
@@ -305,8 +304,7 @@ public class FileUtils {
     copyDirectoryToDirectory(source, destination, new String[0]);
   }
 
-  private ImmutableList<String> getListContentsWithAbsolutePath(String path)
-      throws IOException {
+  private ImmutableList<String> getListContentsWithAbsolutePath(String path) throws IOException {
     List<String> files;
     try (Stream<Path> stream = Files.walk(fileSystem.getPath(expandHomeDirectory(path)))) {
       files = stream.filter(Files::isRegularFile).map((Path::toString)).sorted().collect(toList());
