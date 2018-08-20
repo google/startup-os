@@ -332,5 +332,88 @@ public class GitRepoTest {
   public void testCommitExists_fakeCommit() {
     assertFalse(repo.commitExists("123245"));
   }
+
+  @Test
+  public void testIsMergedWhenBranchIsMergedWithNewFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+
+    repo.merge(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithNewFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+
+    assertFalse(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithoutChanges() {
+    repo.switchBranch(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsMergedWithModifiedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked("New content", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    repo.merge(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithModifiedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked("New content", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    assertFalse(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsMergedWithDeletedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.deleteFileOrDirectoryIfExistsUnchecked(fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    repo.merge(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithDeletedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.deleteFileOrDirectoryIfExistsUnchecked(fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    assertFalse(repo.isMerged(TEST_BRANCH));
+  }
 }
 
