@@ -113,10 +113,10 @@ public class InitCommand implements AaCommand {
         System.err.println(RED_ERROR + "Missing base_path");
         return false;
       } else {
-        basePath = args[args.length - 1];
+        basePath = args[2];
       }
     } else {
-      basePath = args[args.length - 1];
+      basePath = args[1];
     }
     return true;
   }
