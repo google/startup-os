@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/com/google/auto/factory/auto_factory",
+        "//external:jar/mvncom/google/auto/factory/auto_factory",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/auto:auto_common",

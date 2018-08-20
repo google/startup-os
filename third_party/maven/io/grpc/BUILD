@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_auth",
+        "//external:jar/mvnio/grpc/grpc_auth",
     ],
 )
 
@@ -20,7 +20,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_context",
+        "//external:jar/mvnio/grpc/grpc_context",
     ],
 )
 
@@ -33,7 +33,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_core",
+        "//external:jar/mvnio/grpc/grpc_core",
     ],
     runtime_deps = [
         ":grpc_context",
@@ -55,7 +55,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_netty",
+        "//external:jar/mvnio/grpc/grpc_netty",
     ],
     runtime_deps = [
         ":grpc_core",
@@ -73,7 +73,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_protobuf",
+        "//external:jar/mvnio/grpc/grpc_protobuf",
     ],
     runtime_deps = [
         ":grpc_core",
@@ -94,7 +94,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_protobuf_lite",
+        "//external:jar/mvnio/grpc/grpc_protobuf_lite",
     ],
 )
 
@@ -107,7 +107,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_services",
+        "//external:jar/mvnio/grpc/grpc_services",
     ],
     runtime_deps = [
         ":grpc_protobuf",
@@ -125,7 +125,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/io/grpc/grpc_stub",
+        "//external:jar/mvnio/grpc/grpc_stub",
     ],
     runtime_deps = [
         ":grpc_core",

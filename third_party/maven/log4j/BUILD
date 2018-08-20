@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/log4j/log4j",
+        "//external:jar/mvnlog4j/log4j",
     ],
 )

@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/yaml/snakeyaml",
+        "//external:jar/mvnorg/yaml/snakeyaml",
     ],
 )

@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/net/bytebuddy/byte_buddy",
+        "//external:jar/mvnnet/bytebuddy/byte_buddy",
     ],
 )
 
@@ -20,6 +20,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/net/bytebuddy/byte_buddy_agent",
+        "//external:jar/mvnnet/bytebuddy/byte_buddy_agent",
     ],
 )

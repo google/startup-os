@@ -1,0 +1,75 @@
+<!-- Loading -->
+<page-loading [isLoading]="isLoading"></page-loading>
+
+<!-- Diff groups -->
+<div class="diff-groups" *ngIf="!isLoading">
+  <div
+    class="diff-group"
+    *ngFor="let diffGroup of diffGroups; let i = index;"
+  >
+    <!-- Title of diff group -->
+    <div class="cr-titlebar diff-group-title">
+      <span class="group-name">{{ diffGroupNameList[i] }}</span>
+      <span class="diff-amount"> - {{ diffGroup.length }}</span>
+    </div>
+    <!-- Diff list inside a group -->
+    <mat-table
+      class="diff-list"
+      [dataSource]="diffGroup"
+      *ngIf="diffGroup.length > 0"
+    >
+      <!-- Columns -->
+
+      <ng-container matColumnDef="id">
+        <mat-header-cell *matHeaderCellDef> Diff </mat-header-cell>
+        <mat-cell *matCellDef="let diff"> {{ diff.getId() }} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="author">
+        <mat-header-cell *matHeaderCellDef> Author </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ authService.getUsername(diff.getAuthor().getEmail()) }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          <diff-status [diff]="diff"></diff-status>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getModifiedTimestamp() | date: 'mediumDate' }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="reviewers">
+        <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ getUsernames(diff.getReviewerList()) }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="description">
+        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getDescription() }}
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        class="cr-header"
+        *matHeaderRowDef="displayedColumns"
+      ></mat-header-row>
+      <mat-row
+        *matRowDef="let diff; columns: displayedColumns;"
+        (click)="openDiff(diff.getId())"
+      ></mat-row>
+    </mat-table>
+    <!-- Show the placeholder, if group contains no diffs -->
+    <div class="cr-header placeholder" *ngIf="diffGroup.length === 0"></div>
+  </div>
+</div>

@@ -7,6 +7,6 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/jsoup/jsoup",
+        "//external:jar/mvnorg/jsoup/jsoup",
     ],
 )

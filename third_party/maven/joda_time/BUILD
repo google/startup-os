@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/joda_time/joda_time",
+        "//external:jar/mvnjoda_time/joda_time",
     ],
 )

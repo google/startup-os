@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/fasterxml/jackson/core/jackson_core",
+        "//external:jar/mvncom/fasterxml/jackson/core/jackson_core",
     ],
 )

@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/oauth_client/google_oauth_client",
+        "//external:jar/mvncom/google/oauth_client/google_oauth_client",
     ],
 )

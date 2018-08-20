@@ -190,7 +190,6 @@ public class FormatterTool {
               System.out.println(
                   String.format("Intending to format: %s", path.toAbsolutePath().toString()));
             } else {
-              System.out.println(String.format("Formatting: %s", path.toAbsolutePath().toString()));
               formatters.get(getExtension(path)).format(path);
             }
           }

@@ -5,7 +5,7 @@ import {
 } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 
-import { Diff } from '@/shared/shell';
+import { Diff } from '@/shared/proto';
 import { EncodingService } from './encoding.service';
 
 interface FirebaseElement {

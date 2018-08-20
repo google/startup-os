@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/mockito/mockito_core",
+        "//external:jar/mvnorg/mockito/mockito_core",
     ],
     runtime_deps = [
         "//third_party/maven/net/bytebuddy:byte_buddy",

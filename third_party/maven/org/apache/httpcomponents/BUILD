@@ -7,7 +7,7 @@ java_library(
         "//visibility:public",
     ],
     exports = [
-        "//external:jar/org/apache/httpcomponents/fluent_hc",
+        "//external:jar/mvnorg/apache/httpcomponents/fluent_hc",
     ],
     runtime_deps = [
         ":httpclient",
@@ -24,7 +24,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/org/apache/httpcomponents/httpclient",
+        "//external:jar/mvnorg/apache/httpcomponents/httpclient",
     ],
     runtime_deps = [
         ":httpcore",
@@ -41,6 +41,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/org/apache/httpcomponents/httpcore",
+        "//external:jar/mvnorg/apache/httpcomponents/httpcore",
     ],
 )

@@ -7,7 +7,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client",
+        "//external:jar/mvncom/google/http_client/google_http_client",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
@@ -24,7 +24,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_appengine",
+        "//external:jar/mvncom/google/http_client/google_http_client_appengine",
     ],
 )
 
@@ -37,7 +37,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_gson",
+        "//external:jar/mvncom/google/http_client/google_http_client_gson",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/gson",
@@ -53,7 +53,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_jackson",
+        "//external:jar/mvncom/google/http_client/google_http_client_jackson",
     ],
     runtime_deps = [
         "//third_party/maven/org/codehaus/jackson:jackson_core_asl",
@@ -69,7 +69,7 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/com/google/http_client/google_http_client_jackson2",
+        "//external:jar/mvncom/google/http_client/google_http_client_jackson2",
     ],
     runtime_deps = [
         "//third_party/maven/com/fasterxml/jackson/core:jackson_core",

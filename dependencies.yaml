@@ -1,6 +1,7 @@
 options:
   languages: [ "java" ]
   licenses: [ "permissive" ]
+  namePrefix: "mvn"
   resolvers:
     - id: "mavencentral"
       type: "default"
@@ -146,11 +147,6 @@ dependencies:
       lang: java
       version: "2.0.8"
 
-  org.eclipse.jgit:
-    org.eclipse.jgit:
-      lang: java
-      version: "4.10.0.201712302008-r"
-
   org.javassist:
     javassist:
       lang: java
@@ -176,12 +172,12 @@ dependencies:
       lang: java
       version: "2.6"
 
-  org.yaml:
-    snakeyaml:
-      lang: java
-      version: "1.21"
-
   org.slf4j:
     slf4j-simple:
       lang: java
       version: "1.7.25"
+
+  org.yaml:
+    snakeyaml:
+      lang: java
+      version: "1.21"

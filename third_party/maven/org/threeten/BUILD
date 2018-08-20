@@ -7,6 +7,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/org/threeten/threetenbp",
+        "//external:jar/mvnorg/threeten/threetenbp",
     ],
 )

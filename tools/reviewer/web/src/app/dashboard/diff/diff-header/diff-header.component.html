@@ -1,0 +1,10 @@
+<diff-header-titlebar
+  [diff]="diff"
+  (toggleReplyPopup)="toggleReplyPopup($event)"
+></diff-header-titlebar>
+<diff-header-content [diff]="diff"></diff-header-content>
+<reply-popup
+  *ngIf="isReplyPopupDisplayed"
+  [diff]="diff"
+  (toggleReplyPopup)="toggleReplyPopup($event)"
+></reply-popup>

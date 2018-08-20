@@ -3,15 +3,19 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-import { Directives } from '@/shared';
 import { SharedModule } from '@/shared';
+import { DiffStatusComponent } from './';
 import { DashboardRoutes } from './dashboard.routing';
-
 import {
-  DashboardComponents,
-  DashboardEntryComponents,
-  DashboardProviders,
-} from './';
+  AddUserDialogComponent,
+  DiffComponentList,
+  UserPopupComponent,
+} from './diff';
+import { DiffsComponent } from './diffs';
+import {
+  FileChangesComponentList,
+  FileChangesServiceList,
+} from './file-changes';
 
 @NgModule({
   imports: [
@@ -22,12 +26,18 @@ import {
     SharedModule,
   ],
   exports: [RouterModule],
-  declarations: [...DashboardComponents, Directives],
-  entryComponents: DashboardEntryComponents,
-  providers: DashboardProviders,
+  declarations: [
+    DiffsComponent,
+    ...DiffComponentList,
+    ...FileChangesComponentList,
+    DiffStatusComponent,
+  ],
+  providers: [
+    ...FileChangesServiceList,
+  ],
+  entryComponents: [
+    UserPopupComponent,
+    AddUserDialogComponent,
+  ],
 })
-export class DashboardModule {}
-
-export function DashboardEntrypoint() {
-  return DashboardModule;
-}
+export class DashboardModule { }
