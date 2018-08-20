@@ -28,16 +28,15 @@ import javax.inject.Inject;
 /* A command to init a base folder.
  *
  * Usage:
- * bazel run //tools/aa:aa_tool -- init --base_path </path/to/base/folder>
+ * bazel run //tools/aa:aa_tool -- init </path/to/base/folder>
  * or, if aa is already set up:
- * aa init --base_path </path/to/base/folder>
+ * aa init </path/to/base/folder>
  */
-// TODO: Make aa init work without --base_path, i.e `aa init <base_path>`
 public class InitCommand implements AaCommand {
   public static final String BASE_FILENAME = "BASE";
 
-  @FlagDesc(name = "base_path", description = "Base path", required = true)
-  public static Flag<String> basePath = Flag.create("");
+  // set by processArgs
+  private String basePath;
 
   @FlagDesc(name = "startupos_repo", description = "StartupOS git repo")
   public static Flag<String> startuposRepo =
@@ -55,26 +54,29 @@ public class InitCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
+    if (!processArgs(args)) {
+      return false;
+    }
     // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
     try {
-      if (!fileUtils.folderEmptyOrNotExists(basePath.get())) {
+      if (!fileUtils.folderEmptyOrNotExists(basePath)) {
         System.out.println("Error: Base folder exists and is not empty");
         System.exit(1);
       }
-      baseFolderExistedBefore = fileUtils.folderExists(basePath.get());
+      baseFolderExistedBefore = fileUtils.folderExists(basePath);
       // Create folders
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "head"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "ws"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "local"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "logs"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "head"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "ws"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "local"));
+      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "logs"));
 
       // Write BASE file
-      fileUtils.writeString("", fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
+      fileUtils.writeString("", fileUtils.joinPaths(basePath, BASE_FILENAME));
 
       if (!startuposRepo.get().isEmpty()) {
         // Clone StartupOS repo into head:
-        String startupOsPath = fileUtils.joinPaths(basePath.get(), "head", "startup-os");
+        String startupOsPath = fileUtils.joinPaths(basePath, "head", "startup-os");
         System.out.println("Cloning StartupOS into " + startupOsPath);
         GitRepo repo = this.gitRepoFactory.create(startupOsPath);
         repo.cloneRepo(startuposRepo.get(), startupOsPath);
@@ -96,11 +98,34 @@ public class InitCommand implements AaCommand {
     return true;
   }
 
+  private boolean processArgs(String[] args) {
+    if (args.length == 0 || args.length == 1) {
+      System.err.println(
+          RED_ERROR
+              + "Invalid usage. \n"
+              + "Available variants are: \"bazel run //tools/aa:aa_tool -- init </path/to/base/folder>\" "
+              + "or, if aa is already set up: \"aa init <base_path>\"");
+      return false;
+    }
+    boolean aaIsAlreadySetUpMode = args[0].equals("aa");
+    if (aaIsAlreadySetUpMode) {
+      if (args.length < 3) {
+        System.err.println(RED_ERROR + "Missing base_path");
+        return false;
+      } else {
+        basePath = args[args.length - 1];
+      }
+    } else {
+      basePath = args[args.length - 1];
+    }
+    return true;
+  }
+
   private void revertChanges() {
     if (baseFolderExistedBefore) {
-      fileUtils.clearDirectoryUnchecked(basePath.get());
+      fileUtils.clearDirectoryUnchecked(basePath);
     } else {
-      fileUtils.deleteDirectoryUnchecked(basePath.get());
+      fileUtils.deleteDirectoryUnchecked(basePath);
     }
   }
 }
