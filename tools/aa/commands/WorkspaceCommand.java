@@ -138,7 +138,7 @@ public class WorkspaceCommand implements AaCommand {
     }
 
     args = Arrays.copyOfRange(args, 0, args.length - 1);
-    Flags.parse(args, WorkspaceCommand.class.getPackage());
+    Flags.parse(args, WorkspaceCommand.class);
 
     if (force.get() && remove.get()) {
       System.err.println(RED_ERROR + "Cannot specify both force and remove flags");

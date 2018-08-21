@@ -55,8 +55,7 @@ public class InitCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
-    Flags.parse(args, InitCommand.class.getPackage());
+    Flags.parse(args, InitCommand.class);
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath.get())) {
         System.out.println("Error: Base folder exists and is not empty");
