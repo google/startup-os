@@ -8,6 +8,7 @@ and `dependencies.yaml` file.
 ## Ensuring Bazel has correct version
 To make use of the tutorial, `bazel`'s version should be
 equal or more than `0.16.1rc2`
+(see the reasoning [here](https://github.com/bazelbuild/bazel/issues/5766))
 
 To check the version, execute
 ```bash
