@@ -13,6 +13,14 @@ The main technologies in the stack are:
 * [gRPC](https://grpc.io/)
 * [Bazel](https://bazel.build/)
 
+## Hands-on experience
+Try cloning the repo in Google Cloud Shell and look at the tutorials:
+```
+$ ls tutorials/
+$ teachme <tutorial_name.md>
+```
+[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Fgoogle%2Fstartup-os&page=shell)
+
 ## Supported languages
 
 Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Java and Typescript, but there's support for many other languages:
