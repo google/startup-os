@@ -5,13 +5,21 @@
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/google/startup-os)
 [![CircleCI](https://circleci.com/gh/google/startup-os/tree/master.svg?style=svg)](https://circleci.com/gh/google/startup-os/tree/master)
 
-> Examples for Google's Open Source stack and deploying it to the cloud.
+> Examples for Google's Open Source stack and deployment to the cloud.
 
 The main technologies in the stack are:
 * [Angular](https://angular.io/)
 * [Protol Buffers](https://developers.google.com/protocol-buffers/)
 * [gRPC](https://grpc.io/)
 * [Bazel](https://bazel.build/)
+
+## Hands-on experience
+Try cloning the repo in Google Cloud Shell and look at the tutorials:
+```
+$ ls tutorials/
+$ teachme <tutorial_name.md>
+```
+[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Fgoogle%2Fstartup-os&page=shell)
 
 ## Supported languages
 
@@ -25,7 +33,7 @@ Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Jav
 * [gRPC-Web](https://github.com/oferb/startup-os-example/tree/master/app): a js client library running in the browser, connected to a gRPC server through an HTTP proxy. Both server and client use gRPC auto-generated stubs to handle communication.
 * gRPC [microservices example](https://github.com/google/startup-os/blob/master/tools/local_server/LocalServer.java).
 * [Docker example](https://github.com/google/startup-os/tree/master/examples/docker): building containers using Bazel (no dockerfile needed!).
-* [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run a container on k8s.
+* [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run a container built with Bazel on k8s.
 * [CI example](https://github.com/google/startup-os/tree/master/.circleci): Using CircleCI to run CI (continuous integration) and test all Bazel targets.
 * [Firebase](https://firebase.google.com): Java client for storing Protocol Buffers [here](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreClient.java).
 * [Dagger](https://github.com/google/dagger): Java Dependency Injection framework  ("Next gen Guice"), see examples [here](https://github.com/google/startup-os/tree/master/examples/dagger).
@@ -55,7 +63,7 @@ StartupOS doesn't require you to work with a monorepo, but some things, such as 
 
 Some good reads about the monorepo approach:
 * [trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
-* [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext#FNF)
+* [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
 
 ## Contributing
 You're welcome to contribute and in doing so, learn these technologies.
