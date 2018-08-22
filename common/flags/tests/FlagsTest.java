@@ -395,5 +395,43 @@ public class FlagsTest {
     assertEquals("default value", FlagDescTestClass.getStringFlagValue());
     assertEquals("default value", FlagTestClass.stringTestFlag.get());
   }
+
+  @Test
+  public void testParseCurrentPackage_fromOneClass() {
+    List<String> leftOverArgs =
+        Arrays.asList(Flags.parseCurrentPackage(new String[] {"--integer_flag", "12345"}));
+
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(12345), FlagDescTestClass.integerFlag.get());
+    assertEquals(0, leftOverArgs.size());
+  }
+
+  @Test
+  public void testParseCurrentPackage_fromTwoClasses() {
+    List<String> leftOverArgs =
+        Arrays.asList(
+            Flags.parseCurrentPackage(
+                new String[] {"--integer_flag", "12345", "--string_test_flag", "some value"}));
+
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(12345), FlagDescTestClass.integerFlag.get());
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, "some value", FlagTestClass.stringTestFlag.get());
+    assertEquals(0, leftOverArgs.size());
+  }
+
+  @Test
+  public void testParseCurrentPackage_defaultValuesFromOneClass() {
+    List<String> leftOverArgs = Arrays.asList(Flags.parseCurrentPackage(new String[0]));
+
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(123), FlagDescTestClass.integerFlag.get());
+    assertEquals(0, leftOverArgs.size());
+  }
+
+  @Test
+  public void testParseCurrentPackage_defaultValuesFromTwoClasses() {
+    List<String> leftOverArgs = Arrays.asList(Flags.parseCurrentPackage(new String[0]));
+
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, new Integer(123), FlagDescTestClass.integerFlag.get());
+    assertEquals(FLAG_SHOULD_HAVE_VALUE, "default value", FlagTestClass.stringTestFlag.get());
+    assertEquals(0, leftOverArgs.size());
+  }
 }
 
