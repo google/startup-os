@@ -1,29 +1,3 @@
-# Build every buildable Bazel target and test every testable target
-bazel query //... | grep -v ^\/\/third_party | grep -v *node_modules | xargs bazel test
-
-# Format dependencies.yaml
-# format-deps command ensures that dependencies.yaml is formatted properly
-# and requirements are alphabetically sorted
-bazel run @startupos_binaries//:bazel_deps -- format-deps --overwrite --deps `pwd`/dependencies.yaml
-
-# Adding Maven dependency
-# add-dep command adds dependency to dependencies.yaml
-# it does NOT regenerate build files tree (third_party/maven/), so do it manually
-# <maven_artifact> i.e. com.scireum:sirius-kernel:8.0.1
-bazel run @startupos_binaries//:bazel_deps -- add-dep --deps `pwd`/dependencies.yaml --lang java <maven_artifact>
-
-# WARNING: any comments you had in dependencies.yaml
-# would be destroyed by add-dep or format-deps, see:
-# https://github.com/johnynek/bazel-deps/issues/137
-
-# Regenerate dependencies
-# Run this from the workspace root when you add a new Maven dependency to dependencies.yaml
-# This can take a few minutes, depending on how many dependencies there are.
-# Usually there is already a folder 'third_party' but if there isn't, comment out loading of //third_party/maven:workspace.bzl in WORKSPACE
-bazel run @startupos_binaries//:bazel_deps -- generate -r `pwd` -s third_party/maven/workspace.bzl -d dependencies.yaml
-
-# Buildtools (https://github.com/bazelbuild/buildtools)
-
 # Fix formatting of BUILD file with `buildifier`
 # (https://github.com/bazelbuild/buildtools/tree/master/buildifier)
 # Note that all paths should be absolute
