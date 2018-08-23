@@ -73,7 +73,7 @@ Before submitting a pull request with your changes,
 you have to ensure that code is properly formatted. 
 Run 
 ```bash
-./fix_formatting.sh
+tools/fix_formatting.sh
 ```
 
 ## Look at the changes
