@@ -12,3 +12,6 @@ build --strategy=AngularTemplateCompile=worker
 build --symlink_prefix=dist/
 
 test --test_output=errors
+
+# Use the Angular 6 compiler
+build --define=compile=legacy

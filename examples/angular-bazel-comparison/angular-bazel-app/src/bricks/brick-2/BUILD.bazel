@@ -19,8 +19,10 @@ ng_module(
         ":brick-2.component.html",
         ":brick-2-styles",
     ],
-    tsconfig = "//src:tsconfig.json",
     deps = [
+        "//src/services",
+        "@angular//packages/core",
+        "@angular//packages/forms",
         "@rxjs",
     ],
 )
@@ -31,18 +33,25 @@ ts_library(
     srcs = glob(["*.spec.ts"]),
     deps = [
         ":brick-2",
+        "@angular//packages/core",
+        "@angular//packages/core/testing",
+        "@angular//packages/platform-browser",
+        "@angular//packages/platform-browser-dynamic/testing",
     ],
 )
 
 ts_web_test_suite(
     name = "test",
-    bootstrap = ["//:node_modules/zone.js/dist/zone-testing-bundle.js"],
+    srcs = ["//:node_modules/tslib/tslib.js"],
+    # do not sort
+    bootstrap = [
+        "//:node_modules/zone.js/dist/zone-testing-bundle.js",
+        "//:node_modules/reflect-metadata/Reflect.js",
+    ],
     browsers = [
         "@io_bazel_rules_webtesting//browsers:chromium-local",
     ],
     deps = [
         ":test_lib",
-        "//:angular_bundles",
-        "//:angular_test_bundles",
     ],
 )

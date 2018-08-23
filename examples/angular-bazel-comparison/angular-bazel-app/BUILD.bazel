@@ -5,59 +5,43 @@ alias(
     actual = "@nodejs//:yarn",
 )
 
+# ts_library and ng_module use the `//:tsconfig.json` target
+# by default. This alias allows omitting explicit tsconfig
+# attribute.
+alias(
+    name = "tsconfig.json",
+    actual = "//src:tsconfig.json",
+)
+
 # This export allows targets in other packages to reference files that live
 # in this package.
 exports_files([
-    # Let ts_library targets reference the root tsconfig.json file
-    "tsconfig.json",
     # Let devserver and testing targets reference zone.js distro
     "node_modules/zone.js/dist/zone.min.js",
     "node_modules/zone.js/dist/zone-testing-bundle.js",
 ])
 
-# NOTE: this will move to node_modules/BUILD in a later release
 filegroup(
     name = "node_modules",
-    # NB: rxjs is not in this list, because we build it from sources using the
-    # label @rxjs//:rxjs
-    srcs = glob(["/".join([
-        "node_modules",
-        pkg,
-        "**",
-        ext,
-    ]) for pkg in [
-        "@angular",
-        "@ngrx",
-        "@types",
-        "protractor",
-        "tsickle",
-        "tsutils",
-        "typescript",
-    ] for ext in [
-        "*.js",
-        "*.json",
-        "*.d.ts",
-    ]]),
-)
-
-ANGULAR_TESTING = [
-    "node_modules/@angular/*/bundles/*-testing.umd.js",
-    # We use AOT, so the compiler and the dynamic platform-browser should be
-    # visible only in tests
-    "node_modules/@angular/compiler/bundles/*.umd.js",
-    "node_modules/@angular/platform-browser-dynamic/bundles/*.umd.js",
-]
-
-filegroup(
-    name = "angular_bundles",
     srcs = glob(
-        ["node_modules/@angular/*/bundles/*.umd.js"],
-        exclude = ANGULAR_TESTING,
-    ),
-)
-
-filegroup(
-    name = "angular_test_bundles",
-    testonly = 1,
-    srcs = glob(ANGULAR_TESTING),
+        [
+            # Include only .js, .json & .d.ts files to reduce the number of
+            # files in the //:node_modules filegroup
+            "node_modules/**/*.js",
+            "node_modules/**/*.json",
+            "node_modules/**/*.d.ts",
+            # All the files in the protractor package are necesssary
+            "node_modules/protractor/**",
+            # Also include all files in node_modules/.bin
+            "node_modules/.bin/*",
+        ],
+        exclude = [
+            # Exclude files with spaces which are illegal bazel labels
+            "node_modules/**/* *",
+        ],
+    ) + ["@build_bazel_rules_typescript//:node_modules"],
+    # "@build_bazel_rules_typescript//:node_modules" is incluced
+    # in `//:node_modules` so that npm dependencies that are hoisted to
+    # node_modules/@bazel/typescript/node_modules because of conflicting
+    # versions can be resolved correctly
 )

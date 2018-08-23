@@ -18,9 +18,10 @@ ng_module(
         "data-input.component.html",
         ":data-input-styles",
     ],
-    tsconfig = "//src:tsconfig.json",
     deps = [
         "//src/services",
+        "@angular//packages/core",
+        "@angular//packages/forms",
         "@rxjs",
     ],
 )

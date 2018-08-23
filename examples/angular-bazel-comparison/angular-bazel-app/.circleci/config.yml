@@ -60,7 +60,9 @@ jobs:
       - run: bazel info release
 
       # Install the dependencies from NPM
-      - run: bazel run @nodejs//:yarn install
+      # TODO(gmagolan): Use `bazel run :install` once bootstrap issue resolved.
+      # See https://github.com/bazelbuild/rules_nodejs/issues/275.
+      - run: yarn
 
       # Build and Test
       # Use bazel query so that we explicitly ask for all buildable targets to
@@ -70,10 +72,6 @@ jobs:
 
       # Run the benchmark
       - run: node_modules/.bin/ibazel-benchmark-runner //src:devserver src/hello-world/hello-world.component.ts --url=http://localhost:5432
-
-      # Run the protractor end-to-end test - it's not a Bazel target because
-      # we didn't write a protractor rule yet.
-      - run: xvfb-run -a yarn e2e
       
       - store_artifacts:
           path: dist/bin/src/bundle.min.js

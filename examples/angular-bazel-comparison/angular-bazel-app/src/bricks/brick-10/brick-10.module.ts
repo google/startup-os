@@ -6,5 +6,5 @@ import { Brick10Component } from './brick-10.component';
   declarations: [Brick10Component],
   exports: [Brick10Component],
 })
-
 export class Brick10Module { }
+

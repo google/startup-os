@@ -7,3 +7,4 @@ import { Brick9Component } from './brick-9.component';
   exports: [Brick9Component],
 })
 export class Brick9Module { }
+

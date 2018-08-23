@@ -5,5 +5,4 @@ import { Component, NgModule } from '@angular/core';
   templateUrl: 'brick-5.component.html',
   styleUrls: ['./brick-5.component.css']
 })
-
 export class Brick5Component { }

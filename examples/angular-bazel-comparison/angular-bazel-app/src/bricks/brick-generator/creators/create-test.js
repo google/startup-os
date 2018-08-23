@@ -1,10 +1,10 @@
-import { DebugElement } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+function createTest(brickfile, brickCamel) {
+  return `import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 
-import { Brick17Component } from './brick-17.component';
-import { Brick17ModuleNgSummary } from './brick-17.module.ngsummary';
+import { ${brickCamel}Component } from './${brickfile}.component';
+import { ${brickCamel}ModuleNgSummary } from './${brickfile}.module.ngsummary';
 
 // TODO(alexeagle): this helper should be in @angular/platform-browser-dynamic/testing
 try {
@@ -13,20 +13,20 @@ try {
   // Ignore exceptions when calling it multiple times.
 }
 
-describe('Brick17Component', () => {
-  let component: Brick17Component;
-  let fixture: ComponentFixture<Brick17Component>;
+describe('BannerComponent (inline template)', () => {
+  let component: ${brickCamel}Component;
+  let fixture: ComponentFixture<${brickCamel}Component>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [Brick17Component],
-      aotSummaries: Brick17ModuleNgSummary,
+      declarations: [${brickCamel}Component],  // declare the test component
+      aotSummaries: ${brickCamel}ModuleNgSummary,
     });
     TestBed.compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(Brick17Component);
+    fixture = TestBed.createComponent(${brickCamel}Component);
     component = fixture.componentInstance;
   });
 
@@ -36,3 +36,7 @@ describe('Brick17Component', () => {
     }, 1000);
   }));
 });
+`;
+}
+
+module.exports = createTest;

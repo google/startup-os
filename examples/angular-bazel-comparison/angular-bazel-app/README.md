@@ -38,13 +38,22 @@ npm install -g @bazel/ibazel
 ## Setup
 
 Before building the app, we install packages, just as with any npm-based development workflow.
-However, to get the same version of the toolchain as co-workers and our continuous integration, let's have Bazel run the
-package manager using a pinned version it manages. You should not even need
-node, npm, or yarn installed on a machine where you develop with Bazel.
 
 ```bash
-$ bazel run :install
+$ yarn install
 ```
+
+or 
+
+```bash
+$ npm install
+```
+
+For the time being, you need to run your locally installed `yarn` or `npm` to install dependencies
+as shown above. This is because we pull down the `@bazel/typescript` bazel dependency from npm and
+that dependency needs to be in place before we can build the project. We're investigating
+how to resolve this bootstrapping issue so in the future you will be able run `bazel run :install` to
+install your npm packages without needing a local installation of `node`, `yarn` or `npm`.
 
 ## Development
 
@@ -68,15 +77,29 @@ is less than two seconds, even for a large application.
 
 Control-C twice to kill the devserver and also stop `ibazel`.
 
-We can also run all the unit tests:
+## Testing
+
+We can also run all the unit and e2e tests:
 
 ```bash
 $ ibazel test ...
 ```
 
-This will run all the tests. In this example, there is a test for the
-`hello-world` component. Note that Bazel will only re-run the tests whose inputs
-changed since the last run.
+This will run all the tests.
+
+In this example, there is a unit test for the `hello-world` component which uses
+the `ts_web_test_suite` rule. There are also protractor e2e tests for both the
+`prodserver` and `devserver` which use the `protractor_web_test_suite` rule.
+
+You can also run these tests individually using,
+
+```bash
+$ bazel test //src/hello-world:test
+$ bazel test //test/e2e:prodserver_test
+$ bazel test //test/e2e:devserver_test
+```
+
+Note that Bazel will only re-run the tests whose inputs changed since the last run.
 
 ## Production
 
@@ -89,14 +112,6 @@ bundlers can be integrated with Bazel.
 $ ibazel run src:prodserver
 ```
 
-We also use Protractor to run end-to-end tests. We don't have a protractor rule
-yet, so we'll take the build results from Bazel and run the test outside of Bazel.
-
-```bash
-$ yarn e2e
-```
-
 ## Coming soon
 
-- Protractor bazel rule
 - Code-splitting and lazy loading (planned for Q2/Q3 2018)

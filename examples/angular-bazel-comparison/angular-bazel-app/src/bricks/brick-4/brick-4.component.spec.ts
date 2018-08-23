@@ -1,4 +1,3 @@
-import { DebugElement } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
@@ -13,13 +12,13 @@ try {
   // Ignore exceptions when calling it multiple times.
 }
 
-describe('Brick4Component', () => {
+describe('BannerComponent (inline template)', () => {
   let component: Brick4Component;
   let fixture: ComponentFixture<Brick4Component>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [Brick4Component],
+      declarations: [Brick4Component],  // declare the test component
       aotSummaries: Brick4ModuleNgSummary,
     });
     TestBed.compileComponents();

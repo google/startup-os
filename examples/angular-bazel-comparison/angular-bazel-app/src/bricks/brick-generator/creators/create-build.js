@@ -1,23 +1,24 @@
-package(default_visibility = ["//visibility:public"])
+function createBuild(brickfile, brickCamel) {
+  return `package(default_visibility = ["//visibility:public"])
 
 load("@angular//:index.bzl", "ng_module")
 load("@io_bazel_rules_sass//sass:sass.bzl", "sass_binary")
 load("@build_bazel_rules_typescript//:defs.bzl", "ts_library", "ts_web_test_suite")
 
 sass_binary(
-    name = "brick-5-styles",
-    src = "brick-5.component.scss",
+    name = "${brickfile}-styles",
+    src = "${brickfile}.component.scss",
 )
 
 ng_module(
-    name = "brick-5",
+    name = "${brickfile}",
     srcs = [
-        "brick-5.component.ts",
-        "brick-5.module.ts",
+        "${brickfile}.component.ts",
+        "${brickfile}.module.ts",
     ],
     assets = [
-        ":brick-5.component.html",
-        ":brick-5-styles",
+        ":${brickfile}.component.html",
+        ":${brickfile}-styles",
     ],
     deps = [
         "//src/services",
@@ -32,7 +33,7 @@ ts_library(
     testonly = 1,
     srcs = glob(["*.spec.ts"]),
     deps = [
-        ":brick-5",
+        ":${brickfile}",
         "@angular//packages/core",
         "@angular//packages/core/testing",
         "@angular//packages/platform-browser",
@@ -55,3 +56,7 @@ ts_web_test_suite(
         ":test_lib",
     ],
 )
+`;
+}
+
+module.exports = createBuild;
