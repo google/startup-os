@@ -1,22 +1,41 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
 
-import { Comment } from '@/shared/proto';
+import {
+  BranchInfo,
+  Comment,
+  Diff,
+  File,
+  TextDiff,
+  Thread,
+} from '@/shared/proto';
+import {
+  FirebaseService,
+  LocalserverService,
+  NotificationService,
+} from '@/shared/services';
 
-interface HeightResponse {
-  height: number;
-  lineNumber: number;
-}
-
-interface AddCommentResponse {
-  comments: Comment[];
-  lineNumber: number;
-}
-
-// The service receives data from one place of
-// diff component (and children) and send to another.
 @Injectable()
 export class FileChangesService {
+  isLoading: boolean = true;
+  diff: Diff;
+  file: File = new File();
+  localThreads: Thread[];
+  branchInfo: BranchInfo;
+  textDiff: TextDiff;
+  commitId: string[];
+
+  constructor(
+    private firebaseService: FirebaseService,
+    private localserverService: LocalserverService,
+    private notificationService: NotificationService,
+  ) { }
+
+  startLoading(filename: string, diffId: string): void {
+    this.file.setFilename(filename);
+    this.getDiff(diffId);
+  }
+
+  // Download diff from firebase
   getDiff(diffId: string): void {
     this.firebaseService.getDiff(diffId).subscribe(diff => {
       this.diff = diff;
@@ -28,27 +47,21 @@ export class FileChangesService {
     });
   }
 
+  // Get branchInfo from localserver
   getBranchInfo(): void {
     this.localserverService
       .getBranchInfo(this.diff.getId(), this.diff.getWorkspace())
       .subscribe(branchInfo => {
         this.branchInfo = branchInfo;
-        this.file = this.getFile(this.file.getFilename(), this.branchInfo);
+        this.file = this.getFile(
+          this.file.getFilename(),
+          this.branchInfo,
+        );
         this.getFileChanges(this.file);
       });
   }
 
-  // Get file from branchInfo by the filename
-  getFile(filename: string, branchInfo: BranchInfo): File {
-    const files: File[] = this.localserverService
-      .getFilesFromBranchInfo(branchInfo);
-    for (const file of files) {
-      if (filename === file.getFilename()) {
-        return file;
-      }
-    }
-  }
-
+  // Get files from localserver
   getFileChanges(currentFile: File): void {
     // Left commit id - commit before the changes.
     const leftCommitId: string = this.branchInfo
@@ -62,19 +75,18 @@ export class FileChangesService {
     leftFile.setWorkspace(this.diff.getWorkspace());
     const rightFile: File = currentFile;
 
+    this.saveCommitId(leftFile, rightFile);
+
     this.localserverService
       .getFileChanges(leftFile, rightFile)
       .subscribe(textDiffResponse => {
         this.textDiff = textDiffResponse.getTextDiff();
-
-        // TODO: use changes from localserver instead
-        this.changes = this.differenceService.compare(
-          this.textDiff.getLeftFileContents(),
-          this.textDiff.getRightFileContents(),
-        );
-
         this.isLoading = false;
       });
+  }
+
+  saveCommitId(leftFile: File, rightFile: File) {
+    this.commitId = [leftFile.getCommitId(), rightFile.getCommitId()];
   }
 
   // Send diff with new comment to firebase
@@ -101,12 +113,13 @@ export class FileChangesService {
     });
   }
 
-  createNewThread(lineNumber: number, comments: Comment[]): Thread {
+  private createNewThread(lineNumber: number, comments: Comment[]): Thread {
     const newThread: Thread = new Thread();
     newThread.setLineNumber(lineNumber);
     newThread.setIsDone(false);
     newThread.setCommentList(comments);
     newThread.setRepoId(this.branchInfo.getRepoId());
+    // TODO: add ability to add comment to left file (to old commits)
     newThread.setCommitId(this.file.getCommitId());
     newThread.setFile(this.file);
 
@@ -128,6 +141,28 @@ export class FileChangesService {
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
       this.notificationService.success('Comment is deleted');
     });
+  }
+
+  // Get block index (0 or 1) depends on commit id
+  getBlockIndex(thread: Thread): number {
+    for (let i = 0; i <= 1; i++) {
+      const commitId = this.commitId[i];
+      if (commitId === thread.getCommitId()) {
+        return i;
+      }
+    }
+    throw new Error('Undefined commit id');
+  }
+
+  // Get file from branchInfo by the filename
+  getFile(filename: string, branchInfo: BranchInfo): File {
+    const files: File[] = this.localserverService
+      .getFilesFromBranchInfo(branchInfo);
+    for (const file of files) {
+      if (filename === file.getFilename()) {
+        return file;
+      }
+    }
   }
 
   // Get langulage from filename. Example:

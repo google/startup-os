@@ -1,54 +1,48 @@
-@import '../code-block-variables';
-
+$comments-padding: 20px;
 $comment-width: 700px;
 $comment-padding: 4px;
-#line-comments {
-  padding: 15px 0;
-  color: black;
-  background: $comments-background;
-  .comments {
-    margin-bottom: 15px;
-    >.comment {
-      position: relative;
-      background: white;
-      border: 1px solid rgba(0,0,0,.3);
-      border-radius: 2px;
-      margin-bottom: 5px;
-      width: $comment-width;
-      padding: $comment-padding;
-      >.username {
-        font-family: Arial;
-        font-size: 14px;
+
+.comments {
+  padding-top: $comments-padding;
+  padding-left: $comments-padding;
+  padding-right: $comments-padding;
+  >.comment {
+    position: relative;
+    background: white;
+    border: 1px solid rgba(0,0,0,.3);
+    border-radius: 2px;
+    margin-bottom: 5px;
+    width: $comment-width;
+    padding: $comment-padding;
+    >.username {
+      >span {
         font-weight: bold;
-        margin-bottom: 5px;
-      }
-      >.message {
-        margin: 0;
-        padding: 0;
-      }
-      >.delete-button {
-        position: absolute;
-        top: 0;
-        right: 0;
-        >button {
-          margin: 0;
-        }
-        mat-icon {
-          color: #777;
-        }
       }
     }
+    span {
+      font-size: 14px;
+    }
+    >.delete-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      >button {
+        margin: 0;
+      }
+      mat-icon {
+        color: #777;
+      }
+    }
+  }
+}
+.new-comment {
+  padding: $comments-padding;
+  button {
+    margin-top: 5px;
   }
   textarea {
     resize: none;
     width: $comment-width;
     padding: $comment-padding;
-  }
-  button {
-    margin-top: 5px;
-  }
-  .text {
-    font-family: Arial;
-    font-size: 14px;
   }
 }

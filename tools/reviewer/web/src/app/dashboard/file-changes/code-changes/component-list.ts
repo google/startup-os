@@ -1,13 +1,7 @@
-import { AddCommentButtonsComponent } from './add-comment-buttons';
-import { ChangesHighlightingComponent } from './changes-highlighting';
-import { CodeBlockComponent } from './code-block.component';
+import { CodeChangesComponent } from './code-changes.component';
 import { CommentsComponent } from './comments';
-import { LineNumbersComponent } from './line-numbers';
 
-export const CodeBlockComponentList = [
-  CodeBlockComponent,
-  AddCommentButtonsComponent,
-  ChangesHighlightingComponent,
+export const CodeChangesComponentList = [
+  CodeChangesComponent,
   CommentsComponent,
-  LineNumbersComponent,
 ];
