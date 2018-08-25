@@ -42,10 +42,10 @@ public class AddRepoCommand implements AaCommand {
   }
 
   @FlagDesc(name = "url", description = "Repository URL to add", required = true)
-  private static Flag<String> url = Flag.create("");
+  public static Flag<String> url = Flag.create("");
 
   @FlagDesc(name = "name", description = "Repository name")
-  private static Flag<String> name = Flag.create("");
+  public static Flag<String> name = Flag.create("");
 
   private String getNameFromRemoteUrl(String remoteUrl) throws URISyntaxException {
     String path = new URI(remoteUrl).getPath();
@@ -54,7 +54,7 @@ public class AddRepoCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    Flags.parse(args, AddRepoCommand.class);
+    Flags.parse(args, AddRepoCommand.class.getPackage());
 
     String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
     String repoName = name.get();

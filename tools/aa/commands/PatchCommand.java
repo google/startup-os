@@ -33,7 +33,7 @@ public class PatchCommand implements AaCommand {
   private String workspacePath;
 
   @FlagDesc(name = "diff_number", description = "Diff number to apply patch from", required = true)
-  private static Flag<Integer> diffNumber = Flag.create(-1);
+  public static Flag<Integer> diffNumber = Flag.create(-1);
 
   @Inject
   public PatchCommand(
@@ -51,7 +51,7 @@ public class PatchCommand implements AaCommand {
       }
     }
 
-    Flags.parse(args, PatchCommand.class);
+    Flags.parse(args, PatchCommand.class.getPackage());
 
     String branchName = String.format("D%d", diffNumber.get());
     try {

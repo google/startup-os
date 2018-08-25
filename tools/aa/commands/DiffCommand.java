@@ -51,13 +51,13 @@ public class DiffCommand implements AaCommand {
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
   @FlagDesc(name = "reviewers", description = "Reviewers (split by comma)")
-  private static Flag<String> reviewers = Flag.create("");
+  static Flag<String> reviewers = Flag.create("");
 
   @FlagDesc(name = "description", description = "Description")
-  private static Flag<String> description = Flag.create("");
+  static Flag<String> description = Flag.create("");
 
   @FlagDesc(name = "buglink", description = "Buglink")
-  private static Flag<String> buglink = Flag.create("");
+  static Flag<String> buglink = Flag.create("");
 
   @Inject
   public DiffCommand(
@@ -163,7 +163,7 @@ public class DiffCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    Flags.parse(args, this.getClass());
+    Flags.parse(args, this.getClass().getPackage());
 
     Diff diff = (diffNumber == -1) ? createDiff() : updateDiff(diffNumber);
     CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
