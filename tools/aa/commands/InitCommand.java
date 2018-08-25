@@ -63,17 +63,17 @@ public class InitCommand implements AaCommand {
       }
       baseFolderExistedBefore = fileUtils.folderExists(basePath.get());
       // Create folders
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "head"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "ws"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "local"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath.get(), "logs"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath.get(), "head"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath.get(), "ws"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath.get(), "local"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath.get(), "logs"));
 
       // Write BASE file
-      fileUtils.writeString("", fileUtils.joinPaths(basePath.get(), BASE_FILENAME));
+      fileUtils.writeString("", fileUtils.joinToAbsolutePath(basePath.get(), BASE_FILENAME));
 
       if (!startuposRepo.get().isEmpty()) {
         // Clone StartupOS repo into head:
-        String startupOsPath = fileUtils.joinPaths(basePath.get(), "head", "startup-os");
+        String startupOsPath = fileUtils.joinToAbsolutePath(basePath.get(), "head", "startup-os");
         System.out.println("Cloning StartupOS into " + startupOsPath);
         GitRepo repo = this.gitRepoFactory.create(startupOsPath);
         repo.cloneRepo(startuposRepo.get(), startupOsPath);
