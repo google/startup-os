@@ -58,7 +58,7 @@ public class PatchCommand implements AaCommand {
       fileUtils
           .listContents(workspacePath)
           .stream()
-          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(path -> fileUtils.folderExists(path))
           .forEach(
               path -> {
