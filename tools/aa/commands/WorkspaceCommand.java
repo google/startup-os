@@ -89,7 +89,9 @@ public class WorkspaceCommand implements AaCommand {
       fileUtils.mkdirs(workspacePath);
       try {
         fileUtils.copyDirectoryToDirectory(
-            fileUtils.joinPaths(config.getBasePath(), "head"), workspacePath, "^bazel-.*$");
+            fileUtils.joinToAbsolutePath(config.getBasePath(), "head"),
+            workspacePath,
+            "^bazel-.*$");
       } catch (IOException e) {
         fileUtils.deleteDirectoryUnchecked(workspacePath);
         e.printStackTrace();
@@ -130,7 +132,7 @@ public class WorkspaceCommand implements AaCommand {
     }
 
     String workspaceName = args[args.length - 1];
-    workspacePath = fileUtils.joinPaths(config.getBasePath(), "ws", workspaceName);
+    workspacePath = fileUtils.joinToAbsolutePath(config.getBasePath(), "ws", workspaceName);
 
     if (workspaceName.startsWith("-")) {
       System.err.println(RED_ERROR + "Missing workspace name");
@@ -160,7 +162,7 @@ public class WorkspaceCommand implements AaCommand {
   private String guessFolderForCd(String workspacePath) {
     // Try using current workspace subfolder
     String guessedRepoFolder =
-        fileUtils.joinPaths(workspacePath, fileUtils.getCurrentWorkingDirectoryName());
+        fileUtils.joinToAbsolutePath(workspacePath, fileUtils.getCurrentWorkingDirectoryName());
     if (fileUtils.folderExists(guessedRepoFolder)) {
       return guessedRepoFolder;
     }
@@ -168,7 +170,8 @@ public class WorkspaceCommand implements AaCommand {
     try {
       if (fileUtils.listContents(workspacePath).size() == 1) {
         guessedRepoFolder =
-            fileUtils.joinPaths(workspacePath, fileUtils.listContents(workspacePath).get(0));
+            fileUtils.joinToAbsolutePath(
+                workspacePath, fileUtils.listContents(workspacePath).get(0));
         if (fileUtils.folderExists(guessedRepoFolder)) {
           return guessedRepoFolder;
         }

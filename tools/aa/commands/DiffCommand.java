@@ -103,7 +103,7 @@ public class DiffCommand implements AaCommand {
       fileUtils
           .listContents(workspacePath)
           .stream()
-          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
