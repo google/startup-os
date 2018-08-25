@@ -55,7 +55,6 @@ public class InitCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath.get())) {
