@@ -147,9 +147,14 @@ public class FileUtils {
     }
   }
 
+  /** Joins to an absolute paths */
+  public String joinToAbsolutePath(String first, String... more) {
+    return fileSystem.getPath(first, more).toAbsolutePath().toString();
+  }
+
   /** Joins paths */
   public String joinPaths(String first, String... more) {
-    return fileSystem.getPath(first, more).toAbsolutePath().toString();
+    return fileSystem.getPath(first, more).toString();
   }
 
   /** Get the current working directory */
