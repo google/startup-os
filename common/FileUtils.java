@@ -256,14 +256,14 @@ public class FileUtils {
               throws IOException {
             final String dirPath = dir.toAbsolutePath().toString();
             if (ignored.length != 0) {
+              for (String item : ignored) {
+                if (dirPath.contains(item)) {
+                  return FileVisitResult.SKIP_SUBTREE;
+                }
+              }
               for (String itemForIgnore : ignored) {
                 if (Pattern.matches(itemForIgnore, dir.getFileName().toString())) {
                   return FileVisitResult.CONTINUE;
-                }
-                for (String item : ignored) {
-                  if (dirPath.contains(item)) {
-                    return FileVisitResult.CONTINUE;
-                  }
                 }
               }
             }
@@ -274,17 +274,9 @@ public class FileUtils {
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
-            final String filePath = file.toString();
-            if (ignored.length != 0) {
-              for (String itemForIgnore : ignored) {
-                if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
-                  return FileVisitResult.CONTINUE;
-                }
-                for (String item : ignored) {
-                  if (filePath.contains(item)) {
-                    return FileVisitResult.CONTINUE;
-                  }
-                }
+            for (String itemForIgnore : ignored) {
+              if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
+                return FileVisitResult.CONTINUE;
               }
             }
             if (Files.isSymbolicLink(file)) {

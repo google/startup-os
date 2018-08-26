@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This command is used to switch between workspaces and create new ones.
@@ -116,7 +117,7 @@ public class WorkspaceCommand implements AaCommand {
     for (String item : filesAndFoldersInHead) {
       String[] pathNodes = item.split("/");
       String lastNodeInPath = pathNodes[pathNodes.length - 1];
-      if (lastNodeInPath.equals(fileOrFolderToIgnore)) {
+      if (Pattern.matches(fileOrFolderToIgnore, lastNodeInPath)) {
         result.add(item);
       }
     }
