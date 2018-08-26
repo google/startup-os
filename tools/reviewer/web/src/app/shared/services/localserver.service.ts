@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import { Dictionary } from 'associativearray';
 import { Observable } from 'rxjs';
 
 import {
@@ -22,7 +21,7 @@ export class LocalserverService {
     private notificationService: NotificationService,
   ) { }
 
-  getBranchInfo(id: number, workspace: string): Observable<BranchInfo> {
+  getBranchInfo(id: number, workspace: string): Observable<BranchInfo[]> {
     return new Observable(observer => {
       // Create diff files request
       const diffFilesRequest: DiffFilesRequest = new DiffFilesRequest();
@@ -48,8 +47,7 @@ export class LocalserverService {
             this.notificationService.error('Local server: Branches not found');
           }
 
-          // TODO: Add supporting of multiple repos
-          observer.next(diffFilesResponse.getBranchinfoList()[0]);
+          observer.next(diffFilesResponse.getBranchinfoList());
         }, () => {
           this.error();
           observer.error();
@@ -91,27 +89,37 @@ export class LocalserverService {
 
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
     return new Observable(observer => {
-      this.getBranchInfo(id, workspace).subscribe(branchInfo => {
-        observer.next(this.getFilesFromBranchInfo(branchInfo));
+      this.getBranchInfo(id, workspace).subscribe(branchInfoList => {
+        let files: File[] = [];
+        for (const branchInfo of branchInfoList) {
+          const branchFiles: File[] = this.getFilesFromBranchInfo(
+            branchInfo,
+          );
+          files = files.concat(branchFiles);
+        }
+        observer.next(files);
       });
     });
   }
 
   getFilesFromBranchInfo(branchInfo: BranchInfo): File[] {
-    const fileDictionary: Dictionary<File> = new Dictionary<File>();
+    const fileDictionary: { [filename: string]: File } = {};
     for (const commit of branchInfo.getCommitList()) {
       this.addWithReplace(fileDictionary, commit.getFileList());
     }
     this.addWithReplace(fileDictionary, branchInfo.getUncommittedFileList());
 
-    return fileDictionary.values;
+    return Object.values(fileDictionary);
   }
 
-  addWithReplace(fileDictionary: Dictionary<File>, newfiles: File[]): void {
+  addWithReplace(
+    fileDictionary: { [filename: string]: File },
+    newfiles: File[],
+  ): void {
     for (const file of newfiles) {
       // If file with the filename is already exist, it will be replaced by
       // the new one.
-      fileDictionary.add(file.getFilename(), file);
+      fileDictionary[file.getFilenameWithRepo()] = file;
     }
   }
 

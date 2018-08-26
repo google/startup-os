@@ -22,7 +22,7 @@
         <!-- Discussions -->
         <mat-cell *matCellDef="let thread">
           <div class="thread-title">
-            {{ thread.getFile().getFilename() }}
+            {{ thread.getFile().getFilenameWithRepo() }}
             ({{ thread.getCommentList().length }} comments)
           </div>
           <div
