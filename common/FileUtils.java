@@ -272,9 +272,11 @@ public class FileUtils {
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
-            for (String itemForIgnore : ignored) {
-              if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
-                return FileVisitResult.CONTINUE;
+            if (ignored.length != 0) {
+              for (String itemForIgnore : ignored) {
+                if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
+                  return FileVisitResult.CONTINUE;
+                }
               }
             }
             if (Files.isSymbolicLink(file)) {
