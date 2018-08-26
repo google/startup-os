@@ -101,8 +101,8 @@ public class CodeReviewServiceTextDiffTest {
     Flags.parse(
         new String[0], AuthService.class.getPackage(), CodeReviewService.class.getPackage());
     String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
-    String initialRepoFolder = joinPaths(testFolder, "initial_repo");
-    aaBaseFolder = joinPaths(testFolder, "base_folder");
+    String initialRepoFolder = joinToAbsolutePath(testFolder, "initial_repo");
+    aaBaseFolder = joinToAbsolutePath(testFolder, "base_folder");
 
     component =
         DaggerCodeReviewServiceTextDiffTest_TestComponent.builder()
@@ -168,7 +168,7 @@ public class CodeReviewServiceTextDiffTest {
     repo.init();
     repo.setFakeUsersData();
     fileUtils.writeStringUnchecked(
-        TEST_FILE_CONTENTS, fileUtils.joinPaths(initialRepoFolder, FILE_IN_HEAD));
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(initialRepoFolder, FILE_IN_HEAD));
     fileInHeadCommitId = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
   }
 
@@ -186,7 +186,8 @@ public class CodeReviewServiceTextDiffTest {
     WorkspaceCommand workspaceCommand = component.getWorkspaceCommand();
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
-    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    String repoPath =
+        fileUtils.joinToAbsolutePath(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
     repo.setFakeUsersData();
   }
@@ -204,12 +205,12 @@ public class CodeReviewServiceTextDiffTest {
     blockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
-  public String joinPaths(String first, String... more) {
+  public String joinToAbsolutePath(String first, String... more) {
     return FileSystems.getDefault().getPath(first, more).toAbsolutePath().toString();
   }
 
   private String getWorkspaceFolder(String workspace) {
-    return joinPaths(aaBaseFolder, "ws", workspace);
+    return joinToAbsolutePath(aaBaseFolder, "ws", workspace);
   }
 
   private TextDiffResponse getResponse(File file) {
@@ -230,12 +231,13 @@ public class CodeReviewServiceTextDiffTest {
 
   private void writeFile(String filename, String contents) {
     fileUtils.writeStringUnchecked(
-        contents, fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
+        contents,
+        fileUtils.joinToAbsolutePath(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
   }
 
   private void deleteFile(String filename) {
     fileUtils.deleteFileOrDirectoryIfExistsUnchecked(
-        fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
+        fileUtils.joinToAbsolutePath(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
   }
 
   // Committed, workspace exists

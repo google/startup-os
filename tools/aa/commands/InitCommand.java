@@ -57,7 +57,6 @@ public class InitCommand implements AaCommand {
     if (!processArgs(args)) {
       return false;
     }
-    // TODO: Add Flags.parse() support for specifying a particular class, not a whole package
     Flags.parse(args, InitCommand.class.getPackage());
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath)) {
@@ -66,17 +65,17 @@ public class InitCommand implements AaCommand {
       }
       baseFolderExistedBefore = fileUtils.folderExists(basePath);
       // Create folders
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "head"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "ws"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "local"));
-      fileUtils.mkdirs(fileUtils.joinPaths(basePath, "logs"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath, "head"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath, "ws"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath, "local"));
+      fileUtils.mkdirs(fileUtils.joinToAbsolutePath(basePath, "logs"));
 
       // Write BASE file
-      fileUtils.writeString("", fileUtils.joinPaths(basePath, BASE_FILENAME));
+      fileUtils.writeString("", fileUtils.joinToAbsolutePath(basePath, BASE_FILENAME));
 
       if (!startuposRepo.get().isEmpty()) {
         // Clone StartupOS repo into head:
-        String startupOsPath = fileUtils.joinPaths(basePath, "head", "startup-os");
+        String startupOsPath = fileUtils.joinToAbsolutePath(basePath, "head", "startup-os");
         System.out.println("Cloning StartupOS into " + startupOsPath);
         GitRepo repo = this.gitRepoFactory.create(startupOsPath);
         repo.cloneRepo(startuposRepo.get(), startupOsPath);
