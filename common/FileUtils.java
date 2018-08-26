@@ -260,10 +260,8 @@ public class FileUtils {
                 if (dirPath.contains(item)) {
                   return FileVisitResult.SKIP_SUBTREE;
                 }
-              }
-              for (String itemForIgnore : ignored) {
-                if (Pattern.matches(itemForIgnore, dir.getFileName().toString())) {
-                  return FileVisitResult.CONTINUE;
+                if (Pattern.matches(item, dir.getFileName().toString())) {
+                  return FileVisitResult.SKIP_SUBTREE;
                 }
               }
             }

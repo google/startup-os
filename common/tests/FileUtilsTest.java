@@ -892,6 +892,39 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredTwoFolderWithRegex() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/some_folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_folder/some_file.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder_for_ignore"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder_for_ignore/file1.txt"));
+    Files.createDirectories(
+        fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore_with_regex"));
+    Files.createFile(
+        fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore_with_regex/file2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(TEST_DIR_PATH, "destination_folder", "folder_for_ignore.*");
+
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/some_folder")));
+    assertTrue(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/some_folder/some_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to")));
+    assertFalse(Files.isDirectory(fileSystem.getPath("destination_folder" + "/folder_for_ignore")));
+    assertFalse(
+        Files.isDirectory(
+            fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore_with_regex")));
+    assertFalse(
+        Files.isRegularFile(
+            fileSystem.getPath(
+                "destination_folder" + "/path/to/folder_for_ignore_with_regex/file2.txt")));
+  }
+
+  @Test
   public void testCopyDirectoryToDirectoryWhenIgnoredFileAndFolder() throws IOException {
     if (fileSystemName.equals("Windows")) {
       return;

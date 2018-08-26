@@ -16,7 +16,6 @@
 
 package com.google.startupos.tools.aa.commands;
 
-import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
@@ -27,10 +26,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * This command is used to switch between workspaces and create new ones.
@@ -92,13 +88,11 @@ public class WorkspaceCommand implements AaCommand {
     } else {
       fileUtils.mkdirs(workspacePath);
       try {
-        List<String> filesAndFoldersToIgnore = new ArrayList<>();
-        filesAndFoldersToIgnore.add("^bazel-.*$");
-        filesAndFoldersToIgnore.addAll(getFilesOrFoldersToIgnoreInHead("node_modules"));
-        String[] ignored = filesAndFoldersToIgnore.stream().toArray(String[]::new);
-
         fileUtils.copyDirectoryToDirectory(
-            fileUtils.joinPaths(config.getBasePath(), "head"), workspacePath, ignored);
+            fileUtils.joinPaths(config.getBasePath(), "head"),
+            workspacePath,
+            "^bazel-.*$",
+            "node_modules");
       } catch (IOException e) {
         fileUtils.deleteDirectoryUnchecked(workspacePath);
         e.printStackTrace();
@@ -106,22 +100,6 @@ public class WorkspaceCommand implements AaCommand {
       }
     }
     return true;
-  }
-
-  /** Returns list from head folder with all path where file or folder to ignore is found */
-  private ImmutableList<String> getFilesOrFoldersToIgnoreInHead(String fileOrFolderToIgnore)
-      throws IOException {
-    List<String> result = new ArrayList<>();
-    ImmutableList<String> filesAndFoldersInHead =
-        fileUtils.listContentsRecursively(fileUtils.joinPaths(config.getBasePath(), "head"));
-    for (String item : filesAndFoldersInHead) {
-      String[] pathNodes = item.split("/");
-      String lastNodeInPath = pathNodes[pathNodes.length - 1];
-      if (Pattern.matches(fileOrFolderToIgnore, lastNodeInPath)) {
-        result.add(item);
-      }
-    }
-    return ImmutableList.copyOf(result);
   }
 
   private boolean switchWorkspace() {
