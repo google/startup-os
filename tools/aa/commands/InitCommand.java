@@ -101,33 +101,27 @@ public class InitCommand implements AaCommand {
     boolean isAaSetUp = args[0].equals("aa");
     if (isAaSetUp) {
       switch (args.length) {
-        case 2:
-          System.err.println(RED_ERROR + "Missing base_path");
-          return false;
-        case 3:
-          basePath = args[2];
-          break;
-        default:
+        case 1:
           System.err.println(
               RED_ERROR
                   + "Invalid usage. \n"
                   + "Please use \"aa init <base_path>\" command to init a base folder.");
           return false;
+        case 2:
+          System.err.println(RED_ERROR + "Missing base_path");
+          return false;
+        default:
+          basePath = args[2];
+          break;
       }
     } else {
       switch (args.length) {
         case 1:
           System.err.println(RED_ERROR + "Missing base_path");
           return false;
-        case 2:
+        default:
           basePath = args[1];
           break;
-        default:
-          System.err.println(
-              RED_ERROR
-                  + "Invalid usage. \n"
-                  + "Please use \"bazel run //tools/aa:aa_tool -- init </path/to/base/folder>\" command to init a base folder.");
-          return false;
       }
     }
     return true;
