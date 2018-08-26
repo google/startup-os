@@ -1,0 +1,58 @@
+<table cellpadding="0" cellspacing="0" border="0">
+  <!-- Code lines -->
+  <tr *ngFor="let changesLine of changesLines; let lineIndex = index">
+    <!-- left and right block lines -->
+    <ng-container
+      *ngFor="let blockLine of changesLine.blocks; let blockIndex = index"
+    >
+      <!-- Line number -->
+      <td class="line-number" valign="top">
+        <span *ngIf="!blockLine.isPlaceholder">
+          {{ blockLine.lineNumber }}
+        </span>
+      </td>
+
+      <td
+        [ngClass]="[
+          'content',
+          uiService.getLineBackground(changesLine, blockIndex, blockLine)
+        ]"
+        valign="top"
+        (mouseover)="hoverService.mouseOver(blockLine, blockIndex)"
+        (mouseleave)="hoverService.mouseLeave()"
+      >
+        <!-- "Add comment" button -->
+        <div
+          class="add-comment-button"
+          *ngIf="!blockLine.isPlaceholder"
+        >
+          <div
+            class="icon-button"
+            *ngIf="hoverService.isHovered(blockLine, blockIndex)"
+            (click)="commentsService.openComments(changesLine, blockIndex)"
+          >
+            <mat-icon>add_box</mat-icon>
+          </div>
+        </div>
+
+        <!-- Code -->
+        <div
+          class="code"
+          *ngIf="!changesLine.isCommentsLine && !blockLine.isPlaceholder"
+          (dblclick)="commentsService.openComments(changesLine, blockIndex)"
+        >
+          <pre [HTML]="blockLine.code"></pre>
+        </div>
+
+        <!-- Comments -->
+        <line-comments
+          [changesLine]="changesLine"
+          [blockLine]="blockLine"
+          [blockIndex]="blockIndex"
+          [lineIndex]="lineIndex"
+          *ngIf="changesLine.isCommentsLine"
+        ></line-comments>
+      </td>
+    </ng-container>
+  </tr>
+</table>
