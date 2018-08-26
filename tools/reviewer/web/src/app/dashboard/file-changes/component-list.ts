@@ -1,7 +1,7 @@
-import { CodeBlockComponentList } from './code-block';
+import { CodeChangesComponentList } from './code-changes';
 import { FileChangesComponent } from './file-changes.component';
 
 export const FileChangesComponentList = [
   FileChangesComponent,
-  ...CodeBlockComponentList,
+  ...CodeChangesComponentList,
 ];

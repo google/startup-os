@@ -6,7 +6,6 @@ import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { LocalserverService } from './localserver.service';
 import { NotificationService } from './notification.service';
-import { SelectionService } from './selection.service';
 
 export const ServiceList = [
   AuthGuard,
@@ -15,7 +14,6 @@ export const ServiceList = [
   FirebaseService,
   HighlightService,
   NotificationService,
-  SelectionService,
   EncodingService,
   LocalserverService,
 ];
