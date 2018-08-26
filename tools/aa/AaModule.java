@@ -35,7 +35,8 @@ public class AaModule {
   public @Provides @Named("Base path") String provideBasePath(FileUtils fileUtils) {
     String currentFolder = fileUtils.getCurrentWorkingDirectory();
     while (currentFolder != null) {
-      if (fileUtils.fileExists(fileUtils.joinPaths(currentFolder, InitCommand.BASE_FILENAME))) {
+      if (fileUtils.fileExists(
+          fileUtils.joinToAbsolutePath(currentFolder, InitCommand.BASE_FILENAME))) {
         return currentFolder;
       }
       File file = new File(currentFolder);
@@ -55,7 +56,7 @@ public class AaModule {
   @Named("Workspace name")
   public static String getWorkspaceName(FileUtils fileUtils, @Named("Base path") String basePath) {
     Path currentFolder = Paths.get(fileUtils.getCurrentWorkingDirectory());
-    Path wsFolder = Paths.get(fileUtils.joinPaths(basePath, "ws"));
+    Path wsFolder = Paths.get(fileUtils.joinToAbsolutePath(basePath, "ws"));
     try {
       Path currentWsFolder = wsFolder.relativize(currentFolder).normalize();
       String wsName = currentWsFolder.subpath(0, 1).toString();
@@ -74,13 +75,13 @@ public class AaModule {
       FileUtils fileUtils,
       @Named("Base path") String basePath,
       @Named("Workspace name") String workspaceName) {
-    return fileUtils.joinPaths(basePath, "ws", workspaceName);
+    return fileUtils.joinToAbsolutePath(basePath, "ws", workspaceName);
   }
 
   @Provides
   @Named("Head path")
   public static String getHeadPath(FileUtils fileUtils, @Named("Base path") String basePath) {
-    return fileUtils.joinPaths(basePath, "head");
+    return fileUtils.joinToAbsolutePath(basePath, "head");
   }
 
   /**
@@ -108,7 +109,7 @@ public class AaModule {
           fileUtils
               .listContents(workspacePath)
               .stream()
-              .map(path -> fileUtils.joinPaths(workspacePath, path))
+              .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
               .filter(fileUtils::folderExists)
               .findFirst()
               .orElse(null);
