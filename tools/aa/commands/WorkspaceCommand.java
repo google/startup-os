@@ -89,7 +89,7 @@ public class WorkspaceCommand implements AaCommand {
       fileUtils.mkdirs(workspacePath);
       try {
         fileUtils.copyDirectoryToDirectory(
-            fileUtils.joinPaths(config.getBasePath(), "head"),
+            fileUtils.joinToAbsolutePath(config.getBasePath(), "head"),
             workspacePath,
             "^bazel-.*$",
             "node_modules");
