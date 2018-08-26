@@ -98,24 +98,37 @@ public class InitCommand implements AaCommand {
   }
 
   private boolean processArgs(String[] args) {
-    if (args.length == 0 || args.length == 1) {
-      System.err.println(
-          RED_ERROR
-              + "Invalid usage. \n"
-              + "Available variants are: \"bazel run //tools/aa:aa_tool -- init </path/to/base/folder>\" "
-              + "or, if aa is already set up: \"aa init <base_path>\"");
-      return false;
-    }
-    boolean aaIsAlreadySetUpMode = args[0].equals("aa");
-    if (aaIsAlreadySetUpMode) {
-      if (args.length < 3) {
-        System.err.println(RED_ERROR + "Missing base_path");
-        return false;
-      } else {
-        basePath = args[2];
+    boolean isAaSetUp = args[0].equals("aa");
+    if (isAaSetUp) {
+      switch (args.length) {
+        case 2:
+          System.err.println(RED_ERROR + "Missing base_path");
+          return false;
+        case 3:
+          basePath = args[2];
+          break;
+        default:
+          System.err.println(
+              RED_ERROR
+                  + "Invalid usage. \n"
+                  + "Please use \"aa init <base_path>\" command to init a base folder.");
+          return false;
       }
     } else {
-      basePath = args[1];
+      switch (args.length) {
+        case 1:
+          System.err.println(RED_ERROR + "Missing base_path");
+          return false;
+        case 2:
+          basePath = args[1];
+          break;
+        default:
+          System.err.println(
+              RED_ERROR
+                  + "Invalid usage. \n"
+                  + "Please use \"bazel run //tools/aa:aa_tool -- init </path/to/base/folder>\" command to init a base folder.");
+          return false;
+      }
     }
     return true;
   }
