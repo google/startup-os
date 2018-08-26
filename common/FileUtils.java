@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toList;
 
 /** File utils */
 // TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
@@ -189,7 +188,7 @@ public class FileUtils {
             fileSystem.getPath(expandHomeDirectory(path)),
             100000, // Folder depth
             (unused, unused2) -> true)) {
-      return ImmutableList.sortedCopyOf(paths.map(Path::toString).collect(toList()));
+      return ImmutableList.sortedCopyOf(paths.map(Path::toString).collect(Collectors.toList()));
     }
   }
 
