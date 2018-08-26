@@ -143,7 +143,8 @@ public class WorkspaceCommandTest {
   }
 
   @Test
-  public void forcedWorkspaceCommandTestWithIgnoredFolders() throws Exception {
+  public void forcedWorkspaceCommandTestWithIgnoredNodeModulesFolderAndBaselFolders()
+      throws Exception {
     fileUtils.mkdirs("/base/head/startup-os");
     fileUtils.writeString("aaa", "/base/head/startup-os/file.txt");
     fileUtils.mkdirs("/base/head/startup-os/bazel-bin");
@@ -170,6 +171,33 @@ public class WorkspaceCommandTest {
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-out"));
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-startup-os"));
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-testlogs"));
+  }
+
+  @Test
+  public void forcedWorkspaceCommandTestWithIgnoredTwoNodeModulesFolder() throws Exception {
+    fileUtils.mkdirs("/base/head/startup-os");
+    fileUtils.writeString("aaa", "/base/head/startup-os/file1.txt");
+    fileUtils.mkdirs("/base/head/startup-os/tools/local_server/web_login/node_modules");
+    fileUtils.mkdirs("/base/head/startup-os/another/path/to/node_modules");
+    fileUtils.writeString(
+        "aaaa", "/base/head/startup-os/tools/local_server/web_login/node_modules/file2.txt");
+    fileUtils.writeString("bbbb", "/base/head/startup-os/another/path/to/node_modules/file3.txt");
+
+    String[] args = {"workspace", "-f", "workspace_name"};
+    workspaceCommand.run(args);
+    assertTrue(fileUtils.folderExists("/base/ws/workspace_name"));
+    assertTrue(fileUtils.fileExists("/base/ws/workspace_name/startup-os/file1.txt"));
+    assertFalse(
+        fileUtils.folderExists(
+            "/base/ws/workspace_name/startup-os/tools/local_server/web_login/node_modules"));
+    assertFalse(
+        fileUtils.fileExists(
+            "/base/ws/workspace_name/startup-os/tools/local_server/web_login/node_modules/file2.txt"));
+    assertFalse(
+        fileUtils.folderExists("/base/ws/workspace_name/startup-os/another/path/to/node_modules"));
+    assertFalse(
+        fileUtils.fileExists(
+            "/base/ws/workspace_name/startup-os/another/path/to/node_modules/file3.txt"));
   }
 }
 
