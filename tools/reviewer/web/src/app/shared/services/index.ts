@@ -3,7 +3,6 @@ export * from './difference.service';
 export * from './firebase.service';
 export * from './notification.service';
 export * from './highlight.service';
-export * from './selection.service';
 export * from './encoding.service';
 export * from './localserver.service';
 export * from './service-list';
