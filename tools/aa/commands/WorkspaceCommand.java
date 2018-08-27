@@ -91,7 +91,8 @@ public class WorkspaceCommand implements AaCommand {
         fileUtils.copyDirectoryToDirectory(
             fileUtils.joinToAbsolutePath(config.getBasePath(), "head"),
             workspacePath,
-            "^bazel-.*$");
+            "^bazel-.*$",
+            "node_modules");
       } catch (IOException e) {
         fileUtils.deleteDirectoryUnchecked(workspacePath);
         e.printStackTrace();
