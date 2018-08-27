@@ -250,6 +250,24 @@ public class GitRepoTest {
   }
 
   @Test
+  public void testGetUncommittedFilesWhenRenamedFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    gitRepo.renameOrMove(TEST_FILE, "new_name.txt");
+    assertEquals(
+        ImmutableList.of(
+            File.newBuilder()
+                .setFilename("new_name.txt")
+                .setAction(File.Action.RENAME)
+                .setOriginalFilename(TEST_FILE)
+                .build()),
+        repo.getUncommittedFiles());
+  }
+
+  @Test
   public void testTagHead() {
     repo.tagHead("test_tag");
     assertEquals(ImmutableList.of("test_tag"), gitRepo.getTagList());
