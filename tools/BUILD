@@ -80,3 +80,12 @@ sh_binary(
         "@grpcwebproxy_osx//file",
     ],
 )
+
+sh_binary(
+    name = "clang_format",
+    srcs = ["clang-format.sh"],
+    data = [
+        "@clang_format_bin//file",
+        "@clang_format_bin_osx//file",
+    ],
+)
