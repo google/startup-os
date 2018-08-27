@@ -1,12 +1,6 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
-git_repository(
-    name = "startupos_binaries",
-    commit = "3eaa31c93ca9ecb22ad8c348649d1ba4f61f332c",
-    remote = "https://github.com/oferb/startupos-binaries",
-)
-
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
@@ -216,5 +210,40 @@ bind(
 
 bind(
     name = "grpc_java_plugin",
-    actual = "@startupos_binaries//:grpc_java_plugin"
+    actual = "//tools:grpc_java_plugin"
+)
+
+http_file(
+    name = "grpc_java_plugin_linux",
+    executable = True,
+    sha256 = "d9117f0a987004bee3379654871b4cfeb81e49ebba346442dac84c82c5c20887",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpc_java_plugin_linux"],
+)
+
+http_file(
+    name = "grpc_java_plugin_osx",
+    executable = True,
+    sha256 = "e69af502d906199675454ac8af7dfddff78e6213df9abc63434c522adea6c6fb",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpc_java_plugin_osx"],
+)
+
+http_file(
+    name = "grpcwebproxy_linux",
+    executable = True,
+    sha256 = "c4a9167a0d6f0e16debbdca2b27248daae436216d43aa6be010febb6fe572474",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_linux"],
+)
+
+http_file(
+    name = "grpcwebproxy_osx",
+    executable = True,
+    sha256 = "805dedb12948aa36ba29caf532774da714e95910292dda9b993fb8fc7f2019d0",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_osx"],
+)
+
+http_file(
+    name = "bazel_deps",
+    executable = True,
+    sha256 = "c6840b1066793de9a998ef74e45f35f263df16372b2365af78565aeb2669ac6f",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/bazel_deps.jar"],
 )
