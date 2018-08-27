@@ -243,11 +243,8 @@ public class CodeReviewServiceGetDiffFilesTest {
     return blockingStub.getDiffFiles(request);
   }
 
-  private Protos.DiffFilesResponse getExpectedResponse(
-      com.google.startupos.common.repo.Protos.Commit commit) {
-    com.google.startupos.common.repo.Protos.BranchInfo.Builder builder =
-        com.google.startupos.common.repo.Protos.BranchInfo.newBuilder();
-    builder
+  private com.google.startupos.common.repo.Protos.BranchInfo getExpectedBranchInfo() {
+    return com.google.startupos.common.repo.Protos.BranchInfo.newBuilder()
         .setDiffId(DIFF_ID)
         .setRepoId(REPO_ID)
         .addCommit(
@@ -263,19 +260,35 @@ public class CodeReviewServiceGetDiffFilesTest {
                         .setWorkspace("ws1")
                         .setRepoId(REPO_ID)
                         .setCommitId(testFileCommitId)
+                        .setFilenameWithRepo("startup-os/test_file.txt")
                         .build())
-                .build());
-    if (commit != null) {
-      builder.addCommit(commit);
-    }
-    return Protos.DiffFilesResponse.newBuilder()
-        .addAllBranchInfo(Collections.singleton(builder.build()))
+                .build())
         .build();
+  }
+
+  private Protos.DiffFilesResponse getExpectedResponseAddingCommit(
+      com.google.startupos.common.repo.Protos.Commit commit) {
+    com.google.startupos.common.repo.Protos.BranchInfo.Builder branchInfoBuilder =
+        getExpectedBranchInfo().toBuilder();
+    if (commit != null) {
+      branchInfoBuilder.addCommit(commit).build();
+    }
+    return Protos.DiffFilesResponse.newBuilder().addBranchInfo(branchInfoBuilder).build();
+  }
+
+  private Protos.DiffFilesResponse getExpectedResponseAddingUncommittedFile(
+      com.google.startupos.common.repo.Protos.File file) {
+    com.google.startupos.common.repo.Protos.BranchInfo.Builder branchInfoBuilder =
+        getExpectedBranchInfo().toBuilder();
+    if (file != null) {
+      branchInfoBuilder.addUncommittedFile(file).build();
+    }
+    return Protos.DiffFilesResponse.newBuilder().addBranchInfo(branchInfoBuilder).build();
   }
 
   @Test
   public void testGetDiffFiles_withoutChangesInWorkspace() {
-    assertEquals(getExpectedResponse(null), getResponse());
+    assertEquals(getExpectedResponseAddingCommit(null), getResponse());
   }
 
   @Test
@@ -293,10 +306,11 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
                     .setAction(com.google.startupos.common.repo.Protos.File.Action.MODIFY)
+                    .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
 
-    assertEquals(getExpectedResponse(lastCommit), getResponse());
+    assertEquals(getExpectedResponseAddingCommit(lastCommit), getResponse());
   }
 
   @Test
@@ -313,10 +327,28 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
+                    .setFilenameWithRepo("startup-os/new_file.txt")
                     .build())
             .build();
 
-    assertEquals(getExpectedResponse(lastCommit), getResponse());
+    assertEquals(getExpectedResponseAddingCommit(lastCommit), getResponse());
+  }
+
+  @Test
+  public void testGetDiffFiles_whenFileIsRenamed() {
+    repo.renameOrMove(TEST_FILE, "new_filename.txt");
+
+    com.google.startupos.common.repo.Protos.File uncommittedFile =
+        com.google.startupos.common.repo.Protos.File.newBuilder()
+            .setFilename("new_filename.txt")
+            .setWorkspace("ws1")
+            .setRepoId("startup-os")
+            .setAction(com.google.startupos.common.repo.Protos.File.Action.RENAME)
+            .setOriginalFilename("test_file.txt")
+            .setFilenameWithRepo("startup-os/new_filename.txt")
+            .build();
+
+    assertEquals(getExpectedResponseAddingUncommittedFile(uncommittedFile), getResponse());
   }
 
   @Test
@@ -335,10 +367,11 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
                     .setAction(com.google.startupos.common.repo.Protos.File.Action.DELETE)
+                    .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
 
-    assertEquals(getExpectedResponse(lastCommit), getResponse());
+    assertEquals(getExpectedResponseAddingCommit(lastCommit), getResponse());
   }
 
   @Test
@@ -356,6 +389,7 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
+                    .setFilenameWithRepo("startup-os/new_file.txt")
                     .build())
             .addFile(
                 com.google.startupos.common.repo.Protos.File.newBuilder()
@@ -364,10 +398,11 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
                     .setAction(com.google.startupos.common.repo.Protos.File.Action.MODIFY)
+                    .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
 
-    assertEquals(getExpectedResponse(lastCommit), getResponse());
+    assertEquals(getExpectedResponseAddingCommit(lastCommit), getResponse());
   }
 
   @Test
@@ -386,6 +421,7 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
+                    .setFilenameWithRepo("startup-os/new_file.txt")
                     .build())
             .addFile(
                 com.google.startupos.common.repo.Protos.File.newBuilder()
@@ -394,10 +430,11 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
                     .setAction(com.google.startupos.common.repo.Protos.File.Action.DELETE)
+                    .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
 
-    assertEquals(getExpectedResponse(lastCommit), getResponse());
+    assertEquals(getExpectedResponseAddingCommit(lastCommit), getResponse());
   }
 }
 
