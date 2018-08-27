@@ -7,7 +7,7 @@
 RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
-bazel run @startupos_binaries//:bazel_deps -- format-deps \
+bazel run //tools:bazel_deps -- format-deps \
   --overwrite \
   --deps $(pwd)/dependencies.yaml
 

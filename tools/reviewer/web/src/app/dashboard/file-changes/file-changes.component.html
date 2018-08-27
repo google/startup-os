@@ -1,28 +1,19 @@
 <!-- Loading -->
-<page-loading [isLoading]="isLoading"></page-loading>
+<page-loading [isLoading]="fileChangesService.isLoading"></page-loading>
 
 <!-- Header -->
-<div class="file-header" *ngIf="!isLoading">
-  <div><a routerLink="/diff/{{ diff.getId() }}">Back</a></div>
-  <div><span>{{ file.getFilename() }}</span></div>
+<div class="file-header" *ngIf="!fileChangesService.isLoading">
+  <div><a routerLink="/diff/{{ fileChangesService.diff.getId() }}">
+    Back
+  </a></div>
+  <div><span>{{ fileChangesService.file.getFilename() }}</span></div>
 </div>
 
 <!-- Code changes -->
-<div class="split-code" *ngIf="!isLoading">
-  <!-- Old code (left) -->
-  <code-block
-    [fileContent]="textDiff.getLeftFileContents()"
-    [isNewCode]="false"
-    [changes]="changes"
-    [language]="fileChangesService.getLanguage(file.getFilename())"
-  ></code-block>
-
-  <!-- New code (right) -->
-  <code-block
-    [fileContent]="textDiff.getRightFileContents()"
-    [isNewCode]="true"
-    [changes]="changes"
-    [threads]="localThreads"
-    [language]="fileChangesService.getLanguage(file.getFilename())"
-  ></code-block>
+<div class="code-changes" *ngIf="!fileChangesService.isLoading">
+  <code-changes
+    [textDiff]="fileChangesService.textDiff"
+    [language]="language"
+    [threads]="fileChangesService.localThreads"
+  ></code-changes>
 </div>
