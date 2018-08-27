@@ -71,14 +71,14 @@ public class LocalServer {
     }
 
     public void run() {
-      String headPath = fileUtils.joinPaths(this.basePath, "head");
+      String headPath = fileUtils.joinToAbsolutePath(this.basePath, "head");
 
       // Pull all repos in head
       try {
         fileUtils
             .listContents(headPath)
             .stream()
-            .map(path -> fileUtils.joinPaths(headPath, path))
+            .map(path -> fileUtils.joinToAbsolutePath(headPath, path))
             .filter(fileUtils::folderExists)
             .forEach(
                 path -> {

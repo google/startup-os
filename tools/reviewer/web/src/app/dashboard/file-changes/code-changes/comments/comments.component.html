@@ -1,0 +1,43 @@
+<!-- Comment List -->
+<div class="comments" *ngIf="blockLine.comments.length > 0">
+  <div
+    class="comment"
+    *ngFor="let comment of blockLine.comments; let i = index"
+  >
+    <div class="username">
+      <span>{{ authService.getUsername(comment.getCreatedBy()) }}</span>
+    </div>
+    <div class="message">
+      <span>{{comment.getContent()}}</span>
+    </div>
+    <div class="delete-button">
+      <button
+        mat-icon-button
+        (click)="deleteComment(i)"
+      ><mat-icon>delete_forever</mat-icon></button>
+    </div>
+  </div>
+</div>
+
+<!-- Add new comment -->
+<div class="new-comment" *ngIf="blockLine.isNewCommentVisible">
+  <textarea
+    class="text"
+    matInput
+    matTextareaAutosize
+    matAutosizeMinRows="2"
+    placeholder="Leave a comment"
+    [formControl]="textareaControl"
+  ></textarea>
+  <div class="buttons">
+    <button
+      mat-raised-button
+      (click)="addComment()"
+    >Comment</button>
+    <button
+      mat-raised-button
+      (click)="closeComments()"
+      *ngIf="!blockLine.comments.length"
+    >Close</button>
+  </div>
+</div>

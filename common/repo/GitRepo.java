@@ -44,7 +44,9 @@ public class GitRepo implements Repo {
     this.fileUtils = fileUtils;
     gitCommandBase =
         Arrays.asList(
-            "git", "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"), "--work-tree=" + repoPath);
+            "git",
+            "--git-dir=" + fileUtils.joinToAbsolutePath(repoPath, ".git"),
+            "--work-tree=" + repoPath);
   }
 
   private class CommandResult {
@@ -384,7 +386,7 @@ public class GitRepo implements Repo {
 
   public boolean cloneRepo(String url, String path) {
     CommandResult commandResult =
-        runCommand("clone -q " + url + " " + fileUtils.joinPaths(path, ".git"));
+        runCommand("clone -q " + url + " " + fileUtils.joinToAbsolutePath(path, ".git"));
     return commandResult.stderr.isEmpty();
   }
 }
