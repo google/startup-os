@@ -93,7 +93,7 @@ public class Flags {
       instance()
           .scanPackages(Collections.singletonList(Class.forName(className).getPackage().getName()));
     } catch (ClassNotFoundException e) {
-      e.printStackTrace();
+      throw new IllegalArgumentException(e);
     }
     return instance._parse(args);
   }
