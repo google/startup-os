@@ -27,13 +27,17 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SnapshotCommand implements AaCommand {
   private final FileUtils fileUtils;
   private final GitRepoFactory gitRepoFactory;
   private String workspacePath;
+  private String workspaceName;
   private Integer diffNumber;
+  private Map<String, String> repoToInitialBranch = new HashMap<>();
 
   private static final Integer GRPC_PORT = 8001;
 
@@ -42,10 +46,12 @@ public class SnapshotCommand implements AaCommand {
       FileUtils fileUtils,
       GitRepoFactory repoFactory,
       @Named("Workspace path") String workspacePath,
+      @Named("Workspace name") String workspaceName,
       @Named("Diff number") Integer diffNumber) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = repoFactory;
     this.workspacePath = workspacePath;
+    this.workspaceName = workspaceName;
     this.diffNumber = diffNumber;
 
     ManagedChannel channel =
@@ -60,8 +66,6 @@ public class SnapshotCommand implements AaCommand {
       return false;
     }
     String branchName = String.format("D%d", diffNumber);
-    GitRepo gitRepo = this.gitRepoFactory.create(workspacePath);
-    String initialBranch = gitRepo.currentBranch();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -72,6 +76,7 @@ public class SnapshotCommand implements AaCommand {
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 GitRepo repo = this.gitRepoFactory.create(path);
+                repoToInitialBranch.put(repoName, repo.currentBranch());
                 repo.switchBranch(branchName);
                 ImmutableList<File> files = repo.getUncommittedFiles();
                 if (files.isEmpty()) {
@@ -86,12 +91,25 @@ public class SnapshotCommand implements AaCommand {
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });
     } catch (IOException e) {
-      if (!gitRepo.currentBranch().equals(initialBranch)) {
-        gitRepo.switchBranch(initialBranch);
-      }
+      revertChanges(repoToInitialBranch);
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void revertChanges(Map<String, String> repoToInitialBranch) {
+    if (!repoToInitialBranch.isEmpty()) {
+      repoToInitialBranch.forEach(
+          (repoName, initialBranch) -> {
+            GitRepo repo =
+                gitRepoFactory.create(
+                    fileUtils.joinToAbsolutePath(workspacePath, workspaceName, repoName));
+            String currentBranch = repo.currentBranch();
+            if (!currentBranch.equals(initialBranch)) {
+              repo.switchBranch(initialBranch);
+            }
+          });
+    }
   }
 }
 
