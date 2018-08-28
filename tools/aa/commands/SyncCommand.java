@@ -104,7 +104,7 @@ public class SyncCommand implements AaCommand {
                     String.format("[%s/%s]: removing temp branch", workspaceName, repoName));
                 repo.removeBranch("temp_branch_for_sync");
               });
-    } catch (IOException e) {
+    } catch (Exception e) {
       revertChanges(repoToInitialBranch);
       e.printStackTrace();
     }
@@ -116,8 +116,7 @@ public class SyncCommand implements AaCommand {
       repoToInitialBranch.forEach(
           (repoName, initialBranch) -> {
             GitRepo repo =
-                repoFactory.create(
-                    fileUtils.joinToAbsolutePath(workspacePath, workspaceName, repoName));
+                repoFactory.create(fileUtils.joinToAbsolutePath(workspacePath, repoName));
             String currentBranch = repo.currentBranch();
             if (!currentBranch.equals(initialBranch)) {
               repo.switchBranch(initialBranch);

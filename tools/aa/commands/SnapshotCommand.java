@@ -23,7 +23,6 @@ import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.common.repo.Protos.File;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import java.io.IOException;
 import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,7 +34,6 @@ public class SnapshotCommand implements AaCommand {
   private final FileUtils fileUtils;
   private final GitRepoFactory gitRepoFactory;
   private String workspacePath;
-  private String workspaceName;
   private Integer diffNumber;
   private Map<String, String> repoToInitialBranch = new HashMap<>();
 
@@ -46,12 +44,10 @@ public class SnapshotCommand implements AaCommand {
       FileUtils fileUtils,
       GitRepoFactory repoFactory,
       @Named("Workspace path") String workspacePath,
-      @Named("Workspace name") String workspaceName,
       @Named("Diff number") Integer diffNumber) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = repoFactory;
     this.workspacePath = workspacePath;
-    this.workspaceName = workspaceName;
     this.diffNumber = diffNumber;
 
     ManagedChannel channel =
@@ -90,7 +86,7 @@ public class SnapshotCommand implements AaCommand {
                 repo.commit(files, String.format(message, branchName));
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });
-    } catch (IOException e) {
+    } catch (Exception e) {
       revertChanges(repoToInitialBranch);
       e.printStackTrace();
     }
@@ -102,8 +98,7 @@ public class SnapshotCommand implements AaCommand {
       repoToInitialBranch.forEach(
           (repoName, initialBranch) -> {
             GitRepo repo =
-                gitRepoFactory.create(
-                    fileUtils.joinToAbsolutePath(workspacePath, workspaceName, repoName));
+                gitRepoFactory.create(fileUtils.joinToAbsolutePath(workspacePath, repoName));
             String currentBranch = repo.currentBranch();
             if (!currentBranch.equals(initialBranch)) {
               repo.switchBranch(initialBranch);
