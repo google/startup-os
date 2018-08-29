@@ -256,7 +256,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void push() {
-    runCommand("push --all --atomic origin");
+    runCommand("push -q --all --atomic origin");
   }
 
   @Override
