@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 public class SyncCommand implements AaCommand {
+  private static final String TEMP_BRANCH_FOR_SYNC = "temp_branch_for_sync";
 
   private final FileUtils fileUtils;
   private GitRepoFactory repoFactory;
@@ -34,6 +35,7 @@ public class SyncCommand implements AaCommand {
   private String workspaceName;
   private String workspacePath;
   private Map<String, String> repoToInitialBranch = new HashMap<>();
+  private Map<String, Boolean> repoToTempBranchExistedBefore = new HashMap<>();
 
   @Inject
   public SyncCommand(
@@ -80,9 +82,11 @@ public class SyncCommand implements AaCommand {
                     String.format("[%s/%s]: Performing sync", workspaceName, repoName));
                 GitRepo repo = repoFactory.create(path);
                 repoToInitialBranch.put(repoName, repo.currentBranch());
+                repoToTempBranchExistedBefore.put(
+                    repoName, repo.branchExists(TEMP_BRANCH_FOR_SYNC));
                 System.out.println(
                     String.format("[%s/%s]: switching to temp branch", workspaceName, repoName));
-                repo.switchBranch("temp_branch_for_sync");
+                repo.switchBranch(TEMP_BRANCH_FOR_SYNC);
                 System.out.println(
                     String.format("[%s/%s]: committing all changes", workspaceName, repoName));
                 repo.commit(repo.getUncommittedFiles(), "Sync: temporary commit");
@@ -120,6 +124,14 @@ public class SyncCommand implements AaCommand {
             String currentBranch = repo.currentBranch();
             if (!currentBranch.equals(initialBranch)) {
               repo.switchBranch(initialBranch);
+            }
+          });
+      repoToTempBranchExistedBefore.forEach(
+          (repoName, tempBranchExistedBefore) -> {
+            GitRepo repo =
+                repoFactory.create(fileUtils.joinToAbsolutePath(workspacePath, repoName));
+            if (!tempBranchExistedBefore && repo.branchExists(TEMP_BRANCH_FOR_SYNC)) {
+              repo.removeBranch(TEMP_BRANCH_FOR_SYNC);
             }
           });
     }
