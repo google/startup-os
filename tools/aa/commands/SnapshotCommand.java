@@ -23,10 +23,11 @@ import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
 import com.google.startupos.common.repo.Protos.File;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import java.io.IOException;
 import java.nio.file.Paths;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SnapshotCommand implements AaCommand {
@@ -34,6 +35,7 @@ public class SnapshotCommand implements AaCommand {
   private final GitRepoFactory gitRepoFactory;
   private String workspacePath;
   private Integer diffNumber;
+  private Map<String, String> repoToInitialBranch = new HashMap<>();
 
   private static final Integer GRPC_PORT = 8001;
 
@@ -60,8 +62,6 @@ public class SnapshotCommand implements AaCommand {
       return false;
     }
     String branchName = String.format("D%d", diffNumber);
-    GitRepo gitRepo = this.gitRepoFactory.create(workspacePath);
-    String initialBranch = gitRepo.currentBranch();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -72,6 +72,7 @@ public class SnapshotCommand implements AaCommand {
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
                 GitRepo repo = this.gitRepoFactory.create(path);
+                repoToInitialBranch.put(repoName, repo.currentBranch());
                 repo.switchBranch(branchName);
                 ImmutableList<File> files = repo.getUncommittedFiles();
                 if (files.isEmpty()) {
@@ -85,13 +86,25 @@ public class SnapshotCommand implements AaCommand {
                 repo.commit(files, String.format(message, branchName));
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });
-    } catch (IOException e) {
-      if (!gitRepo.currentBranch().equals(initialBranch)) {
-        gitRepo.switchBranch(initialBranch);
-      }
+    } catch (Exception e) {
+      revertChanges(repoToInitialBranch);
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void revertChanges(Map<String, String> repoToInitialBranch) {
+    if (!repoToInitialBranch.isEmpty()) {
+      repoToInitialBranch.forEach(
+          (repoName, initialBranch) -> {
+            GitRepo repo =
+                gitRepoFactory.create(fileUtils.joinToAbsolutePath(workspacePath, repoName));
+            String currentBranch = repo.currentBranch();
+            if (!currentBranch.equals(initialBranch)) {
+              repo.switchBranch(initialBranch);
+            }
+          });
+    }
   }
 }
 

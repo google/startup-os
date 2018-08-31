@@ -14,12 +14,9 @@ The main technologies in the stack are:
 * [Bazel](https://bazel.build/)
 
 ## Hands-on experience
-Try cloning the repo in Google Cloud Shell and look at the tutorials:
-```
-$ ls tutorials/
-$ teachme <tutorial_name.md>
-```
-[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Fgoogle%2Fstartup-os&page=shell)
+Try the Google Cloud Shell tutorial on formatting code using a Bazel-built tool:
+
+[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/google/startup-os&page=shell&tutorial=tutorials/formatting-code.md)
 
 ## Supported languages
 
@@ -64,6 +61,9 @@ StartupOS doesn't require you to work with a monorepo, but some things, such as 
 Some good reads about the monorepo approach:
 * [trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
 * [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
+
+## Platforms
+While Bazel supports Linux, Mac and Windows, this repo has only been developed on Linux and Mac, so on Windows, YMMV.
 
 ## Contributing
 You're welcome to contribute and in doing so, learn these technologies.
