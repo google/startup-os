@@ -62,6 +62,9 @@ Some good reads about the monorepo approach:
 * [trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
 * [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
 
+## Platforms
+While Bazel supports Linux, Mac and Windows, this repo has only been developed on Linux and Mac, so on Windows, YMMV.
+
 ## Contributing
 You're welcome to contribute and in doing so, learn these technologies.
 You can have a look at the issues list, or at the project [milestones](docs/milestones.md).
