@@ -14,12 +14,9 @@ The main technologies in the stack are:
 * [Bazel](https://bazel.build/)
 
 ## Hands-on experience
-Try cloning the repo in Google Cloud Shell and look at the tutorials:
-```
-$ ls tutorials/
-$ teachme <tutorial_name.md>
-```
-[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https%3A%2F%2Fgithub.com%2Fgoogle%2Fstartup-os&page=shell)
+Try the Google Cloud Shell tutorial on formatting code using a Bazel-built tool:
+
+[![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/google/startup-os&page=shell&tutorial=tutorials/formatting-code.md)
 
 ## Supported languages
 
