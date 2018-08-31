@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /src/app/shared/proto/functions
+.firebase
 
 # dependencies
 /node_modules

@@ -38,11 +38,14 @@ $comment-padding: 4px;
 .new-comment {
   padding: $comments-padding;
   button {
-    margin-top: 5px;
+    margin-top: 10px;
   }
   textarea {
     resize: none;
     width: $comment-width;
     padding: $comment-padding;
+    background: white;
+    vertical-align: bottom;
+    font-size: 15px;
   }
 }
