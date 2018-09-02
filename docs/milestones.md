@@ -15,6 +15,7 @@ Working examples of:
 * ✓ [Error Prone](https://github.com/google/error-prone): Error Prone is actually already [integrated](https://blog.bazel.build/2015/06/25/ErrorProne.html) into Bazel.
 * ✓ [Google Java Formatter](https://github.com/google/google-java-format): Integrated into the CI.
 * ✓ [Kubernetes](https://kubernetes.io)
+* [Skaffold on Bazel](https://github.com/GoogleContainerTools/skaffold/tree/master/examples/bazel)
 * [ABC](http://g.co/ng/abc) (Angular Bazel Closure)
 * [j2objc](https://developers.google.com/j2objc)
 * [Dagger on Android](https://google.github.io/dagger/android.html)
