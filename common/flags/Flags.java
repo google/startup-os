@@ -81,13 +81,13 @@ public class Flags {
   }
 
   /**
-   * Initializes flag values from command-line style arguments. Scanners all flags of the current
+   * Initializes flag values from command-line style arguments. Scans all flags of the current
    * package.
    *
    * @param args command-line arguments to parse values from
    */
   public static String[] parseCurrentPackage(String[] args) {
-    // getting the caller class name
+    // Getting a caller class name. Index [2] is used to obtain a method which calls this method
     String className = Thread.currentThread().getStackTrace()[2].getClassName();
     try {
       instance()
