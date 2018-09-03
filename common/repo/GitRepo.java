@@ -266,7 +266,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void push() {
-    runCommand("push --all --atomic origin");
+    runCommand("push -q --all --atomic origin");
   }
 
   @Override
@@ -283,7 +283,7 @@ public class GitRepo implements Repo {
     switchToMasterBranch();
     CommandResult mergeCommandResult;
     if (remote) {
-      CommandResult fetchCommandResult = runCommand("fetch origin " + branch);
+      CommandResult fetchCommandResult = runCommand("fetch -q origin " + branch);
       if (!fetchCommandResult.stderr.isEmpty()) {
         throw new IllegalStateException(
             "Failed to fetch remote branch before merging \'"

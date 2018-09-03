@@ -22,6 +22,7 @@ table {
       }
     }
     >.content {
+      $add-comment-button-width: 24px;
       min-width: 650px;
       position: relative;
       >.add-comment-button {
@@ -40,10 +41,21 @@ table {
           }
         }
       }
+      >.chars-highlighting {
+        position: absolute;
+        left: $add-comment-button-width;
+        pre {
+          color: rgba(0,0,0,0);
+        }
+      }
       >.code {
+        position: relative;
         min-height: $font-size;
-        margin-left: 24px;
+        margin-left: $add-comment-button-width;
         padding-right: 10px;
+      }
+      .code-line {
+        padding-top: 1px;
       }
     }
   }

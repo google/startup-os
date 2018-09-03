@@ -767,5 +767,190 @@ public class FileUtilsTest {
     }
     fileUtils.clearDirectoryUnchecked("/nonexistent_path");
   }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWithoutIgnored() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/file1.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/file2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(TEST_DIR_PATH, "destination_folder");
+
+    assertTrue(Files.isRegularFile(fileSystem.getPath("destination_folder" + "/file1.txt")));
+    assertTrue(
+        Files.isRegularFile(fileSystem.getPath("destination_folder" + "/path/to/file2.txt")));
+  }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredOneFile() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_file.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/file_for_ignore.txt"));
+
+    fileUtils.copyDirectoryToDirectory(TEST_DIR_PATH, "destination_folder", "file_for_ignore.txt");
+
+    assertTrue(Files.isRegularFile(fileSystem.getPath("destination_folder" + "/some_file.txt")));
+    assertFalse(
+        Files.isRegularFile(fileSystem.getPath("destination_folder" + "/file_for_ignore.txt")));
+  }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredTwoFiles() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_file.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/file_for_ignore1.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/file_for_ignore2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(
+        TEST_DIR_PATH,
+        "destination_folder",
+        "file_for_ignore1.txt",
+        "path/to/file_for_ignore2.txt");
+
+    assertTrue(Files.isRegularFile(fileSystem.getPath("destination_folder" + "/some_file.txt")));
+    assertFalse(
+        Files.isRegularFile(fileSystem.getPath("destination_folder" + "/file_for_ignore1.txt")));
+    assertFalse(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "path/to/file_for_ignore2.txt")));
+  }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredOneFolder() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/some_folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_folder/some_file.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore"));
+    Files.createDirectories(
+        fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore/internal_folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore/file2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(
+        TEST_DIR_PATH, "destination_folder", "path/to/folder_for_ignore");
+
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/some_folder")));
+    assertTrue(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/some_folder/some_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to")));
+    assertFalse(
+        Files.isDirectory(
+            fileSystem.getPath(
+                "destination_folder" + "/path/to/folder_for_ignore/internal_folder")));
+    assertFalse(
+        Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore")));
+    assertFalse(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore/file2.txt")));
+  }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredTwoFolder() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/some_folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_folder/some_file.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder_for_ignore1"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder_for_ignore1/file1.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore2"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore2/file2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(
+        TEST_DIR_PATH, "destination_folder", "folder_for_ignore1", "path/to/folder_for_ignore2");
+
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/some_folder")));
+    assertTrue(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/some_folder/some_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to")));
+    assertFalse(
+        Files.isDirectory(fileSystem.getPath("destination_folder" + "/folder_for_ignore1")));
+    assertFalse(
+        Files.isDirectory(
+            fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore2")));
+    assertFalse(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore2/file2.txt")));
+  }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredTwoFolderWithRegex() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/some_folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_folder/some_file.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder_for_ignore"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder_for_ignore/file1.txt"));
+    Files.createDirectories(
+        fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore_with_regex"));
+    Files.createFile(
+        fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore_with_regex/file2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(TEST_DIR_PATH, "destination_folder", "folder_for_ignore.*");
+
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/some_folder")));
+    assertTrue(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/some_folder/some_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to")));
+    assertFalse(Files.isDirectory(fileSystem.getPath("destination_folder" + "/folder_for_ignore")));
+    assertFalse(
+        Files.isDirectory(
+            fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore_with_regex")));
+    assertFalse(
+        Files.isRegularFile(
+            fileSystem.getPath(
+                "destination_folder" + "/path/to/folder_for_ignore_with_regex/file2.txt")));
+  }
+
+  @Test
+  public void testCopyDirectoryToDirectoryWhenIgnoredFileAndFolder() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/some_folder"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/some_folder/some_file.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/file1.txt"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/path/to/folder_for_ignore/file2.txt"));
+
+    fileUtils.copyDirectoryToDirectory(
+        TEST_DIR_PATH, "destination_folder", "file1.txt", "path/to/folder_for_ignore");
+
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/some_folder")));
+    assertTrue(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/some_folder/some_file.txt")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path")));
+    assertTrue(Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to")));
+    assertFalse(Files.isRegularFile(fileSystem.getPath("destination_folder" + "/file1.txt")));
+    assertFalse(
+        Files.isDirectory(fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore")));
+    assertFalse(
+        Files.isRegularFile(
+            fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore/file2.txt")));
+  }
 }
 

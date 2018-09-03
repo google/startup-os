@@ -31,7 +31,7 @@ export class FileChangesService {
   ) { }
 
   startLoading(filename: string, diffId: string): void {
-    this.file.setFilename(filename);
+    this.file.setFilenameWithRepo(filename);
     this.getDiff(diffId);
   }
 
@@ -41,7 +41,10 @@ export class FileChangesService {
       this.diff = diff;
       this.localThreads = this.diff
         .getThreadList()
-        .filter(v => v.getFile().getFilename() === this.file.getFilename());
+        .filter(thread =>
+          thread.getFile().getFilenameWithRepo() ===
+          this.file.getFilenameWithRepo(),
+        );
 
       this.getBranchInfo();
     });
@@ -51,12 +54,13 @@ export class FileChangesService {
   getBranchInfo(): void {
     this.localserverService
       .getBranchInfo(this.diff.getId(), this.diff.getWorkspace())
-      .subscribe(branchInfo => {
-        this.branchInfo = branchInfo;
-        this.file = this.getFile(
-          this.file.getFilename(),
-          this.branchInfo,
+      .subscribe(branchInfoList => {
+        const { branchInfo, file } = this.getFileData(
+          this.file.getFilenameWithRepo(),
+          branchInfoList,
         );
+        this.branchInfo = branchInfo;
+        this.file = file;
         this.getFileChanges(this.file);
       });
   }
@@ -154,15 +158,26 @@ export class FileChangesService {
     throw new Error('Undefined commit id');
   }
 
-  // Get file from branchInfo by the filename
-  getFile(filename: string, branchInfo: BranchInfo): File {
-    const files: File[] = this.localserverService
-      .getFilesFromBranchInfo(branchInfo);
-    for (const file of files) {
-      if (filename === file.getFilename()) {
-        return file;
+  // Get file and branchInfo from branchInfo list
+  getFileData(filenameWithRepo: string, branchInfoList: BranchInfo[]): {
+    file: File;
+    branchInfo: BranchInfo;
+  } {
+    // Compare the filename with each filename of each repo
+    for (const branchInfo of branchInfoList) {
+      const files: File[] = this.localserverService
+        .getFilesFromBranchInfo(branchInfo);
+      for (const file of files) {
+        if (filenameWithRepo === file.getFilenameWithRepo()) {
+          // File found
+          return {
+            file: file,
+            branchInfo: branchInfo,
+          };
+        }
       }
     }
+    throw new Error('File not found');
   }
 
   // Get langulage from filename. Example:
