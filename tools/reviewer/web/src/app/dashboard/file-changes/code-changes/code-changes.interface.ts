@@ -1,4 +1,4 @@
-import { Comment } from '@/shared/proto';
+import { Comment, TextChange } from '@/shared/proto';
 
 export enum BlockIndex {
   leftFile,
@@ -8,13 +8,15 @@ export enum BlockIndex {
 // Code line of a block of code
 export interface BlockLine {
   code: string;
+  clearCode: string;
   lineNumber: number;
-  isChanged: boolean;
   // Is the line a placeholder?
   isPlaceholder: boolean;
   // Is "add new comment" UI displayed?
   isNewCommentVisible: boolean;
   comments: Comment[];
+  isChanged: boolean;
+  textChange?: TextChange;
 }
 
 // Line of code changes (left and right blocks)

@@ -39,7 +39,7 @@ message TextChange {
   // The {@link Type} of the difference.
   ChangeType type = 2;
 
-  int32 lineNumber = 3;
+  int32 line_number = 3;
 
   // Coordinates of a change in one line.
   // Leave it empty, if whole line was changed.

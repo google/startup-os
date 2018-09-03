@@ -33,11 +33,19 @@ export class ChangesService {
       .makeHighlightingInline(highlightedCode)
       .split('\n');
 
+    // Code lines without highlighting
+    const clearCodeLines: string[] = fileContent.split('\n');
+
     const blockLines: BlockLine[] = [];
     highlightedLines.forEach((lineCode, index) => {
+      const clearLineCode: string = clearCodeLines[index];
+      if (clearLineCode === undefined) {
+        throw new Error("Highlighted and clear lines don't match");
+      }
+
       blockLines.push(
         // index + 1 because we want 1,2,3,4,5... instead of 0,1,2,3,4...
-        this.lineService.createBlockLine(lineCode, index + 1),
+        this.lineService.createBlockLine(lineCode, clearLineCode, index + 1),
       );
     });
 
@@ -164,6 +172,7 @@ export class ChangesService {
         case ChangeType.ADD:
           // Highlight changes
           blockLines[textChange.getLineNumber()].isChanged = true;
+          blockLines[textChange.getLineNumber()].textChange = textChange;
       }
     });
   }
@@ -178,6 +187,7 @@ export class ChangesService {
           0,
           this.lineService.createPlaceholder(),
         );
+        // TODO: to use placeholderLineCount ?
       }
     });
   }
