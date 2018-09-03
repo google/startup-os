@@ -6,6 +6,8 @@ java_binary(
     main_class = "com.google.startupos.tools.formatter.FormatterTool",
     runtime_deps = [
         "//tools:buildifier",
+        # TODO: Current downloaded file is 292mb. Find a smaller source for the formatter.
+        #"//tools:clang_format",
     ],
     deps = [
         "//common/flags",
