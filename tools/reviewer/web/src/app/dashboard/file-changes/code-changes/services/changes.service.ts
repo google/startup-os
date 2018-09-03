@@ -39,6 +39,10 @@ export class ChangesService {
     const blockLines: BlockLine[] = [];
     highlightedLines.forEach((lineCode, index) => {
       const clearLineCode: string = clearCodeLines[index];
+      if (clearLineCode == undefined) {
+        throw new Error("Highlighted and clear lines don't match");
+      }
+
       blockLines.push(
         // index + 1 because we want 1,2,3,4,5... instead of 0,1,2,3,4...
         this.lineService.createBlockLine(lineCode, clearLineCode, index + 1),

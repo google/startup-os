@@ -7,7 +7,7 @@ import {
 } from '../code-changes.interface';
 
 @Injectable()
-export class UIService {
+export class TemplateService {
   getLineBackground(
     changesLine: ChangesLine,
     blockIndex: number,

@@ -15,7 +15,11 @@
       <td
         [ngClass]="[
           'content',
-          uiService.getLineBackground(changesLine, blockIndex, blockLine)
+          templateService.getLineBackground(
+            changesLine,
+            blockIndex,
+            blockLine,
+          )
         ]"
         valign="top"
         (mouseover)="hoverService.mouseOver(blockLine, blockIndex)"
@@ -41,7 +45,7 @@
           *ngIf="blockLine.isChanged"
         >
           <pre
-            [HTML]="uiService.highlightChanges(blockLine, blockIndex)"
+            [HTML]="templateService.highlightChanges(blockLine, blockIndex)"
           ></pre>
         </div>
 
