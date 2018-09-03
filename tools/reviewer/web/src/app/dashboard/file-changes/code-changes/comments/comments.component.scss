@@ -1,0 +1,51 @@
+$comments-padding: 20px;
+$comment-width: 700px;
+$comment-padding: 4px;
+
+.comments {
+  padding-top: $comments-padding;
+  padding-left: $comments-padding;
+  padding-right: $comments-padding;
+  >.comment {
+    position: relative;
+    background: white;
+    border: 1px solid rgba(0,0,0,.3);
+    border-radius: 2px;
+    margin-bottom: 5px;
+    width: $comment-width;
+    padding: $comment-padding;
+    >.username {
+      >span {
+        font-weight: bold;
+      }
+    }
+    span {
+      font-size: 14px;
+    }
+    >.delete-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      >button {
+        margin: 0;
+      }
+      mat-icon {
+        color: #777;
+      }
+    }
+  }
+}
+.new-comment {
+  padding: $comments-padding;
+  button {
+    margin-top: 10px;
+  }
+  textarea {
+    resize: none;
+    width: $comment-width;
+    padding: $comment-padding;
+    background: white;
+    vertical-align: bottom;
+    font-size: 15px;
+  }
+}
