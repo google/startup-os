@@ -24,6 +24,7 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 
 /* A command to init a base folder.
  *
@@ -98,32 +99,26 @@ public class InitCommand implements AaCommand {
   }
 
   private boolean processArgs(String[] args) {
-    boolean isAaSetUp = args[0].equals("aa");
-    if (isAaSetUp) {
-      switch (args.length) {
-        case 1:
-          System.err.println(
-              RED_ERROR
-                  + "Invalid usage. \n"
-                  + "Please use \"aa init <base_path>\" command to init a base folder.");
-          return false;
-        case 2:
-          System.err.println(RED_ERROR + "Missing base_path");
-          return false;
-        default:
-          basePath = args[2];
-          break;
+    String[] initArgs = Arrays.copyOf(args, args.length);
+    boolean isAaAlreadySetUp = initArgs[0].equals("aa");
+    if (isAaAlreadySetUp) {
+      if (initArgs.length == 1) {
+        System.err.println(
+            RED_ERROR
+                + "Invalid usage. \n"
+                + "Please use \"aa init <base_path>\" command to init a base folder.");
+        return false;
       }
-    } else {
-      switch (args.length) {
-        case 1:
-          System.err.println(RED_ERROR + "Missing base_path");
-          return false;
-        default:
-          basePath = args[1];
-          break;
-      }
+      // leave in `initArgs` array only `init` and `</path/to/base/folder>` arguments
+      initArgs = Arrays.copyOfRange(initArgs, 1, initArgs.length);
     }
+    if (initArgs.length == 1) {
+      System.err.println(RED_ERROR + "Missing base_path" + ANSI_RESET);
+      System.err.println("some text1");
+      System.out.println("some text2");
+      return false;
+    }
+    basePath = initArgs[1];
     return true;
   }
 
