@@ -35,7 +35,6 @@ public class SyncCommand implements AaCommand {
   private String workspaceName;
   private String workspacePath;
   private Map<String, String> repoToInitialBranch = new HashMap<>();
-  private Map<String, Boolean> repoToTempBranchExistedBefore = new HashMap<>();
 
   @Inject
   public SyncCommand(
@@ -82,8 +81,9 @@ public class SyncCommand implements AaCommand {
                     String.format("[%s/%s]: Performing sync", workspaceName, repoName));
                 GitRepo repo = repoFactory.create(path);
                 repoToInitialBranch.put(repoName, repo.currentBranch());
-                repoToTempBranchExistedBefore.put(
-                    repoName, repo.branchExists(TEMP_BRANCH_FOR_SYNC));
+                if (repo.branchExists(TEMP_BRANCH_FOR_SYNC)) {
+                  repo.removeBranch(TEMP_BRANCH_FOR_SYNC);
+                }
                 System.out.println(
                     String.format("[%s/%s]: switching to temp branch", workspaceName, repoName));
                 repo.switchBranch(TEMP_BRANCH_FOR_SYNC);
@@ -124,14 +124,6 @@ public class SyncCommand implements AaCommand {
             String currentBranch = repo.currentBranch();
             if (!currentBranch.equals(initialBranch)) {
               repo.switchBranch(initialBranch);
-            }
-          });
-      repoToTempBranchExistedBefore.forEach(
-          (repoName, tempBranchExistedBefore) -> {
-            GitRepo repo =
-                repoFactory.create(fileUtils.joinToAbsolutePath(workspacePath, repoName));
-            if (!tempBranchExistedBefore && repo.branchExists(TEMP_BRANCH_FOR_SYNC)) {
-              repo.removeBranch(TEMP_BRANCH_FOR_SYNC);
             }
           });
     }
