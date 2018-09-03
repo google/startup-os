@@ -11,6 +11,7 @@ export class LineService {
   createEmptyBlockLine(): BlockLine {
     return {
       code: '',
+      clearCode: '',
       lineNumber: 0,
       isChanged: false,
       isNewCommentVisible: false,
@@ -25,9 +26,14 @@ export class LineService {
     return placeholder;
   }
 
-  createBlockLine(code: string, lineNumber: number): BlockLine {
+  createBlockLine(
+    code: string,
+    clearCode: string,
+    lineNumber: number,
+  ): BlockLine {
     const blockLine: BlockLine = this.createEmptyBlockLine();
     blockLine.code = code;
+    blockLine.clearCode = clearCode;
     blockLine.lineNumber = lineNumber;
     return blockLine;
   }

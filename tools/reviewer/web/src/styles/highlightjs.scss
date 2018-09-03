@@ -69,3 +69,16 @@
 .hljs-link {
   text-decoration: underline;
 }
+
+
+.hl-left,
+.hl-right {
+  color: rgba(0,0,0,0);
+  opacity: .1;
+}
+.hl-left {
+  background: red;
+}
+.hl-right {
+  background: green;
+}

@@ -19,8 +19,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "./styles/styles.scss",
-        "./assets/highlight-github-gist.css"
+        "./styles/styles.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
