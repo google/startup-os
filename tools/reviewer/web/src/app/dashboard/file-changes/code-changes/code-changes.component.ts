@@ -17,9 +17,6 @@ import {
   TemplateService,
 } from './services';
 
-// TODO: add highlighting of separate chars
-// (additionally to highlighting of whole line)
-
 @Component({
   selector: 'code-changes',
   templateUrl: './code-changes.component.html',

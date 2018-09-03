@@ -39,7 +39,7 @@ export class ChangesService {
     const blockLines: BlockLine[] = [];
     highlightedLines.forEach((lineCode, index) => {
       const clearLineCode: string = clearCodeLines[index];
-      if (clearLineCode == undefined) {
+      if (clearLineCode === undefined) {
         throw new Error("Highlighted and clear lines don't match");
       }
 
