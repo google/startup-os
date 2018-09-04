@@ -24,13 +24,18 @@ import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.Commit;
+import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.startupos.tools.aa.AaModule;
 import com.google.startupos.tools.aa.commands.InitCommand;
 import com.google.startupos.tools.aa.commands.WorkspaceCommand;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.service.CodeReviewService;
 import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.service.Protos;
+import com.google.startupos.tools.reviewer.service.Protos.DiffFilesResponse;
+import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
 import dagger.Component;
 import dagger.Provides;
 import io.grpc.ManagedChannel;
@@ -46,7 +51,6 @@ import org.junit.runners.JUnit4;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -54,6 +58,7 @@ import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -89,10 +94,6 @@ public class CodeReviewServiceGetDiffFilesTest {
   public void setup() throws IOException {
     Flags.parse(
         new String[0], AuthService.class.getPackage(), CodeReviewService.class.getPackage());
-    String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
-    String initialRepoFolder = joinPaths(testFolder, "initial_repo");
-    aaBaseFolder = joinPaths(testFolder, "base_folder");
-
     component =
         DaggerCodeReviewServiceGetDiffFilesTest_TestComponent.builder()
             .aaModule(
@@ -108,11 +109,11 @@ public class CodeReviewServiceGetDiffFilesTest {
             .build();
     gitRepoFactory = component.getGitRepoFactory();
     fileUtils = component.getFileUtils();
+    String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
+    String initialRepoFolder = fileUtils.joinToAbsolutePath(testFolder, "initial_repo");
+    aaBaseFolder = fileUtils.joinToAbsolutePath(testFolder, "base_folder");
 
-    String projectId = component.getAuthService().getProjectId();
-    String token = component.getAuthService().getToken();
-    when(firestoreClientFactory.create(projectId, token)).thenReturn(firestoreClient);
-    firestoreClientFactory.create(projectId, token);
+    when(firestoreClientFactory.create(any(), any())).thenReturn(firestoreClient);
 
     codeReviewService =
         new CodeReviewService(
@@ -130,26 +131,6 @@ public class CodeReviewServiceGetDiffFilesTest {
     writeFile(TEST_FILE_CONTENTS);
     testFileCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
     mockFirestoreClientMethods();
-  }
-
-  private void mockFirestoreClientMethods() {
-    when(firestoreClient.getDocument("reviewer/data/diff/2", Protos.DiffFilesResponse.newBuilder()))
-        .thenReturn(
-            Protos.DiffFilesResponse.newBuilder()
-                .addAllBranchInfo(
-                    Collections.singleton(
-                        com.google.startupos.common.repo.Protos.BranchInfo.newBuilder()
-                            .setDiffId(DIFF_ID)
-                            .setRepoId(REPO_ID)
-                            .addCommit(
-                                com.google.startupos.common.repo.Protos.Commit.newBuilder()
-                                    .setId(fileInHeadCommitId))
-                            .build()))
-                .build());
-
-    when(firestoreClient.getDocument(
-            "/reviewer/data/last_diff_id", Protos.DiffNumberResponse.newBuilder()))
-        .thenReturn(Protos.DiffNumberResponse.newBuilder().setLastDiffId(1).build());
   }
 
   @After
@@ -219,14 +200,6 @@ public class CodeReviewServiceGetDiffFilesTest {
     blockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
   }
 
-  private String joinPaths(String first, String... more) {
-    return FileSystems.getDefault().getPath(first, more).toAbsolutePath().toString();
-  }
-
-  private String getWorkspaceFolder(String workspace) {
-    return joinPaths(aaBaseFolder, "ws", workspace);
-  }
-
   private void writeFile(String contents) {
     writeFile(TEST_FILE, contents);
   }
@@ -236,29 +209,62 @@ public class CodeReviewServiceGetDiffFilesTest {
         contents, fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", filename));
   }
 
-  private Protos.DiffFilesResponse getResponse() {
-    Protos.DiffFilesRequest request =
-        Protos.DiffFilesRequest.newBuilder()
-            .setWorkspace(TEST_WORKSPACE)
-            .setDiffId(DIFF_ID)
-            .build();
+  private void mockFirestoreClientMethods() {
+    when(firestoreClient.getDocument(
+            "reviewer/data/diff/" + DIFF_ID, DiffFilesResponse.newBuilder()))
+        .thenReturn(
+            DiffFilesResponse.newBuilder()
+                .addAllBranchInfo(
+                    Collections.singleton(
+                        BranchInfo.newBuilder()
+                            .setDiffId(DIFF_ID)
+                            .setRepoId(REPO_ID)
+                            .addCommit(Commit.newBuilder().setId(fileInHeadCommitId))
+                            .build()))
+                .build());
+
+    when(firestoreClient.getDocument(
+            "/reviewer/data/last_diff_id", DiffNumberResponse.newBuilder()))
+        .thenReturn(DiffNumberResponse.newBuilder().setLastDiffId(1).build());
+  }
+
+  private String getWorkspaceFolder(String workspace) {
+    return fileUtils.joinToAbsolutePath(aaBaseFolder, "ws", workspace);
+  }
+
+  private DiffFilesResponse getResponse() {
+    DiffFilesRequest request =
+        DiffFilesRequest.newBuilder().setWorkspace(TEST_WORKSPACE).setDiffId(DIFF_ID).build();
 
     return blockingStub.getDiffFiles(request);
   }
 
-  private com.google.startupos.common.repo.Protos.BranchInfo getExpectedBranchInfo() {
-    return com.google.startupos.common.repo.Protos.BranchInfo.newBuilder()
+  private DiffFilesResponse getExpectedResponseAddingCommit(Commit commit) {
+    BranchInfo.Builder branchInfoBuilder = getExpectedBranchInfo().toBuilder();
+    if (commit != null) {
+      branchInfoBuilder.addCommit(commit).build();
+    }
+    return DiffFilesResponse.newBuilder().addBranchInfo(branchInfoBuilder).build();
+  }
+
+  private DiffFilesResponse getExpectedResponseAddingUncommittedFile(File file) {
+    BranchInfo.Builder branchInfoBuilder = getExpectedBranchInfo().toBuilder();
+    if (file != null) {
+      branchInfoBuilder.addUncommittedFile(file).build();
+    }
+    return DiffFilesResponse.newBuilder().addBranchInfo(branchInfoBuilder).build();
+  }
+
+  private BranchInfo getExpectedBranchInfo() {
+    return BranchInfo.newBuilder()
         .setDiffId(DIFF_ID)
         .setRepoId(REPO_ID)
+        .addCommit(Commit.newBuilder().setId(fileInHeadCommitId).build())
         .addCommit(
-            com.google.startupos.common.repo.Protos.Commit.newBuilder()
-                .setId(fileInHeadCommitId)
-                .build())
-        .addCommit(
-            com.google.startupos.common.repo.Protos.Commit.newBuilder()
+            Commit.newBuilder()
                 .setId(testFileCommitId)
                 .addFile(
-                    com.google.startupos.common.repo.Protos.File.newBuilder()
+                    File.newBuilder()
                         .setFilename("test_file.txt")
                         .setWorkspace("ws1")
                         .setRepoId(REPO_ID)
@@ -267,26 +273,6 @@ public class CodeReviewServiceGetDiffFilesTest {
                         .build())
                 .build())
         .build();
-  }
-
-  private Protos.DiffFilesResponse getExpectedResponseAddingCommit(
-      com.google.startupos.common.repo.Protos.Commit commit) {
-    com.google.startupos.common.repo.Protos.BranchInfo.Builder branchInfoBuilder =
-        getExpectedBranchInfo().toBuilder();
-    if (commit != null) {
-      branchInfoBuilder.addCommit(commit).build();
-    }
-    return Protos.DiffFilesResponse.newBuilder().addBranchInfo(branchInfoBuilder).build();
-  }
-
-  private Protos.DiffFilesResponse getExpectedResponseAddingUncommittedFile(
-      com.google.startupos.common.repo.Protos.File file) {
-    com.google.startupos.common.repo.Protos.BranchInfo.Builder branchInfoBuilder =
-        getExpectedBranchInfo().toBuilder();
-    if (file != null) {
-      branchInfoBuilder.addUncommittedFile(file).build();
-    }
-    return Protos.DiffFilesResponse.newBuilder().addBranchInfo(branchInfoBuilder).build();
   }
 
   @Test
@@ -299,16 +285,16 @@ public class CodeReviewServiceGetDiffFilesTest {
     writeFile("new_file_content");
     final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
 
-    com.google.startupos.common.repo.Protos.Commit lastCommit =
-        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+    Commit lastCommit =
+        Commit.newBuilder()
             .setId(lastCommitId)
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("test_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
-                    .setAction(com.google.startupos.common.repo.Protos.File.Action.MODIFY)
+                    .setAction(File.Action.MODIFY)
                     .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
@@ -321,11 +307,11 @@ public class CodeReviewServiceGetDiffFilesTest {
     writeFile("new_file.txt", "file content");
     final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
 
-    com.google.startupos.common.repo.Protos.Commit lastCommit =
-        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+    Commit lastCommit =
+        Commit.newBuilder()
             .setId(lastCommitId)
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("new_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
@@ -348,12 +334,12 @@ public class CodeReviewServiceGetDiffFilesTest {
     repo.addFile("new_filename.txt");
     repo.addFile(TEST_FILE);
 
-    com.google.startupos.common.repo.Protos.File uncommittedFile =
-        com.google.startupos.common.repo.Protos.File.newBuilder()
+    File uncommittedFile =
+        File.newBuilder()
             .setFilename("new_filename.txt")
             .setWorkspace("ws1")
             .setRepoId("startup-os")
-            .setAction(com.google.startupos.common.repo.Protos.File.Action.RENAME)
+            .setAction(File.Action.RENAME)
             .setOriginalFilename("test_file.txt")
             .setFilenameWithRepo("startup-os/new_filename.txt")
             .build();
@@ -367,16 +353,16 @@ public class CodeReviewServiceGetDiffFilesTest {
         fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
     final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
 
-    com.google.startupos.common.repo.Protos.Commit lastCommit =
-        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+    Commit lastCommit =
+        Commit.newBuilder()
             .setId(lastCommitId)
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("test_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
-                    .setAction(com.google.startupos.common.repo.Protos.File.Action.DELETE)
+                    .setAction(File.Action.DELETE)
                     .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
@@ -390,11 +376,11 @@ public class CodeReviewServiceGetDiffFilesTest {
     writeFile("new_file.txt", "file content");
     final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
 
-    com.google.startupos.common.repo.Protos.Commit lastCommit =
-        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+    Commit lastCommit =
+        Commit.newBuilder()
             .setId(lastCommitId)
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("new_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
@@ -402,12 +388,12 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setFilenameWithRepo("startup-os/new_file.txt")
                     .build())
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("test_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
-                    .setAction(com.google.startupos.common.repo.Protos.File.Action.MODIFY)
+                    .setAction(File.Action.MODIFY)
                     .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
@@ -422,11 +408,11 @@ public class CodeReviewServiceGetDiffFilesTest {
         fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os", TEST_FILE));
     final String lastCommitId = repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE).getId();
 
-    com.google.startupos.common.repo.Protos.Commit lastCommit =
-        com.google.startupos.common.repo.Protos.Commit.newBuilder()
+    Commit lastCommit =
+        Commit.newBuilder()
             .setId(lastCommitId)
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("new_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
@@ -434,12 +420,12 @@ public class CodeReviewServiceGetDiffFilesTest {
                     .setFilenameWithRepo("startup-os/new_file.txt")
                     .build())
             .addFile(
-                com.google.startupos.common.repo.Protos.File.newBuilder()
+                File.newBuilder()
                     .setFilename("test_file.txt")
                     .setWorkspace("ws1")
                     .setRepoId(REPO_ID)
                     .setCommitId(lastCommitId)
-                    .setAction(com.google.startupos.common.repo.Protos.File.Action.DELETE)
+                    .setAction(File.Action.DELETE)
                     .setFilenameWithRepo("startup-os/test_file.txt")
                     .build())
             .build();
