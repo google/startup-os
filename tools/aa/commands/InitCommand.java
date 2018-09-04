@@ -99,26 +99,24 @@ public class InitCommand implements AaCommand {
   }
 
   private boolean processArgs(String[] args) {
-    String[] initArgs = Arrays.copyOf(args, args.length);
-    boolean isAaAlreadySetUp = initArgs[0].equals("aa");
-    if (isAaAlreadySetUp) {
-      if (initArgs.length == 1) {
+    // `aa init` can be called by either `bazel run //tools/aa:aa_tool -- init` or `aa init`.
+    // For `aa init`, there is an extra first argument `aa` in `args`.
+    if (args[0].equals("aa")) {
+      if (args.length == 1) {
         System.err.println(
             RED_ERROR
                 + "Invalid usage. \n"
                 + "Please use \"aa init <base_path>\" command to init a base folder.");
         return false;
       }
-      // leave in `initArgs` array only `init` and `</path/to/base/folder>` arguments
-      initArgs = Arrays.copyOfRange(initArgs, 1, initArgs.length);
+      // We remove the first element so that both calls to `aa init` have the same args
+      args = Arrays.copyOfRange(args, 1, args.length);
     }
-    if (initArgs.length == 1) {
+    if (args.length == 1) {
       System.err.println(RED_ERROR + "Missing base_path" + ANSI_RESET);
-      System.err.println("some text1");
-      System.out.println("some text2");
       return false;
     }
-    basePath = initArgs[1];
+    basePath = args[1];
     return true;
   }
 
