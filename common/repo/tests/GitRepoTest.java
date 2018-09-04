@@ -21,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -250,13 +252,22 @@ public class GitRepoTest {
   }
 
   @Test
-  public void testGetUncommittedFilesWhenRenamedFile() {
+  public void testGetUncommittedFilesWhenRenamedFile() throws IOException {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    gitRepo.renameOrMove(TEST_FILE, "new_name.txt");
+
+    // rename the file
+    Files.move(
+        Paths.get(fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE)),
+        Paths.get(fileUtils.joinToAbsolutePath(repoFolder, "new_name.txt")),
+        StandardCopyOption.REPLACE_EXISTING);
+
+    gitRepo.addFile("new_name.txt");
+    gitRepo.addFile(TEST_FILE);
+
     assertEquals(
         ImmutableList.of(
             File.newBuilder()
