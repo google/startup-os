@@ -173,7 +173,7 @@ public class FormatterTool {
           .build();
 
   public static void main(String[] args) {
-    Flags.parse(args, FormatterTool.class.getPackage());
+    Flags.parseCurrentPackage(args);
 
     Set<Path> ignoredDirectories =
         Stream.of(ignoreDirectories.get().split(","))

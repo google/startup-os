@@ -18,6 +18,7 @@ package com.google.startupos.common.flags;
 
 import com.google.common.annotations.VisibleForTesting;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.IOException;
@@ -76,6 +77,24 @@ public class Flags {
    */
   public static String[] parse(String[] args, Class clazz) {
     instance().scanClass(clazz);
+    return instance._parse(args);
+  }
+
+  /**
+   * Initializes flag values from command-line style arguments. Scans all flags of the current
+   * package.
+   *
+   * @param args command-line arguments to parse values from
+   */
+  public static String[] parseCurrentPackage(String[] args) {
+    // Getting a caller class name. Index [2] is used to obtain a method which calls this method
+    String className = Thread.currentThread().getStackTrace()[2].getClassName();
+    try {
+      instance()
+          .scanPackages(Collections.singletonList(Class.forName(className).getPackage().getName()));
+    } catch (ClassNotFoundException e) {
+      throw new IllegalArgumentException(e);
+    }
     return instance._parse(args);
   }
 
