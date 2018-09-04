@@ -113,7 +113,7 @@ public class InitCommand implements AaCommand {
       args = Arrays.copyOfRange(args, 1, args.length);
     }
     if (args.length == 1) {
-      System.err.println(RED_ERROR + "Missing base_path" + ANSI_RESET);
+      System.err.println(RED_ERROR + "Missing base path argument" + ANSI_RESET);
       return false;
     }
     basePath = args[1];
