@@ -186,6 +186,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
+    checkAuth();
     FirestoreClient client =
         firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     String diffPath = fileUtils.joinToAbsolutePath(firestoreReviewRoot.get(), "data/diff");
@@ -222,6 +223,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getAvailableDiffNumber(
       Empty request, StreamObserver<DiffNumberResponse> responseObserver) {
+    checkAuth();
     FirestoreClient client =
         firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     DiffNumberResponse diffNumberResponse =
@@ -242,6 +244,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void getDiff(DiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
+    checkAuth();
     FirestoreClient client =
         firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     String diffPath =
@@ -371,6 +374,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
     responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
     responseObserver.onCompleted();
+  }
+
+  private void checkAuth() {
+    if (authService.getProjectId() || authService.getToken() == null) {
+      throw new IllegalStateException("AuthService not initialized");
+    }
   }
 }
 
