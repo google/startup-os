@@ -58,7 +58,7 @@ public class InitCommand implements AaCommand {
     if (!processArgs(args)) {
       return false;
     }
-    Flags.parse(args, InitCommand.class.getPackage());
+    Flags.parseCurrentPackage(args);
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath)) {
         System.out.println("Error: Base folder exists and is not empty");

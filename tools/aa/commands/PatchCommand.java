@@ -51,7 +51,7 @@ public class PatchCommand implements AaCommand {
       }
     }
 
-    Flags.parse(args, PatchCommand.class.getPackage());
+    Flags.parseCurrentPackage(args);
 
     String branchName = String.format("D%d", diffNumber.get());
     try {

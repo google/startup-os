@@ -54,7 +54,7 @@ public class AddRepoCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    Flags.parse(args, AddRepoCommand.class.getPackage());
+    Flags.parseCurrentPackage(args);
 
     String headPath = fileUtils.joinToAbsolutePath(this.config.getBasePath(), "head");
     String repoName = name.get();

@@ -143,7 +143,7 @@ public class TextDifferencerTool {
   }
 
   public static void main(String[] args) throws IOException {
-    Flags.parse(args, TextDifferencerTool.class.getPackage());
+    Flags.parseCurrentPackage(args);
     DaggerTextDifferencerTool_ToolComponent.create().getTool().run();
   }
 }
