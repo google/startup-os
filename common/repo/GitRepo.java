@@ -181,9 +181,19 @@ public class GitRepo implements Repo {
       action:ADD, filename:package/untracked.txt
       */
       File.Action action = getAction(parts[0]);
-      // TODO: Set original_filename for RENAME and COPY
-      String filename = action.equals(File.Action.RENAME) ? parts[3] : parts[1];
-      files.add(File.newBuilder().setAction(action).setFilename(filename).build());
+      if (action.equals(File.Action.RENAME) || action.equals(File.Action.COPY)) {
+        String filename = parts[3];
+        String originalFilename = parts[1];
+        files.add(
+            File.newBuilder()
+                .setAction(action)
+                .setFilename(filename)
+                .setOriginalFilename(originalFilename)
+                .build());
+      } else {
+        String filename = parts[1];
+        files.add(File.newBuilder().setAction(action).setFilename(filename).build());
+      }
     }
     return files.build();
   }
