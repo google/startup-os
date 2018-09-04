@@ -275,7 +275,7 @@ public class LocalHttpGateway {
   }
 
   public static void main(String[] args) throws Exception {
-    Flags.parse(args, LocalHttpGateway.class.getPackage());
+    Flags.parseCurrentPackage(args);
     checkFlags();
     new LocalHttpGateway(httpGatewayPort.get(), localServerPort.get()).serve();
   }
