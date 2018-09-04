@@ -5,6 +5,8 @@ load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
 
+# new comment
+
 http_archive(
     name = "io_grpc_grpc_java",
     sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",

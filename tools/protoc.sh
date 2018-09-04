@@ -11,7 +11,7 @@ if [ "$platform" == "Darwin" ]; then
 elif [ "$platform" == "Linux" ]; then
     ARCHIVE=$(find . -iname protoc-3.6.0-linux-x86_64.zip | head -n1)
 else
-    echo "protoc does not have a binary for $platform"
+    echo "protoc says sup"
     exit 1
 fi
 
