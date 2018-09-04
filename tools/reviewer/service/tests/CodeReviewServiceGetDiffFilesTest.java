@@ -190,8 +190,8 @@ public class CodeReviewServiceGetDiffFilesTest {
     InitCommand initCommand = component.getInitCommand();
     InitCommand.startuposRepo.resetValueForTesting();
     String[] args = {
+      "init", aaBaseFolder,
       "--startupos_repo", initialRepoFolder,
-      "--base_path", aaBaseFolder,
     };
     initCommand.run(args);
   }
