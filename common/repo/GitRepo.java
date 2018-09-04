@@ -376,11 +376,6 @@ public class GitRepo implements Repo {
     runCommand("config user.name \"test\"");
   }
 
-  @VisibleForTesting
-  public void renameOrMove(String oldName, String newName) {
-    runCommand("mv " + oldName + " " + newName);
-  }
-
   public boolean cloneRepo(String url, String path) {
     CommandResult commandResult =
         runCommand("clone -q " + url + " " + fileUtils.joinToAbsolutePath(path, ".git"));

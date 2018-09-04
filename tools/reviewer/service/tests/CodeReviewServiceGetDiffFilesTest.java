@@ -48,6 +48,8 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -77,6 +79,8 @@ public class CodeReviewServiceGetDiffFilesTest {
   private ManagedChannel channel;
   private CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
   private CodeReviewService codeReviewService;
+  // set by createAaWorkspace
+  private String repoPath;
 
   private FirestoreClientFactory firestoreClientFactory = mock(FirestoreClientFactory.class);
   private FirestoreClient firestoreClient = mock(FirestoreClient.class);
@@ -197,7 +201,7 @@ public class CodeReviewServiceGetDiffFilesTest {
     WorkspaceCommand workspaceCommand = component.getWorkspaceCommand();
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
-    String repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
+    repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
     repo.setFakeUsersData();
     repo.switchBranch("D" + DIFF_ID);
@@ -335,8 +339,15 @@ public class CodeReviewServiceGetDiffFilesTest {
   }
 
   @Test
-  public void testGetDiffFiles_whenFileIsRenamed() {
-    repo.renameOrMove(TEST_FILE, "new_filename.txt");
+  public void testGetDiffFiles_whenFileIsRenamed() throws IOException {
+    // rename the file
+    Files.move(
+        Paths.get(fileUtils.joinToAbsolutePath(repoPath, TEST_FILE)),
+        Paths.get(fileUtils.joinToAbsolutePath(repoPath, "new_filename.txt")),
+        StandardCopyOption.REPLACE_EXISTING);
+
+    repo.addFile("new_filename.txt");
+    repo.addFile(TEST_FILE);
 
     com.google.startupos.common.repo.Protos.File uncommittedFile =
         com.google.startupos.common.repo.Protos.File.newBuilder()
