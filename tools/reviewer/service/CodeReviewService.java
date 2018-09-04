@@ -377,7 +377,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   private void checkAuth() {
-    if (authService.getProjectId() || authService.getToken() == null) {
+    if (authService.getProjectId() == null || authService.getToken() == null) {
       throw new IllegalStateException("AuthService not initialized");
     }
   }
