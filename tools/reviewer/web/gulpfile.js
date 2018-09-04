@@ -100,6 +100,6 @@ gulp.task('protoc', () => {
 
   // When all *.proto files are removed
   function removingOnLoad() {
-    console.log('Proto functions is successfully created.');
+    console.log('Proto functions are successfully created.');
   }
 });
