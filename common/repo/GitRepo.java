@@ -310,21 +310,12 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean isMerged(String branch) {
-    final String initialBranch = currentBranch();
-    List<String> mergedBranches = new ArrayList<>();
-    try {
-      switchToMasterBranch();
-      CommandResult commandResult = runCommand("branch --merged");
-      mergedBranches =
-          splitLines(commandResult.stdout)
-              .stream()
-              .map(line -> line.trim().replaceAll("\\*", ""))
-              .collect(Collectors.toList());
-    } catch (Exception e) {
-      switchBranch(initialBranch);
-      e.printStackTrace();
-    }
-    switchBranch(initialBranch);
+    CommandResult commandResult = runCommand("branch --merged master");
+    List<String> mergedBranches =
+        splitLines(commandResult.stdout)
+            .stream()
+            .map(line -> line.trim().replaceAll("\\*", ""))
+            .collect(Collectors.toList());
     return mergedBranches.contains(branch);
   }
 
