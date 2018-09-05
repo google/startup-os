@@ -8,6 +8,8 @@ export class DiffService {
   constructor(private router: Router) { }
 
   openFile(file: File, diffId: number): void {
-    this.router.navigate(['diff/' + diffId + '/' + file.getFilename()]);
+    this.router.navigate([
+      'diff/' + diffId + '/' + file.getFilenameWithRepo(),
+    ]);
   }
 }

@@ -15,7 +15,7 @@
       <ng-container matColumnDef="filename">
         <mat-header-cell *matHeaderCellDef> File </mat-header-cell>
         <mat-cell *matCellDef="let file">
-          {{ file.getFilename() }}
+          {{ file.getFilenameWithRepo() }}
         </mat-cell>
       </ng-container>
 

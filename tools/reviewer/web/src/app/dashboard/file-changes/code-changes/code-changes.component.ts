@@ -14,11 +14,8 @@ import {
   CommentsService,
   HoverService,
   LineService,
-  UIService,
+  TemplateService,
 } from './services';
-
-// TODO: add highlighting of separate chars
-// (additionally to highlighting of whole line)
 
 @Component({
   selector: 'code-changes',
@@ -28,7 +25,7 @@ import {
     HoverService,
     ChangesService,
     LineService,
-    UIService,
+    TemplateService,
   ],
 })
 export class CodeChangesComponent implements OnInit, OnChanges {
@@ -44,7 +41,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     private changesService: ChangesService,
     public hoverService: HoverService,
     public commentsService: CommentsService,
-    public uiService: UIService,
+    public templateService: TemplateService,
     private fileChangesService: FileChangesService,
   ) { }
 

@@ -15,7 +15,10 @@
       <td
         [ngClass]="[
           'content',
-          uiService.getLineBackground(changesLine, blockIndex, blockLine)
+          templateService.getLineBackground(
+            changesLine,
+            blockIndex,
+            blockLine)
         ]"
         valign="top"
         (mouseover)="hoverService.mouseOver(blockLine, blockIndex)"
@@ -35,9 +38,19 @@
           </div>
         </div>
 
+        <!-- Chars changes highlighting -->
+        <div
+          class="code-line chars-highlighting"
+          *ngIf="blockLine.isChanged"
+        >
+          <pre
+            [HTML]="templateService.highlightChanges(blockLine, blockIndex)"
+          ></pre>
+        </div>
+
         <!-- Code -->
         <div
-          class="code"
+          class="code-line code"
           *ngIf="!changesLine.isCommentsLine && !blockLine.isPlaceholder"
           (dblclick)="commentsService.openComments(changesLine, blockIndex)"
         >

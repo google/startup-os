@@ -21,16 +21,20 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 public class SyncCommand implements AaCommand {
+  private static final String TEMP_BRANCH_FOR_SYNC = "temp_branch_for_sync";
 
   private final FileUtils fileUtils;
   private GitRepoFactory repoFactory;
   private String headPath;
   private String workspaceName;
   private String workspacePath;
+  private Map<String, String> repoToInitialBranch = new HashMap<>();
 
   @Inject
   public SyncCommand(
@@ -64,8 +68,6 @@ public class SyncCommand implements AaCommand {
       e.printStackTrace();
     }
     // then, do the sync for all workspaces
-    GitRepo gitRepo = this.repoFactory.create(workspacePath);
-    String initialBranch = gitRepo.currentBranch();
     try {
       fileUtils
           .listContents(workspacePath)
@@ -78,9 +80,13 @@ public class SyncCommand implements AaCommand {
                 System.out.println(
                     String.format("[%s/%s]: Performing sync", workspaceName, repoName));
                 GitRepo repo = repoFactory.create(path);
+                repoToInitialBranch.put(repoName, repo.currentBranch());
+                if (repo.branchExists(TEMP_BRANCH_FOR_SYNC)) {
+                  repo.removeBranch(TEMP_BRANCH_FOR_SYNC);
+                }
                 System.out.println(
                     String.format("[%s/%s]: switching to temp branch", workspaceName, repoName));
-                repo.switchBranch("temp_branch_for_sync");
+                repo.switchBranch(TEMP_BRANCH_FOR_SYNC);
                 System.out.println(
                     String.format("[%s/%s]: committing all changes", workspaceName, repoName));
                 repo.commit(repo.getUncommittedFiles(), "Sync: temporary commit");
@@ -102,13 +108,25 @@ public class SyncCommand implements AaCommand {
                     String.format("[%s/%s]: removing temp branch", workspaceName, repoName));
                 repo.removeBranch("temp_branch_for_sync");
               });
-    } catch (IOException e) {
-      if (!gitRepo.currentBranch().equals(initialBranch)) {
-        gitRepo.switchBranch(initialBranch);
-      }
+    } catch (Exception e) {
+      revertChanges(repoToInitialBranch);
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void revertChanges(Map<String, String> repoToInitialBranch) {
+    if (!repoToInitialBranch.isEmpty()) {
+      repoToInitialBranch.forEach(
+          (repoName, initialBranch) -> {
+            GitRepo repo =
+                repoFactory.create(fileUtils.joinToAbsolutePath(workspacePath, repoName));
+            String currentBranch = repo.currentBranch();
+            if (!currentBranch.equals(initialBranch)) {
+              repo.switchBranch(initialBranch);
+            }
+          });
+    }
   }
 }
 
