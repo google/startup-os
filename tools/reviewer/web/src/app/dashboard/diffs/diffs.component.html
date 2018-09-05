@@ -46,6 +46,13 @@
         </mat-cell>
       </ng-container>
 
+      <ng-container matColumnDef="workspace">
+        <mat-header-cell *matHeaderCellDef> Workspace </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getWorkspace() }}
+        </mat-cell>
+      </ng-container>
+
       <ng-container matColumnDef="reviewers">
         <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
         <mat-cell *matCellDef="let diff">

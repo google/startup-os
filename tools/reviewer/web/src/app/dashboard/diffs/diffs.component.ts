@@ -27,6 +27,7 @@ export class DiffsComponent implements OnInit {
     'author',
     'status',
     'action',
+    'workspace',
     'reviewers',
     'description',
   ];
@@ -85,7 +86,7 @@ export class DiffsComponent implements OnInit {
 
           if (diff.getAuthor().getEmail() === userEmail) {
             // Current user is an author of the diff
-            this.diffGroups[DiffGroups.Incoming].push(diff);
+            this.diffGroups[DiffGroups.Outgoing].push(diff);
 
             switch (diff.getStatus()) {
               case Diff.Status.SUBMITTED:
@@ -104,7 +105,7 @@ export class DiffsComponent implements OnInit {
           } else if (needAttentionOfList.includes(userEmail)) {
             // Need attention of user
             this.diffGroups[DiffGroups.NeedAttention].push(diff);
-            this.diffGroups[DiffGroups.Outgoing].push(diff);
+            this.diffGroups[DiffGroups.Incoming].push(diff);
           } else if (diff.getCcList().includes(userEmail)) {
             // User is cc'ed on this
             this.diffGroups[DiffGroups.CC].push(diff);
@@ -121,7 +122,8 @@ export class DiffsComponent implements OnInit {
   sortDiffs(): void {
     for (const diffList of this.diffGroups) {
       diffList.sort((a, b) => {
-        return Math.sign(a.getModifiedTimestamp() - b.getModifiedTimestamp());
+        // Newest first
+        return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
       });
     }
   }

@@ -45,6 +45,10 @@ export class FirebaseService {
   }
 
   updateDiff(diff: Diff): Observable<void> {
+    // Milliseconds since Jan 01 1970. (UTC)
+    const currentTimestampMs: number = Date.now();
+    diff.setModifiedTimestamp(currentTimestampMs);
+
     return new Observable(observer => {
       this.diffs
         .doc(diff.getId().toString())
