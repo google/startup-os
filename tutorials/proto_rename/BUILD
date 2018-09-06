@@ -27,21 +27,3 @@ java_binary(
         "//third_party/maven/javax/inject:javax_inject",
     ],
 )
-
-java_binary(
-    name = "person_writer",
-    srcs = [
-        "PersonWriter.java",
-    ],
-    data = ["person.pb"],
-    main_class = "tutorials.proto_rename.PersonWriter",
-    deps = [
-        ":person_java_proto",
-        ":person_proto",
-        "//common",
-        "//common:dagger_with_annotation_processor",
-        "//third_party/maven/com/google/guava",
-        "//third_party/maven/com/google/protobuf:protobuf_java",
-        "//third_party/maven/javax/inject:javax_inject",
-    ],
-)
