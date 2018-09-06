@@ -42,7 +42,7 @@
       <ng-container matColumnDef="action">
         <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          {{ diff.getModifiedTimestamp() | date: 'medium' }}
+          {{ diff.getModifiedTimestamp() | time }}
         </mat-cell>
       </ng-container>
 

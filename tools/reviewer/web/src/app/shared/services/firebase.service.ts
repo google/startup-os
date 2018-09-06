@@ -29,7 +29,7 @@ export class FirebaseService {
       .map(actions => {
         return actions.map(action => {
           const firebaseElement = action.payload.doc.data() as FirebaseElement;
-          return this.converFirebaseElementToDiff(firebaseElement);
+          return this.convertFirebaseElementToDiff(firebaseElement);
         });
       });
   }
@@ -40,12 +40,12 @@ export class FirebaseService {
       .snapshotChanges()
       .map(action => {
         const firebaseElement = action.payload.data() as FirebaseElement;
-        return this.converFirebaseElementToDiff(firebaseElement);
+        return this.convertFirebaseElementToDiff(firebaseElement);
       });
   }
 
   updateDiff(diff: Diff): Observable<void> {
-    // Milliseconds since Jan 01 1970. (UTC)
+    // Unix timestamp in milliseconds
     const currentTimestampMs: number = Date.now();
     diff.setModifiedTimestamp(currentTimestampMs);
 
@@ -75,7 +75,7 @@ export class FirebaseService {
     return firebaseElement;
   }
 
-  private converFirebaseElementToDiff(firebaseElement: FirebaseElement): Diff {
+  private convertFirebaseElementToDiff(firebaseElement: FirebaseElement): Diff {
     // Convert firebaseElement to binary
     const binary: Uint8Array = this.encodingService
       .decodeBase64StringToUint8Array(firebaseElement.proto);
