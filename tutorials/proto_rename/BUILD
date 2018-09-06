@@ -16,7 +16,7 @@ java_binary(
         "PersonReader.java",
     ],
     data = ["person.pb"],
-    main_class = "tutorials.proto_rename.PersonReader",
+    main_class = "com.google.startupos.tutorials.proto_rename.PersonReader",
     deps = [
         ":person_java_proto",
         ":person_proto",
