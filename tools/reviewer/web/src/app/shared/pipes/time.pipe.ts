@@ -16,7 +16,7 @@ export class TimePipe implements PipeTransform {
 
     if (this.getDateString(pipedDate) === this.getDateString(currentDate)) {
       // It's today.
-      // Dislay time only
+      // Display time only
       return pipedTime;
     } else {
       // Several days ago or more
