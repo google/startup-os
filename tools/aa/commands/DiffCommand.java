@@ -103,7 +103,7 @@ public class DiffCommand implements AaCommand {
       fileUtils
           .listContents(workspacePath)
           .stream()
-          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
@@ -163,7 +163,7 @@ public class DiffCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    Flags.parse(args, this.getClass().getPackage());
+    Flags.parseCurrentPackage(args);
 
     Diff diff = (diffNumber == -1) ? createDiff() : updateDiff(diffNumber);
     CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();

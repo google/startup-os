@@ -144,9 +144,14 @@ public class FileUtils {
     }
   }
 
+  /** Joins to an absolute paths */
+  public String joinToAbsolutePath(String first, String... more) {
+    return fileSystem.getPath(first, more).toAbsolutePath().toString();
+  }
+
   /** Joins paths */
   public String joinPaths(String first, String... more) {
-    return fileSystem.getPath(first, more).toAbsolutePath().toString();
+    return fileSystem.getPath(first, more).toString();
   }
 
   /** Get the current working directory */
@@ -238,19 +243,26 @@ public class FileUtils {
    * Copies a directory to another directory. Creates target directory if needed and doesn't copy
    * symlinks.
    */
-  public void copyDirectoryToDirectory(String source, String destination, String ignored)
+  public void copyDirectoryToDirectory(String source, String destination, String... ignored)
       throws IOException {
     final Path sourcePath = fileSystem.getPath(source);
     final Path targetPath = fileSystem.getPath(destination);
+
     Files.walkFileTree(
         sourcePath,
         new SimpleFileVisitor<Path>() {
           @Override
           public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
               throws IOException {
-            if (ignored != null) {
-              if (Pattern.matches(ignored, dir.getFileName().toString())) {
-                return FileVisitResult.CONTINUE;
+            final String dirPath = dir.toAbsolutePath().toString();
+            if (ignored.length != 0) {
+              for (String item : ignored) {
+                if (dirPath.contains(item)) {
+                  return FileVisitResult.SKIP_SUBTREE;
+                }
+                if (Pattern.matches(item, dir.getFileName().toString())) {
+                  return FileVisitResult.SKIP_SUBTREE;
+                }
               }
             }
             Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
@@ -260,9 +272,11 @@ public class FileUtils {
           @Override
           public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
               throws IOException {
-            if (ignored != null) {
-              if (Pattern.matches(ignored, file.getFileName().toString())) {
-                return FileVisitResult.CONTINUE;
+            if (ignored.length != 0) {
+              for (String itemForIgnore : ignored) {
+                if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
+                  return FileVisitResult.CONTINUE;
+                }
               }
             }
             if (Files.isSymbolicLink(file)) {
@@ -275,7 +289,7 @@ public class FileUtils {
   }
 
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
-    copyDirectoryToDirectory(source, destination, null);
+    copyDirectoryToDirectory(source, destination, new String[0]);
   }
 
   /** Deletes all files and folders in directory. Target directory is deleted. */

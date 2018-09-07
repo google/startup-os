@@ -27,6 +27,7 @@ export class DiffsComponent implements OnInit {
     'author',
     'status',
     'action',
+    'workspace',
     'reviewers',
     'description',
   ];
@@ -53,75 +54,82 @@ export class DiffsComponent implements OnInit {
 
     if (urlEmail) {
       // Show the page from a view of the user from url.
-      this.getReviews(urlEmail);
+      this.categorizeDiffs(urlEmail);
     } else {
       // Show the page from current login view.
-      this.getReviews(this.authService.userEmail);
+      this.categorizeDiffs(this.authService.userEmail);
     }
   }
 
-  // Get diff/reviews from Database
-  getReviews(userEmail: string) {
-    this.firebaseService.getDiffs().subscribe(
-      diffs => {
-        // Diffs are categorized in 4 different lists
-        this.diffGroups[DiffGroups.NeedAttention] = [];
-        this.diffGroups[DiffGroups.Incoming] = [];
-        this.diffGroups[DiffGroups.Outgoing] = [];
-        this.diffGroups[DiffGroups.CC] = [];
-        this.diffGroups[DiffGroups.Draft] = [];
-        this.diffGroups[DiffGroups.Pending] = [];
-        this.diffGroups[DiffGroups.Submitted] = [];
+  // Categorize diffs in specific groups
+  categorizeDiffs(userEmail: string) {
+    this.firebaseService.getDiffs().subscribe(diffs => {
+      this.diffGroups[DiffGroups.NeedAttention] = [];
+      this.diffGroups[DiffGroups.Incoming] = [];
+      this.diffGroups[DiffGroups.Outgoing] = [];
+      this.diffGroups[DiffGroups.CC] = [];
+      this.diffGroups[DiffGroups.Draft] = [];
+      this.diffGroups[DiffGroups.Pending] = [];
+      this.diffGroups[DiffGroups.Submitted] = [];
 
-        // Iterate over each object in res
-        // and create Diff from proto and categorize
-        // into a specific list.
-        for (const diff of diffs) {
-          // needAttentionOfList is a list of all reviewers,
-          // where attention is requested
-          const needAttentionOfList: string[] = diff.getReviewerList()
-            .filter(reviewer => reviewer.getNeedsAttention())
-            .map(reviewer => reviewer.getEmail());
+      for (const diff of diffs) {
+        if (diff.getAuthor().getEmail() === userEmail) {
+          // Current user is an author of the diff
+          switch (diff.getStatus()) {
+            case Diff.Status.UNDER_REVIEW:
+            case Diff.Status.NEEDS_MORE_WORK:
+            case Diff.Status.ACCEPTED:
+            case Diff.Status.SUBMITTING:
+            case Diff.Status.REVERTING:
+              // Outgoing Review
+              this.diffGroups[DiffGroups.Outgoing].push(diff);
+              break;
+            case Diff.Status.SUBMITTED:
+            case Diff.Status.REVERTED:
+              // Submitted Review
+              this.diffGroups[DiffGroups.Submitted].push(diff);
+              break;
+            case Diff.Status.REVIEW_NOT_STARTED:
+              // Draft Review
+              this.diffGroups[DiffGroups.Draft].push(diff);
+              break;
+          }
 
-          if (diff.getAuthor().getEmail() === userEmail) {
-            // Current user is an author of the diff
-            this.diffGroups[DiffGroups.Incoming].push(diff);
-
-            switch (diff.getStatus()) {
-              case Diff.Status.SUBMITTED:
-                // Submitted Review
-                this.diffGroups[DiffGroups.Submitted].push(diff);
-                break;
-              case Diff.Status.REVIEW_NOT_STARTED:
-                // Draft Review
-                this.diffGroups[DiffGroups.Draft].push(diff);
-                break;
-            }
-            // Attention of current user as an author is requested
-            if (diff.getAuthor().getNeedsAttention()) {
-              this.diffGroups[DiffGroups.NeedAttention].push(diff);
-            }
-          } else if (needAttentionOfList.includes(userEmail)) {
-            // Need attention of user
+          if (diff.getAuthor().getNeedsAttention()) {
+            // Attention of the author is requested
             this.diffGroups[DiffGroups.NeedAttention].push(diff);
-            this.diffGroups[DiffGroups.Outgoing].push(diff);
-          } else if (diff.getCcList().includes(userEmail)) {
-            // User is cc'ed on this
-            this.diffGroups[DiffGroups.CC].push(diff);
+          }
+        } else if (diff.getCcList().includes(userEmail)) {
+          // User is cc'ed on this
+          this.diffGroups[DiffGroups.CC].push(diff);
+        } else {
+          // Current user is neither an author nor CC
+          // Maybe reviewer?
+          for (const reviewer of diff.getReviewerList()) {
+            if (reviewer.getEmail() === userEmail) {
+              // Current user is a reviewer
+              this.diffGroups[DiffGroups.Incoming].push(diff);
+              if (reviewer.getNeedsAttention()) {
+                // Attention of the reviewer is requested
+                this.diffGroups[DiffGroups.NeedAttention].push(diff);
+              }
+              break;
+            }
           }
         }
+      }
 
-        this.sortDiffs();
-        this.isLoading = false;
-      },
-    );
+      this.sortDiffs();
+      this.isLoading = false;
+    });
   }
 
   // Sort the diffs based on their date modified
   sortDiffs(): void {
     for (const diffList of this.diffGroups) {
       diffList.sort((a, b) => {
-        return Math.sign(a.getModifiedTimestamp() - b.getModifiedTimestamp());
+        // Newest first
+        return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
       });
     }
   }

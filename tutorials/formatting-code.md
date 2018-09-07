@@ -2,25 +2,7 @@
 
 To keep code in `startup-os` consistently formatted,
 we've developed a tool called `FormatterTool`.
-It works for C++, Java, Python, BUILD 
-and `dependencies.yaml` file.
-
-## Ensuring Bazel has correct version
-To make use of the tutorial, `bazel`'s version should be
-equal or more than `0.16.1rc2`
-(see the reasoning [here](https://github.com/bazelbuild/bazel/issues/5766))
-
-To check the version, execute
-```bash
-bazel version
-```
-
-To upgrade, execute
-```bash
-wget https://releases.bazel.build/0.16.1/rc2/bazel_0.16.1rc2-linux-x86_64.deb &&
-sudo dpkg -i bazel_0.16.1rc2-linux-x86_64.deb && 
-rm bazel_0.16.1rc2-linux-x86_64.deb
-```
+It works for Java, C++, Python and BUILD files.
 
 ## Listing available targets
 
@@ -51,10 +33,10 @@ to `main` method in
 	filePath="startup-os/tools/formatter/FormatterTool.java" 
 	text="FormatterTool.java">
 </walkthrough-editor-open-file>.
-It is intentionally misformatted, so we can show the tool in work.
+It is intentionally misformatted, so we can show the tool at work.
 
 ## Commit the results
-We use `git` for source control. Firstly, you have to set your identity:
+We use `git` for source control. First, you have to set your identity:
 ```bash
 git config --global user.email "you@example.com"
 ```
@@ -73,7 +55,7 @@ Before submitting a pull request with your changes,
 you have to ensure that code is properly formatted. 
 Run 
 ```bash
-./fix_formatting.sh
+tools/fix_formatting.sh
 ```
 
 ## Look at the changes

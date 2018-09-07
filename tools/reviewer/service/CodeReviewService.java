@@ -90,7 +90,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   private Repo getHeadRepo(String repoId) {
-    String repoPath = fileUtils.joinPaths(basePath, "head", repoId);
+    String repoPath = fileUtils.joinToAbsolutePath(basePath, "head", repoId);
     return repoFactory.create(repoPath);
   }
 
@@ -113,14 +113,15 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           if (file.getCommitId().isEmpty()) {
             // It's a file in the local filesystem (not in a repo)
             String filePath =
-                fileUtils.joinPaths(
+                fileUtils.joinToAbsolutePath(
                     basePath, "ws", file.getWorkspace(), file.getRepoId(), file.getFilename());
             return fileUtils.readFile(filePath);
           } else {
             // It's a file in a repo
             if (workspaceExists(file.getWorkspace())) {
               String repoPath =
-                  fileUtils.joinPaths(basePath, "ws", file.getWorkspace(), file.getRepoId());
+                  fileUtils.joinToAbsolutePath(
+                      basePath, "ws", file.getWorkspace(), file.getRepoId());
               Repo repo = repoFactory.create(repoPath);
               return repo.getFileContents(file.getCommitId(), file.getFilename());
             } else {
@@ -142,7 +143,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           if (file.getCommitId().isEmpty()) {
             // It's a file in the local filesystem (not in a repo)
             String filePath =
-                fileUtils.joinPaths(
+                fileUtils.joinToAbsolutePath(
                     basePath,
                     "users",
                     file.getUser(),
@@ -154,7 +155,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           } else {
             // It's a file in a repo
             String repoPath =
-                fileUtils.joinPaths(
+                fileUtils.joinToAbsolutePath(
                     basePath, "users", file.getUser(), "ws", file.getWorkspace(), file.getRepoId());
             Repo repo = repoFactory.create(repoPath);
             return repo.getFileContents(file.getCommitId(), file.getFilename());
@@ -170,7 +171,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getFile(FileRequest req, StreamObserver<FileResponse> responseObserver) {
     try {
-      String filePath = fileUtils.joinPaths(basePath, "head", "startup-os", req.getFilename());
+      String filePath =
+          fileUtils.joinToAbsolutePath(basePath, "head", "startup-os", req.getFilename());
       responseObserver.onNext(
           FileResponse.newBuilder().setContent(fileUtils.readFile(filePath)).build());
       responseObserver.onCompleted();
@@ -184,9 +186,10 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
+    checkAuth();
     FirestoreClient client =
         firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
-    String diffPath = fileUtils.joinPaths(firestoreReviewRoot.get(), "data/diff");
+    String diffPath = fileUtils.joinToAbsolutePath(firestoreReviewRoot.get(), "data/diff");
     Diff diff =
         req.getDiff()
             .toBuilder()
@@ -220,6 +223,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void getAvailableDiffNumber(
       Empty request, StreamObserver<DiffNumberResponse> responseObserver) {
+    checkAuth();
     FirestoreClient client =
         firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     DiffNumberResponse diffNumberResponse =
@@ -240,10 +244,11 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void getDiff(DiffRequest request, StreamObserver<Protos.Diff> responseObserver) {
+    checkAuth();
     FirestoreClient client =
         firestoreClientFactory.create(authService.getProjectId(), authService.getToken());
     String diffPath =
-        fileUtils.joinPaths(
+        fileUtils.joinToAbsolutePath(
             firestoreReviewRoot.get(), "data/diff", String.valueOf(request.getDiffId()));
     Diff diff = (Diff) client.getProtoDocument(diffPath, Diff.newBuilder());
 
@@ -256,7 +261,14 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     return ImmutableList.copyOf(
         files
             .stream()
-            .map(file -> file.toBuilder().setWorkspace(workspace).setRepoId(repoId).build())
+            .map(
+                file ->
+                    file.toBuilder()
+                        .setWorkspace(workspace)
+                        .setRepoId(repoId)
+                        .setFilenameWithRepo(fileUtils.joinPaths(repoId, file.getFilename()))
+                        .build())
+            .peek(System.out::println)
             .collect(Collectors.toList()));
   }
 
@@ -273,7 +285,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   String getWorkspacePath(String workspace) {
-    return fileUtils.joinPaths(basePath, "ws", workspace);
+    return fileUtils.joinToAbsolutePath(basePath, "ws", workspace);
   }
 
   boolean workspaceExists(String workspace) {
@@ -304,7 +316,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       logger
           .atInfo()
           .log("Workspace %s does not exist. Fallbacking to head.", request.getWorkspace());
-      workspacePath = fileUtils.joinPaths(basePath, "head");
+      workspacePath = fileUtils.joinToAbsolutePath(basePath, "head");
       workspace = "";
       branch = "remotes/origin/D" + request.getDiffId();
       isHead = true;
@@ -315,7 +327,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       fileUtils
           .listContents(workspacePath)
           .stream()
-          .map(path -> fileUtils.joinPaths(workspacePath, path))
+          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
@@ -362,6 +374,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
     responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
     responseObserver.onCompleted();
+  }
+
+  private void checkAuth() {
+    if (authService.getProjectId() == null || authService.getToken() == null) {
+      throw new IllegalStateException("AuthService not initialized");
+    }
   }
 }
 

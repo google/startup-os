@@ -75,7 +75,7 @@ public class ProtoVsJsonTool {
   }
 
   public static void main(String[] args) throws IOException {
-    Flags.parse(args, ProtoVsJsonTool.class.getPackage());
+    Flags.parseCurrentPackage(args);
     DaggerProtoVsJsonTool_MainComponent.create().getTool().run();
   }
 }
