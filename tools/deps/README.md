@@ -38,9 +38,9 @@ We keep a [`dependencies.yaml`](https://github.com/google/startup-os/blob/master
 
 ## Dependency whitelist
 
-To make sure we don't depend dependencies we don't want, we check dependencies in the following places, against a `whitelist.yaml` file:
-* `WORKSPACE`, using `WorkspaceDepsWhitelistTest.java`
-* `dependencies.yaml`, using `MavenDepsWhitelistTest.java`
-* `package-lock.bzl`, TBD
+To make sure we don't depend on dependencies we don't want, we check dependencies in the following places, against a `whitelist.yaml` file:
+* `WORKSPACE`, using [`WorkspaceDepsWhitelistTest.java`](https://github.com/google/startup-os/blob/master/tools/deps/WorkspaceDepsWhitelistTest.java)
+* `dependencies.yaml`, using [`MavenDepsWhitelistTest.java`](https://github.com/google/startup-os/blob/master/tools/deps/MavenDepsWhitelistTest.java)
+* `package-lock.bzl`, using [`PackageLockWhitelistTest.java`](https://github.com/google/startup-os/blob/master/tools/deps/PackageLockWhitelistTest.java)
 
 Tests are run as part of CI and so if they fail, a commit cannot be merged to master.

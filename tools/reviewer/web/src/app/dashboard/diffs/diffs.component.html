@@ -10,7 +10,7 @@
     <!-- Title of diff group -->
     <div class="cr-titlebar diff-group-title">
       <span class="group-name">{{ diffGroupNameList[i] }}</span>
-      <span class="diff-amount"> - {{ diffGroup.length }}</span>
+      <span class="diff-amount">- {{ diffGroup.length }}</span>
     </div>
     <!-- Diff list inside a group -->
     <mat-table
@@ -42,7 +42,14 @@
       <ng-container matColumnDef="action">
         <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          {{ diff.getModifiedTimestamp() | date: 'mediumDate' }}
+          {{ diff.getModifiedTimestamp() | time }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="workspace">
+        <mat-header-cell *matHeaderCellDef> Workspace </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getWorkspace() }}
         </mat-cell>
       </ng-container>
 
