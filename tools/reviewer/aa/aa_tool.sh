@@ -71,7 +71,7 @@ function find_base_folder {
 
 function start_local_server {
     # starts local_server if it is not running yet
-    # server is started by tools/local_server/run.sh
+    # server is started by tools/reviewer/local_server/run.sh
     # to check whether it is running already we try
     # to communicate with it by gRPC via polyglot
     # for additional output, set LOCAL_SERVER_POLYGLOT_DEBUG env variable
@@ -109,7 +109,7 @@ function start_local_server {
         echo "$GREEN""Server PID is:$RESET" # will be printed by bash
         # nohup detaches the command from terminal it was executed on
         echo "$GREEN""Server log is $SERVER_LOG_FILE"
-        nohup bash $AA_BASE/head/startup-os/tools/local_server/run.sh </dev/null >$SERVER_LOG_FILE 2>&1 &
+        nohup bash $AA_BASE/head/startup-os/tools/reviewer/local_server/run.sh </dev/null >$SERVER_LOG_FILE 2>&1 &
         echo "$RED""Visit$RESET http://localhost:8000$RED to log in$RESET"
         return 1
     else
