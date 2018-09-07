@@ -43,8 +43,8 @@ import org.json.JSONObject;
  * client (which in turn communicates to gRPC server and responds) and returns responses
  *
  * To run:
- * bazel build //tools/local_server:local_http_gateway_deploy.jar
- * bazel-bin/tools/local_server/local_http_gateway -- {absolute_path}
+ * bazel build //tools/reviewer/local_server:local_http_gateway_deploy.jar
+ * bazel-bin/tools/reviewer/local_server/local_http_gateway -- {absolute_path}
  * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
  */
 // TODO: Find an automated way to do this, e.g github.com/improbable-eng/grpc-web

@@ -41,8 +41,8 @@ import java.util.TimerTask;
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
  */
 
-/* To run: bazel build //tools/local_server:local_server
- * bazel-bin/tools/local_server/local_server
+/* To run: bazel build //tools/reviewer/local_server:local_server
+ * bazel-bin/tools/reviewer/local_server/local_server
  */
 @Singleton
 public class LocalServer {
