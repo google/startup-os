@@ -57,11 +57,11 @@
       </tr>
       <tr>
         <td>Created</td>
-        <td>{{ diff.getCreatedTimestamp() | time }}</td>
+        <td>{{ diff.getCreatedTimestamp() | time:true }}</td>
       </tr>
       <tr>
         <td>Modified</td>
-        <td>{{ diff.getModifiedTimestamp() | time }}</td>
+        <td>{{ diff.getModifiedTimestamp() | time:true }}</td>
       </tr>
     </table>
   </div>

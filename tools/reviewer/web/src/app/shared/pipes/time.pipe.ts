@@ -4,20 +4,28 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'time',
 })
 export class TimePipe implements PipeTransform {
-  transform(timestamp: number): string {
-    // Date of right now
-    const currentDate: Date = new Date(Date.now());
+  transform(timestamp: number, isFullDate: boolean): string {
     // Date of the value, which we need to display
-    const pipedDate: Date = new Date(timestamp);
+    const pipedDate = new Date(timestamp);
 
-    if (this.getDateString(pipedDate) === this.getDateString(currentDate)) {
-      // It's today.
-      // Display time only
-      return this.getTimeString(pipedDate);
+    if (isFullDate) {
+      // Example: '01:02, 19 jul 1999'
+      return this.getFullDateString(pipedDate);
     } else {
-      // Several days ago or more.
-      // Display date only.
-      return this.getDateString(pipedDate);
+      // Date of right now
+      const currentDate = new Date(Date.now());
+
+      if (this.getDateString(pipedDate) === this.getDateString(currentDate)) {
+        // It's today.
+        // Display time only.
+        // Example: '16:03'
+        return this.getTimeString(pipedDate);
+      } else {
+        // Several days ago or more.
+        // Display date only.
+        // Example: '29 feb 2096'
+        return this.getDateString(pipedDate);
+      }
     }
   }
 
@@ -56,5 +64,10 @@ export class TimePipe implements PipeTransform {
     return date.getDate() + ' ' +
       monthNames[date.getMonth()] + ' ' +
       date.getFullYear();
+  }
+
+  // Date -> '09:57, 5 sep 2018'
+  getFullDateString(date: Date): string {
+    return this.getTimeString(date) + ', ' + this.getDateString(date);
   }
 }

@@ -85,6 +85,7 @@ export class DiffsComponent implements OnInit {
               this.diffGroups[DiffGroups.Outgoing].push(diff);
               break;
             case Diff.Status.SUBMITTED:
+            case Diff.Status.REVERTED:
               // Submitted Review
               this.diffGroups[DiffGroups.Submitted].push(diff);
               break;
