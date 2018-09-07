@@ -19,6 +19,7 @@ import { RouterModule } from '@angular/router';
 
 import { PageLoadingComponent } from '@/page-loading';
 import { DirectiveList } from './directives';
+import { PipeList } from './pipes';
 
 const SharedModules = [
   FlexLayoutModule,
@@ -38,6 +39,7 @@ const SharedModules = [
 
 const Declarations = [
   ...DirectiveList,
+  ...PipeList,
   PageLoadingComponent,
 ];
 
