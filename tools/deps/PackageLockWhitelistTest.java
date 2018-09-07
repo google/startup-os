@@ -29,11 +29,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
+/*
+ * This test assumes all used Maven artifacts are whitelisted
+ * A line not starting with # sign and containing :// is assumed a URL
+ */
 public class PackageLockWhitelistTest {
   private Map<String, List<String>> whitelist;
   private List<String> packageLockLines;
@@ -68,8 +71,7 @@ public class PackageLockWhitelistTest {
     List<String> validPackageGroups = whitelist.get("maven_dependencies");
     for (Dependency dep : parsedDependencies) {
 
-      assertEquals(
-          "Artifact %s is not in the Maven Central", MAVEN_CENTRAL_URL, dep.getRepository());
+      assertEquals("Artifact %s is not in Maven Central", MAVEN_CENTRAL_URL, dep.getRepository());
 
       boolean isValidPackage = false;
       for (String validPackageGroup : validPackageGroups) {
