@@ -10,17 +10,14 @@ export class TimePipe implements PipeTransform {
     // Date of the value, which we need to display
     const pipedDate: Date = new Date(timestamp);
 
-    const pipedTime: string =
-      this.addZero(pipedDate.getHours()) + ':' +
-      this.addZero(pipedDate.getMinutes());
-
     if (this.getDateString(pipedDate) === this.getDateString(currentDate)) {
       // It's today.
       // Display time only
-      return pipedTime;
+      return this.getTimeString(pipedDate);
     } else {
-      // Several days ago or more
-      return pipedTime + ', ' + this.getDateString(pipedDate);
+      // Several days ago or more.
+      // Display date only.
+      return this.getDateString(pipedDate);
     }
   }
 
@@ -34,7 +31,12 @@ export class TimePipe implements PipeTransform {
     return ('0' + integer).slice(-2);
   }
 
-  // Date -> '14:20, 5 sep 2018'
+  // Date -> '09:57'
+  getTimeString(date: Date): string {
+    return this.addZero(date.getHours()) + ':' + this.addZero(date.getMinutes());
+  }
+
+  // Date -> '5 sep 2018'
   getDateString(date: Date): string {
     const monthNames: string[] = [
       'jan',
