@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package com.google.startupos.tools.deps;
+
+option java_package = "com.google.startupos.tools.deps";
+option java_outer_classname = "Protos";
+
+message Dependency {
+  string artifact = 1;
+  string lang = 2;
+  string sha1 = 3;
+  string repository = 4;
+  string name = 5;
+  string actual = 6;
+  string bind = 7;
+}
