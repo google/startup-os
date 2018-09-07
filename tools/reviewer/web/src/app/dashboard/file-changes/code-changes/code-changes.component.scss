@@ -1,0 +1,62 @@
+@import 'basic-styles.scss';
+
+$font-size: 15px;
+$border: #CCC solid 1px;
+
+table {
+  border-top: $border;
+  border-right: $border;
+  border-bottom: $border;
+  tr {
+    >.line-number {
+      background: #fafbfc;
+      border-left: $border;
+      border-right: $border;
+      font-size: $font-size;
+      user-select: none;
+      padding: 0 3px;
+      >span {
+        font-family: monospace;
+        float: right;
+        opacity: 0.7;
+      }
+    }
+    >.content {
+      $add-comment-button-width: 24px;
+      min-width: 650px;
+      position: relative;
+      >.add-comment-button {
+        position: absolute;
+        user-select: none;
+        >.icon-button {
+          margin-top: 2px;
+          width: $font-size;
+          height: $font-size;
+          cursor: pointer;
+          >.mat-icon {
+            color: #036fe8;
+            width: $font-size;
+            height: $font-size;
+            line-height: $font-size;
+          }
+        }
+      }
+      >.chars-highlighting {
+        position: absolute;
+        left: $add-comment-button-width;
+        pre {
+          color: rgba(0,0,0,0);
+        }
+      }
+      >.code {
+        position: relative;
+        min-height: $font-size;
+        margin-left: $add-comment-button-width;
+        padding-right: 10px;
+      }
+      .code-line {
+        padding-top: 1px;
+      }
+    }
+  }
+}

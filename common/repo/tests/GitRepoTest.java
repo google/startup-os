@@ -21,6 +21,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
@@ -61,7 +63,7 @@ public class GitRepoTest {
     gitRepo.setFakeUsersData();
     // We need one commit to make the repo have a master branch.
     fileUtils.writeStringUnchecked(
-        "initial commit", fileUtils.joinPaths(repoFolder, "initial_commit.txt"));
+        "initial commit", fileUtils.joinToAbsolutePath(repoFolder, "initial_commit.txt"));
     initialCommit = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
   }
 
@@ -101,7 +103,8 @@ public class GitRepoTest {
   @Test
   public void testGetCommitIds() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     assertEquals(2, gitRepo.getCommitIds(TEST_BRANCH).size());
   }
@@ -110,7 +113,8 @@ public class GitRepoTest {
   public void testGetCommits() {
     String initialCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     String commitId = gitRepo.getHeadCommitId();
     assertEquals(
@@ -132,10 +136,12 @@ public class GitRepoTest {
   public void testGetMultipleCommits() {
     String initialCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     String commitId1 = gitRepo.getHeadCommitId();
-    fileUtils.writeStringUnchecked("More content", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        "More content", fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     String commitId2 = gitRepo.getHeadCommitId();
     assertEquals(
@@ -165,7 +171,8 @@ public class GitRepoTest {
   @Test
   public void testAddFile() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     List<File> uncom = repo.getUncommittedFiles();
     assertEquals(1, repo.getUncommittedFiles().size());
@@ -174,7 +181,8 @@ public class GitRepoTest {
   @Test
   public void testAddAndCommitFile() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     assertEquals(0, repo.getUncommittedFiles().size());
@@ -183,7 +191,8 @@ public class GitRepoTest {
   @Test
   public void testGetFileContents() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     String commitId = gitRepo.getHeadCommitId();
@@ -194,7 +203,7 @@ public class GitRepoTest {
   public void testGetUncommittedFilesWhenAddedFile() {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
-        TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, "added_file.txt"));
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
     gitRepo.addFile("added_file.txt");
     assertEquals(
         ImmutableList.of(File.newBuilder().setFilename("added_file.txt").build()),
@@ -204,10 +213,12 @@ public class GitRepoTest {
   @Test
   public void testGetUncommittedFilesWhenModifiedFile() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    fileUtils.writeStringUnchecked("new file contents", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        "new file contents", fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     assertEquals(
         ImmutableList.of(
             File.newBuilder().setFilename(TEST_FILE).setAction(File.Action.MODIFY).build()),
@@ -217,7 +228,8 @@ public class GitRepoTest {
   @Test
   public void testGetUncommittedFilesWhenUntrackedFile() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     assertEquals(
         ImmutableList.of(
             File.newBuilder().setFilename(TEST_FILE).setAction(File.Action.ADD).build()),
@@ -227,13 +239,42 @@ public class GitRepoTest {
   @Test
   public void testGetUncommittedFilesWhenDeletedFile() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
-    fileUtils.deleteFileOrDirectoryIfExistsUnchecked(fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.deleteFileOrDirectoryIfExistsUnchecked(
+        fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     assertEquals(
         ImmutableList.of(
             File.newBuilder().setFilename(TEST_FILE).setAction(File.Action.DELETE).build()),
+        repo.getUncommittedFiles());
+  }
+
+  @Test
+  public void testGetUncommittedFilesWhenRenamedFile() throws IOException {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+
+    // rename the file
+    Files.move(
+        Paths.get(fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE)),
+        Paths.get(fileUtils.joinToAbsolutePath(repoFolder, "new_name.txt")),
+        StandardCopyOption.REPLACE_EXISTING);
+
+    gitRepo.addFile("new_name.txt");
+    gitRepo.addFile(TEST_FILE);
+
+    assertEquals(
+        ImmutableList.of(
+            File.newBuilder()
+                .setFilename("new_name.txt")
+                .setAction(File.Action.RENAME)
+                .setOriginalFilename(TEST_FILE)
+                .build()),
         repo.getUncommittedFiles());
   }
 
@@ -254,13 +295,14 @@ public class GitRepoTest {
   @Test
   public void testReset() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked("first commit\n", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        "first commit\n", fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "first commit message");
     String firstCommitId = gitRepo.getHeadCommitId();
     fileUtils.writeStringUnchecked(
         repo.getFileContents(firstCommitId, TEST_FILE) + "second commit\n",
-        fileUtils.joinPaths(repoFolder, TEST_FILE));
+        fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "Second commit message");
     String secondCommitId = gitRepo.getHeadCommitId();
@@ -272,24 +314,26 @@ public class GitRepoTest {
   @Test
   public void testMergeWhenAddNewFile() {
     repo.switchBranch(TEST_BRANCH);
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
     repo.switchBranch("master");
     assertTrue(repo.merge(TEST_BRANCH));
     assertEquals("master", repo.currentBranch());
-    assertTrue(fileUtils.fileExists(fileUtils.joinPaths(repoFolder, TEST_FILE)));
+    assertTrue(fileUtils.fileExists(fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE)));
   }
 
   @Test
   public void testMergeWhenFileIsChanged() {
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "Commit to master");
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         repo.getFileContents(gitRepo.getHeadCommitId(), TEST_FILE) + "New contents\n",
-        fileUtils.joinPaths(repoFolder, TEST_FILE));
+        fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "Commit to another branch");
     repo.switchBranch("master");
@@ -302,7 +346,8 @@ public class GitRepoTest {
 
   @Test
   public void testMergeWhenFileIsDeleted() throws IOException {
-    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
     repo.commit(repo.getUncommittedFiles(), "Commit to master");
     repo.switchBranch(TEST_BRANCH);
@@ -331,6 +376,91 @@ public class GitRepoTest {
   @Test
   public void testCommitExists_fakeCommit() {
     assertFalse(repo.commitExists("123245"));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsMergedWithNewFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+
+    repo.merge(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithNewFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+
+    assertFalse(repo.isMerged(TEST_BRANCH));
+  }
+
+  // TODO:  Find the reason why this test isn't passing. If `gitRepo.isMerged()` method contains
+  // switching to `master` branch and then use `branch --merged` command this test is passing.
+  //  @Test
+  //  public void testIsMergedWhenBranchIsNotMergedWithoutChanges() {
+  //    repo.switchBranch(TEST_BRANCH);
+  //
+  //    assertTrue(repo.isMerged(TEST_BRANCH));
+  //  }
+
+  @Test
+  public void testIsMergedWhenBranchIsMergedWithModifiedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked("New content", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    repo.merge(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithModifiedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked("New content", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    assertFalse(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsMergedWithDeletedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.deleteFileOrDirectoryIfExistsUnchecked(fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    repo.merge(TEST_BRANCH);
+
+    assertTrue(repo.isMerged(TEST_BRANCH));
+  }
+
+  @Test
+  public void testIsMergedWhenBranchIsNotMergedWithDeletedFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    gitRepo.addFile(TEST_FILE);
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.deleteFileOrDirectoryIfExistsUnchecked(fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in " + TEST_BRANCH);
+
+    assertFalse(repo.isMerged(TEST_BRANCH));
   }
 }
 

@@ -1,12 +1,6 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
-git_repository(
-    name = "startupos_binaries",
-    commit = "3eaa31c93ca9ecb22ad8c348649d1ba4f61f332c",
-    remote = "https://github.com/oferb/startupos-binaries",
-)
-
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
@@ -197,6 +191,22 @@ http_file(
     urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
 )
 
+# clang-format tool download, to be used by Formatter tool
+
+http_file(
+    name = "clang_format_bin",
+    executable = True,
+    sha256 = "cc99fda45b4c740f35d0a367985a2bf55491065a501e2dd5d1ad3f97dcac89da",
+    urls = ["https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz"]
+)
+
+http_file(
+    name = "clang_format_bin_osx",
+    executable = True,
+    sha256 = "0ef8e99e9c9b262a53ab8f2821e2391d041615dd3f3ff36fdf5370916b0f4268",
+    urls = ["https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz"]
+)
+
 """
 We use proto_compiler and proto_java_toolchain bindings to avoid
 compilation of protoc. To turn off prebuilt binaries, replace
@@ -216,5 +226,40 @@ bind(
 
 bind(
     name = "grpc_java_plugin",
-    actual = "@startupos_binaries//:grpc_java_plugin"
+    actual = "//tools:grpc_java_plugin"
+)
+
+http_file(
+    name = "grpc_java_plugin_linux",
+    executable = True,
+    sha256 = "d9117f0a987004bee3379654871b4cfeb81e49ebba346442dac84c82c5c20887",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpc_java_plugin_linux"],
+)
+
+http_file(
+    name = "grpc_java_plugin_osx",
+    executable = True,
+    sha256 = "e69af502d906199675454ac8af7dfddff78e6213df9abc63434c522adea6c6fb",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpc_java_plugin_osx"],
+)
+
+http_file(
+    name = "grpcwebproxy_linux",
+    executable = True,
+    sha256 = "c4a9167a0d6f0e16debbdca2b27248daae436216d43aa6be010febb6fe572474",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_linux"],
+)
+
+http_file(
+    name = "grpcwebproxy_osx",
+    executable = True,
+    sha256 = "805dedb12948aa36ba29caf532774da714e95910292dda9b993fb8fc7f2019d0",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_osx"],
+)
+
+http_file(
+    name = "bazel_deps",
+    executable = True,
+    sha256 = "c6840b1066793de9a998ef74e45f35f263df16372b2365af78565aeb2669ac6f",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/bazel_deps.jar"],
 )

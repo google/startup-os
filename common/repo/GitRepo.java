@@ -44,7 +44,9 @@ public class GitRepo implements Repo {
     this.fileUtils = fileUtils;
     gitCommandBase =
         Arrays.asList(
-            "git", "--git-dir=" + fileUtils.joinPaths(repoPath, ".git"), "--work-tree=" + repoPath);
+            "git",
+            "--git-dir=" + fileUtils.joinToAbsolutePath(repoPath, ".git"),
+            "--work-tree=" + repoPath);
   }
 
   private class CommandResult {
@@ -113,7 +115,11 @@ public class GitRepo implements Repo {
 
   @Override
   public void switchBranch(String branch) {
-    runCommand("checkout --quiet -B " + branch);
+    if (branchExists(branch)) {
+      runCommand("checkout --quiet " + branch);
+    } else {
+      runCommand("checkout --quiet -b " + branch);
+    }
   }
 
   @Override
@@ -179,9 +185,19 @@ public class GitRepo implements Repo {
       action:ADD, filename:package/untracked.txt
       */
       File.Action action = getAction(parts[0]);
-      // TODO: Set original_filename for RENAME and COPY
-      String filename = action.equals(File.Action.RENAME) ? parts[3] : parts[1];
-      files.add(File.newBuilder().setAction(action).setFilename(filename).build());
+      if (action.equals(File.Action.RENAME) || action.equals(File.Action.COPY)) {
+        String filename = parts[3];
+        String originalFilename = parts[1];
+        files.add(
+            File.newBuilder()
+                .setAction(action)
+                .setFilename(filename)
+                .setOriginalFilename(originalFilename)
+                .build());
+      } else {
+        String filename = parts[1];
+        files.add(File.newBuilder().setAction(action).setFilename(filename).build());
+      }
     }
     return files.build();
   }
@@ -254,7 +270,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void push() {
-    runCommand("push --all --atomic origin");
+    runCommand("push -q --all --atomic origin");
   }
 
   @Override
@@ -271,7 +287,7 @@ public class GitRepo implements Repo {
     switchToMasterBranch();
     CommandResult mergeCommandResult;
     if (remote) {
-      CommandResult fetchCommandResult = runCommand("fetch origin " + branch);
+      CommandResult fetchCommandResult = runCommand("fetch -q origin " + branch);
       if (!fetchCommandResult.stderr.isEmpty()) {
         throw new IllegalStateException(
             "Failed to fetch remote branch before merging \'"
@@ -294,8 +310,13 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean isMerged(String branch) {
-    // TODO: Implement method
-    throw new UnsupportedOperationException("Not implemented");
+    CommandResult commandResult = runCommand("branch --merged master");
+    List<String> mergedBranches =
+        splitLines(commandResult.stdout)
+            .stream()
+            .map(line -> line.trim().replaceAll("\\*", ""))
+            .collect(Collectors.toList());
+    return mergedBranches.contains(branch);
   }
 
   @Override
@@ -366,7 +387,7 @@ public class GitRepo implements Repo {
 
   public boolean cloneRepo(String url, String path) {
     CommandResult commandResult =
-        runCommand("clone -q " + url + " " + fileUtils.joinPaths(path, ".git"));
+        runCommand("clone -q " + url + " " + fileUtils.joinToAbsolutePath(path, ".git"));
     return commandResult.stderr.isEmpty();
   }
 }

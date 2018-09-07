@@ -69,7 +69,7 @@ public class InitCommandTest {
   @Test
   public void initCommandTest() throws Exception {
     String[] args = {
-      "--base_path", "/path/to/base",
+      "init", "/path/to/base",
       "--startupos_repo", ""
     };
     initCommand.run(args);

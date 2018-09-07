@@ -54,9 +54,9 @@ public class AddRepoCommand implements AaCommand {
 
   @Override
   public boolean run(String[] args) {
-    Flags.parse(args, AddRepoCommand.class.getPackage());
+    Flags.parseCurrentPackage(args);
 
-    String headPath = fileUtils.joinPaths(this.config.getBasePath(), "head");
+    String headPath = fileUtils.joinToAbsolutePath(this.config.getBasePath(), "head");
     String repoName = name.get();
 
     if (repoName.isEmpty()) {
@@ -72,7 +72,7 @@ public class AddRepoCommand implements AaCommand {
       }
     }
 
-    String repoPath = fileUtils.joinPaths(headPath, repoName);
+    String repoPath = fileUtils.joinToAbsolutePath(headPath, repoName);
     System.out.println(String.format("Cloning repo %s into %s", repoName, repoPath));
     GitRepo repo = this.gitRepoFactory.create(repoPath);
     if (!repo.cloneRepo(url.get(), repoPath)) {

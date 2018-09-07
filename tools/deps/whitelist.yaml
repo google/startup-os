@@ -42,3 +42,4 @@ workspace_dependencies:
   - https://github.com/grpc/grpc-java
   - https://github.com/oferb/startupos-binaries
   - https://github.com/open-source-parsers/jsoncpp
+  - https://releases.llvm.org
