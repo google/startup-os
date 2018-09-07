@@ -1,0 +1,14 @@
+{
+    "left_file":{
+       "filename":"tools/reviewer/local_server/service/CodeReviewService.java",
+       "workspace":"demo-workspace",
+       "repo_id":"startup-os",
+       "commit_id":"78a77921e1ef0dadef99a1913245a8c82fb40205"
+    },
+    "right_file":{
+       "filename":"tools/reviewer/local_server/service/CodeReviewService.java",
+       "commit_id":"e99c050568a5f21292490718aebe77b9ee4eca3e",
+       "repo_id":"startup-os",
+       "action": "MODIFY"
+    }
+ }
