@@ -12,9 +12,9 @@ java_binary(
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/org/slf4j:slf4j_simple",
-        "//tools/reviewer/local_server/service:code_review_service",
         "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
+        "//tools/reviewer/local_server/service:code_review_service",
     ],
 )
 
@@ -45,8 +45,8 @@ java_test(
         "//tools/reviewer/aa:aa_module",
         "//tools/reviewer/aa/commands",
         "//tools/reviewer/local_server/service:auth_service",
-        "//tools/reviewer/local_server/service:code_review_service",
         "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
+        "//tools/reviewer/local_server/service:code_review_service",
     ],
 )

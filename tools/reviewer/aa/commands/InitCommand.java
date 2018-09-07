@@ -99,7 +99,8 @@ public class InitCommand implements AaCommand {
   }
 
   private boolean processArgs(String[] args) {
-    // `aa init` can be called by either `bazel run //tools/reviewer/aa:aa_tool -- init` or `aa init`.
+    // `aa init` can be called by either `bazel run //tools/reviewer/aa:aa_tool -- init`
+    // or `aa init`.
     // For `aa init`, there is an extra first argument `aa` in `args`.
     if (args[0].equals("aa")) {
       if (args.length == 1) {
