@@ -7,23 +7,25 @@
         }
         >.group-name {
           font-weight: bold;
+          margin-right: 5px;
         }
       }
       >.diff-list {
         >.mat-row {
           cursor: pointer;
         }
+
         .mat-column-id {
-          flex: 0 0 120px;
+          flex: 0 0 5%;
         }
-        .mat-column-author {
-          flex: 0 0 250px;
-        }
-        .mat-column-status {
-          flex: 0 0 250px;
-        }
+        .mat-column-author,
+        .mat-column-status,
         .mat-column-action {
-          flex: 0 0 250px;
+          flex: 0 0 12%;
+        }
+        .mat-column-reviewers,
+        .mat-column-description {
+          flex: 0 0 20%;
         }
       }
       >.placeholder {
