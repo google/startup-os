@@ -25,7 +25,7 @@ public class PersonTool {
 
   static {
     FileUtils fileUtils = DaggerProtoRenameComponent.create().getFileUtils();
-    PERSON_PROTOBINARY_PATH = fileUtils.joinToAbsolutePath("person1.pb");
+    PERSON_PROTOBINARY_PATH = fileUtils.joinToAbsolutePath("person.pb");
   }
 
   public static void main(String[] args) {
@@ -60,7 +60,7 @@ public class PersonTool {
   private static void writePerson() {
     Person person =
         Person.newBuilder()
-            .setName("John Smith")
+            .setName("John")
             .setId(1)
             .setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPLE)
             .build();

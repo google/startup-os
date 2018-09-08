@@ -14,14 +14,19 @@ The main technologies in the stack are:
 * [Bazel](https://bazel.build/)
 
 ## Hands-on experience
-Try the Google Cloud Shell tutorial on formatting code using a Bazel-built tool:
+Try these Google Cloud Shell tutorials:
+
+Multi-language code formatting tool built with Bazel:
 
 [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/google/startup-os&page=shell&tutorial=tutorials/formatting-code.md)
 
-Try the Google Cloud Shell tutorial on renaming proto fields:
+Field & enum renaming API backwards compatibility 1: how old data can still be read by new release, even after renaming:
 
 [![Open in Cloud Shell](http://gstatic.com/cloudssh/images/open-btn.svg)](https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/google/startup-os&page=shell&tutorial=tutorials/proto_rename/renaming-proto.md)
 
+Field & enum renaming API backwards compatibility 2: how old releases can talk to new releases without breaking:
+
+TBD
 ## Supported languages
 
 Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Java and Typescript, but there's support for many other languages:

@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 @Singleton
 @Component(modules = {CommonModule.class})
-public interface ProtoRenameComponent {
+interface ProtoRenameComponent {
   FileUtils getFileUtils();
 }
 
