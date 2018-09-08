@@ -1,0 +1,36 @@
+:host {
+  >.diff-groups {
+    >.diff-group {
+      >.diff-group-title {
+        >span {
+          font-size: 20px;
+        }
+        >.group-name {
+          font-weight: bold;
+          margin-right: 5px;
+        }
+      }
+      >.diff-list {
+        >.mat-row {
+          cursor: pointer;
+        }
+
+        .mat-column-id {
+          flex: 0 0 5%;
+        }
+        .mat-column-author,
+        .mat-column-status,
+        .mat-column-action {
+          flex: 0 0 12%;
+        }
+        .mat-column-reviewers,
+        .mat-column-description {
+          flex: 0 0 20%;
+        }
+      }
+      >.placeholder {
+        height: 14px;
+      }
+    }
+  }
+}

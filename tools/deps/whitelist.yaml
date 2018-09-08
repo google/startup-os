@@ -1,23 +1,35 @@
 maven_dependencies:
+  - com.fasterxml.jackson
   - com.google
   - com.jcraft
+  - com.squareup.okhttp
+  - com.squareup.okio
+  - com.squareup:javapoet
+  - commons-codec:commons-codec
   - commons-logging
   - io.grpc
+  - io.netty
   - io.opencensus
   - javax.annotation
   - javax.inject
+  - joda-time:joda-time
   - junit
+  - log4j:log4j
+  - net.bytebuddy:byte-buddy
   - org.apache
+  - org.checkerframework:checker-compat-qual
+  - org.codehaus.jackson
+  - org.codehaus.mojo:animal-sniffer-annotations
   - org.eclipse
+  - org.hamcrest:hamcrest-core
   - org.javassist
   - org.json
   - org.jsoup
   - org.mockito
   - org.objenesis
   - org.slf4j
+  - org.threeten:threetenbp
   - org.yaml
-  - com.squareup.okhttp
-  - com.squareup.okio
 workspace_dependencies:
   - https://github.com/abseil/abseil-cpp
   - https://github.com/bazelbuild/
