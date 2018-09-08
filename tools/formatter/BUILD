@@ -5,8 +5,8 @@ java_binary(
     srcs = ["FormatterTool.java"],
     main_class = "com.google.startupos.tools.formatter.FormatterTool",
     runtime_deps = [
-        "//tools:buildifier",
         ":clang_format",
+        "//tools:buildifier",
     ],
     deps = [
         "//common/flags",

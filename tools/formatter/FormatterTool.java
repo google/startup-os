@@ -36,17 +36,44 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Scanner;
 
 public class FormatterTool {
+  private static final boolean DEBUG_MODE = false;
 
   static String readFile(Path path) throws IOException {
     return String.join(System.lineSeparator(), Files.readAllLines(path));
   }
 
-  static void execute(String cmd) throws IOException {
-    // XXX: Remove
-    System.out.println(cmd);
+  static void executeWithRuntime(String cmd) throws IOException {
     Runtime.getRuntime().exec(cmd);
+  }
+
+  static void executeWithProcess(String... cmd) throws IOException {
+    try {
+      ProcessBuilder builder = new ProcessBuilder(cmd);
+      builder.redirectErrorStream(true);
+      Process process = builder.start();
+
+      if (DEBUG_MODE) {
+        Scanner scanner = new Scanner(process.getInputStream());
+        StringBuilder output = new StringBuilder();
+        while (scanner.hasNextLine()) {
+          output.append(scanner.nextLine());
+          output.append("\n");
+        }
+        scanner.close();
+        int result = process.waitFor();
+        System.out.printf("Process exited with result %d and output:\n%s%n", result, output);
+      } else {
+        process.waitFor();
+      }
+
+    } catch (InterruptedException e) {
+      // We wrap the InterruptedException so we don't need to propagate 2 exceptions.
+      // For our purposes, these exceptions are close enough.
+      throw new IOException(e);
+    }
   }
 
   interface BaseFormatter {
@@ -77,7 +104,7 @@ public class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
-      execute("yapf -i " + path.toAbsolutePath().toString());
+      executeWithRuntime("yapf -i " + path.toAbsolutePath().toString());
     }
   }
 
@@ -85,10 +112,12 @@ public class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
-      execute(
-          "/usr/bin/env bash "
-              + "tools/formatter/clang-format.sh -i "
-              + path.toAbsolutePath().toString());
+      executeWithProcess(
+          "/usr/bin/env",
+          "bash",
+          "tools/formatter/clang-format.sh",
+          "-i",
+          path.toAbsolutePath().toString());
     }
   }
 
@@ -96,9 +125,12 @@ public class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
-      String command =
-          "/usr/bin/env bash " + "tools/buildtools_wrappers/buildifier.sh -mode=fix " + "%s";
-      execute(String.format(command, path.toAbsolutePath().toString()));
+      executeWithProcess(
+          "/usr/bin/env",
+          "bash",
+          "tools/buildtools_wrappers/buildifier.sh",
+          "-mode=fix",
+          path.toAbsolutePath().toString());
     }
   }
 
