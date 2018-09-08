@@ -44,6 +44,8 @@ public class FormatterTool {
   }
 
   static void execute(String cmd) throws IOException {
+    // XXX: Remove
+    System.out.println(cmd);
     Runtime.getRuntime().exec(cmd);
   }
 
@@ -83,7 +85,10 @@ public class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
-      execute("clang-format -i " + path.toAbsolutePath().toString());
+      execute(
+          "/usr/bin/env bash "
+              + "tools/formatter/clang-format.sh -i "
+              + path.toAbsolutePath().toString());
     }
   }
 

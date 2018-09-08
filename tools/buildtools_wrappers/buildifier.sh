@@ -5,12 +5,12 @@
 platform=$(uname)
 
 if [ "$platform" == "Darwin" ]; then
-    BUILDIFIER_BINARY=$(pwd)/external/buildifier_osx/file/buildifier.osx
+    BINARY=$(pwd)/external/buildifier_osx/file/buildifier.osx
 elif [ "$platform" == "Linux" ]; then
-    BUILDIFIER_BINARY=$(pwd)/external/buildifier/file/buildifier
+    BINARY=$(pwd)/external/buildifier/file/buildifier
 else
     echo "Buildifier does not have a binary for $platform"
     exit 1
 fi
 
-$BUILDIFIER_BINARY $*
+$BINARY $*

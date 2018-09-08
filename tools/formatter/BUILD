@@ -6,8 +6,7 @@ java_binary(
     main_class = "com.google.startupos.tools.formatter.FormatterTool",
     runtime_deps = [
         "//tools:buildifier",
-        # TODO: Current downloaded file is 292mb. Find a smaller source for the formatter.
-        #"//tools:clang_format",
+        ":clang_format",
     ],
     deps = [
         "//common/flags",
@@ -15,5 +14,14 @@ java_binary(
         "//third_party/maven/com/google/googlejavaformat:google_java_format",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/org/slf4j:slf4j_simple",
+    ],
+)
+
+sh_binary(
+    name = "clang_format",
+    srcs = ["clang-format.sh"],
+    data = [
+        "@clang_format_bin//file",
+        "@clang_format_bin_osx//file",
     ],
 )
