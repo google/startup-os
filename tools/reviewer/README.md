@@ -5,7 +5,7 @@ It can do some cool stuff:
 - Well, multi-repo. Repos can be any combination of on-prem, GitHub, GitLab, Bitbucket, Google CSR etc.
 - No server to maintain. Code is served locally from your machine, metadata from Firebase.
 - Can view local changes in tool - no need to push.
-- Comes with multi-repo cli tool called [aa](aa).
+- Comes with multi-repo cli tool.
 - Supports multiple auth providers - GitHub, Google (this is just part of Firebase)
 
 Here's a 2-min video of the tool:
@@ -15,7 +15,7 @@ The grand idea is that having multi-repo code review, multi-repo cli and multi-r
 
 ## Architecture
 Reviewer has 3 components:
-* [Web front-end](web), written in Angular.
+* [Web front-end](webapp), written in Angular.
 * [Local server](local_server), to serve code and diffs to the web front-end from the local machine.
 * [cli tool](aa) called aa (easy to type) to manage multiple repos locally.
 

@@ -12,4 +12,4 @@ and verify it in CI (see [here](https://github.com/google/startup-os/blob/fedbc1
 * Precommit checks: [pre-commit.sh](pre-commit.sh)
 * CI (using CircleCI) to enforce formatting, pre-commit checks, compile and test everything (see [here](https://github.com/google/startup-os/tree/master/.circleci))
 * Dependency management: see [deps](deps).
-* A multi-repo code review tool, that works with any combination of on-prem, GitHub, GitLab, Bitbucket, Google CSR etc. See [reviewer](reviewer).
+* [Reviewer](reviewer) - a multi-repo code review tool, that works with any combination of on-prem, GitHub, GitLab, Bitbucket, Google CSR etc.
