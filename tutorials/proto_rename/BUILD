@@ -10,13 +10,13 @@ java_proto_library(
     deps = [":person_proto"],
 )
 
-java_binary(
-    name = "person_reader",
+java_library(
+    name = "person_reader_and_writer",
     srcs = [
         "PersonReader.java",
+        "PersonWriter.java",
+        "ProtoRenameComponent.java",
     ],
-    data = ["person.pb"],
-    main_class = "com.google.startupos.tutorials.proto_rename.PersonReader",
     deps = [
         ":person_java_proto",
         ":person_proto",
@@ -25,5 +25,19 @@ java_binary(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+java_binary(
+    name = "person_tool",
+    srcs = [
+        "PersonTool.java",
+    ],
+    main_class = "com.google.startupos.tutorials.proto_rename.PersonTool",
+    deps = [
+        ":person_java_proto",
+        ":person_proto",
+        ":person_reader_and_writer",
+        "//common",
     ],
 )

@@ -16,21 +16,15 @@
 
 package com.google.startupos.tutorials.proto_rename;
 
+import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tutorials.proto_rename.Protos.Person;
+import dagger.Component;
 
-import javax.inject.Inject;
+import javax.inject.Singleton;
 
-public class PersonReader {
-  private FileUtils fileUtils;
-
-  @Inject
-  PersonReader() {
-    fileUtils = DaggerProtoRenameComponent.create().getFileUtils();
-  }
-
-  Person readPerson(String path, Person.Builder builder) {
-    return (Person) fileUtils.readProtoBinaryUnchecked(path, builder);
-  }
+@Singleton
+@Component(modules = {CommonModule.class})
+public interface ProtoRenameComponent {
+  FileUtils getFileUtils();
 }
 

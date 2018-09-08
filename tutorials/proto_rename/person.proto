@@ -10,16 +10,10 @@ message Person {
     string name = 1;
     int32 id = 2;
 
-    enum PhoneType {
-        MOBILE = 0;
-        HOME = 1;
-        WORK = 2;
+    enum FavoritePizzaTopping {
+        MUSHROOMS = 0;
+        OLIVES_AND_PINEAPLE = 1;
     }
 
-    message PhoneNumber {
-        int32 number = 1;
-        PhoneType type = 2;
-    }
-
-    repeated PhoneNumber phone = 4;
+    FavoritePizzaTopping favorite_pizza_topping = 3;
 }

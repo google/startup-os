@@ -21,16 +21,16 @@ import com.google.startupos.tutorials.proto_rename.Protos.Person;
 
 import javax.inject.Inject;
 
-public class PersonReader {
+public class PersonWriter {
   private FileUtils fileUtils;
 
   @Inject
-  PersonReader() {
+  PersonWriter() {
     fileUtils = DaggerProtoRenameComponent.create().getFileUtils();
   }
 
-  Person readPerson(String path, Person.Builder builder) {
-    return (Person) fileUtils.readProtoBinaryUnchecked(path, builder);
+  void writePerson(String path, Person person) {
+    fileUtils.writeProtoBinaryUnchecked(person, path);
   }
 }
 
