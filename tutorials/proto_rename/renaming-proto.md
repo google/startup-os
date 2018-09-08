@@ -5,21 +5,28 @@ The binary protobuf encoding is based on tag numbers, so that is what you need t
  
 ## Contents of this tutorial  
 - **person.proto** It's a proto definition. We will rename some fields in next steps and see what will happen.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/person.proto" 
 	text="person.proto">
 </walkthrough-editor-open-file>
+
 - **PersonWriter.java** Writes a Person message to `person.pb` file.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonWriter.java" 
 	text="PersonWriter.java">
 </walkthrough-editor-open-file>
+
 - **PersonReader.java** Reads a Person message from `person.pb` file, which creates `PersonWriter`.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonReader.java" 
 	text="PersonReader.java">
 </walkthrough-editor-open-file>
+
 - **PersonTool.java** Contains the `main` method and manages `PersonReader` and `PersonWriter`.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java">
@@ -31,6 +38,7 @@ The binary protobuf encoding is based on tag numbers, so that is what you need t
 bazel build //tutorials/proto_rename:all
 ```
 - Look at `writePerson()` method of `PersonTool.java` class. This method is creating a new Person which will be saved to `person.pb` file.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java">
@@ -47,17 +55,21 @@ bazel run //tutorials/proto_rename:person_tool -- read
 
 ## Renaming scalar field
 - Open `person.proto` file:
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/person.proto" 
 	text="person.proto">
 </walkthrough-editor-open-file>
+
 - Change `string name = 1` field to `string full_name = 1`
 - Save changes.
 - Open `PersonTool.java` and comment the body of `writePerson()` method.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java"
 </walkthrough-editor-open-file>
+
 - Save changes.
 - Run the command to reads `person.pb` file:
 ```bash
@@ -79,17 +91,21 @@ Remember, when you rename proto field you need also rename setter for this field
 
 ## Renaming enum field
 - Open `person.proto` file:
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/person.proto" 
 	text="person.proto">
 </walkthrough-editor-open-file>
+
 - Change `OLIVES_AND_PINEAPPLE = 1` field to `SEAFOOD = 1`
 - Save changes.
 - Open `PersonTool.java` and change `setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPPLE)` setter to `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` in `writePerson()` method.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java"
 </walkthrough-editor-open-file>
+
 - Save changes
 - Run the command to reads `person.pb` file:
 ```bash
@@ -99,17 +115,21 @@ You can see that we still read `person.pb` file and `OLIVES_AND_PINEAPPLE` field
  
 ## Renaming message field
 - Open `person.proto` file:
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/person.proto" 
 	text="person.proto">
 </walkthrough-editor-open-file>
+
 - Change `FavoritePizzaTopping favorite_pizza_topping = 3` field to `FavoritePizzaTopping favorite_pizza = 3`
 - Save changes
 - Open `PersonTool.java` and change `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` setter to `setFavoritePizza(Person.FavoritePizzaTopping.SEAFOOD)` in `writePerson()` method.
+
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java"
 </walkthrough-editor-open-file>
+
 - Save changes
 - Run the command to reads `person.pb` file:
 ```bash
