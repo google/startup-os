@@ -63,27 +63,25 @@ bazel run //tutorials/proto_rename:person_tool -- read
 
 - Change `string name = 1` field to `string full_name = 1`
 - Save changes.
-- Open `PersonTool.java` and comment the body of `writePerson()` method.
+- Open `PersonTool.java` and comment the body of `writePerson()` method:
 
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java"
 </walkthrough-editor-open-file>
 
-- Save changes.
 - Run the command to reads `person.pb` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
 You can see that we still read `person.pb` and `string name` field was changed to `string full_name`.
 - Uncomment the body of `writePerson()` method. 
-- Save changes.
 - Run the command to reads `person.pb` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
 - It doesn't compile. When we renaming proto field we also need to change the setter for this field. 
-Just change `setName("John")` to `setFullName("John")` and save changes. Run it one more time:
+Just change `setName("John")` to `setFullName("John")`. Run it one more time:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
@@ -98,15 +96,13 @@ Remember, when you rename proto field you need also rename setter for this field
 </walkthrough-editor-open-file>
 
 - Change `OLIVES_AND_PINEAPPLE = 1` field to `SEAFOOD = 1`
-- Save changes.
-- Open `PersonTool.java` and change `setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPPLE)` setter to `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` in `writePerson()` method.
+- Open `PersonTool.java` and change `setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPPLE)` setter to `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` in `writePerson()` method:
 
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java"
 </walkthrough-editor-open-file>
 
-- Save changes
 - Run the command to reads `person.pb` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
@@ -122,15 +118,13 @@ You can see that we still read `person.pb` file and `OLIVES_AND_PINEAPPLE` field
 </walkthrough-editor-open-file>
 
 - Change `FavoritePizzaTopping favorite_pizza_topping = 3` field to `FavoritePizzaTopping favorite_pizza = 3`
-- Save changes
-- Open `PersonTool.java` and change `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` setter to `setFavoritePizza(Person.FavoritePizzaTopping.SEAFOOD)` in `writePerson()` method.
+- Open `PersonTool.java` and change `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` setter to `setFavoritePizza(Person.FavoritePizzaTopping.SEAFOOD)` in `writePerson()` method:
 
 <walkthrough-editor-open-file 
 	filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
 	text="PersonTool.java"
 </walkthrough-editor-open-file>
 
-- Save changes
 - Run the command to reads `person.pb` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
