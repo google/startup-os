@@ -60,20 +60,24 @@ public class ProtobufCheck extends BugChecker implements MethodInvocationTreeMat
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
 
+    // check whether it's a newBuilder() method of any protobuf-generated message class
     if (NEW_BUILDER.matches(tree, state)) {
+      // find next method invocation in chain (on obj.method1().method2() it would return method2)
       ExpressionTree methodInvocation =
           ASTHelpers.findEnclosingNode(state.getPath(), MethodInvocationTree.class);
+      // next invoked message is a build() method of any protobuf-generated message builder class
       if (BUILDER_BUILD.matches(methodInvocation, state)) {
 
+        // select "newBuilder().build()" part of tree
         int start = state.getEndPosition(tree) - "newBuilder()".length();
         int end = state.getEndPosition(methodInvocation);
 
+        // suggest to replace it with "getDefaultInstance()"
         return describeMatch(
             methodInvocation,
             SuggestedFix.builder().replace(start, end, "getDefaultInstance()").build());
       }
     }
-
     return NO_MATCH;
   }
 }

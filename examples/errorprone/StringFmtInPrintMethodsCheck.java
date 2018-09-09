@@ -61,17 +61,19 @@ import java.util.Objects;
 public class StringFmtInPrintMethodsCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
 
-  Matcher<ExpressionTree> PRINT_METHOD =
+  private Matcher<ExpressionTree> PRINT_METHOD =
       instanceMethod().onDescendantOf(PrintStream.class.getName()).named("print");
 
-  Matcher<ExpressionTree> STRING_FORMAT =
+  private Matcher<ExpressionTree> STRING_FORMAT =
       staticMethod().onClass(String.class.getName()).named("format");
 
   @Override
   public Description matchMethodInvocation(MethodInvocationTree tree, VisitorState state) {
+    // check whether it's a method named "print" on PrintStream
     if (!PRINT_METHOD.matches(tree, state)) {
       return NO_MATCH;
     }
+    // fuzzy description: searching for parent of `PrintStream`
     Symbol base =
         tree.getMethodSelect()
             .accept(
@@ -87,16 +89,25 @@ public class StringFmtInPrintMethodsCheck extends BugChecker
                   }
                 },
                 null);
+    // check whether the PrintStream is a static method of System
+    // if it is, it's either System.out or System.err
     if (!Objects.equals(base, state.getSymtab().systemType.tsym)) {
       return NO_MATCH;
     }
+    // get the argument: System.<out|err>.print(<arg>)
     ExpressionTree arg = Iterables.getOnlyElement(tree.getArguments());
+    // check whether <arg> is a String.format() call
     if (!STRING_FORMAT.matches(arg, state)) {
       return NO_MATCH;
     }
-    List<? extends ExpressionTree> formatArgs = ((MethodInvocationTree) arg).getArguments();
 
+    // figure out which of system PrintStream's it is: <out|err>
+    // tree is System.<out|err>.print(String.format(<arg>))
     String printStream = tree.toString().replaceFirst("System.([^.]*)(.*)", "$1");
+
+    // <arg> in String.format(<arg>) call
+    List<? extends ExpressionTree> formatArgs = ((MethodInvocationTree) arg).getArguments();
+    // suggest to replace it with System.<out|err>.printf(<arg>)
     return describeMatch(
         tree,
         SuggestedFix.builder()
