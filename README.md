@@ -28,7 +28,7 @@ Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Jav
 ## Top examples
 * Lots of [Protocol Buffer examples](https://github.com/search?utf8=%E2%9C%93&q=repo%3Agoogle%2Fstartup-os+extension%3Aproto&type=Code&ref=advsearch&l=&l=).
 * [gRPC-Web](https://github.com/oferb/startup-os-example/tree/master/app): a js client library running in the browser, connected to a gRPC server through an HTTP proxy. Both server and client use gRPC auto-generated stubs to handle communication.
-* gRPC [microservices example](https://github.com/google/startup-os/blob/master/tools/local_server/LocalServer.java).
+* gRPC [microservices example](https://github.com/google/startup-os/blob/master/tools/reviewer/local_server/LocalServer.java).
 * [Docker example](https://github.com/google/startup-os/tree/master/examples/docker): building containers using Bazel (no dockerfile needed!).
 * [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run a container built with Bazel on k8s.
 * [CI example](https://github.com/google/startup-os/tree/master/.circleci): Using CircleCI to run CI (continuous integration) and test all Bazel targets.
@@ -55,8 +55,8 @@ Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's i
 * Run all tests: `./test.sh`
 
 ## About monorepos
-A monorepo is a software development approach where all code is stored in a single repository.
-StartupOS doesn't require you to work with a monorepo, but some things, such as sharing a proto file across front-end and backend, are easier to do in a monorepo.
+A monorepo is a software development approach where all code is stored in a single repository. Some things are easier to do in a monorepo, such as sharing a proto file across front-end and backend, some things are harder, such as per-repo control over collaborators, email notifications, commit history etc.
+We're working on an approach where multiple repos can act as a single monorepo, while still being separate repos, using multi-repo tooling such as [multi-repo code review](tools/reviewer).
 
 Some good reads about the monorepo approach:
 * [trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)
