@@ -1,73 +1,38 @@
+import { DatePipe } from '@angular/common';
 import { Pipe, PipeTransform } from '@angular/core';
+
+// Angular date format guide:
+// https://angular.io/api/common/DatePipe#pre-defined-format-options
 
 @Pipe({
   name: 'time',
 })
 export class TimePipe implements PipeTransform {
-  transform(timestamp: number, isFullDate: boolean): string {
-    // Date of the value, which we need to display
-    const pipedDate = new Date(timestamp);
+  transform(timestamp: number, timeFormat: string): string {
+    const datePipe = new DatePipe('en-US');
 
-    if (isFullDate) {
-      // Example: '01:02, 19 jul 1999'
-      return this.getFullDateString(pipedDate);
+    if (timeFormat === 'fullDate') {
+      return datePipe.transform(timestamp, 'h:mm a, MMM dd, yyyy z');
     } else {
-      // Date of right now
-      const currentDate = new Date(Date.now());
-
-      if (this.getDateString(pipedDate) === this.getDateString(currentDate)) {
-        // It's today.
-        // Display time only.
-        // Example: '16:03'
-        return this.getTimeString(pipedDate);
+      if (this.isToday(timestamp)) {
+        // It's today
+        return datePipe.transform(timestamp, 'h:mm a');
       } else {
-        // Several days ago or more.
-        // Display date only.
-        // Example: '29 feb 2096'
-        return this.getDateString(pipedDate);
+        // Several days ago or more
+        return datePipe.transform(timestamp, 'MMM dd, yyyy');
       }
     }
   }
 
-  // Add zero, if number < 10;
-  // Example:
-  // 12 -> 12
-  // 5 -> 05
-  // 29 -> 29
-  // 0 -> 00
-  addZero(integer: number): string {
-    return ('0' + integer).slice(-2);
-  }
+  isToday(timestamp: number): boolean {
+    const datePipe = new DatePipe('en-US');
+    const dateFormat: string = 'd.M.yyyy';
 
-  // Date -> '09:57'
-  getTimeString(date: Date): string {
-    return this.addZero(date.getHours()) + ':' + this.addZero(date.getMinutes());
-  }
+    // Date string of right now
+    const todayDate: string = datePipe.transform(Date.now(), dateFormat);
+    // Date string of the value, which we need to display
+    const pipedDate: string = datePipe.transform(timestamp, dateFormat);
 
-  // Date -> '5 sep 2018'
-  getDateString(date: Date): string {
-    const monthNames: string[] = [
-      'jan',
-      'feb',
-      'mar',
-      'apr',
-      'may',
-      'jun',
-      'jul',
-      'aug',
-      'sep',
-      'oct',
-      'nov',
-      'dec',
-    ];
-
-    return date.getDate() + ' ' +
-      monthNames[date.getMonth()] + ' ' +
-      date.getFullYear();
-  }
-
-  // Date -> '09:57, 5 sep 2018'
-  getFullDateString(date: Date): string {
-    return this.getTimeString(date) + ', ' + this.getDateString(date);
+    return todayDate === pipedDate;
   }
 }
