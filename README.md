@@ -9,7 +9,7 @@
 
 The main technologies in the stack are:
 * [Angular](https://angular.io/)
-* [Protol Buffers](https://developers.google.com/protocol-buffers/)
+* [Protocol Buffers](https://developers.google.com/protocol-buffers/)
 * [gRPC](https://grpc.io/)
 * [Bazel](https://bazel.build/)
 
