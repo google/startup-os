@@ -8,9 +8,12 @@ import {
   BlockIndex,
   BlockLine,
   ChangesLine,
+  LineThread,
 } from '../code-changes.interface';
 import { CommentsService } from '../services';
 
+// The component implements comments of code changes.
+// How it looks: https://i.imgur.com/tVusnEd.jpg
 @Component({
   selector: 'line-comments',
   templateUrl: './comments.component.html',
@@ -23,6 +26,7 @@ export class CommentsComponent {
   @Input() blockLine: BlockLine;
   @Input() blockIndex: BlockIndex;
   @Input() lineIndex: number;
+  @Input() thread: LineThread;
 
   constructor(
     private commentsService: CommentsService,
@@ -43,16 +47,15 @@ export class CommentsComponent {
     comment.setTimestamp(Date.now());
 
     // Send comment to firebase
-    this.blockLine.comments.push(comment);
+    this.thread.comments.addComment(comment);
     this.fileChangesService.addComment(
       this.blockLine.lineNumber,
-      this.blockLine.comments,
+      this.thread.comments.getCommentList(),
     );
 
     this.textareaControl.reset();
 
-    // Save as opened thread
-    this.commentsService.openThread(
+    this.commentsService.saveAsOpen(
       this.blockLine.lineNumber,
       this.lineIndex,
       this.blockIndex,
@@ -60,16 +63,18 @@ export class CommentsComponent {
   }
 
   deleteComment(index: number): void {
-    this.blockLine.comments.splice(index, 1);
+    const comments: Comment[] = this.thread.comments.getCommentList();
+    comments.splice(index, 1);
+    this.thread.comments.setCommentList(comments);
 
     // Delete the thread if it doesn't contain comments.
-    const isDeleteThread: boolean = this.blockLine.comments.length === 0;
+    const isDeleteThread: boolean = this.thread.comments.getCommentList().length === 0;
     this.fileChangesService.deleteComment(isDeleteThread);
 
     if (isDeleteThread) {
       // Close thread, if it doesn't contain any comments
       this.closeComments();
-      this.commentsService.closeThread(
+      this.commentsService.saveAsClosed(
         this.blockLine.lineNumber,
         this.blockIndex,
       );
@@ -77,6 +82,11 @@ export class CommentsComponent {
   }
 
   closeComments(): void {
-    this.commentsService.closeComments(this.changesLine, this.blockIndex);
+    this.commentsService.clearThreads(this.changesLine, this.blockIndex);
+  }
+
+  resolveThread(): void {
+    this.thread.comments.setIsDone(true);
+    this.fileChangesService.resolveThread();
   }
 }

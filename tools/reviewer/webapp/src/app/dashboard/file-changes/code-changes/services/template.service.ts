@@ -8,6 +8,7 @@ import {
 
 @Injectable()
 export class TemplateService {
+  // Get class for a line, based on its parameters
   getLineBackground(
     changesLine: ChangesLine,
     blockIndex: number,

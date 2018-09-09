@@ -13,10 +13,11 @@ import {
   ChangesService,
   CommentsService,
   HoverService,
-  LineService,
   TemplateService,
 } from './services';
 
+// The component implements code changes.
+// How it looks: https://i.imgur.com/HvoXiNC.jpg
 @Component({
   selector: 'code-changes',
   templateUrl: './code-changes.component.html',
@@ -24,7 +25,6 @@ import {
   providers: [
     HoverService,
     ChangesService,
-    LineService,
     TemplateService,
   ],
 })
@@ -82,51 +82,42 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     this.changesLinesMap = changesLinesMap;
   }
 
-  // Initialize comment threads
+  // Initialize comments
   initComments(threads: Thread[]): void {
     for (const thread of threads) {
-      this.openComments(thread);
+      if (thread.getIsDone()) {
+        // Display not resolved thread only
+        continue;
+      }
+      this.startThread(thread);
     }
   }
 
   // Update comments, when data from firebase is received
   updateComments(threads: Thread[]): void {
-    // Copy current open threads to create list of empty threads
-    const emptyThreads: { [id: number]: number }[] = this.commentsService
-      .copyOpenThreads();
-
-    for (const thread of threads) {
-      const blockIndex = this.openComments(thread);
-      // If thread contains comments then thread isn't empty
-      delete emptyThreads[blockIndex][thread.getLineNumber()];
-    }
-
-    // Close empty threads
-    emptyThreads.forEach((blockEmptyThreads, blockIndex) => {
-      for (const lineNumber in blockEmptyThreads) {
-        const lineIndex: number = blockEmptyThreads[lineNumber];
-        const changesLine: ChangesLine = this.changesLines[lineIndex]
-          .commentsLine;
-        changesLine.blocks[blockIndex].comments = [];
-        this.commentsService.closeComments(changesLine, blockIndex);
+    // Close open threads
+    this.commentsService.openThreadsMap.forEach((lineIndexMap, blockIndex) => {
+      for (const lineNumber in lineIndexMap) {
+        const lineIndex: number = lineIndexMap[lineNumber];
+        const changesLine: ChangesLine = this.changesLines[lineIndex].commentsLine;
+        this.commentsService.closeThreads(changesLine, blockIndex);
       }
     });
+
+    // Open received threads
+    this.initComments(threads);
   }
 
-  openComments(thread: Thread): number {
+  // Add the thread to all threads, to display it on user screen
+  startThread(thread: Thread): void {
     const blockIndex: number = this.fileChangesService.getBlockIndex(thread);
-    const lineIndex: number = this.changesLinesMap[blockIndex]
-      [thread.getLineNumber()];
-    const blockLine: BlockLine = this.changesLines[lineIndex]
-      .commentsLine.blocks[blockIndex];
-    blockLine.comments = thread.getCommentList();
-    this.commentsService.openThread(
+    const lineIndex: number = this.changesLinesMap[blockIndex][thread.getLineNumber()];
+
+    this.commentsService.addThread(this.changesLines[lineIndex], blockIndex, thread);
+    this.commentsService.saveAsOpen(
       thread.getLineNumber(),
       lineIndex,
       blockIndex,
     );
-    this.commentsService.openComments(this.changesLines[lineIndex], 1);
-
-    return blockIndex;
   }
 }

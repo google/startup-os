@@ -1,20 +1,27 @@
-import { Comment, TextChange } from '@/shared/proto';
+import { TextChange, Thread } from '@/shared/proto';
 
 export enum BlockIndex {
   leftFile,
   rightFile,
 }
 
+export interface LineThread {
+  comments: Thread;
+  // For future improvement.
+  // Is "add new comment" interface focused by user cursor?
+  // TODO: make it work
+  isFocus: boolean;
+}
+
 // Code line of a block of code
 export interface BlockLine {
-  code: string;
   clearCode: string;
+  // Code with highlighting
+  code: string;
   lineNumber: number;
   // Is the line a placeholder?
   isPlaceholder: boolean;
-  // Is "add new comment" UI displayed?
-  isNewCommentVisible: boolean;
-  comments: Comment[];
+  threads: LineThread[];
   isChanged: boolean;
   textChange?: TextChange;
 }

@@ -32,7 +32,7 @@
           <div
             class="icon-button"
             *ngIf="hoverService.isHovered(blockLine, blockIndex)"
-            (click)="commentsService.openComments(changesLine, blockIndex)"
+            (click)="commentsService.addThread(changesLine, blockIndex)"
           >
             <mat-icon>add_box</mat-icon>
           </div>
@@ -52,19 +52,22 @@
         <div
           class="code-line code"
           *ngIf="!changesLine.isCommentsLine && !blockLine.isPlaceholder"
-          (dblclick)="commentsService.openComments(changesLine, blockIndex)"
+          (dblclick)="commentsService.addThread(changesLine, blockIndex)"
         >
           <pre [HTML]="blockLine.code"></pre>
         </div>
 
         <!-- Comments -->
-        <line-comments
-          [changesLine]="changesLine"
-          [blockLine]="blockLine"
-          [blockIndex]="blockIndex"
-          [lineIndex]="lineIndex"
-          *ngIf="changesLine.isCommentsLine"
-        ></line-comments>
+        <div class="threads" *ngIf="changesLine.isCommentsLine">
+          <line-comments
+            [changesLine]="changesLine"
+            [blockLine]="blockLine"
+            [blockIndex]="blockIndex"
+            [lineIndex]="lineIndex"
+            [thread]="thread"
+            *ngFor="let thread of blockLine.threads"
+          ></line-comments>
+        </div>
       </td>
     </ng-container>
   </tr>

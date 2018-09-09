@@ -1,18 +1,22 @@
 $comments-padding: 20px;
-$comment-width: 700px;
 $comment-padding: 4px;
+$border: #CCC solid 1px;
 
 .comments {
   padding-top: $comments-padding;
   padding-left: $comments-padding;
   padding-right: $comments-padding;
+  >.resolve {
+    margin-bottom: 10px;
+    padding-left: calc(2 * #{$comment-padding});
+    direction: rtl;
+  }
   >.comment {
     position: relative;
     background: white;
     border: 1px solid rgba(0,0,0,.3);
     border-radius: 2px;
     margin-bottom: 5px;
-    width: $comment-width;
     padding: $comment-padding;
     >.username {
       >span {
@@ -42,10 +46,14 @@ $comment-padding: 4px;
   }
   textarea {
     resize: none;
-    width: $comment-width;
     padding: $comment-padding;
     background: white;
     vertical-align: bottom;
     font-size: 15px;
   }
+}
+.comment-block {
+  width: 90%;
+  min-width: 400px;
+  max-width: 900px;
 }

@@ -9,7 +9,6 @@ import { HighlightService } from '@/shared/services';
 import {
   BlockIndex, BlockLine, ChangesLine,
 } from '../code-changes.interface';
-import { CommentsService } from './comments.service';
 import { LineService } from './line.service';
 
 @Injectable()
@@ -17,7 +16,6 @@ export class ChangesService {
   constructor(
     private highlightService: HighlightService,
     private lineService: LineService,
-    private commentsService: CommentsService,
   ) { }
 
   // Convert string file content to highlighted code lines
@@ -127,12 +125,12 @@ export class ChangesService {
 
     if (leftBlockLines.length !== rightBlockLines.length) {
       // After adding all placeholders
-      throw new Error('Files should have the same amount of lines');
+      throw new Error('Blocks should have the same amount of lines');
     }
     const amountOfLines: number = leftBlockLines.length;
 
     const changesLines: ChangesLine[] = [];
-    const changesLinesMap: { [id: number]: number }[] = this.commentsService
+    const changesLinesMap: { [id: number]: number }[] = this.lineService
       .createSplitDictionary();
     for (let i = 0; i < amountOfLines; i++) {
       // Create line for code
