@@ -1,2 +1,7 @@
 export * from './html.directive';
-export * from './directive-list';
+
+// Directives
+import { HtmlDirective } from './html.directive';
+export const DirectiveList = [
+  HtmlDirective,
+];

@@ -1,2 +1,7 @@
 export * from './time.pipe';
-export * from './pipe-list';
+
+// Pipes
+import { TimePipe } from './time.pipe';
+export const PipeList = [
+  TimePipe,
+];
