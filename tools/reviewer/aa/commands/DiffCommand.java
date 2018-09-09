@@ -80,6 +80,7 @@ public class DiffCommand implements AaCommand {
   private ImmutableList<Reviewer> getReviewers(String reviewersInput) {
     return ImmutableList.copyOf(
         Arrays.stream(reviewersInput.split(","))
+            .filter(x -> !x.equals(""))
             .map(reviewer -> Reviewer.newBuilder().setEmail(reviewer.trim()).build())
             .collect(Collectors.toList()));
   }
