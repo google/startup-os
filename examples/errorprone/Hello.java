@@ -16,7 +16,9 @@
 
 package com.google.startupos.examples.errorprone;
 
+// <editor-fold desc="Uncomment to test ProtobufCheck">
 // import com.google.startupos.proto_vs_json.Protos;
+// </editor-fold>
 
 public class Hello {
   public static void main(String[] args) {

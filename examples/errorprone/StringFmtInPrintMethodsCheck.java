@@ -95,13 +95,15 @@ public class StringFmtInPrintMethodsCheck extends BugChecker
       return NO_MATCH;
     }
     List<? extends ExpressionTree> formatArgs = ((MethodInvocationTree) arg).getArguments();
+
+    String printStream = tree.toString().replaceFirst("System.([^.]*)(.*)", "$1");
     return describeMatch(
         tree,
         SuggestedFix.builder()
             .replace(
                 ((JCTree) tree).getStartPosition(),
                 ((JCTree) formatArgs.get(0)).getStartPosition(),
-                "System.err.printf(")
+                String.format("System.%s.printf(", printStream))
             .replace(
                 state.getEndPosition((JCTree) getLast(formatArgs)),
                 state.getEndPosition((JCTree) tree),
