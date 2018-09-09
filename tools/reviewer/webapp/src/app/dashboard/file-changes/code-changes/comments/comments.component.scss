@@ -3,9 +3,7 @@ $comment-padding: 4px;
 $border: #CCC solid 1px;
 
 .comments {
-  padding-top: $comments-padding;
-  padding-left: $comments-padding;
-  padding-right: $comments-padding;
+  padding: $comments-padding;
   >.resolve {
     margin-bottom: 10px;
     padding-left: calc(2 * #{$comment-padding});
@@ -40,7 +38,9 @@ $border: #CCC solid 1px;
   }
 }
 .new-comment {
-  padding: $comments-padding;
+  padding-left: $comments-padding;
+  padding-right: $comments-padding;
+  padding-bottom: $comments-padding;
   button {
     margin-top: 10px;
   }

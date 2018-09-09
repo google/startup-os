@@ -26,7 +26,7 @@ export class CommentsComponent {
   @Input() blockLine: BlockLine;
   @Input() blockIndex: BlockIndex;
   @Input() lineIndex: number;
-  @Input() thread: LineThread;
+  @Input() lineThread: LineThread;
 
   constructor(
     private commentsService: CommentsService,
@@ -47,10 +47,10 @@ export class CommentsComponent {
     comment.setTimestamp(Date.now());
 
     // Send comment to firebase
-    this.thread.comments.addComment(comment);
+    this.lineThread.thread.addComment(comment);
     this.fileChangesService.addComment(
       this.blockLine.lineNumber,
-      this.thread.comments.getCommentList(),
+      this.lineThread.thread.getCommentList(),
     );
 
     this.textareaControl.reset();
@@ -63,12 +63,12 @@ export class CommentsComponent {
   }
 
   deleteComment(index: number): void {
-    const comments: Comment[] = this.thread.comments.getCommentList();
+    const comments: Comment[] = this.lineThread.thread.getCommentList();
     comments.splice(index, 1);
-    this.thread.comments.setCommentList(comments);
+    this.lineThread.thread.setCommentList(comments);
 
     // Delete the thread if it doesn't contain comments.
-    const isDeleteThread: boolean = this.thread.comments.getCommentList().length === 0;
+    const isDeleteThread: boolean = this.lineThread.thread.getCommentList().length === 0;
     this.fileChangesService.deleteComment(isDeleteThread);
 
     if (isDeleteThread) {
@@ -85,8 +85,9 @@ export class CommentsComponent {
     this.commentsService.clearThreads(this.changesLine, this.blockIndex);
   }
 
-  resolveThread(): void {
-    this.thread.comments.setIsDone(true);
+  toggleThread(): void {
+    const isDone: boolean = this.lineThread.thread.getIsDone();
+    this.lineThread.thread.setIsDone(!isDone);
     this.fileChangesService.resolveThread();
   }
 }

@@ -17,7 +17,7 @@ export class LineService {
       lineNumber: 0,
       isChanged: false,
       isPlaceholder: false,
-      threads: [],
+      lineThreads: [],
     };
   }
 
@@ -73,7 +73,7 @@ export class LineService {
   createLineThread(): LineThread {
     return {
       isFocus: true,
-      comments: new Thread(),
+      thread: new Thread(),
     };
   }
 

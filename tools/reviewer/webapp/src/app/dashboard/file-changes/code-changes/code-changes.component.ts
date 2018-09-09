@@ -85,10 +85,6 @@ export class CodeChangesComponent implements OnInit, OnChanges {
   // Initialize comments
   initComments(threads: Thread[]): void {
     for (const thread of threads) {
-      if (thread.getIsDone()) {
-        // Display not resolved thread only
-        continue;
-      }
       this.startThread(thread);
     }
   }

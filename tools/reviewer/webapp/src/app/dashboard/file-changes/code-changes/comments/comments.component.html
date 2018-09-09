@@ -1,12 +1,14 @@
 <!-- Comment List -->
-<div class="comments" *ngIf="thread.comments.getCommentList().length > 0">
+<div class="comments" *ngIf="lineThread.thread.getCommentList().length > 0">
   <div class="comment-block resolve">
-    <button mat-raised-button (click)="resolveThread()">Resolve</button>
+    <button mat-raised-button (click)="toggleThread()">{{
+      lineThread.thread.getIsDone() ? 'Unresolve' : 'Resolve'
+    }}</button>
   </div>
 
   <div
     class="comment-block comment"
-    *ngFor="let comment of thread.comments.getCommentList(); let i = index"
+    *ngFor="let comment of lineThread.thread.getCommentList(); let i = index"
   >
     <div class="username">
       <span>{{ authService.getUsername(comment.getCreatedBy()) }}</span>
@@ -24,7 +26,7 @@
 </div>
 
 <!-- Add new comment -->
-<div class="new-comment">
+<div class="new-comment" *ngIf="!lineThread.thread.getIsDone()">
   <textarea
     class="comment-block text"
     matInput
@@ -41,7 +43,7 @@
     <button
       mat-raised-button
       (click)="closeComments()"
-      *ngIf="!thread.comments.getCommentList().length"
+      *ngIf="!lineThread.thread.getCommentList().length"
     >Close</button>
   </div>
 </div>

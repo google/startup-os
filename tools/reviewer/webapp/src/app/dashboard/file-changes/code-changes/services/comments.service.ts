@@ -20,24 +20,24 @@ export class CommentsService {
   addThread(changesLine: ChangesLine, blockIndex: number, thread?: Thread): void {
     const lineThread: LineThread = this.lineService.createLineThread();
     if (thread) {
-      lineThread.comments = thread;
+      lineThread.thread = thread;
     }
-    changesLine.commentsLine.blocks[blockIndex].threads.push(lineThread);
+    changesLine.commentsLine.blocks[blockIndex].lineThreads.push(lineThread);
   }
 
   // Remove all threads without comments from the line
   clearThreads(changesLine: ChangesLine, blockIndex: number): void {
-    const threads: LineThread[] = changesLine.blocks[blockIndex].threads;
-    changesLine.blocks[blockIndex].threads = threads.filter(thread => {
-      return thread.comments.getCommentList().length !== 0;
+    const threads: LineThread[] = changesLine.blocks[blockIndex].lineThreads;
+    changesLine.blocks[blockIndex].lineThreads = threads.filter(lineThread => {
+      return lineThread.thread.getCommentList().length !== 0;
     });
   }
 
   // Remove all threads with comments from the line
   closeThreads(changesLine: ChangesLine, blockIndex: number): void {
-    const threads: LineThread[] = changesLine.blocks[blockIndex].threads;
-    changesLine.blocks[blockIndex].threads = threads.filter(thread => {
-      return thread.comments.getCommentList().length === 0;
+    const threads: LineThread[] = changesLine.blocks[blockIndex].lineThreads;
+    changesLine.blocks[blockIndex].lineThreads = threads.filter(lineThread => {
+      return lineThread.thread.getCommentList().length === 0;
     });
   }
 
