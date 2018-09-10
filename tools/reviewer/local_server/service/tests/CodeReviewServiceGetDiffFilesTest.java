@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.service.tests;
+package com.google.startupos.tools.reviewer.localserver.service.tests;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
@@ -24,18 +24,18 @@ import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.repo.Protos.BranchInfo;
-import com.google.startupos.tools.aa.AaModule;
-import com.google.startupos.tools.aa.commands.InitCommand;
-import com.google.startupos.tools.aa.commands.WorkspaceCommand;
+import com.google.startupos.tools.reviewer.aa.AaModule;
+import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
+import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
 import com.google.startupos.tools.localserver.service.AuthService;
-import com.google.startupos.tools.reviewer.service.CodeReviewService;
-import com.google.startupos.tools.reviewer.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.service.Protos.DiffFilesResponse;
-import com.google.startupos.tools.reviewer.service.Protos.DiffFilesRequest;
-import com.google.startupos.tools.reviewer.service.Protos.DiffNumberResponse;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
 import dagger.Component;
 import dagger.Provides;
 import io.grpc.ManagedChannel;
@@ -62,7 +62,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-// TODO Add tests for copied and modified files
 @RunWith(JUnit4.class)
 public class CodeReviewServiceGetDiffFilesTest {
   private static final String TEST_FILE = "test_file.txt";
