@@ -1,5 +1,5 @@
 java_library(
-    name = "checker_compat_qual",
+    name = "ant",
     licenses = [
         "permissive",
     ],
@@ -7,12 +7,15 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/mvnorg/checkerframework/checker_compat_qual",
+        "//external:jar/mvnorg/apache/ant/ant",
+    ],
+    runtime_deps = [
+        ":ant_launcher",
     ],
 )
 
 java_library(
-    name = "checker_qual",
+    name = "ant_launcher",
     licenses = [
         "permissive",
     ],
@@ -20,6 +23,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/mvnorg/checkerframework/checker_qual",
+        "//external:jar/mvnorg/apache/ant/ant_launcher",
     ],
 )

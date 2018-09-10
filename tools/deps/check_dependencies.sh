@@ -17,7 +17,7 @@ else
 fi
 
 # Regenerate dependencies
-bazel run @startupos_binaries//:bazel_deps -- generate \
+bazel run //tools:bazel_deps -- generate \
   -r $(pwd) \
   -s third_party/maven/package-lock.bzl \
   -d dependencies.yaml \

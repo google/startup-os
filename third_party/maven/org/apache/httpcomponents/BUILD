@@ -29,6 +29,7 @@ java_library(
     runtime_deps = [
         ":httpcore",
         "//third_party/maven/commons_codec",
+        "//third_party/maven/commons_logging",
     ],
 )
 
