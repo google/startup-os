@@ -27,6 +27,12 @@ dependencies:
       lang: java
       version: "1.0-beta5"
 
+  com.google.auto.service:
+    auto-service:
+      lang: java
+      processorClasses: [ "com.google.auto.service.processor.AutoServiceProcessor" ]
+      version: "1.0-rc4"
+
   com.google.auto.value:
     auto-value:
       lang: java
@@ -49,6 +55,11 @@ dependencies:
       modules: [ "", "compiler" ]
       version: "2.15"
 
+  com.google.errorprone:
+    error_prone_ant:
+      lang: java
+      version: "2.3.1"
+
   com.google.firebase:
     firebase-admin:
       lang: java
@@ -68,7 +79,7 @@ dependencies:
   com.google.guava:
     guava:
       lang: java
-      version: "24.0-android"
+      version: "26.0-jre"
 
   com.google.jimfs:
     jimfs:
