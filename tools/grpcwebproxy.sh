@@ -9,4 +9,4 @@ else
     echo "grpcwebproxy does not have a binary for $platform"
     exit 1
 fi
- $BINARY "$@"
+$BINARY "$@"
