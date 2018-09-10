@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package com.google.startupos.tutorials.proto_rename;
+
+option java_package = "com.google.startupos.tutorials.proto_rename";
+option java_outer_classname = "Protos";
+
+
+message Person {
+    string name = 1;
+    int32 id = 2;
+
+    enum FavoritePizzaTopping {
+        MUSHROOMS = 0;
+        OLIVES_AND_PINEAPLE = 1;
+    }
+
+    FavoritePizzaTopping favorite_pizza_topping = 3;
+}
