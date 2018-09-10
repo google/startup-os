@@ -2,6 +2,7 @@ options:
   languages: [ "java" ]
   licenses: [ "permissive" ]
   namePrefix: "mvn"
+  resolverType: "coursier"
   resolvers:
     - id: "mavencentral"
       type: "default"
