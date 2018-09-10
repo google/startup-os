@@ -12,6 +12,22 @@ java_library(
 )
 
 java_library(
+    name = "error_prone_ant",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/errorprone/error_prone_ant",
+    ],
+    runtime_deps = [
+        "//third_party/maven/org/apache/ant",
+    ],
+)
+
+java_library(
     name = "javac_shaded",
     licenses = [
         "permissive",

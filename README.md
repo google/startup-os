@@ -9,7 +9,7 @@
 
 The main technologies in the stack are:
 * [Angular](https://angular.io/)
-* [Protol Buffers](https://developers.google.com/protocol-buffers/)
+* [Protocol Buffers](https://developers.google.com/protocol-buffers/)
 * [gRPC](https://grpc.io/)
 * [Bazel](https://bazel.build/)
 
@@ -55,8 +55,8 @@ Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's i
 * Run all tests: `./test.sh`
 
 ## About monorepos
-A monorepo is a software development approach where all code is stored in a single repository.
-StartupOS doesn't require you to work with a monorepo, but some things, such as sharing a proto file across front-end and backend, are easier to do in a monorepo.
+A monorepo is a software development approach where all code is stored in a single repository. Some things are easier to do in a monorepo, such as sharing a proto file across front-end and backend, some things are harder, such as per-repo control over collaborators, email notifications, commit history etc.
+We're working on an approach where multiple repos can act as a single monorepo, while still being separate repos, using multi-repo tooling such as [multi-repo code review](tools/reviewer).
 
 Some good reads about the monorepo approach:
 * [trunkbaseddevelopment.com/monorepos](https://trunkbaseddevelopment.com/monorepos/)

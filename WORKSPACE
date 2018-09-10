@@ -260,6 +260,6 @@ http_file(
 http_file(
     name = "bazel_deps",
     executable = True,
-    sha256 = "c6840b1066793de9a998ef74e45f35f263df16372b2365af78565aeb2669ac6f",
-    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/bazel_deps.jar"],
+    sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
 )
