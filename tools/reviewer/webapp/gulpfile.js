@@ -5,7 +5,7 @@ const clean = require('gulp-clean');
 const { exec } = require('child_process');
 
 const protoPath = './src/app/shared/proto/functions';
-const codeReviewProtoRelativePath = 'tools/reviewer/service/code_review.proto';
+const codeReviewProtoRelativePath = 'tools/reviewer/local_server/service/code_review.proto';
 // from 'startup-os/tools/reviewer/webapp' to 'startup-os'
 const startuposPath = path.resolve('../../../');
 

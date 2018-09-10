@@ -1,14 +1,13 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { Comment } from '@/shared/proto';
+import { Comment, Thread } from '@/shared/proto';
 import { AuthService } from '@/shared/services';
 import { FileChangesService } from '../../file-changes.service';
 import {
   BlockIndex,
   BlockLine,
   ChangesLine,
-  LineThread,
 } from '../code-changes.interface';
 import { CommentsService } from '../services';
 
@@ -19,20 +18,25 @@ import { CommentsService } from '../services';
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss'],
 })
-export class CommentsComponent {
+export class CommentsComponent implements OnInit {
   textareaControl: FormControl = new FormControl();
+  thread: Thread = new Thread();
 
   @Input() changesLine: ChangesLine;
   @Input() blockLine: BlockLine;
   @Input() blockIndex: BlockIndex;
   @Input() lineIndex: number;
-  @Input() lineThread: LineThread;
+  @Input() threadIndex: number;
 
   constructor(
     private commentsService: CommentsService,
     public authService: AuthService,
     private fileChangesService: FileChangesService,
   ) { }
+
+  ngOnInit() {
+    this.thread = this.blockLine.lineThreads[this.threadIndex].thread;
+  }
 
   addComment(): void {
     if (!this.textareaControl.value) {
@@ -47,10 +51,10 @@ export class CommentsComponent {
     comment.setTimestamp(Date.now());
 
     // Send comment to firebase
-    this.lineThread.thread.addComment(comment);
+    this.thread.addComment(comment);
     this.fileChangesService.addComment(
       this.blockLine.lineNumber,
-      this.lineThread.thread.getCommentList(),
+      this.thread.getCommentList(),
     );
 
     this.textareaControl.reset();
@@ -63,31 +67,34 @@ export class CommentsComponent {
   }
 
   deleteComment(index: number): void {
-    const comments: Comment[] = this.lineThread.thread.getCommentList();
+    // Delete the comment from the thread
+    const comments: Comment[] = this.thread.getCommentList();
     comments.splice(index, 1);
-    this.lineThread.thread.setCommentList(comments);
+    this.thread.setCommentList(comments);
 
-    // Delete the thread if it doesn't contain comments.
-    const isDeleteThread: boolean = this.lineThread.thread.getCommentList().length === 0;
+    const isDeleteThread: boolean = this.thread.getCommentList().length === 0;
+
+    // Delete the comment from firebase
     this.fileChangesService.deleteComment(isDeleteThread);
 
     if (isDeleteThread) {
-      // Close thread, if it doesn't contain any comments
-      this.closeComments();
-      this.commentsService.saveAsClosed(
-        this.blockLine.lineNumber,
-        this.blockIndex,
-      );
+      // Close the thread, if it doesn't contain any comments
+      this.closeThread();
     }
   }
 
-  closeComments(): void {
-    this.commentsService.clearThreads(this.changesLine, this.blockIndex);
+  closeThread(): void {
+    this.commentsService.closeThread(
+      this.blockLine,
+      this.threadIndex,
+      this.blockIndex,
+    );
   }
 
+  // Make thread resolved/unresolved
   toggleThread(): void {
-    const isDone: boolean = this.lineThread.thread.getIsDone();
-    this.lineThread.thread.setIsDone(!isDone);
-    this.fileChangesService.resolveThread();
+    const isDone: boolean = !this.thread.getIsDone();
+    this.thread.setIsDone(isDone);
+    this.fileChangesService.resolveThread(isDone);
   }
 }

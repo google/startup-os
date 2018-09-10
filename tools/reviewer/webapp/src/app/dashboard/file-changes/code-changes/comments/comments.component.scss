@@ -1,59 +1,59 @@
-$comments-padding: 20px;
+$thread-padding: 20px;
 $comment-padding: 4px;
-$border: #CCC solid 1px;
 
-.comments {
-  padding: $comments-padding;
-  >.resolve {
-    margin-bottom: 10px;
-    padding-left: calc(2 * #{$comment-padding});
-    direction: rtl;
-  }
-  >.comment {
-    position: relative;
-    background: white;
-    border: 1px solid rgba(0,0,0,.3);
-    border-radius: 2px;
-    margin-bottom: 5px;
-    padding: $comment-padding;
-    >.username {
-      >span {
-        font-weight: bold;
+.thread {
+  padding: 5px $thread-padding;
+  .comments {
+    margin-bottom: $thread-padding;
+    >.resolve {
+      margin-bottom: 10px;
+      padding-left: calc(2 * #{$comment-padding});
+      direction: rtl;
+    }
+    >.comment {
+      position: relative;
+      background: white;
+      border: 1px solid rgba(0,0,0,.3);
+      border-radius: 2px;
+      margin-bottom: 5px;
+      padding: $comment-padding;
+      >.username {
+        >span {
+          font-weight: bold;
+        }
+      }
+      span {
+        font-size: 14px;
+      }
+      >.delete-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        >button {
+          margin: 0;
+        }
+        mat-icon {
+          color: #777;
+        }
       }
     }
-    span {
-      font-size: 14px;
+  }
+  .new-comment {
+    margin-bottom: $thread-padding;
+    button {
+      margin-top: 10px;
     }
-    >.delete-button {
-      position: absolute;
-      top: 0;
-      right: 0;
-      >button {
-        margin: 0;
-      }
-      mat-icon {
-        color: #777;
-      }
+    textarea {
+      resize: none;
+      padding: $comment-padding;
+      background: white;
+      vertical-align: bottom;
+      font-size: 15px;
     }
   }
-}
-.new-comment {
-  padding-left: $comments-padding;
-  padding-right: $comments-padding;
-  padding-bottom: $comments-padding;
-  button {
-    margin-top: 10px;
+  .comment-block {
+    width: 90%;
+    min-width: 400px;
+    max-width: 900px;
   }
-  textarea {
-    resize: none;
-    padding: $comment-padding;
-    background: white;
-    vertical-align: bottom;
-    font-size: 15px;
-  }
-}
-.comment-block {
-  width: 90%;
-  min-width: 400px;
-  max-width: 900px;
 }

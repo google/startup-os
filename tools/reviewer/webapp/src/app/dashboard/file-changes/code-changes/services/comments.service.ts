@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import { Thread } from '@/shared/proto';
 import {
+  BlockLine,
   ChangesLine,
   LineThread,
 } from '../code-changes.interface';
 import { LineService } from './line.service';
 
+// Functions related to comments
 @Injectable()
 export class CommentsService {
   // Line indexes of all open threads.
@@ -16,29 +17,33 @@ export class CommentsService {
     this.openThreadsMap = this.lineService.createSplitDictionary();
   }
 
-  // Add a thread to the line
-  addThread(changesLine: ChangesLine, blockIndex: number, thread?: Thread): void {
+  // Add empty thread to the line
+  addEmptyThread(changesLine: ChangesLine, blockIndex: number): LineThread {
     const lineThread: LineThread = this.lineService.createLineThread();
-    if (thread) {
-      lineThread.thread = thread;
-    }
     changesLine.commentsLine.blocks[blockIndex].lineThreads.push(lineThread);
-  }
-
-  // Remove all threads without comments from the line
-  clearThreads(changesLine: ChangesLine, blockIndex: number): void {
-    const threads: LineThread[] = changesLine.blocks[blockIndex].lineThreads;
-    changesLine.blocks[blockIndex].lineThreads = threads.filter(lineThread => {
-      return lineThread.thread.getCommentList().length !== 0;
-    });
+    return lineThread;
   }
 
   // Remove all threads with comments from the line
   closeThreads(changesLine: ChangesLine, blockIndex: number): void {
-    const threads: LineThread[] = changesLine.blocks[blockIndex].lineThreads;
-    changesLine.blocks[blockIndex].lineThreads = threads.filter(lineThread => {
+    const blockLine: BlockLine = changesLine.blocks[blockIndex];
+    const threads: LineThread[] = blockLine.lineThreads;
+    blockLine.lineThreads = threads.filter(lineThread => {
       return lineThread.thread.getCommentList().length === 0;
     });
+
+    if (blockLine.lineThreads.length === 0) {
+      this.saveAsClosed(blockLine.lineNumber, blockIndex);
+    }
+  }
+
+  // Remove thread by thread index
+  closeThread(blockLine: BlockLine, threadIndex: number, blockIndex: number): void {
+    blockLine.lineThreads.splice(threadIndex, 1);
+
+    if (blockLine.lineThreads.length === 0) {
+      this.saveAsClosed(blockLine.lineNumber, blockIndex);
+    }
   }
 
   // Add to open threads map

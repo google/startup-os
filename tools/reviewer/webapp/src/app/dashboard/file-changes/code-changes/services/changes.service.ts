@@ -11,6 +11,7 @@ import {
 } from '../code-changes.interface';
 import { LineService } from './line.service';
 
+// Main service of code-changes
 @Injectable()
 export class ChangesService {
   constructor(

@@ -8,6 +8,7 @@ import {
   LineThread,
 } from '../code-changes.interface';
 
+// Constructors of line interfaces
 @Injectable()
 export class LineService {
   createEmptyBlockLine(): BlockLine {

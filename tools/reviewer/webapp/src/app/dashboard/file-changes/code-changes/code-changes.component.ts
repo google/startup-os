@@ -104,12 +104,18 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     this.initComments(threads);
   }
 
-  // Add the thread to all threads, to display it on user screen
+  // Add the thread to all threads to display it on user screen
   startThread(thread: Thread): void {
     const blockIndex: number = this.fileChangesService.getBlockIndex(thread);
     const lineIndex: number = this.changesLinesMap[blockIndex][thread.getLineNumber()];
 
-    this.commentsService.addThread(this.changesLines[lineIndex], blockIndex, thread);
+    // Add the thread to all threads
+    this.commentsService.addEmptyThread(
+      this.changesLines[lineIndex],
+      blockIndex,
+    ).thread = thread;
+
+    // Save to threads map for fast access
     this.commentsService.saveAsOpen(
       thread.getLineNumber(),
       lineIndex,

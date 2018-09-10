@@ -6,6 +6,8 @@ import {
   ChangesLine,
 } from '../code-changes.interface';
 
+// It's not a great idea to write a lot of typescript code inside html template.
+// So most complicated code is located here and is called by template.
 @Injectable()
 export class TemplateService {
   // Get class for a line, based on its parameters
@@ -107,5 +109,10 @@ export class TemplateService {
     span.innerHTML = changedPart;
 
     return leftPart + span.outerHTML + rightPart;
+  }
+
+  // Does the block line contain no comments?
+  isEmpty(blockLine: BlockLine): boolean {
+    return blockLine.lineThreads.length === 0;
   }
 }

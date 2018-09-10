@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { BlockLine } from '../code-changes.interface';
 
+// Functions related mouse cursor and its hovering
 @Injectable()
 export class HoverService {
   hoveredLineNumber: number;

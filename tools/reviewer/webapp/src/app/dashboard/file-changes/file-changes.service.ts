@@ -147,9 +147,10 @@ export class FileChangesService {
     });
   }
 
-  resolveThread(): void {
+  resolveThread(isDone: boolean): void {
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.notificationService.success('Thread is resolved');
+      const threadStatus: string = isDone ? 'resolved' : 'unresolved';
+      this.notificationService.success('Thread is ' + threadStatus);
     });
   }
 
