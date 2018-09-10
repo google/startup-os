@@ -115,7 +115,11 @@ public class GitRepo implements Repo {
 
   @Override
   public void switchBranch(String branch) {
-    runCommand("checkout --quiet -B " + branch);
+    if (branchExists(branch)) {
+      runCommand("checkout --quiet " + branch);
+    } else {
+      runCommand("checkout --quiet -b " + branch);
+    }
   }
 
   @Override
@@ -306,8 +310,13 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean isMerged(String branch) {
-    // TODO: Implement method
-    throw new UnsupportedOperationException("Not implemented");
+    CommandResult commandResult = runCommand("branch --merged master");
+    List<String> mergedBranches =
+        splitLines(commandResult.stdout)
+            .stream()
+            .map(line -> line.trim().replaceAll("\\*", ""))
+            .collect(Collectors.toList());
+    return mergedBranches.contains(branch);
   }
 
   @Override
