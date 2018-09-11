@@ -147,6 +147,13 @@ export class FileChangesService {
     });
   }
 
+  resolveThread(isDone: boolean): void {
+    this.firebaseService.updateDiff(this.diff).subscribe(() => {
+      const threadStatus: string = isDone ? 'resolved' : 'unresolved';
+      this.notificationService.success('Thread is ' + threadStatus);
+    });
+  }
+
   // Get block index (0 or 1) depends on commit id
   getBlockIndex(thread: Thread): number {
     for (let i = 0; i <= 1; i++) {

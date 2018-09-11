@@ -32,7 +32,7 @@
             <div class="message">{{ comment.getContent() }}</div>
             <div class="username">
               by <span class="bold">{{ getUsername(comment) }}</span>
-              on {{ comment.getTimestamp() | date:'medium' }} 
+              on {{ comment.getTimestamp() | time }} 
             </div>
           </div>
           <div class="line-number">

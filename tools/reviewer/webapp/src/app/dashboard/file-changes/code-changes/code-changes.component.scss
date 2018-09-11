@@ -1,7 +1,10 @@
 @import 'basic-styles.scss';
 
+// TODO: synchronize local scss variables
+
 $font-size: 15px;
 $border: #CCC solid 1px;
+$thread-padding: 20px;
 
 table {
   border-top: $border;
@@ -56,6 +59,9 @@ table {
       }
       .code-line {
         padding-top: 1px;
+      }
+      >.threads {
+        padding-top: $thread-padding;
       }
     }
   }

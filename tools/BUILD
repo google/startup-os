@@ -80,13 +80,3 @@ sh_binary(
     ],
     visibility = ["//visibility:public"],
 )
-
-sh_binary(
-    name = "clang_format",
-    srcs = ["clang-format.sh"],
-    data = [
-        # See TODO in tools/formatter/BUILD about download size.
-        #"@clang_format_bin//file",
-        #"@clang_format_bin_osx//file",
-    ],
-)
