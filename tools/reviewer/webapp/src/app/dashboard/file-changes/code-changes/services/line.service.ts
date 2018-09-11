@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 
+import { Thread } from '@/shared/proto';
 import {
   BlockIndex,
   BlockLine,
   ChangesLine,
+  LineThread,
 } from '../code-changes.interface';
 
+// Constructors of line interfaces
 @Injectable()
 export class LineService {
   createEmptyBlockLine(): BlockLine {
@@ -14,9 +17,8 @@ export class LineService {
       clearCode: '',
       lineNumber: 0,
       isChanged: false,
-      isNewCommentVisible: false,
       isPlaceholder: false,
-      comments: [],
+      lineThreads: [],
     };
   }
 
@@ -67,5 +69,24 @@ export class LineService {
     commentsLine.blocks[BlockIndex.rightFile].lineNumber = rightBlockLine
       .lineNumber;
     return commentsLine;
+  }
+
+  createLineThread(): LineThread {
+    return {
+      isFocus: true,
+      thread: new Thread(),
+    };
+  }
+
+  // Split dictionary is a matrix, where
+  // first key is index of block (left or right)
+  // second key is line number of block.
+  // By the second key you can get fast access to lineIndex (line number of code changes)
+  createSplitDictionary(): { [id: number]: number }[] {
+    const splitDictionary: { [id: number]: number }[] = [];
+    splitDictionary[BlockIndex.leftFile] = {};
+    splitDictionary[BlockIndex.rightFile] = {};
+
+    return splitDictionary;
   }
 }
