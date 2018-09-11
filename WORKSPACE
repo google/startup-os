@@ -196,15 +196,15 @@ http_file(
 http_file(
     name = "clang_format_bin",
     executable = True,
-    sha256 = "cc99fda45b4c740f35d0a367985a2bf55491065a501e2dd5d1ad3f97dcac89da",
-    urls = ["https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-linux-gnu-ubuntu-16.04.tar.xz"]
+    sha256 = "320f62a8a20941b7d876c09de96913e0d18f0e2649688c2cd010a5f12b5d7616",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/clang_format_bin"],
 )
 
 http_file(
     name = "clang_format_bin_osx",
     executable = True,
-    sha256 = "0ef8e99e9c9b262a53ab8f2821e2391d041615dd3f3ff36fdf5370916b0f4268",
-    urls = ["https://releases.llvm.org/6.0.0/clang+llvm-6.0.0-x86_64-apple-darwin.tar.xz"]
+    sha256 = "06986eeed23213c5b6a97440c6a3090eabc62ceaf7fcb72f2b95c4744128dccf",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/clang_format_bin_osx"]
 )
 
 """
@@ -260,6 +260,6 @@ http_file(
 http_file(
     name = "bazel_deps",
     executable = True,
-    sha256 = "c6840b1066793de9a998ef74e45f35f263df16372b2365af78565aeb2669ac6f",
-    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/bazel_deps.jar"],
+    sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
 )

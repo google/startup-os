@@ -9,6 +9,10 @@ java_library(
     exports = [
         "//external:jar/mvnio/grpc/grpc_auth",
     ],
+    runtime_deps = [
+        ":grpc_core",
+        "//third_party/maven/com/google/auth:google_auth_library_credentials",
+    ],
 )
 
 java_library(
@@ -95,6 +99,10 @@ java_library(
     ],
     exports = [
         "//external:jar/mvnio/grpc/grpc_protobuf_lite",
+    ],
+    runtime_deps = [
+        ":grpc_core",
+        "//third_party/maven/com/google/guava",
     ],
 )
 
