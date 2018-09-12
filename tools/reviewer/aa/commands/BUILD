@@ -6,6 +6,10 @@ java_library(
         "*.java",
         "checks/*.java",
     ]),
+    runtime_deps = [
+        "//tools:buildifier",
+        "//tools/formatter:clang_format",
+    ],
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

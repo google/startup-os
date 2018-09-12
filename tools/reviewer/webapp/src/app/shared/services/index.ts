@@ -4,4 +4,21 @@ export * from './notification.service';
 export * from './highlight.service';
 export * from './encoding.service';
 export * from './localserver.service';
-export * from './service-list';
+
+// Services
+import { AuthGuard } from './auth.guard';
+import { AuthService } from './auth.service';
+import { EncodingService } from './encoding.service';
+import { FirebaseService } from './firebase.service';
+import { HighlightService } from './highlight.service';
+import { LocalserverService } from './localserver.service';
+import { NotificationService } from './notification.service';
+export const ServiceList = [
+  AuthGuard,
+  AuthService,
+  FirebaseService,
+  HighlightService,
+  NotificationService,
+  EncodingService,
+  LocalserverService,
+];

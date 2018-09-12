@@ -91,13 +91,17 @@ public class DiffCommand implements AaCommand {
     String branchName = String.format("D%s", response.getLastDiffId());
     System.out.println("Creating " + branchName);
 
+    Long currentTime = new Long(System.currentTimeMillis());
+
     Diff.Builder diffBuilder =
         Diff.newBuilder()
             .setWorkspace(workspaceName)
             .setDescription(description.get())
             .setBug(buglink.get())
             .addAllReviewer(getReviewers(reviewers.get()))
-            .setId(response.getLastDiffId());
+            .setId(response.getLastDiffId())
+            .setCreatedTimestamp(currentTime)
+            .setModifiedTimestamp(currentTime);
 
     Map<GitRepo, String> repoToInitialBranch = new HashMap<>();
     try {
@@ -158,6 +162,8 @@ public class DiffCommand implements AaCommand {
       // replace buglink if specified
       diffBuilder.setBug(buglink.get());
     }
+
+    diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 
     return diffBuilder.build();
   }

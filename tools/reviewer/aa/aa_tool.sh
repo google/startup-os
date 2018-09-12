@@ -26,8 +26,10 @@ function _aa_completions()
     cur_word="${COMP_WORDS[COMP_CWORD]}"
     prev_word="${COMP_WORDS[COMP_CWORD-1]}"
 
-    commands="init workspace diff fix sync snapshot"
+    commands="init workspace diff fix sync snapshot add_repo"
     init_options="--base_path --startupos_repo --user"
+    add_repo_options="--url --name"
+    diff_options="--reviewers --description --buglink"
 
     if [ "$prev_word" = "aa" ] ; then
         # completing command name
@@ -38,16 +40,24 @@ function _aa_completions()
         find_base_folder
         workspaces=$(ls -1 $AA_BASE/ws/)
         COMPREPLY=( $(compgen -W "${workspaces}" -- "${cur_word}") )
-    elif [ "$prev_word" = "init" ]; then
-        # user entered "aa init" already
-        command="init"
+    elif echo $commands | grep --quiet -- "$prev_word"; then
+        # user entered "aa <command>" already
+        command="$prev_word"
     else
         COMPREPLY=()
     fi
 
-    if [[ $command = "init" && ${cur_word} == -* ]] ; then
-        # completing params for `init`
-        COMPREPLY=( $(compgen -W "${init_options}" -- ${cur_word}) )
+    if [[ ${cur_word} == -* ]] ; then
+        if [[ $command = "init" ]]; then
+          # completing params for `init`
+          COMPREPLY=( $(compgen -W "${init_options}" -- ${cur_word}) )
+        elif [[ $command = "add_repo" ]]; then
+          # completing params for `add_repo`
+          COMPREPLY=( $(compgen -W "${add_repo_options}" -- ${cur_word}) )
+        elif [[ $command = "diff" ]]; then
+          # completing params for `diff`
+          COMPREPLY=( $(compgen -W "${diff_options}" -- ${cur_word}) )
+        fi
     fi
 
     return 0

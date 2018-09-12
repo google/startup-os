@@ -1,66 +1,62 @@
 import { Injectable } from '@angular/core';
 
 import {
-  BlockIndex,
+  BlockLine,
   ChangesLine,
+  LineThread,
 } from '../code-changes.interface';
+import { LineService } from './line.service';
 
+// Functions related to comments
 @Injectable()
 export class CommentsService {
   // Line indexes of all open threads.
-  openThreads: { [id: number]: number }[];
+  openThreadsMap: { [id: number]: number }[];
 
-  constructor() {
-    this.clearThreads();
+  constructor(private lineService: LineService) {
+    this.openThreadsMap = this.lineService.createSplitDictionary();
   }
 
-  // Display "add new comment" UI
-  openComments(changesLine: ChangesLine, blockIndex: number): void {
-    changesLine.commentsLine.blocks[blockIndex].isNewCommentVisible = true;
+  // Add empty thread to the line
+  addEmptyThread(changesLine: ChangesLine, blockIndex: number): LineThread {
+    const lineThread: LineThread = this.lineService.createLineThread();
+    changesLine.commentsLine.blocks[blockIndex].lineThreads.push(lineThread);
+    return lineThread;
   }
 
-  // Hide "add new comment" UI
-  closeComments(changesLine: ChangesLine, blockIndex: number): void {
-    changesLine.blocks[blockIndex].isNewCommentVisible = false;
+  // Remove all threads with comments from the line
+  closeThreads(changesLine: ChangesLine, blockIndex: number): void {
+    const blockLine: BlockLine = changesLine.blocks[blockIndex];
+    const threads: LineThread[] = blockLine.lineThreads;
+    blockLine.lineThreads = threads.filter(lineThread => {
+      return lineThread.thread.getCommentList().length === 0;
+    });
+
+    if (blockLine.lineThreads.length === 0) {
+      this.saveAsClosed(blockLine.lineNumber, blockIndex);
+    }
   }
 
-  // Save the thread as opened
-  openThread(
+  // Remove thread by thread index
+  closeThread(blockLine: BlockLine, threadIndex: number, blockIndex: number): void {
+    blockLine.lineThreads.splice(threadIndex, 1);
+
+    if (blockLine.lineThreads.length === 0) {
+      this.saveAsClosed(blockLine.lineNumber, blockIndex);
+    }
+  }
+
+  // Add to open threads map
+  saveAsOpen(
     lineNumber: number,
     lineIndex: number,
     blockIndex: number,
   ): void {
-    this.openThreads[blockIndex][lineNumber] = lineIndex;
+    this.openThreadsMap[blockIndex][lineNumber] = lineIndex;
   }
 
-  // Remove from open threads
-  closeThread(lineNumber: number, blockIndex: number): void {
-    delete this.openThreads[blockIndex][lineNumber];
-  }
-
-  clearThreads(): void {
-    this.openThreads = this.createSplitDictionary();
-  }
-
-  createSplitDictionary(): { [id: number]: number }[] {
-    const openThreads: { [id: number]: number }[] = [];
-    openThreads[BlockIndex.leftFile] = {};
-    openThreads[BlockIndex.rightFile] = {};
-
-    return openThreads;
-  }
-
-  copyOpenThreads(): { [id: number]: number }[] {
-    const newOpenThreads: { [id: number]: number }[] = this
-      .createSplitDictionary();
-    newOpenThreads[BlockIndex.leftFile] = Object.assign(
-      {},
-      this.openThreads[BlockIndex.leftFile],
-    );
-    newOpenThreads[BlockIndex.rightFile] = Object.assign(
-      {},
-      this.openThreads[BlockIndex.rightFile],
-    );
-    return newOpenThreads;
+  // Remove from open threads map
+  saveAsClosed(lineNumber: number, blockIndex: number): void {
+    delete this.openThreadsMap[blockIndex][lineNumber];
   }
 }

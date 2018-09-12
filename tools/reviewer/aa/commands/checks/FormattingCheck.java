@@ -51,7 +51,6 @@ public class FormattingCheck implements FixCommandCheck {
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
-
     FormatterTool.main(
         new String[] {
           "--path",

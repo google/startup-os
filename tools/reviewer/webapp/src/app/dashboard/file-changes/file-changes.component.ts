@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { FileChangesService } from './file-changes.service';
 
+// The component implements file changes page
 @Component({
   selector: 'file-changes',
   templateUrl: './file-changes.component.html',
