@@ -72,7 +72,6 @@ public class CodeReviewServiceGetDiffFilesTest {
   private static final String REPO_ID = "startup-os";
   private static final int DIFF_ID = 2;
 
-  private GitRepoFactory gitRepoFactory;
   private String aaBaseFolder;
   private String testFileCommitId;
   private String fileInHeadCommitId;
@@ -106,7 +105,6 @@ public class CodeReviewServiceGetDiffFilesTest {
                   }
                 })
             .build();
-    gitRepoFactory = component.getGitRepoFactory();
     fileUtils = component.getFileUtils();
     String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
     String initialRepoFolder = fileUtils.joinToAbsolutePath(testFolder, "initial_repo");
@@ -119,7 +117,7 @@ public class CodeReviewServiceGetDiffFilesTest {
             component.getAuthService(),
             fileUtils,
             aaBaseFolder,
-            gitRepoFactory,
+            component.getGitRepoFactory(),
             component.getTextDifferencer(),
             firestoreClientFactory);
 
@@ -158,9 +156,9 @@ public class CodeReviewServiceGetDiffFilesTest {
 
   private void createInitialRepo(String initialRepoFolder) {
     fileUtils.mkdirs(initialRepoFolder);
-    GitRepo repo = gitRepoFactory.create(initialRepoFolder);
+    GitRepo repo = component.getGitRepoFactory().create(initialRepoFolder);
     repo.init();
-    repo.setFakeUsersData();
+    repo.setUserDataForTesting();
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinPaths(initialRepoFolder, FILE_IN_HEAD));
     fileInHeadCommitId = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
@@ -168,7 +166,6 @@ public class CodeReviewServiceGetDiffFilesTest {
 
   private void initAaBase(String initialRepoFolder, String aaBaseFolder) {
     InitCommand initCommand = component.getInitCommand();
-    InitCommand.startuposRepo.resetValueForTesting();
     String[] args = {
       "init", aaBaseFolder,
       "--startupos_repo", initialRepoFolder,
@@ -181,8 +178,8 @@ public class CodeReviewServiceGetDiffFilesTest {
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
     repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
-    repo = gitRepoFactory.create(repoPath);
-    repo.setFakeUsersData();
+    repo = component.getGitRepoFactory().create(repoPath);
+    repo.setUserDataForTesting();
     repo.switchBranch("D" + DIFF_ID);
   }
 
