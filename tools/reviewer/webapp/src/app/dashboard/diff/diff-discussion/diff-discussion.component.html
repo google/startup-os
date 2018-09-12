@@ -12,42 +12,67 @@
   </div>
 </div>
 <div class="cr-header">
-  <mat-table [dataSource]="threads">
-      <ng-container matColumnDef="discussions">
-        <mat-header-cell *matHeaderCellDef>
-          General discussions
-          ({{ threads.length }} comments,
-          {{ getUnresolvedThreads() }} unresolved)
-        </mat-header-cell>
-        <!-- Discussions -->
-        <mat-cell *matCellDef="let thread">
-          <div class="thread-title">
-            {{ thread.getFile().getFilenameWithRepo() }}
-            ({{ thread.getCommentList().length }} comments)
-          </div>
-          <div
-            class="comment"
-            *ngFor="let comment of thread.getCommentList()"
-          >
-            <div class="message">{{ comment.getContent() }}</div>
-            <div class="username">
-              by <span class="bold">{{ getUsername(comment) }}</span>
-              on {{ comment.getTimestamp() | time }} 
-            </div>
-          </div>
-          <div class="line-number">
-            Line number: {{ thread.getLineNumber() }}
-          </div>
-        </mat-cell>
-      </ng-container>
+  <mat-table [dataSource]="allThreads">
+    <ng-container matColumnDef="discussions">
+      <mat-header-cell *matHeaderCellDef>
+        General discussions
+        ({{ allThreads.length }} threads,
+        {{ getUnresolvedThreads() }} unresolved)
+      </mat-header-cell>
+      <mat-cell *matCellDef="let thread; let threadIndex = index">
+        <!-- Thread -->
 
-      <mat-header-row
-        class="cr-header"
-        *matHeaderRowDef="displayedColumns"
-      ></mat-header-row>
-      <mat-row
-        *matRowDef="let thread; columns: displayedColumns;"
-        (click)="openFile(thread)"
-      ></mat-row>
-    </mat-table>
+        <!-- Filename and amoung of comments (code thread only) -->
+        <div class="thread-title" *ngIf="!isDiffThread(thread)">
+          {{ thread.getFile().getFilenameWithRepo() }}
+          ({{ thread.getCommentList().length }} comments)
+        </div>
+
+        <!-- Comments -->
+        <div
+          [ngClass]="[
+            'comment',
+            getThreadBackground(thread)
+          ]"
+          *ngFor="let comment of thread.getCommentList()"
+          (click)="openFile(thread)"
+        >
+          <div class="message">{{ comment.getContent() }}</div>
+          <div class="username">
+            by <span class="bold">{{ getUsername(comment) }}</span>
+            on {{ comment.getTimestamp() | time }} 
+          </div>
+        </div>
+
+        <!-- Line number (code thread only) -->
+        <div class="line-number" *ngIf="!isDiffThread(thread)">
+          Line number: {{ thread.getLineNumber() }}
+        </div>
+
+        <!-- Thread buttons (diff thread only) -->
+        <div class="diff-thread-buttons" *ngIf="isDiffThread(thread)">
+          <button
+            class="cr-light-button"
+            mat-raised-button
+            (click)="toggleThread(thread)"
+          >{{
+            thread.getIsDone() ? 'Unresolve' : 'Resolve'
+          }}</button>
+          <button
+            class="cr-light-button"
+            mat-raised-button
+            (click)="deleteThread(threadIndex)"
+          >Delete</button>
+        </div>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row
+      class="cr-header"
+      *matHeaderRowDef="displayedColumns"
+    ></mat-header-row>
+    <mat-row
+      *matRowDef="let thread; columns: displayedColumns;"
+    ></mat-row>
+  </mat-table>
 </div>

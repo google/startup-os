@@ -4,9 +4,12 @@
     color: #fff;
     padding: 0px 40px;
   }
-  .title {
-    font-size: 25px;
-    cursor: pointer;
+  .titlebar {
+    outline: 0;
+    .title {
+      font-size: 25px;
+      cursor: pointer;
+    }
   }
   .search {
     margin-left: 30px;
