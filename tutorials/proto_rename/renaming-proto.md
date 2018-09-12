@@ -76,7 +76,7 @@ bazel run //tutorials/proto_rename:person_tool -- read
 
     <walkthrough-editor-open-file 
 	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
-	    text="PersonTool.java"
+	    text="PersonTool.java">
     </walkthrough-editor-open-file>
 
 - Run the command to reads `person.pb` file:
@@ -117,7 +117,7 @@ in `writePerson()` method:
 
     <walkthrough-editor-open-file 
 	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
-	    text="PersonTool.java"
+	    text="PersonTool.java">
     </walkthrough-editor-open-file>
 
 - Run the command to reads `person.pb` file:
@@ -144,7 +144,7 @@ in `writePerson()` method:
 
     <walkthrough-editor-open-file 
 	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
-	    text="PersonTool.java"
+	    text="PersonTool.java">
     </walkthrough-editor-open-file>
 
 - Run the command to reads `person.pb` file:
