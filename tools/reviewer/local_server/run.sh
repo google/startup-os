@@ -35,7 +35,7 @@ fi
 
 cd tools/reviewer/local_server/web_login
 npm install
-ng serve &
+npm run serve &
 cd -
 
 # Run:
