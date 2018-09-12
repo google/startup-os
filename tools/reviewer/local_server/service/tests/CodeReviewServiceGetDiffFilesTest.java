@@ -72,6 +72,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   private static final String REPO_ID = "startup-os";
   private static final int DIFF_ID = 2;
 
+  private GitRepoFactory gitRepoFactory;
   private String aaBaseFolder;
   private String testFileCommitId;
   private String fileInHeadCommitId;
@@ -105,6 +106,7 @@ public class CodeReviewServiceGetDiffFilesTest {
                   }
                 })
             .build();
+    gitRepoFactory = component.getGitRepoFactory();
     fileUtils = component.getFileUtils();
     String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
     String initialRepoFolder = fileUtils.joinToAbsolutePath(testFolder, "initial_repo");
@@ -117,7 +119,7 @@ public class CodeReviewServiceGetDiffFilesTest {
             component.getAuthService(),
             fileUtils,
             aaBaseFolder,
-            component.getGitRepoFactory(),
+            gitRepoFactory,
             component.getTextDifferencer(),
             firestoreClientFactory);
 
@@ -156,7 +158,7 @@ public class CodeReviewServiceGetDiffFilesTest {
 
   private void createInitialRepo(String initialRepoFolder) {
     fileUtils.mkdirs(initialRepoFolder);
-    GitRepo repo = component.getGitRepoFactory().create(initialRepoFolder);
+    GitRepo repo = gitRepoFactory.create(initialRepoFolder);
     repo.init();
     repo.setUserDataForTesting();
     fileUtils.writeStringUnchecked(
@@ -178,7 +180,7 @@ public class CodeReviewServiceGetDiffFilesTest {
     String[] args = {"workspace", "-f", name};
     workspaceCommand.run(args);
     repoPath = fileUtils.joinPaths(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
-    repo = component.getGitRepoFactory().create(repoPath);
+    repo = gitRepoFactory.create(repoPath);
     repo.setUserDataForTesting();
     repo.switchBranch("D" + DIFF_ID);
   }
