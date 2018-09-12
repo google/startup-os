@@ -60,7 +60,7 @@ public class GitRepoTest {
     gitRepo = gitRepoFactory.create(repoFolder);
     gitRepo.init();
     repo = gitRepo;
-    gitRepo.setFakeUsersData();
+    gitRepo.setUserDataForTesting();
     // We need one commit to make the repo have a master branch.
     fileUtils.writeStringUnchecked(
         "initial commit", fileUtils.joinToAbsolutePath(repoFolder, "initial_commit.txt"));

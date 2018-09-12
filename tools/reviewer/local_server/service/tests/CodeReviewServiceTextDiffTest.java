@@ -166,7 +166,7 @@ public class CodeReviewServiceTextDiffTest {
     fileUtils.mkdirs(initialRepoFolder);
     GitRepo repo = gitRepoFactory.create(initialRepoFolder);
     repo.init();
-    repo.setFakeUsersData();
+    repo.setUserDataForTesting();
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(initialRepoFolder, FILE_IN_HEAD));
     fileInHeadCommitId = repo.commit(repo.getUncommittedFiles(), "Initial commit").getId();
@@ -174,7 +174,6 @@ public class CodeReviewServiceTextDiffTest {
 
   private void initAaBase(String initialRepoFolder, String aaBaseFolder) {
     InitCommand initCommand = component.getInitCommand();
-    InitCommand.startuposRepo.resetValueForTesting();
     String[] args = {
       "init", aaBaseFolder,
       "--startupos_repo", initialRepoFolder,
@@ -189,7 +188,7 @@ public class CodeReviewServiceTextDiffTest {
     String repoPath =
         fileUtils.joinToAbsolutePath(getWorkspaceFolder(TEST_WORKSPACE), "startup-os");
     repo = gitRepoFactory.create(repoPath);
-    repo.setFakeUsersData();
+    repo.setUserDataForTesting();
   }
 
   private void createBlockingStub() throws IOException {

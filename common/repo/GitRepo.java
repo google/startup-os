@@ -380,7 +380,7 @@ public class GitRepo implements Repo {
   }
 
   @VisibleForTesting
-  public void setFakeUsersData() {
+  public void setUserDataForTesting() {
     runCommand("config user.email \"test@test.test\"");
     runCommand("config user.name \"test\"");
   }
