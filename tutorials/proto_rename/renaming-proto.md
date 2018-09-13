@@ -18,7 +18,7 @@ We will rename some fields in next steps and see what will happen.
   	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
   	    text="PersonTool.java">
       </walkthrough-editor-open-file> 
-Contains main method and methods to write and read protobinary file.
+Contains main method and methods to write and read a proto file in binary format.
 
 ## First launch
 - Run the command to build targets:
@@ -29,12 +29,12 @@ bazel build //tutorials/proto_rename:all
                                     	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
                                     	    text="PersonTool.java">
                                         </walkthrough-editor-open-file> class. 
-This method is creating a new Person which will be saved to `person.pb` file.
-- Run the command to creates `person.pb` file:
+This method is creating a new Person which will be saved to `person.protobin` file.
+- Run the command to create `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- write
 ```
-- Run the command to reads `person.pb` file:
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
@@ -48,40 +48,14 @@ bazel run //tutorials/proto_rename:person_tool -- read
 - Open <walkthrough-editor-open-file 
        	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
        	    text="PersonTool.java">
-           </walkthrough-editor-open-file> and comment the body of `writePerson()` method like this:
-```
-  private static void writePerson() {
-//    Person person =
-//        Person.newBuilder()
-//            .setName("John")
-//            .setId(1)
-//            .setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPLE)
-//            .build();
-//
-//    fileUtils.writeProtoBinaryUnchecked(person, personProtobinaryPath);
-  }
-```
-
-- Run the command to reads `person.pb` file:
+           </walkthrough-editor-open-file> and and change 
+`setName("John")` setter to `setFullName("John")` in `writePerson()` method.
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
-You can see that we still read `person.pb` and `string name` field 
+You can see that we still read `person.protobin` and `string name` field 
 was changed to `string full_name`.
-- Uncomment the body of `writePerson()` method. 
-- Run the command to reads `person.pb` file:
-```bash
-bazel run //tutorials/proto_rename:person_tool -- read
-```
-- It doesn't compile. When we renaming proto field we also need 
-to change the setter for this field. 
-Just change `setName("John")` to `setFullName("John")`. 
-Run it one more time:
-```bash
-bazel run //tutorials/proto_rename:person_tool -- read
-```
-**Remember, when you rename proto field you need also rename setter 
-for this field in the code.**
 
 ## Renaming enum field
 - Open <walkthrough-editor-open-file 
@@ -97,11 +71,11 @@ for this field in the code.**
 setter to 
 `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` 
 in `writePerson()` method.
-- Run the command to reads `person.pb` file:
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
-You can see that we still read `person.pb` file 
+You can see that we still read `person.protobin` file 
 and `OLIVES_AND_PINEAPPLE` field was changed to `SEAFOOD`.
  
 ## Renaming message field
@@ -119,9 +93,9 @@ to `FavoritePizzaTopping favorite_pizza = 3`.
 `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` setter 
 to `setFavoritePizza(Person.FavoritePizzaTopping.SEAFOOD)` 
 in `writePerson()` method.
-- Run the command to reads `person.pb` file:
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
-You can see that we still read `person.pb` file and 
+You can see that we still read `person.protobin` file and 
 `favorite_pizza_topping` field was changed to `favorite_pizza`.

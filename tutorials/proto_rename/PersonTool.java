@@ -30,7 +30,7 @@ public class PersonTool {
   public static void main(String[] args) {
     fileUtils = DaggerPersonTool_PersonToolComponent.create().getFileUtils();
     personProtobinaryPath =
-        fileUtils.joinToAbsolutePath(fileUtils.getCurrentWorkingDirectory(), "person.pb");
+        fileUtils.joinToAbsolutePath(fileUtils.getCurrentWorkingDirectory(), "person.protobin");
 
     if (!processArgs(args)) {
       System.exit(1);
