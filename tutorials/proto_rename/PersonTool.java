@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tutorials.proto_rename;
+package com.google.startupos.tutorials.protorename;
 
+import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tutorials.proto_rename.Protos.Person;
+import com.google.startupos.tutorials.protorename.Protos.Person;
+import dagger.Component;
+
+import javax.inject.Singleton;
 
 public class PersonTool {
-
-  private static final String PERSON_PROTOBINARY_PATH;
-
-  static {
-    FileUtils fileUtils = DaggerProtoRenameComponent.create().getFileUtils();
-    PERSON_PROTOBINARY_PATH = fileUtils.joinToAbsolutePath("person.pb");
-  }
+  private static String personProtobinaryPath;
+  private static FileUtils fileUtils;
 
   public static void main(String[] args) {
+    fileUtils = DaggerPersonTool_PersonToolComponent.create().getFileUtils();
+    personProtobinaryPath =
+        fileUtils.joinToAbsolutePath(fileUtils.getCurrentWorkingDirectory(), "person.pb");
+
     if (!processArgs(args)) {
       System.exit(1);
     }
@@ -38,6 +41,22 @@ public class PersonTool {
     } else {
       readPerson();
     }
+  }
+
+  private static void writePerson() {
+    Person person =
+        Person.newBuilder()
+            .setName("John")
+            .setId(1)
+            .setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPLE)
+            .build();
+
+    fileUtils.writeProtoBinaryUnchecked(person, personProtobinaryPath);
+  }
+
+  private static void readPerson() {
+    System.out.println(
+        fileUtils.readProtoBinaryUnchecked(personProtobinaryPath, Person.newBuilder()));
   }
 
   private static boolean processArgs(String[] args) {
@@ -53,19 +72,10 @@ public class PersonTool {
     return true;
   }
 
-  private static void readPerson() {
-    System.out.println(new PersonReader().readPerson(PERSON_PROTOBINARY_PATH, Person.newBuilder()));
-  }
-
-  private static void writePerson() {
-    Person person =
-        Person.newBuilder()
-            .setName("John")
-            .setId(1)
-            .setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPLE)
-            .build();
-
-    new PersonWriter().writePerson(PERSON_PROTOBINARY_PATH, person);
+  @Singleton
+  @Component(modules = {CommonModule.class})
+  interface PersonToolComponent {
+    FileUtils getFileUtils();
   }
 }
 
