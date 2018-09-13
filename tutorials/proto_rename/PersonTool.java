@@ -19,48 +19,44 @@ package com.google.startupos.tutorials.protorename;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tutorials.protorename.Protos.Person;
-import com.google.startupos.tutorials.protorename.Protos.Persons;
 import dagger.Component;
 
 import javax.inject.Singleton;
 
 public class PersonTool {
-  private static String personsProtobinaryPath;
+  private static String personProtobinaryPath;
   private static FileUtils fileUtils;
 
   public static void main(String[] args) {
     fileUtils = DaggerPersonTool_PersonToolComponent.create().getFileUtils();
-    personsProtobinaryPath =
-        fileUtils.joinToAbsolutePath(fileUtils.getCurrentWorkingDirectory(), "persons.protobin");
+    personProtobinaryPath =
+        fileUtils.joinToAbsolutePath(fileUtils.getCurrentWorkingDirectory(), "person.protobin");
 
     if (!processArgs(args)) {
       System.exit(1);
     }
 
     if (args[0].equals("write")) {
-      writePersons();
+      writePerson();
     } else {
-      readPersons();
+      readPerson();
     }
   }
 
-  private static void writePersons() {
-    Persons persons =
-        Persons.newBuilder()
-            .addPersons(
-                Person.newBuilder()
-                    .setName("John")
-                    .setId(1)
-                    .setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPLE)
-                    .build())
+  private static void writePerson() {
+    Person person =
+        Person.newBuilder()
+            .setName("John")
+            .setId(1)
+            .setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPLE)
             .build();
 
-    fileUtils.writeProtoBinaryUnchecked(persons, personsProtobinaryPath);
+    fileUtils.writeProtoBinaryUnchecked(person, personProtobinaryPath);
   }
 
-  private static void readPersons() {
+  private static void readPerson() {
     System.out.println(
-        fileUtils.readProtoBinaryUnchecked(personsProtobinaryPath, Persons.newBuilder()));
+        fileUtils.readProtoBinaryUnchecked(personProtobinaryPath, Person.newBuilder()));
   }
 
   private static boolean processArgs(String[] args) {

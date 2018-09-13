@@ -1,13 +1,13 @@
 package(default_visibility = ["//visibility:private"])
 
 proto_library(
-    name = "persons_proto",
-    srcs = ["persons.proto"],
+    name = "person_proto",
+    srcs = ["person.proto"],
 )
 
 java_proto_library(
-    name = "persons_java_proto",
-    deps = [":persons_proto"],
+    name = "person_java_proto",
+    deps = [":person_proto"],
 )
 
 java_binary(
@@ -17,8 +17,8 @@ java_binary(
     ],
     main_class = "com.google.startupos.tutorials.protorename.PersonTool",
     deps = [
-        ":persons_java_proto",
-        ":persons_proto",
+        ":person_java_proto",
+        ":person_proto",
         "//common",
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/guava",

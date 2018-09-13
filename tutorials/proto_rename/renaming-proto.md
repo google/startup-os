@@ -8,8 +8,8 @@ is what you need to preserve.
  
 ## Contents of this tutorial  
 - <walkthrough-editor-open-file 
-  	    filePath="startup-os/tutorials/proto_rename/persons.proto" 
-  	    text="persons.proto">
+  	    filePath="startup-os/tutorials/proto_rename/person.proto" 
+  	    text="person.proto">
       </walkthrough-editor-open-file> 
 It's a proto definition. 
 We will rename some fields in next steps and see what will happen.
@@ -25,42 +25,42 @@ Contains main method and methods to write and read a proto file in binary format
 ```bash
 bazel build //tutorials/proto_rename:all
 ```
-- Look at `writePersons()` method of <walkthrough-editor-open-file 
+- Look at `writePerson()` method of <walkthrough-editor-open-file 
                                     	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
                                     	    text="PersonTool.java">
                                         </walkthrough-editor-open-file> class. 
-This method is creating a new Persons which will be saved to `persons.protobin` file.
-- Run the command to create `persons.protobin` file:
+This method is creating a new Person which will be saved to `person.protobin` file.
+- Run the command to create `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- write
 ```
-- Run the command to read `persons.protobin` file:
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
 
-## Renaming scalar field
+## Renaming a field
 - Open <walkthrough-editor-open-file 
-       	    filePath="startup-os/tutorials/proto_rename/persons.proto" 
-       	    text="persons.proto">
+       	    filePath="startup-os/tutorials/proto_rename/person.proto" 
+       	    text="person.proto">
            </walkthrough-editor-open-file> file.
 - Change `string name = 1` field to `string full_name = 1`
 - Open <walkthrough-editor-open-file 
        	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
        	    text="PersonTool.java">
            </walkthrough-editor-open-file> and and change 
-`setName("John")` setter to `setFullName("John")` in `writePersons()` method.
-- Run the command to read `persons.protobin` file:
+`setName("John")` setter to `setFullName("John")` in `writePerson()` method.
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
-You can see that we still read `persons.protobin` and `string name` field 
+You can see that we still read `person.protobin` and `string name` field 
 was changed to `string full_name`.
 
-## Renaming enum field
+## Renaming an enum value
 - Open <walkthrough-editor-open-file 
-       	    filePath="startup-os/tutorials/proto_rename/persons.proto" 
-       	    text="persons.proto">
+       	    filePath="startup-os/tutorials/proto_rename/person.proto" 
+       	    text="person.proto">
            </walkthrough-editor-open-file> file
 - Change `OLIVES_AND_PINEAPPLE = 1` field to `SEAFOOD = 1`
 - Open <walkthrough-editor-open-file 
@@ -70,29 +70,31 @@ was changed to `string full_name`.
 `setFavoritePizzaTopping(Person.FavoritePizzaTopping.OLIVES_AND_PINEAPPLE)` 
 setter to 
 `setFavoritePizzaTopping(Person.FavoritePizzaTopping.SEAFOOD)` 
-in `writePersons()` method.
-- Run the command to read `persons.protobin` file:
+in `writePerson()` method.
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
-You can see that we still read `persons.protobin` file 
+You can see that we still read `person.protobin` file 
 and `OLIVES_AND_PINEAPPLE` field was changed to `SEAFOOD`.
  
-## Renaming message field
+## Renaming a message
 - Open <walkthrough-editor-open-file 
-       	    filePath="startup-os/tutorials/proto_rename/persons.proto" 
-       	    text="persons.proto">
+       	    filePath="startup-os/tutorials/proto_rename/person.proto" 
+       	    text="person.proto">
            </walkthrough-editor-open-file> file.
 
-- Change `repeated Person persons = 1` field to `repeated Person people = 1`.
+- Change `message Person` to `message Employee`.
 - Open <walkthrough-editor-open-file 
        	    filePath="startup-os/tutorials/proto_rename/PersonTool.java" 
        	    text="PersonTool.java">
-           </walkthrough-editor-open-file> and change 
-`addPersons(...)` setter to `addPeople(...)` in `writePersons()` method.
-- Run the command to read `persons.protobin` file:
+           </walkthrough-editor-open-file> and change:
+1) `import com.google.startupos.tutorials.protorename.Protos.Person` 
+to `import com.google.startupos.tutorials.protorename.Protos.Employee`.
+2) All mentions of `Person` to `Employee` in `writePerson()` 
+and `readPerson()` methods.
+- Run the command to read `person.protobin` file:
 ```bash
 bazel run //tutorials/proto_rename:person_tool -- read
 ```
-You can see that we still read `persons.protobin` file and 
-`persons` field was changed to `people`.
+You can see that we still read `person.protobin` file.

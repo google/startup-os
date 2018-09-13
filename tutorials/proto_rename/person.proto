@@ -16,5 +16,3 @@ message Person {
 
   FavoritePizzaTopping favorite_pizza_topping = 3;
 }
-
-message Persons { repeated Person persons = 1; }
