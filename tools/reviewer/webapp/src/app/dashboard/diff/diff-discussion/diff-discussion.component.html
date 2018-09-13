@@ -12,17 +12,17 @@
   </div>
 </div>
 <div class="cr-header">
-  <mat-table [dataSource]="allThreads">
+  <mat-table [dataSource]="threads">
     <ng-container matColumnDef="discussions">
       <mat-header-cell *matHeaderCellDef>
         General discussions
-        ({{ allThreads.length }} threads,
+        ({{ threads.length }} threads,
         {{ getUnresolvedThreads() }} unresolved)
       </mat-header-cell>
       <mat-cell *matCellDef="let thread; let threadIndex = index">
         <!-- Thread -->
 
-        <!-- Filename and amoung of comments (code thread only) -->
+        <!-- Filename and amount of comments (line thread only) -->
         <div class="thread-title" *ngIf="!isDiffThread(thread)">
           {{ thread.getFile().getFilenameWithRepo() }}
           ({{ thread.getCommentList().length }} comments)
@@ -44,7 +44,7 @@
           </div>
         </div>
 
-        <!-- Line number (code thread only) -->
+        <!-- Line number (line thread only) -->
         <div class="line-number" *ngIf="!isDiffThread(thread)">
           Line number: {{ thread.getLineNumber() }}
         </div>

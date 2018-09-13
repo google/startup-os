@@ -44,7 +44,7 @@ export class FileChangesService {
       .subscribe(diff => {
         this.diff = diff;
         this.localThreads = this.diff
-          .getThreadList()
+          .getLineThreadList()
           .filter(thread =>
             thread.getFile().getFilenameWithRepo() ===
             this.file.getFilenameWithRepo(),
@@ -113,7 +113,7 @@ export class FileChangesService {
     if (comments.length === 1) {
       // Create new thread
       const newThread: Thread = this.createNewThread(lineNumber, comments);
-      this.diff.addThread(newThread);
+      this.diff.addLineThread(newThread);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
@@ -137,13 +137,13 @@ export class FileChangesService {
   deleteComment(isDeleteThread: boolean): void {
     if (isDeleteThread) {
       // Delete all threads without comments.
-      const threads: Thread[] = this.diff.getThreadList();
+      const threads: Thread[] = this.diff.getLineThreadList();
       threads.forEach((thread, threadIndex) => {
         if (thread.getCommentList().length === 0) {
           threads.splice(threadIndex, 1);
         }
       });
-      this.diff.setThreadList(threads);
+      this.diff.setLineThreadList(threads);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {

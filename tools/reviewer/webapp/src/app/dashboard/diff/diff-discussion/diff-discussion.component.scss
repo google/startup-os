@@ -1,5 +1,5 @@
-$comments-background: #f1f8ff;
-$diff-thread-background: #FFFCF1;
+$line-thread-background: #f1f8ff;
+$diff-thread-background: #fffcf1;
 
 mat-table {
   .mat-cell {
@@ -24,9 +24,9 @@ mat-table {
   }
 }
 
-.code-thread {
+.line-thread {
   cursor: pointer;
-  background: $comments-background;
+  background: $line-thread-background;
 }
 .diff-thread {
   background: $diff-thread-background;

@@ -130,7 +130,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
   sortDiffs(): void {
     for (const diffList of this.diffGroups) {
       diffList.sort((a, b) => {
-        // Newest on the top
+        // Newest on top
         return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
       });
     }

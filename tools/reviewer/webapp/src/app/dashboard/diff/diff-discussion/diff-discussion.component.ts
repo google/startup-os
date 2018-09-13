@@ -8,7 +8,7 @@ import { DiffService } from '../diff.service';
 // How it looks: https://i.imgur.com/cc6XITV.jpg
 
 // There's used some methods and interfaces from file-changes
-// TODO: make code DRY and reuse it from one place
+// TODO: make code DRY and use it from one place
 @Component({
   selector: 'diff-discussion',
   templateUrl: './diff-discussion.component.html',
@@ -17,10 +17,9 @@ import { DiffService } from '../diff.service';
 })
 export class DiffDiscussionComponent implements OnInit, OnChanges {
   displayedColumns = ['discussions'];
-  allThreads: Thread[];
+  threads: Thread[];
 
   @Input() diff: Diff;
-  @Input() diffId: number;
 
   constructor(
     public diffService: DiffService,
@@ -38,22 +37,30 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
   }
 
   refreshThreads(): void {
-    this.allThreads = this.diff
-      .getThreadList()
+    // Are the threads valid?
+    this.checkThreadsValidation(
+      this.diff.getDiffThreadList(),
+      this.diff.getLineThreadList(),
+    );
+
+    // threads = lineThreads + diffThreads
+    this.threads = this.diff
+      .getLineThreadList()
       .concat(this.diff.getDiffThreadList());
-    this.sortThreads(this.allThreads);
+
+    this.sortThreads(this.threads);
   }
 
   getUnresolvedThreads(): number {
-    return this.allThreads.filter(thread => !thread.getIsDone()).length;
+    return this.threads.filter(thread => !thread.getIsDone()).length;
   }
 
   openFile(thread: Thread): void {
     if (this.isDiffThread(thread)) {
-      // We can't open diff thread
+      // We can't open a file of a diff thread
       return;
     }
-    this.diffService.openFile(thread.getFile(), this.diffId);
+    this.diffService.openFile(thread.getFile(), this.diff.getId());
   }
 
   getUsername(comment: Comment): string {
@@ -64,7 +71,7 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
     return (thread.getFile() === undefined) ? true : false;
   }
 
-  // Sort all thread based on timestamp of last comment of the thread
+  // Sort all threads based on timestamp of last comment of the thread
   sortThreads(threads: Thread[]): void {
     threads.sort((a, b) => {
       const aLastIndex: number = a.getCommentList().length - 1;
@@ -72,32 +79,56 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
       const aTimestamp: number = a.getCommentList()[aLastIndex].getTimestamp();
       const bTimestamp: number = b.getCommentList()[bLastIndex].getTimestamp();
 
-      // Newest on the top
+      // Newest on top
       return Math.sign(bTimestamp - aTimestamp);
     });
   }
 
   getThreadBackground(thread: Thread): string {
-    return this.isDiffThread(thread) ? 'diff-thread' : 'code-thread';
+    return this.isDiffThread(thread) ? 'diff-thread' : 'line-thread';
   }
 
   deleteThread(threadIndex: number): void {
-    let diffThreads: Thread[] = this.allThreads.slice();
+    // Remove the thread by its index from thread list
+    let diffThreads: Thread[] = this.threads.slice();
     diffThreads.splice(threadIndex, 1);
     diffThreads = diffThreads.filter(thread => this.isDiffThread(thread));
     this.diff.setDiffThreadList(diffThreads);
+
+    // Delete from firebase
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
       this.notificationService.success('Thread is deleted');
     });
   }
 
-  // Make thread resolved/unresolved
+  // Make thread resolved / unresolved
   toggleThread(thread: Thread): void {
+    // Reverse "isDone" of the thread
     const isDone: boolean = !thread.getIsDone();
     thread.setIsDone(isDone);
+
+    // Save in firebase
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
       const threadStatus: string = isDone ? 'resolved' : 'unresolved';
       this.notificationService.success('Thread is ' + threadStatus);
     });
+  }
+
+  // Each line thread should have a file.
+  // Each diff thread shouldn't.
+  // We don't have another way to distinguish the threads.
+  // Let's check that everything is right.
+  checkThreadsValidation(diffThreads: Thread[], lineThreads: Thread[]): void {
+    for (const thread of diffThreads) {
+      if (thread.getFile() !== undefined) {
+        throw new Error('Diff thread is invalid');
+      }
+    }
+
+    for (const thread of lineThreads) {
+      if (thread.getFile() === undefined) {
+        throw new Error('Line thread is invalid');
+      }
+    }
   }
 }

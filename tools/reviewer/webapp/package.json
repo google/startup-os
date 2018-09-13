@@ -1,5 +1,5 @@
 {
-  "name": "code-reviews",
+  "name": "reviewer-webapp",
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
@@ -11,7 +11,6 @@
     "e2e": "ng e2e",
     "protoc": "gulp protoc"
   },
-  "private": true,
   "devDependencies": {
     "@angular/animations": "^5.2.8",
     "@angular/cdk": "^5.2.4",
