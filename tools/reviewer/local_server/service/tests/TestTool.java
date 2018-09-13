@@ -17,6 +17,8 @@
 package com.google.startupos.tools.reviewer.localserver.service.tests;
 
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
@@ -97,6 +99,21 @@ public class TestTool {
 
   public void runGetFile() {
     System.out.println(getFile("WORKSPACE"));
+  }
+
+  public DiffFilesResponse getDiffFiles(String workspace, long diffNumber) {
+    DiffFilesRequest request =
+        DiffFilesRequest.newBuilder().setWorkspace(workspace).setDiffId(diffNumber).build();
+    try {
+      return blockingStub.getDiffFiles(request);
+    } catch (StatusRuntimeException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
+  public void runGetDiffFiles(String workspace, long diffNumber) {
+    System.out.println(getDiffFiles(workspace, diffNumber));
   }
 
   public static void main(String[] args) {
