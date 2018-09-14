@@ -29,7 +29,7 @@ java_image(
 
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 
-# To push the container to a container registry, such as Google's gcr.io, update
+# To push the container into a container registry, such as Google's gcr.io, update
 # the container_push rule below to use your projects repository, e.g. "my-gcloud-project-id/hello-server".
 #
 # First make sure everything is set up:

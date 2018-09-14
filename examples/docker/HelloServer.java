@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The StartupOS Authors.
+ * Copyright 2018 The StartupOS Authors and their friends and family.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 
 public class HelloServer {
-  public static String DOCKERENV_FILE = "/.dockerenv";
+  public static String DOCKERENV_FILE = "/.dockerenvfile";
 
   static class SayHelloHandler implements HttpHandler {
     @Override
@@ -36,7 +36,8 @@ public class HelloServer {
         response = String.format("Hello, I am *inside* the container! (%s exists)", DOCKERENV_FILE);
       } else {
         response =
-            String.format("Hello from outside of container (%s does not exist)", DOCKERENV_FILE);
+            String.format(
+                "Hello from outside of of the container (%s does not exist)", DOCKERENV_FILE);
       }
 
       t.sendResponseHeaders(200, response.length());
