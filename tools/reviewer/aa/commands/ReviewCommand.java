@@ -71,6 +71,7 @@ public class ReviewCommand implements AaCommand {
           RED_ERROR + "Workspace has no diff to review (git branch has no D# branch)");
       return false;
     }
+    String branchName = String.format("D%d", diffNumber);
     Diff.Builder diffBuilder =
         codeReviewBlockingStub
             .getDiff(DiffRequest.newBuilder().setDiffId(diffNumber).build())
@@ -95,7 +96,7 @@ public class ReviewCommand implements AaCommand {
           .forEach(
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
-                repo.push();
+                repo.push(branchName);
               });
     } catch (IOException e) {
       e.printStackTrace();
