@@ -12,30 +12,30 @@
   </div>
 </div>
 <div class="cr-header">
-  <mat-table [dataSource]="threads">
+  <mat-table [dataSource]="threadFrames">
     <ng-container matColumnDef="discussions">
       <mat-header-cell *matHeaderCellDef>
         General discussions
-        ({{ threads.length }} threads,
+        ({{ threadFrames.length }} threads,
         {{ getUnresolvedThreads() }} unresolved)
       </mat-header-cell>
-      <mat-cell *matCellDef="let thread; let threadIndex = index">
+      <mat-cell *matCellDef="let threadFrame; let threadIndex = index;">
         <!-- Thread -->
 
         <!-- Filename and amount of comments (line thread only) -->
-        <div class="thread-title" *ngIf="!isDiffThread(thread)">
-          {{ thread.getFile().getFilenameWithRepo() }}
-          ({{ thread.getCommentList().length }} comments)
+        <div class="thread-title" *ngIf="!threadFrame.isDiffThread">
+          {{ threadFrame.thread.getFile().getFilenameWithRepo() }}
+          ({{ threadFrame.thread.getCommentList().length }} comments)
         </div>
 
         <!-- Comments -->
         <div
           [ngClass]="[
             'comment',
-            getThreadBackground(thread)
+            getThreadBackground(threadFrame)
           ]"
-          *ngFor="let comment of thread.getCommentList()"
-          (click)="openFile(thread)"
+          *ngFor="let comment of threadFrame.thread.getCommentList()"
+          (click)="openFile(threadFrame)"
         >
           <div class="message">{{ comment.getContent() }}</div>
           <div class="username">
@@ -45,18 +45,18 @@
         </div>
 
         <!-- Line number (line thread only) -->
-        <div class="line-number" *ngIf="!isDiffThread(thread)">
-          Line number: {{ thread.getLineNumber() }}
+        <div class="line-number" *ngIf="!threadFrame.isDiffThread">
+          Line number: {{ threadFrame.thread.getLineNumber() }}
         </div>
 
         <!-- Thread buttons (diff thread only) -->
-        <div class="diff-thread-buttons" *ngIf="isDiffThread(thread)">
+        <div class="diff-thread-buttons" *ngIf="threadFrame.isDiffThread">
           <button
             class="cr-light-button"
             mat-raised-button
-            (click)="toggleThread(thread)"
+            (click)="toggleThread(threadFrame.thread)"
           >{{
-            thread.getIsDone() ? 'Unresolve' : 'Resolve'
+            threadFrame.thread.getIsDone() ? 'Unresolve' : 'Resolve'
           }}</button>
           <button
             class="cr-light-button"

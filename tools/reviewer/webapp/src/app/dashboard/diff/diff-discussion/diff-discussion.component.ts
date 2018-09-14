@@ -4,6 +4,12 @@ import { Comment, Diff, Thread } from '@/shared/proto';
 import { AuthService, FirebaseService, NotificationService } from '@/shared/services';
 import { DiffService } from '../diff.service';
 
+// To distinguish diff threads and line threads
+interface ThreadFrame {
+  thread: Thread;
+  isDiffThread: boolean;
+}
+
 // The component implements UI of thread list of the diff
 // How it looks: https://i.imgur.com/cc6XITV.jpg
 
@@ -17,7 +23,7 @@ import { DiffService } from '../diff.service';
 })
 export class DiffDiscussionComponent implements OnInit, OnChanges {
   displayedColumns = ['discussions'];
-  threads: Thread[];
+  threadFrames: ThreadFrame[];
 
   @Input() diff: Diff;
 
@@ -37,43 +43,47 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
   }
 
   refreshThreads(): void {
-    // Are the threads valid?
-    this.checkThreadsValidation(
-      this.diff.getDiffThreadList(),
-      this.diff.getLineThreadList(),
-    );
+    // line threads + diff threads
+    this.threadFrames = [];
+    for (const thread of this.diff.getLineThreadList()) {
+      this.threadFrames.push({
+        thread: thread,
+        isDiffThread: false,
+      });
+    }
+    for (const thread of this.diff.getDiffThreadList()) {
+      this.threadFrames.push({
+        thread: thread,
+        isDiffThread: true,
+      });
+    }
 
-    // threads = lineThreads + diffThreads
-    this.threads = this.diff
-      .getLineThreadList()
-      .concat(this.diff.getDiffThreadList());
-
-    this.sortThreads(this.threads);
+    this.sortThreads(this.threadFrames);
   }
 
   getUnresolvedThreads(): number {
-    return this.threads.filter(thread => !thread.getIsDone()).length;
+    return this.threadFrames
+      .filter(threadFrame => !threadFrame.thread.getIsDone())
+      .length;
   }
 
-  openFile(thread: Thread): void {
-    if (this.isDiffThread(thread)) {
+  openFile(threadFrame: ThreadFrame): void {
+    if (threadFrame.isDiffThread) {
       // We can't open a file of a diff thread
       return;
     }
-    this.diffService.openFile(thread.getFile(), this.diff.getId());
+    this.diffService.openFile(threadFrame.thread.getFile(), this.diff.getId());
   }
 
   getUsername(comment: Comment): string {
     return this.authService.getUsername(comment.getCreatedBy());
   }
 
-  isDiffThread(thread: Thread): boolean {
-    return (thread.getFile() === undefined) ? true : false;
-  }
-
   // Sort all threads based on timestamp of last comment of the thread
-  sortThreads(threads: Thread[]): void {
-    threads.sort((a, b) => {
+  sortThreads(ThreadFrames: ThreadFrame[]): void {
+    ThreadFrames.sort((aFrame, bFrame) => {
+      const a: Thread = aFrame.thread;
+      const b: Thread = bFrame.thread;
       const aLastIndex: number = a.getCommentList().length - 1;
       const bLastIndex: number = b.getCommentList().length - 1;
       const aTimestamp: number = a.getCommentList()[aLastIndex].getTimestamp();
@@ -84,15 +94,19 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
     });
   }
 
-  getThreadBackground(thread: Thread): string {
-    return this.isDiffThread(thread) ? 'diff-thread' : 'line-thread';
+  getThreadBackground(threadFrame: ThreadFrame): string {
+    return threadFrame.isDiffThread ? 'diff-thread' : 'line-thread';
   }
 
   deleteThread(threadIndex: number): void {
     // Remove the thread by its index from thread list
-    let diffThreads: Thread[] = this.threads.slice();
-    diffThreads.splice(threadIndex, 1);
-    diffThreads = diffThreads.filter(thread => this.isDiffThread(thread));
+    const diffThreadFrames: ThreadFrame[] = this.threadFrames.slice();
+    diffThreadFrames.splice(threadIndex, 1);
+    const diffThreads: Thread[] = diffThreadFrames
+      // Leave diff threads only
+      .filter(threadFrame => threadFrame.isDiffThread)
+      // Thread frames -> threads
+      .map(threadFrame => threadFrame.thread);
     this.diff.setDiffThreadList(diffThreads);
 
     // Delete from firebase
@@ -112,23 +126,5 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
       const threadStatus: string = isDone ? 'resolved' : 'unresolved';
       this.notificationService.success('Thread is ' + threadStatus);
     });
-  }
-
-  // Each line thread should have a file.
-  // Each diff thread shouldn't.
-  // We don't have another way to distinguish the threads.
-  // Let's check that everything is right.
-  checkThreadsValidation(diffThreads: Thread[], lineThreads: Thread[]): void {
-    for (const thread of diffThreads) {
-      if (thread.getFile() !== undefined) {
-        throw new Error('Diff thread is invalid');
-      }
-    }
-
-    for (const thread of lineThreads) {
-      if (thread.getFile() === undefined) {
-        throw new Error('Line thread is invalid');
-      }
-    }
   }
 }
