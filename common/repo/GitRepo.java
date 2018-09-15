@@ -269,13 +269,13 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public void push() {
-    runCommand("push -q --all --atomic origin");
+  public void push(String branch) {
+    runCommand("push -q --atomic -u origin " + branch);
   }
 
   @Override
   public void pull() {
-    runCommand("pull -q");
+    runCommand("pull -q --prune");
   }
 
   @Override
