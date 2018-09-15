@@ -85,7 +85,6 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
 
       default:
         throw new Error('The type is not supported for diff page');
-        break;
     }
   }
 
