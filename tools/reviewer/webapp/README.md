@@ -1,6 +1,6 @@
 ## You need installed
 Required to use Reviewer locally:
-[node](https://nodejs.org/) LTS
+[node](https://nodejs.org/) LTS version
 [npm](https://www.npmjs.com/)  
 [protoc](https://github.com/protocolbuffers/protobuf/releases)  
 Optional:  
