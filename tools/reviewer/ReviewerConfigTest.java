@@ -27,9 +27,9 @@ import java.nio.file.FileSystem;
 import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
-import com.google.startupos.tools.reviewer.Protos.ReviewerConfig;
-import com.google.startupos.tools.reviewer.Protos.FirebaseConfig;
-import com.google.startupos.tools.reviewer.Protos.Repo;
+import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
+import com.google.startupos.tools.reviewer.ReviewerProtos.FirebaseConfig;
+import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 
 /* A test to check reviewer_config.prototxt is valid proto format */
 public class ReviewerConfigTest {

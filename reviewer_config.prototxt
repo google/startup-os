@@ -15,3 +15,19 @@ repo {
   id: "hasadna"
   url: "https://github.com/hasadna/hasadna"
 }
+user {
+  id: "oferb"
+  first_name: "Ofer"
+  last_name: "Bartal"
+  email: "oferb@google.com"
+  social_network {
+    type: LINKEDIN
+    url: "https://www.linkedin.com/in/ofer-bartal-58a50811/"
+  }
+  social_network {
+    type: TWITTER
+    url: "https://twitter.com/bartalofer"
+  }
+  skill: "Java"
+  skill: "Linux"
+}
