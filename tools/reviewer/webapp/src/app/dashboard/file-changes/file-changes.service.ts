@@ -44,7 +44,7 @@ export class FileChangesService {
       .subscribe(diff => {
         this.diff = diff;
         this.localThreads = this.diff
-          .getLineThreadList()
+          .getCodeThreadList()
           .filter(thread =>
             thread.getFile().getFilenameWithRepo() ===
             this.file.getFilenameWithRepo(),
@@ -113,7 +113,7 @@ export class FileChangesService {
     if (comments.length === 1) {
       // Create new thread
       const newThread: Thread = this.createNewThread(lineNumber, comments);
-      this.diff.addLineThread(newThread);
+      this.diff.addCodeThread(newThread);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
@@ -130,7 +130,7 @@ export class FileChangesService {
     // TODO: add ability to add comment to left file (to old commits)
     newThread.setCommitId(this.file.getCommitId());
     newThread.setFile(this.file);
-    newThread.setIsDiffThread(false);
+    newThread.setType(Thread.Type.CODE);
 
     return newThread;
   }
@@ -138,13 +138,13 @@ export class FileChangesService {
   deleteComment(isDeleteThread: boolean): void {
     if (isDeleteThread) {
       // Delete all threads without comments.
-      const threads: Thread[] = this.diff.getLineThreadList();
+      const threads: Thread[] = this.diff.getCodeThreadList();
       threads.forEach((thread, threadIndex) => {
         if (thread.getCommentList().length === 0) {
           threads.splice(threadIndex, 1);
         }
       });
-      this.diff.setLineThreadList(threads);
+      this.diff.setCodeThreadList(threads);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {

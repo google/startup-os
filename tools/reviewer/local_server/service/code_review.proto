@@ -79,7 +79,7 @@ message Diff {
   int64 created_timestamp = 9;
   int64 modified_timestamp = 10;
   // Threads on a line.
-  repeated Thread line_thread = 13;
+  repeated Thread code_thread = 13;
   repeated string cc = 14;
   // Threads on the whole diff, not on a particular file or line.
   repeated Thread diff_thread = 15;
@@ -99,13 +99,23 @@ message Author {
 // Comment thread. Note that for whole-diff threads, some fields will be empty
 // (e.g repo_id, commit_id).
 message Thread {
+  enum Type {
+    // Thread on a code line
+    CODE = 0;
+    // Thread on commit (synced from other systems e.g GitHub)
+    COMMIT = 1;
+    // Thread on repo (synced from other systems e.g GitHub)    
+    REPO = 2;
+    // Thread on whole diff
+    DIFF = 3;
+  }
   string repo_id = 1;
   string commit_id = 2;
   com.google.startupos.common.repo.File file = 3;
   int32 line_number = 4;
   bool is_done = 5;
   repeated Comment comment = 6;
-  bool is_diff_thread = 7;
+  Type type = 7;
 }
 
 message Comment {

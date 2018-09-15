@@ -37,10 +37,10 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
   }
 
   refreshThreads(): void {
-    // threads = line threads + diff threads
+    // threads = diff threads + code threads
     this.threads = []
       .concat(this.diff.getDiffThreadList())
-      .concat(this.diff.getLineThreadList());
+      .concat(this.diff.getCodeThreadList());
 
     this.sortThreads(this.threads);
   }
@@ -52,7 +52,7 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
   }
 
   openFile(thread: Thread): void {
-    if (thread.getIsDiffThread()) {
+    if (this.isDiffThread(thread)) {
       // We can't open a file of a diff thread
       return;
     }
@@ -77,7 +77,16 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
   }
 
   getThreadBackground(thread: Thread): string {
-    return thread.getIsDiffThread() ? 'diff-thread' : 'line-thread';
+    switch (thread.getType()) {
+      case Thread.Type.DIFF:
+        return 'diff-thread';
+      case Thread.Type.CODE:
+        return 'code-thread';
+
+      default:
+        throw new Error('The type is not supported for diff page');
+        break;
+    }
   }
 
   deleteThread(threadIndex: number): void {
@@ -85,7 +94,7 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
     this.threads.splice(threadIndex, 1);
     // Leave diff threads only
     const diffThreads: Thread[] = this.threads
-      .filter(thread => thread.getIsDiffThread());
+      .filter(thread => this.isDiffThread(thread));
     // Put new diff thread list in diff
     this.diff.setDiffThreadList(diffThreads);
 
@@ -106,5 +115,13 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
       const threadStatus: string = isDone ? 'resolved' : 'unresolved';
       this.notificationService.success('Thread is ' + threadStatus);
     });
+  }
+
+  isDiffThread(thread: Thread): boolean {
+    return thread.getType() === Thread.Type.DIFF;
+  }
+
+  isCodeThread(thread: Thread): boolean {
+    return thread.getType() === Thread.Type.CODE;
   }
 }

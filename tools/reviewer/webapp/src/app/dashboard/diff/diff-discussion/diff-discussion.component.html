@@ -22,8 +22,8 @@
       <mat-cell *matCellDef="let thread; let threadIndex = index;">
         <!-- Thread -->
 
-        <!-- Filename and amount of comments (line thread only) -->
-        <div class="thread-title" *ngIf="!thread.getIsDiffThread()">
+        <!-- Filename and amount of comments (code thread only) -->
+        <div class="thread-title" *ngIf="isCodeThread(thread)">
           {{ thread.getFile().getFilenameWithRepo() }}
           ({{ thread.getCommentList().length }} comments)
         </div>
@@ -44,13 +44,13 @@
           </div>
         </div>
 
-        <!-- Line number (line thread only) -->
-        <div class="line-number" *ngIf="!thread.getIsDiffThread()">
+        <!-- Line number (code thread only) -->
+        <div class="line-number" *ngIf="isCodeThread(thread)">
           Line number: {{ thread.getLineNumber() }}
         </div>
 
         <!-- Thread buttons (diff thread only) -->
-        <div class="diff-thread-buttons" *ngIf="thread.getIsDiffThread()">
+        <div class="diff-thread-buttons" *ngIf="isDiffThread(thread)">
           <button
             class="cr-light-button"
             mat-raised-button
