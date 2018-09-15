@@ -54,4 +54,3 @@ public class GlobalRegistryTest {
         "tools/reviewer/global_registry.prototxt", ReviewerRegistry.newBuilder());
   }
 }
-
