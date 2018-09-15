@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import {
   BranchInfo,
@@ -23,6 +24,7 @@ export class FileChangesService {
   branchInfo: BranchInfo;
   textDiff: TextDiff;
   commitId: string[];
+  firebaseSubscription = new Subscription();
 
   constructor(
     private firebaseService: FirebaseService,
@@ -37,17 +39,19 @@ export class FileChangesService {
 
   // Download diff from firebase
   getDiff(diffId: string): void {
-    this.firebaseService.getDiff(diffId).subscribe(diff => {
-      this.diff = diff;
-      this.localThreads = this.diff
-        .getThreadList()
-        .filter(thread =>
-          thread.getFile().getFilenameWithRepo() ===
-          this.file.getFilenameWithRepo(),
-        );
+    this.firebaseSubscription = this.firebaseService
+      .getDiff(diffId)
+      .subscribe(diff => {
+        this.diff = diff;
+        this.localThreads = this.diff
+          .getCodeThreadList()
+          .filter(thread =>
+            thread.getFile().getFilenameWithRepo() ===
+            this.file.getFilenameWithRepo(),
+          );
 
-      this.getBranchInfo();
-    });
+        this.getBranchInfo();
+      });
   }
 
   // Get branchInfo from localserver
@@ -109,7 +113,7 @@ export class FileChangesService {
     if (comments.length === 1) {
       // Create new thread
       const newThread: Thread = this.createNewThread(lineNumber, comments);
-      this.diff.addThread(newThread);
+      this.diff.addCodeThread(newThread);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
@@ -126,6 +130,7 @@ export class FileChangesService {
     // TODO: add ability to add comment to left file (to old commits)
     newThread.setCommitId(this.file.getCommitId());
     newThread.setFile(this.file);
+    newThread.setType(Thread.Type.CODE);
 
     return newThread;
   }
@@ -133,13 +138,13 @@ export class FileChangesService {
   deleteComment(isDeleteThread: boolean): void {
     if (isDeleteThread) {
       // Delete all threads without comments.
-      const threads: Thread[] = this.diff.getThreadList();
+      const threads: Thread[] = this.diff.getCodeThreadList();
       threads.forEach((thread, threadIndex) => {
         if (thread.getCommentList().length === 0) {
           threads.splice(threadIndex, 1);
         }
       });
-      this.diff.setThreadList(threads);
+      this.diff.setCodeThreadList(threads);
     }
 
     this.firebaseService.updateDiff(this.diff).subscribe(() => {
@@ -212,5 +217,9 @@ export class FileChangesService {
 
     // All supported languages:
     // https://github.com/highlightjs/highlight.js/tree/master/src/languages
+  }
+
+  destroy(): void {
+    this.firebaseSubscription.unsubscribe();
   }
 }

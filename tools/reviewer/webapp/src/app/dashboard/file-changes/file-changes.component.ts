@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { FileChangesService } from './file-changes.service';
@@ -10,7 +10,7 @@ import { FileChangesService } from './file-changes.service';
   styleUrls: ['./file-changes.component.scss'],
   providers: [FileChangesService],
 })
-export class FileChangesComponent implements OnInit {
+export class FileChangesComponent implements OnInit, OnDestroy {
   language: string;
 
   constructor(
@@ -32,5 +32,9 @@ export class FileChangesComponent implements OnInit {
 
     this.language = this.fileChangesService.getLanguage(filename);
     this.fileChangesService.startLoading(filename, diffId);
+  }
+
+  ngOnDestroy() {
+    this.fileChangesService.destroy();
   }
 }

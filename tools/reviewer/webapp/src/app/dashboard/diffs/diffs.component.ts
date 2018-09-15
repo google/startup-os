@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { AuthService, FirebaseService } from '@/shared';
 import { Diff, Reviewer } from '@/shared/proto';
@@ -19,7 +20,7 @@ export enum DiffGroups {
   templateUrl: './diffs.component.html',
   styleUrls: ['./diffs.component.scss'],
 })
-export class DiffsComponent implements OnInit {
+export class DiffsComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   diffGroups: Diff[][] = [];
   displayedColumns: string[] = [
@@ -32,6 +33,7 @@ export class DiffsComponent implements OnInit {
     'description',
   ];
   diffGroupNameList: string[] = [];
+  firebaseSubscription = new Subscription();
 
   constructor(
     private firebaseService: FirebaseService,
@@ -63,7 +65,7 @@ export class DiffsComponent implements OnInit {
 
   // Categorize diffs in specific groups
   categorizeDiffs(userEmail: string) {
-    this.firebaseService.getDiffs().subscribe(diffs => {
+    this.firebaseSubscription = this.firebaseService.getDiffs().subscribe(diffs => {
       this.diffGroups[DiffGroups.NeedAttention] = [];
       this.diffGroups[DiffGroups.Incoming] = [];
       this.diffGroups[DiffGroups.Outgoing] = [];
@@ -128,7 +130,7 @@ export class DiffsComponent implements OnInit {
   sortDiffs(): void {
     for (const diffList of this.diffGroups) {
       diffList.sort((a, b) => {
-        // Newest first
+        // Newest on top
         return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
       });
     }
@@ -143,5 +145,9 @@ export class DiffsComponent implements OnInit {
     return reviewerList
       .map(reviewer => this.authService.getUsername(reviewer.getEmail()))
       .join(', ');
+  }
+
+  ngOnDestroy() {
+    this.firebaseSubscription.unsubscribe();
   }
 }

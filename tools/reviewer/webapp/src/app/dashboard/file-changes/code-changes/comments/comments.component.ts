@@ -91,10 +91,12 @@ export class CommentsComponent implements OnInit {
     );
   }
 
-  // Make thread resolved/unresolved
+  // Make thread resolved / unresolved
   toggleThread(): void {
+    // Reverse "isDone" of the thread
     const isDone: boolean = !this.thread.getIsDone();
     this.thread.setIsDone(isDone);
+
     this.fileChangesService.resolveThread(isDone);
   }
 }

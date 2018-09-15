@@ -79,6 +79,7 @@ export class ReplyPopupComponent {
       // Set isDone of Thread based on Action Required Checkbox
       diffThread.setIsDone(!this.actionRequired);
       diffThread.addComment(comment);
+      diffThread.setType(Thread.Type.DIFF);
       this.diff.addDiffThread(diffThread);
     }
 
