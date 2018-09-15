@@ -4,10 +4,13 @@ java_library(
     name = "FirestoreTestBase",
     srcs = ["util/FirestoreJsonFormatTestBase.java"],
     deps = [
+        "//common",
+        "//common:dagger_with_annotation_processor",
         "//common/firestore",
         "//third_party/maven/com/google/code/gson",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/junit",
         "//third_party/maven/org/mockito:mockito_core",
     ],

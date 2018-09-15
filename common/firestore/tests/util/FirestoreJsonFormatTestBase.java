@@ -26,24 +26,33 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import java.io.IOException;
 import org.junit.Before;
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.FileUtils;
+import dagger.Component;
+import javax.inject.Singleton;
 
 /**
  * Test base class for {@code FirestoreJsonFormat.Parser} and {@code FirestoreJsonFormat.Printer}
  */
+// TODO: Move this class to com.google.startupos.common.firestore.test.
 public class FirestoreJsonFormatTestBase {
+  private FileUtils fileUtils;
   private JsonParser jsonParser;
   private FirestoreJsonFormat.Printer printer;
   private FirestoreJsonFormat.Parser parser;
 
   @Before
   public void setup() {
+    // Using real FileSystem since this test only loads files from Resources.
+    TestComponent component = DaggerFirestoreJsonFormatTestBase_TestComponent.create();
+    fileUtils = component.getFileUtils();
     jsonParser = new JsonParser();
     printer = FirestoreJsonFormat.printer();
     parser = FirestoreJsonFormat.parser();
   }
 
   protected String getGoldenFileAsString(String filename) {
-    return getFileContents(filename);
+    return fileUtils.readFileFromResourcesUnchecked("common/firestore/tests/resources/" + filename);
   }
 
   protected JsonElement getGoldenFile(String filename) {
@@ -60,17 +69,14 @@ public class FirestoreJsonFormatTestBase {
     return builder.build();
   }
 
-  private String getFileContents(String filename) {
-    try {
-      return Resources.toString(
-          Resources.getResource("common/firestore/tests/resources/" + filename), UTF_8);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   private void printStringToLog(JsonElement json) {
     throw new RuntimeException("\n" + json.toString() + "\n");
+  }
+
+  @Singleton
+  @Component(modules = CommonModule.class)
+  interface TestComponent {
+    FileUtils getFileUtils();
   }
 }
 
