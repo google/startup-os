@@ -42,15 +42,17 @@ message ReviewerConfig {
 
 /* Config for a Reviewer instance for a registry. */
 message ReviewerRegistryConfig {
+  // ID, should be unique in a ReviewerRegistry
+  string id = 1;
   // Display name for Reviewer instance. Should be same as
   // ReviewerConfig.display_name
-  string display_name = 1;
+  string display_name = 2;
   // Repo with .reviewer config folder
-  string config_repo = 2;
+  string config_repo = 3;
   // URL of webapp
-  string webapp_url = 3;
+  string webapp_url = 4;
   // Default port for local server
-  int32 default_port = 4;
+  int32 default_port = 5;
 }
 
 /* Registry for Reviewer instances, to help in discovery. */

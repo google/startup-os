@@ -1,4 +1,5 @@
 reviewer_config {
+  id: "startup_os"
   display_name: "StartupOS"
   config_repo: "https://github.com/google/startup-os"
   webapp_url: "https://startupos-5f279.firebaseapp.com"
