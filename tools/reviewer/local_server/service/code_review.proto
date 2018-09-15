@@ -17,6 +17,7 @@ service CodeReviewService {
   rpc getAvailableDiffNumber(Empty) returns (DiffNumberResponse);
   rpc getDiff(DiffRequest) returns (Diff);
   rpc getDiffFiles(DiffFilesRequest) returns (DiffFilesResponse);
+  rpc removeWorkspace(RemoveWorkspaceRequest) returns (RemoveWorkspaceResponse);
   rpc ping(Empty) returns (PongResponse);
 }
 
@@ -49,6 +50,10 @@ message DiffFilesResponse {
 message DiffRequest { int64 diff_id = 1; }
 
 message PongResponse { string message = 1; }
+
+message RemoveWorkspaceRequest { string workspaceName = 1; }
+
+message RemoveWorkspaceResponse { bool removed = 1; }
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues

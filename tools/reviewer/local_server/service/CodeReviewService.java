@@ -40,6 +40,8 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesR
 import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.PongResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.RemoveWorkspaceRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.RemoveWorkspaceResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -373,6 +375,20 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   @Override
   public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
     responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
+    responseObserver.onCompleted();
+  }
+
+  @Override
+  public void removeWorkspace(
+      RemoveWorkspaceRequest req, StreamObserver<RemoveWorkspaceResponse> responseObserver) {
+    String workspacePath = getWorkspacePath(req.getWorkspaceName());
+
+    try {
+      fileUtils.deleteDirectory(workspacePath);
+      responseObserver.onNext(RemoveWorkspaceResponse.newBuilder().setRemoved(true).build());
+    } catch (IOException ignored) {
+      responseObserver.onNext(RemoveWorkspaceResponse.newBuilder().setRemoved(false).build());
+    }
     responseObserver.onCompleted();
   }
 
