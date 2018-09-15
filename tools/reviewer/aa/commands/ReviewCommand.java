@@ -31,6 +31,12 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+/* A command to either start a review, or send back fixes.
+ *
+ * Snapshots the workspace (comitting all changes), and pushes all repos.
+ * Sets the Attention to reviewers, removes it from author, and set status to UNDER_REVIEW.
+ */
+// TODO: Add the "Snapshots the workspace (comitting all changes), and pushes all repos." part.
 public class ReviewCommand implements AaCommand {
   private static final Integer GRPC_PORT = 8001;
 
@@ -65,6 +71,7 @@ public class ReviewCommand implements AaCommand {
           RED_ERROR + "Workspace has no diff to review (git branch has no D# branch)");
       return false;
     }
+    String branchName = String.format("D%d", diffNumber);
     Diff.Builder diffBuilder =
         codeReviewBlockingStub
             .getDiff(DiffRequest.newBuilder().setDiffId(diffNumber).build())
@@ -73,6 +80,7 @@ public class ReviewCommand implements AaCommand {
       System.out.println(String.format("D%d has no reviewers", diffNumber));
       return false;
     }
+    // TODO: Fail if SUBMITTING, SUBMITTED, REVERTING or REVERTED.
     for (int i = 0; i < diffBuilder.getReviewerCount(); i++) {
       diffBuilder.setReviewer(i, diffBuilder.getReviewer(i).toBuilder().setNeedsAttention(true));
     }
@@ -88,7 +96,7 @@ public class ReviewCommand implements AaCommand {
           .forEach(
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
-                repo.push();
+                repo.push(branchName);
               });
     } catch (IOException e) {
       e.printStackTrace();

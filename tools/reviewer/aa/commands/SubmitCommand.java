@@ -115,7 +115,7 @@ public class SubmitCommand implements AaCommand {
                 System.out.println(String.format("[%s]: removing branch", repoName));
                 repo.removeBranch(diffBranchName);
                 System.out.println(String.format("[%s]: pushing to remote", repoName));
-                repo.push();
+                repo.push(diffBranchName);
               });
     } catch (IOException e) {
       e.printStackTrace();

@@ -30,6 +30,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/* A command to take a snapshot of the workspace.
+ *
+ * For each repo:
+ * - Switch to diff branch
+ * - Commit uncommitted files
+ */
+// TODO: Add option to also push and call them `aa snapshot` and `aa snapshot_and_push`.
 public class SnapshotCommand implements AaCommand {
   private final FileUtils fileUtils;
   private final GitRepoFactory gitRepoFactory;

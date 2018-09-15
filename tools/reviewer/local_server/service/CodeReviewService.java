@@ -40,6 +40,7 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesR
 import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.PongResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.RemoveWorkspaceRequest;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -374,6 +375,23 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   public void ping(Empty req, StreamObserver<PongResponse> responseObserver) {
     responseObserver.onNext(PongResponse.newBuilder().setMessage("pong").build());
     responseObserver.onCompleted();
+  }
+
+  @Override
+  public void removeWorkspace(RemoveWorkspaceRequest req, StreamObserver<Empty> responseObserver) {
+    String workspacePath = getWorkspacePath(req.getWorkspaceName());
+
+    try {
+      fileUtils.deleteDirectory(workspacePath);
+      responseObserver.onNext(Empty.getDefaultInstance());
+      responseObserver.onCompleted();
+    } catch (IOException ignored) {
+      // We assume it's a missing workspace. That's the most probable reason.
+      responseObserver.onError(
+          Status.NOT_FOUND
+              .withDescription(String.format("No such workspace %s", req.getWorkspaceName()))
+              .asException());
+    }
   }
 
   private void checkAuth() {

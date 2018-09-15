@@ -35,6 +35,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import com.google.common.io.Resources;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -201,6 +202,15 @@ public class FileUtils {
   public String readFileUnchecked(String path) {
     try {
       return readFile(path);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /** Reads a text file, rethrows exceptions as unchecked. */
+  public String readFileFromResourcesUnchecked(String path) {
+    try {
+      return Resources.toString(Resources.getResource(path), UTF_8);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

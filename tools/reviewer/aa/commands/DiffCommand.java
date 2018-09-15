@@ -131,16 +131,7 @@ public class DiffCommand implements AaCommand {
     return diffBuilder.build();
   }
 
-  /*
-   * From underlying repo perspective we do the following
-   * - commit all changes to a temporary branch
-   * - merge temporary branch to diff branch, preferring changes in the former
-   * - merge diff branch to master (without commit)
-   * - update diff entry in Firestore
-   * After this, there would be one extra commit on top of diff branch,
-   * representing the latest changes. We cannot commit to it directly
-   * because tree is not clean and branch cannot be switched with dirty tree
-   */
+  /* Update diff metadata - reviewers, description, buglink */
   private Diff updateDiff(Integer diffNumber) {
     System.out.println(String.format("Updating D%d", diffNumber));
 
@@ -174,6 +165,8 @@ public class DiffCommand implements AaCommand {
 
     Diff diff = (diffNumber == -1) ? createDiff() : updateDiff(diffNumber);
     CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
+    // TODO: Check if we changed diff, update only if changed. Write to output if no change.
+    // TODO: Rename createDiff to createOrUpdateDiff
     codeReviewBlockingStub.createDiff(request);
     return true;
   }
