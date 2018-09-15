@@ -130,6 +130,7 @@ export class FileChangesService {
     // TODO: add ability to add comment to left file (to old commits)
     newThread.setCommitId(this.file.getCommitId());
     newThread.setFile(this.file);
+    newThread.setIsDiffThread(false);
 
     return newThread;
   }

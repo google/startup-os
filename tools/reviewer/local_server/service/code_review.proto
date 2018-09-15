@@ -105,6 +105,7 @@ message Thread {
   int32 line_number = 4;
   bool is_done = 5;
   repeated Comment comment = 6;
+  bool is_diff_thread = 7;
 }
 
 message Comment {
