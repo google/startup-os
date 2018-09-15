@@ -1,5 +1,7 @@
 # Reviewer webapp
-This is Reviewer Angular webapp. To set up your development environment, follow these steps:
+The Reviewer front-end is an Angular webapp.
+
+To set up your development environment, follow these steps:
 
 ## Installation
 Install these:
