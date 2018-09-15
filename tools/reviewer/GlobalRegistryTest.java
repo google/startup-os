@@ -27,7 +27,6 @@ import java.nio.file.FileSystem;
 import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
-import com.google.common.io.Resources;
 
 /* A test to check global_registry.prototxt and global_registry.protobin match */
 public class GlobalRegistryTest {
@@ -45,18 +44,8 @@ public class GlobalRegistryTest {
     fileUtils = component.getFileUtils();
   }
 
-  private String getFileContents(String filename) {
-    try {
-      return Resources.toString(
-          Resources.getResource("common/firestore/tests/resources/" + filename), UTF_8);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @Test
   public void protoFileTest() throws Exception {
-
     // TODO: Test that .reviewer/global_registry.prototxt and .reviewer/global_registry.protobin
     // match. Print matching protobin if not.
   }
