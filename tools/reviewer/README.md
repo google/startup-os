@@ -21,6 +21,16 @@ Reviewer has 3 components:
 
 ![Fix all the things!](https://image.ibb.co/dOMa9p/rsz_3gcfpfw4wuj.png)
 
+## Reviewer instances and the global registry
+There can be multiple Reviewer instances in the world, each covering a set of repos. To help in
+their discovery, instances can be registered in a [global registry](global_registry.prototxt) file
+in this repo.
+As each Reviewer instance covers a set of repos, its configuration is stored in one of the repos,
+in a root file called [reviewer_config.prototxt](../../reviewer_config.prototxt). This repo is
+pointed at from the global registry.
+Since Reviewer instances run a local server that holds a port, to try to avoid collisions, we also
+define a default port for each Reviewer instance in the global registry.
+
 ## Current status:
 The tool is WIP. The video is up-to-date as of Sep 6th 2018. If you want to use the alpha version please contact oferb@google.com.
 If you want to help, these are the areas we need most help in:

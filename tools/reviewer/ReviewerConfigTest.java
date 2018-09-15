@@ -27,11 +27,12 @@ import java.nio.file.FileSystem;
 import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
-import com.google.startupos.tools.reviewer.Protos.ReviewerRegistry;
-import com.google.startupos.tools.reviewer.Protos.ReviewerRegistryConfig;
+import com.google.startupos.tools.reviewer.Protos.ReviewerConfig;
+import com.google.startupos.tools.reviewer.Protos.FirebaseConfig;
+import com.google.startupos.tools.reviewer.Protos.Repo;
 
-/* A test to check global_registry.prototxt is valid proto format */
-public class GlobalRegistryTest {
+/* A test to check reviewer_config.prototxt is valid proto format */
+public class ReviewerConfigTest {
 
   @Singleton
   @Component(modules = {CommonModule.class})
@@ -43,15 +44,14 @@ public class GlobalRegistryTest {
 
   @Before
   public void setup() {
-    TestComponent component = DaggerGlobalRegistryTest_TestComponent.create();
+    TestComponent component = DaggerReviewerConfigTest_TestComponent.create();
     fileUtils = component.getFileUtils();
   }
 
-  // Test that global registry file can be read.
+  // Test that the reviewer config file can be read.
   @Test
   public void protoFileTest() throws Exception {
-    fileUtils.readPrototxt(
-        "tools/reviewer/global_registry.prototxt", ReviewerRegistry.newBuilder());
+    fileUtils.readPrototxt("reviewer_config.prototxt", ReviewerConfig.newBuilder());
   }
 }
 

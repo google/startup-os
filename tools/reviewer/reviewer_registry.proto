@@ -6,10 +6,11 @@ option java_outer_classname = "Protos";
 
 /* Config for a single repo. */
 message Repo {
+  // ID, e.g startup-os. This is used as the folder name in the local workspace.
+  // Should be unique in a Reviewer instance.
+  string id = 1;
   // Url, e.g https://github.com/google/startup-os
-  string url = 1;
-  // ID, e.g startup-os. This is used as the folder name in the local workspace
-  string id = 2;
+  string url = 2;
 }
 
 /* Firebase config. The only field we probably need is project_id, but we're not
@@ -47,7 +48,7 @@ message ReviewerRegistryConfig {
   // Repo with .reviewer config folder
   string config_repo = 2;
   // URL of webapp
-  string url = 3;
+  string webapp_url = 3;
   // Default port for local server
   int32 default_port = 4;
 }

@@ -1,0 +1,6 @@
+reviewer_config {
+  display_name: "StartupOS"
+  config_repo: "https://github.com/google/startup-os"
+  webapp_url: "https://startupos-5f279.firebaseapp.com"
+  default_port: 7000
+}
