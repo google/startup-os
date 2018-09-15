@@ -26,7 +26,7 @@ function _aa_completions()
     cur_word="${COMP_WORDS[COMP_CWORD]}"
     prev_word="${COMP_WORDS[COMP_CWORD-1]}"
 
-    commands="init workspace diff fix sync snapshot add_repo"
+    commands="init workspace diff fix sync snapshot add_repo killserver"
     init_options="--base_path --startupos_repo --user"
     add_repo_options="--url --name"
     diff_options="--reviewers --description --buglink"
@@ -79,9 +79,20 @@ function find_base_folder {
   return 0
 }
 
+function stop_local_server {
+    find_base_folder
+    if [[ -z "$AA_BASE" ]]; then
+      echo "BASE file not found in path until root"
+      return 1
+    fi
+
+    export STARTUP_OS=$AA_BASE/head/startup-os
+    bash $AA_BASE/head/startup-os/tools/reviewer/local_server/local_server.sh stop
+}
+
 function start_local_server {
     # starts local_server if it is not running yet
-    # server is started by tools/reviewer/local_server/run.sh
+    # server is started by tools/reviewer/local_server/local_server.sh
     # to check whether it is running already we try
     # to communicate with it by gRPC via polyglot
     # for additional output, set LOCAL_SERVER_POLYGLOT_DEBUG env variable
@@ -119,7 +130,7 @@ function start_local_server {
         echo "$GREEN""Server PID is:$RESET" # will be printed by bash
         # nohup detaches the command from terminal it was executed on
         echo "$GREEN""Server log is $SERVER_LOG_FILE"
-        nohup bash $AA_BASE/head/startup-os/tools/reviewer/local_server/run.sh </dev/null >$SERVER_LOG_FILE 2>&1 &
+        nohup bash $AA_BASE/head/startup-os/tools/reviewer/local_server/local_server.sh start </dev/null >$SERVER_LOG_FILE 2>&1 &
         echo "$RED""Visit$RESET http://localhost:8000$RED to log in$RESET"
         return 1
     else
@@ -176,6 +187,8 @@ function aa {
       AA_RESULT=$(eval $AA_BINARY $*)
       AA_RESULT_CODE=$?
       $AA_RESULT
+  elif [ "$1" = "killserver" ]; then
+      stop_local_server
   else
       # if command is not workspace, let `aa` execute as is
       eval $AA_BINARY $*
