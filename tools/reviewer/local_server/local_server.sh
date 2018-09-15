@@ -1,6 +1,6 @@
 # Run LocalHttpGateway and LocalServer
 # Usage:
-# run.sh start --root_path <root_path>
+# local_server.sh start --root_path <root_path>
 
 #
 # Debugging gRPC server:
