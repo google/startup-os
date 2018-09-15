@@ -19,7 +19,7 @@ Reviewer has 3 components:
 * [Local server](local_server), to serve code and diffs to the web front-end from the local machine.
 * [cli tool](aa) called aa (easy to type) to manage multiple repos locally.
 
-![Fix all the things!](https://image.ibb.co/dOMa9p/rsz_3gcfpfw4wuj.png)
+![Reviewer architecture diagram!](https://image.ibb.co/dOMa9p/rsz_3gcfpfw4wuj.png)
 
 ## Reviewer instances and the global registry
 There can be multiple Reviewer instances in the world, each covering a set of repos. To help in
