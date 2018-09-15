@@ -386,6 +386,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       responseObserver.onNext(Empty.getDefaultInstance());
       responseObserver.onCompleted();
     } catch (IOException ignored) {
+      // We assume it's a missing workspace. That's the most probable reason.
       responseObserver.onError(
           Status.NOT_FOUND
               .withDescription(String.format("No such workspace %s", req.getWorkspaceName()))

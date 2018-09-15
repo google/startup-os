@@ -51,7 +51,7 @@ message DiffRequest { int64 diff_id = 1; }
 
 message PongResponse { string message = 1; }
 
-message RemoveWorkspaceRequest { string workspaceName = 1; }
+message RemoveWorkspaceRequest { string workspace_name = 1; }
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues
