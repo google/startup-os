@@ -7,8 +7,7 @@ To set up your development environment, follow these steps:
 Install these:
 * [node](https://nodejs.org/) LTS version
 * [npm](https://www.npmjs.com/)  
-* [protoc](https://github.com/protocolbuffers/protobuf/releases)  
-* `google-protobuf 3.5` or above.
+* [protoc](https://github.com/protocolbuffers/protobuf/releases, `google-protobuf 3.5` or above).
 
 Optional:
 * [firebase](https://firebase.google.com/docs/hosting/quickstart) to be able to deploy.  
