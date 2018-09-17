@@ -92,7 +92,7 @@ function stop_local_server {
 
 function start_local_server {
     # starts local_server if it is not running yet
-    # server is started by tools/reviewer/local_server/local_server.sh
+    # server is started by tools/reviewer/local_server/local_server.sh start
     # to check whether it is running already we try
     # to communicate with it by gRPC via polyglot
     # for additional output, set LOCAL_SERVER_POLYGLOT_DEBUG env variable
