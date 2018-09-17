@@ -40,6 +40,10 @@ export class FirebaseService {
       .snapshotChanges()
       .map(action => {
         const firebaseElement = action.payload.data() as FirebaseElement;
+        if (firebaseElement === undefined) {
+          // Diff not found
+          return;
+        }
         return this.convertFirebaseElementToDiff(firebaseElement);
       });
   }

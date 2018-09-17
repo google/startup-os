@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+
+interface FileData {
+  file: File;
+  branchInfo: BranchInfo;
+}
 
 import {
   BranchInfo,
@@ -10,6 +15,7 @@ import {
   Thread,
 } from '@/shared/proto';
 import {
+  ExceptionService,
   FirebaseService,
   LocalserverService,
   NotificationService,
@@ -30,6 +36,7 @@ export class FileChangesService {
     private firebaseService: FirebaseService,
     private localserverService: LocalserverService,
     private notificationService: NotificationService,
+    private exceptionService: ExceptionService,
   ) { }
 
   startLoading(filename: string, diffId: string): void {
@@ -42,6 +49,10 @@ export class FileChangesService {
     this.firebaseSubscription = this.firebaseService
       .getDiff(diffId)
       .subscribe(diff => {
+        if (diff === undefined) {
+          this.exceptionService.diffNotFound();
+          return;
+        }
         this.diff = diff;
         this.localThreads = this.diff
           .getCodeThreadList()
@@ -59,13 +70,17 @@ export class FileChangesService {
     this.localserverService
       .getBranchInfo(this.diff.getId(), this.diff.getWorkspace())
       .subscribe(branchInfoList => {
-        const { branchInfo, file } = this.getFileData(
+        // Get file and branchInfo
+        this.getFileData(
           this.file.getFilenameWithRepo(),
           branchInfoList,
-        );
-        this.branchInfo = branchInfo;
-        this.file = file;
-        this.getFileChanges(this.file);
+        ).subscribe(fileData => {
+          this.branchInfo = fileData.branchInfo;
+          this.file = fileData.file;
+          this.getFileChanges(this.file);
+        }, () => {
+          this.exceptionService.fileNotFound(this.diff.getId());
+        });
       });
   }
 
@@ -171,25 +186,29 @@ export class FileChangesService {
   }
 
   // Get file and branchInfo from branchInfo list
-  getFileData(filenameWithRepo: string, branchInfoList: BranchInfo[]): {
-    file: File;
-    branchInfo: BranchInfo;
-  } {
-    // Compare the filename with each filename of each repo
-    for (const branchInfo of branchInfoList) {
-      const files: File[] = this.localserverService
-        .getFilesFromBranchInfo(branchInfo);
-      for (const file of files) {
-        if (filenameWithRepo === file.getFilenameWithRepo()) {
-          // File found
-          return {
-            file: file,
-            branchInfo: branchInfo,
-          };
+  getFileData(
+    filenameWithRepo: string,
+    branchInfoList: BranchInfo[],
+  ): Observable<FileData> {
+    return new Observable(observer => {
+      // Compare the filename with each filename of each repo
+      for (const branchInfo of branchInfoList) {
+        const files: File[] = this.localserverService
+          .getFilesFromBranchInfo(branchInfo);
+        for (const file of files) {
+          if (filenameWithRepo === file.getFilenameWithRepo()) {
+            // File found
+            observer.next({
+              file: file,
+              branchInfo: branchInfo,
+            });
+            return;
+          }
         }
       }
-    }
-    throw new Error('File not found');
+
+      observer.error();
+    });
   }
 
   // Get langulage from filename. Example:

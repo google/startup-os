@@ -3,7 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Diff, File } from '@/shared/proto';
-import { FirebaseService, LocalserverService } from '@/shared/services';
+import {
+  ExceptionService,
+  FirebaseService,
+  LocalserverService,
+} from '@/shared/services';
 
 // The component implements diff page
 // How it looks: https://i.imgur.com/nBGrGuc.jpg
@@ -21,6 +25,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private firebaseService: FirebaseService,
     private localserverService: LocalserverService,
+    private exceptionService: ExceptionService,
   ) { }
 
   ngOnInit() {
@@ -30,6 +35,10 @@ export class DiffComponent implements OnInit, OnDestroy {
     this.firebaseSubscription = this.firebaseService
       .getDiff(diffId)
       .subscribe(diff => {
+        if (diff === undefined) {
+          this.exceptionService.diffNotFound();
+          return;
+        }
         this.diff = diff;
         // Get files from localserver
         this.localserverService

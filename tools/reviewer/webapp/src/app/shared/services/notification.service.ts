@@ -13,7 +13,7 @@ export class NotificationService {
   private duration: number;
 
   constructor(private snackbar: MatSnackBar) {
-    this.duration = 4500;
+    this.duration = 2000;
   }
 
   snack(
