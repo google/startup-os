@@ -62,6 +62,8 @@ public class AaTool {
     commands.put("submit", submitCommand);
     commands.put("add_repo", addRepoCommand);
     commands.put("patch", patchCommand);
+    // killserver is implemented in aa_tool.sh
+    commands.put("killserver", null);
   }
 
   private void printUsage() {
