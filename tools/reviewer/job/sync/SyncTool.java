@@ -35,24 +35,23 @@ public class SyncTool {
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
 
-        String repo;
-        int diffNumber;
-        String login;
-        String password;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
-          System.out.print("Enter GitHub repository name:\n");
-          repo = br.readLine();
-          System.out.print("Enter Pull Request number:\n");
-          diffNumber = Integer.parseInt(br.readLine());
-          System.out.print("Enter GitHub login:\n");
-          login = br.readLine();
-          System.out.print("Enter GitHub password:\n");
-          password = br.readLine();
-        }
+    String repo;
+    int diffNumber;
+    String login;
+    String password;
+    try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+      System.out.print("Enter GitHub repository name:\n");
+      repo = br.readLine();
+      System.out.print("Enter Pull Request number:\n");
+      diffNumber = Integer.parseInt(br.readLine());
+      System.out.print("Enter GitHub login:\n");
+      login = br.readLine();
+      System.out.print("Enter GitHub password:\n");
+      password = br.readLine();
+    }
 
     RecipientGitHubDiff recipientGitHubComments =
-        new RecipientGitHubDiff(
-            repo, diffNumber, login, password);
+        new RecipientGitHubDiff(repo, diffNumber, login, password);
 
     Protos.Diff diff = recipientGitHubComments.getDiff();
     System.out.println(diff);
