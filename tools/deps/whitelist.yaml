@@ -6,6 +6,7 @@ maven_dependencies:
   - com.squareup.okio
   - com.squareup:javapoet
   - commons-codec:commons-codec
+  - commons-io
   - commons-logging
   - io.grpc
   - io.netty
