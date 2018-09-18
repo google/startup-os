@@ -26,6 +26,7 @@ maven_dependencies:
   - org.javassist
   - org.json
   - org.jsoup
+  - org.kohsuke
   - org.mockito
   - org.objenesis
   - org.slf4j
