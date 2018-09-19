@@ -16,44 +16,37 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.localserver.service.Protos;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /*
  * Usage:
- * bazel build //tools/reviewer/job/sync:sync_tool
- * bazel run //tools/reviewer/job/sync:sync_tool
+ *  bazel run //tools/reviewer/job/sync:sync_tool -- --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
  *
- * After running the program follow instructions
- * (enter 'repository_name', 'Pull Request number',  'login' and 'password').
  */
 public class SyncTool {
+  @FlagDesc(name = "repo_name", description = "GitHub repository name")
+  private static Flag<String> repoName = Flag.create("");
+
+  @FlagDesc(name = "diff_number", description = "PullRequest number")
+  private static Flag<Integer> diffNumber = Flag.create(0);
+
+  @FlagDesc(name = "login", description = "GitHub login")
+  private static Flag<String> login = Flag.create("");
+
+  @FlagDesc(name = "password", description = "GitHub password")
+  private static Flag<String> password = Flag.create("");
+
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
+    GitHubReader gitHubReader = new GitHubReader();
 
-    String repo;
-    int diffNumber;
-    String login;
-    String password;
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
-      System.out.print("Enter GitHub repository name:\n");
-      repo = br.readLine();
-      System.out.print("Enter Pull Request number:\n");
-      diffNumber = Integer.parseInt(br.readLine());
-      System.out.print("Enter GitHub login:\n");
-      login = br.readLine();
-      System.out.print("Enter GitHub password:\n");
-      password = br.readLine();
-    }
-
-    RecipientGitHubDiff recipientGitHubComments =
-        new RecipientGitHubDiff(repo, diffNumber, login, password);
-
-    Protos.Diff diff = recipientGitHubComments.getDiff();
+    Protos.Diff diff =
+        gitHubReader.getDiff(repoName.get(), diffNumber.get(), login.get(), password.get());
     System.out.println(diff);
   }
 }
