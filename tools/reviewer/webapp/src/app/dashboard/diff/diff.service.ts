@@ -7,9 +7,11 @@ import { File } from '@/shared/proto';
 export class DiffService {
   constructor(private router: Router) { }
 
-  openFile(file: File, diffId: number): void {
+  openFile(file: File, diffId: number, commitId?: string): void {
     this.router.navigate([
       'diff/' + diffId + '/' + file.getFilenameWithRepo(),
-    ]);
+    ], { queryParams: {
+       right_commit_id: commitId,
+    } });
   }
 }

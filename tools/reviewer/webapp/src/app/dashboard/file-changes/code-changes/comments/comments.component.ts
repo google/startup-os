@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 
 import { Comment, Thread } from '@/shared/proto';
 import { AuthService } from '@/shared/services';
-import { FileChangesService } from '../../file-changes.service';
+import { ThreadService } from '../../services';
 import {
   BlockIndex,
   BlockLine,
@@ -11,7 +11,7 @@ import {
 } from '../code-changes.interface';
 import { CommentsService } from '../services';
 
-// The component implements comments of code changes.
+// The component implements comments of code-changes.
 // How it looks: https://i.imgur.com/tVusnEd.jpg
 @Component({
   selector: 'line-comments',
@@ -31,7 +31,7 @@ export class CommentsComponent implements OnInit {
   constructor(
     private commentsService: CommentsService,
     public authService: AuthService,
-    private fileChangesService: FileChangesService,
+    private threadService: ThreadService,
   ) { }
 
   ngOnInit() {
@@ -50,20 +50,32 @@ export class CommentsComponent implements OnInit {
     comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());
 
-    // Send comment to firebase
     this.thread.addComment(comment);
-    this.fileChangesService.addComment(
-      this.blockLine.lineNumber,
-      this.thread.getCommentList(),
-    );
 
-    this.textareaControl.reset();
-
-    this.commentsService.saveAsOpen(
+    // Send comment to firebase
+    const isNewThread: boolean = this.thread.getCommentList().length === 1;
+    const isError: boolean = this.threadService.addComment(
       this.blockLine.lineNumber,
-      this.lineIndex,
+      comment,
       this.blockIndex,
+      isNewThread,
     );
+
+    if (isError) {
+      // Comment can't be sent to firebase because of an error.
+      // Delete the comment.
+      const comments: Comment[] = this.thread.getCommentList();
+      comments.splice(comments.length - 1, 1);
+      this.thread.setCommentList(comments);
+    } else {
+      this.textareaControl.reset();
+
+      this.commentsService.saveAsOpen(
+        this.blockLine.lineNumber,
+        this.lineIndex,
+        this.blockIndex,
+      );
+    }
   }
 
   deleteComment(index: number): void {
@@ -75,7 +87,7 @@ export class CommentsComponent implements OnInit {
     const isDeleteThread: boolean = this.thread.getCommentList().length === 0;
 
     // Delete the comment from firebase
-    this.fileChangesService.deleteComment(isDeleteThread);
+    this.threadService.deleteComment(isDeleteThread);
 
     if (isDeleteThread) {
       // Close the thread, if it doesn't contain any comments
@@ -97,6 +109,6 @@ export class CommentsComponent implements OnInit {
     const isDone: boolean = !this.thread.getIsDone();
     this.thread.setIsDone(isDone);
 
-    this.fileChangesService.resolveThread(isDone);
+    this.threadService.resolveThread(isDone);
   }
 }

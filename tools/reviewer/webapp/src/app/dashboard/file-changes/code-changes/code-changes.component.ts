@@ -4,7 +4,7 @@ import {
   TextDiff,
   Thread,
 } from '@/shared/proto';
-import { FileChangesService } from '../file-changes.service';
+import { CommitService } from '../services';
 import {
   BlockLine,
   ChangesLine,
@@ -18,6 +18,8 @@ import {
 
 // The component implements code changes.
 // How it looks: https://i.imgur.com/HvoXiNC.jpg
+// code-changes don't know where changes come from and where it should be sent.
+// All the work is on file-changes.
 @Component({
   selector: 'code-changes',
   templateUrl: './code-changes.component.html',
@@ -42,7 +44,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     public hoverService: HoverService,
     public commentsService: CommentsService,
     public templateService: TemplateService,
-    private fileChangesService: FileChangesService,
+    private commitService: CommitService,
   ) { }
 
   ngOnInit() {
@@ -106,7 +108,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
 
   // Add the thread to all threads to display it on user screen
   startThread(thread: Thread): void {
-    const blockIndex: number = this.fileChangesService.getBlockIndex(thread);
+    const blockIndex: number = this.commitService.getBlockIndex(thread);
     const lineIndex: number = this.changesLinesMap[blockIndex][thread.getLineNumber()];
 
     // Add the thread to all threads

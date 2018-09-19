@@ -11,6 +11,7 @@ import {
   MatInputModule,
   MatListModule,
   MatProgressSpinnerModule,
+  MatSelectModule,
   MatSnackBarModule,
   MatTableModule,
   MatToolbarModule,
@@ -35,6 +36,7 @@ const SharedModules = [
   MatTableModule,
   MatDialogModule,
   MatCheckboxModule,
+  MatSelectModule,
 ];
 
 const Declarations = [

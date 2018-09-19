@@ -10,16 +10,16 @@ export class ExceptionService {
     private notificationService: NotificationService,
   ) { }
 
+  // Diff not found.
+  // Show error message and open root
   diffNotFound(): void {
-    // Diff not found.
-    // Show error message and open root
     this.notificationService.error('Diff not found');
     this.router.navigate(['/']);
   }
 
+  // File not found.
+  // Show error message and open diff
   fileNotFound(diffId: number): void {
-    // File not found.
-    // Show error message and open diff
     this.notificationService.error('File not found');
     this.router.navigate(['/diff/' + diffId]);
   }

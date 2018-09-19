@@ -1,0 +1,10 @@
+.select {
+  margin-right: 30px;
+  >.title {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+  ::ng-deep .mat-input-wrapper{
+    width: 400px;
+  }
+}
