@@ -72,14 +72,13 @@ Some good reads about the monorepo approach:
 * [Why Google stores billions of lines of code in a single repository](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext)
 
 ## Platforms
-While Bazel supports Linux, Mac and Windows, this repo has only been developed on Linux and Mac, so on Windows, YMMV.
+While Bazel supports Linux, Mac and Windows, this repo supports Linux and Mac.
+If you're on Windows 10, you can use [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/ru-ru/windows/wsl/about).
+It gives you a Linux environment, without the overhead of a virtual machine.
 
-[Windows Subsystem for Linux(WSL)](https://docs.microsoft.com/ru-ru/windows/wsl/about)
-
-The Windows Subsystem for Linux lets developers run GNU/Linux environment -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
-* Install WSL: Please follow the [guide](https://docs.microsoft.com/ru-ru/windows/wsl/install-win10).
-Note: You may have to upgrade the version of Windows. If you need it you will know about it at the very beginning of the installation.
-* Use StartupOS in WSL: Please follow the [instructions](https://github.com/google/startup-os#how-to-use-startupos)
+#### Installing Windows Subsystem for Linux:
+Please follow the [guide](https://docs.microsoft.com/ru-ru/windows/wsl/install-win10).
+Note: You may have to do a Windows upgrade. If you need it, it will ask for it at the beginning of the installation.
 
 ## Contributing
 You're welcome to contribute and in doing so, learn these technologies.
