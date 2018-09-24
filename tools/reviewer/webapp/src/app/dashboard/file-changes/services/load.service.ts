@@ -24,7 +24,7 @@ export class LoadService {
     private threadService: ThreadService,
   ) { }
 
-  // Download diff from firebase
+  // Load diff from firebase
   loadDiff(diffId: string): void {
     this.stateService.subscription = this.firebaseService
       .getDiff(diffId)

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Comment, Diff, File, Thread } from '@/shared/proto';
 import { FirebaseService, NotificationService } from '@/shared/services';
 import { StateService } from './state.service';
+import { BlockIndex } from '../code-changes';
 
 // Functions related to threads
 @Injectable()
@@ -48,7 +49,7 @@ export class ThreadService {
     lineNumber: number,
     comment: Comment,
     thread: Thread,
-    blockIndex: number,
+    blockIndex: BlockIndex,
   ): void {
     if (!this.stateService.getCommitIdByBlockIndex(blockIndex)) {
       // TODO: Add more UX behavior here

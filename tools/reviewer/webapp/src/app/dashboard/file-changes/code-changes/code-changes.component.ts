@@ -8,6 +8,7 @@ import { CommitService } from '../services';
 import {
   BlockLine,
   ChangesLine,
+  BlockIndex
 } from './code-changes.interface';
 import {
   ChangesService,
@@ -108,7 +109,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
 
   // Add the thread to all threads to display it on user screen
   startThread(thread: Thread): void {
-    const blockIndex: number = this.commitService.getBlockIndex(thread);
+    const blockIndex: BlockIndex = this.commitService.getBlockIndex(thread);
     const lineIndex: number = this.changesLinesMap[blockIndex][thread.getLineNumber()];
 
     // Add the thread to all threads

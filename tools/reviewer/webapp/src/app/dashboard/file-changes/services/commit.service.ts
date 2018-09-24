@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BranchInfo, Thread } from '@/shared/proto';
 import { LocalserverService, NotificationService } from '@/shared/services';
 import { StateService } from './state.service';
+import { BlockIndex } from '../code-changes/code-changes.interface';
 
 // Bunch of methods related to commits
 @Injectable()
@@ -51,7 +52,7 @@ export class CommitService {
 
   // Get block index (0 or 1) depends on commit id
   getBlockIndex(thread: Thread): number {
-    for (let blockIndex = 0; blockIndex <= 1; blockIndex++) {
+    for (let blockIndex of [BlockIndex.leftFile, BlockIndex.rightFile]) {
       const commitId: string = this.stateService.getCommitIdByBlockIndex(blockIndex);
       if (commitId === thread.getCommitId()) {
         return blockIndex;
