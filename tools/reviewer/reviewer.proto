@@ -44,45 +44,45 @@ message ReviewerConfig {
 
 // A user, a contributor to the Reviewer repos.
 message User {
-    // A unique identifier for a user, e.g GitHub user
-    string id = 1;
-    string first_name = 2;
-    string last_name = 3;
-    string email = 4;
-    string image_url = 5;
-    repeated SocialNetwork social_network = 6;
-    // Skills the user has, e.g programming languages.
-    repeated string skill = 7;
-    // Projects the user works on
-    repeated string project_id = 8;
-    repeated Contribution top_contribution = 9;
+  // A unique identifier for a user, e.g GitHub user
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string email = 4;
+  string image_url = 5;
+  repeated SocialNetwork social_network = 6;
+  // Skills the user has, e.g programming languages.
+  repeated string skill = 7;
+  // Projects the user works on
+  repeated string project_id = 8;
+  repeated Contribution top_contribution = 9;
+}
+
+message SocialNetwork {
+  enum Type {
+    NONE = 0;
+    FACEBOOK = 1;
+    TWITTER = 2;
+    LINKEDIN = 3;
   }
-  
-  message SocialNetwork {
-    enum Type {
-      NONE = 0;
-      FACEBOOK = 1;
-      TWITTER = 2;
-      LINKEDIN = 3;
-    }
-    Type type = 1;
-    string url = 2;
-  }
-  
-  message Contribution {
-    string description = 1;
-    // E.g link to a GitHub Pull Request.
-    string url = 2;
-  }
-  
-  message Project {
-    string id = 1;
-    string display_name = 2;
-    string project_url = 3;
-    // Short description
-    string description = 4;
-    // This is redundant since User lists projects, but we don't want to do the calculation
-    // in the front-end. We might add a test to enforce this, or push a better data structure to
-    // Firebase.
-    repeated string user_id = 5;
-  }
+  Type type = 1;
+  string url = 2;
+}
+
+message Contribution {
+  string description = 1;
+  // E.g link to a GitHub Pull Request.
+  string url = 2;
+}
+
+message Project {
+  string id = 1;
+  string display_name = 2;
+  string project_url = 3;
+  // Short description
+  string description = 4;
+  // This is redundant since User lists projects, but we don't want to do the
+  // calculation in the front-end. We might add a test to enforce this, or push
+  // a better data structure to Firebase.
+  repeated string user_id = 5;
+}

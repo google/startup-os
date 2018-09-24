@@ -107,7 +107,7 @@ message Thread {
     CODE = 0;
     // Thread on commit (synced from other systems e.g GitHub)
     COMMIT = 1;
-    // Thread on repo (synced from other systems e.g GitHub)    
+    // Thread on repo (synced from other systems e.g GitHub)
     REPO = 2;
     // Thread on whole diff
     DIFF = 3;
