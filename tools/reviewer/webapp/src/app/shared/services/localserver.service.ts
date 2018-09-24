@@ -26,7 +26,7 @@ export class LocalserverService {
     private notificationService: NotificationService,
   ) { }
 
-  getBranchInfo(id: number, workspace: string): Observable<BranchInfo[]> {
+  getBranchInfoList(id: number, workspace: string): Observable<BranchInfo[]> {
     return new Observable(observer => {
       // Create diff files request
       const diffFilesRequest: DiffFilesRequest = new DiffFilesRequest();
@@ -95,7 +95,7 @@ export class LocalserverService {
   // Get all newest files of a diff by id and workspace
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
     return new Observable(observer => {
-      this.getBranchInfo(id, workspace).subscribe(branchInfoList => {
+      this.getBranchInfoList(id, workspace).subscribe(branchInfoList => {
         let files: File[] = [];
         for (const branchInfo of branchInfoList) {
           const branchFiles: File[] = this.getFilesFromBranchInfo(branchInfo);
@@ -132,27 +132,22 @@ export class LocalserverService {
   getFileData(
     filenameWithRepo: string,
     branchInfoList: BranchInfo[],
-  ): Observable<FileData> {
-    // Observable is used for convenience, because it's easy way
-    // to return value or error.
-    return new Observable(observer => {
-      for (const branchInfo of branchInfoList) {
-        const files: File[] = this.getFilesFromBranchInfo(branchInfo);
-        for (const file of files) {
-          if (file.getFilenameWithRepo() === filenameWithRepo) {
-            // File found
-            observer.next({
-              branchInfo: branchInfo,
-              file: file,
-            });
-            return;
-          }
+  ): FileData {
+    for (const branchInfo of branchInfoList) {
+      const files: File[] = this.getFilesFromBranchInfo(branchInfo);
+      for (const file of files) {
+        if (file.getFilenameWithRepo() === filenameWithRepo) {
+          // File found
+          return {
+            branchInfo: branchInfo,
+            file: file,
+          };
         }
       }
+    }
 
-      // File not found
-      observer.error();
-    });
+    // File not found
+    throw new Error('File not found');
   }
 
   getCommitIdList(filenameWithRepo: string, branchInfo: BranchInfo): string[] {

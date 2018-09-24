@@ -38,11 +38,11 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.getUrlParam();
+    this.parseUrlParam();
   }
 
   // Get parameters from url
-  getUrlParam(): void {
+  parseUrlParam(): void {
     this.stateService.diffId = this.activatedRoute.snapshot.url[0].path;
     const filename: string = this.activatedRoute.snapshot.url
       .splice(1)
@@ -54,15 +54,11 @@ export class FileChangesComponent implements OnInit, OnDestroy {
 
     // Get left and right commit ids from url if they present
     this.activatedRoute.queryParams.subscribe(params => {
-      if (params.left_commit_id) {
-        this.stateService.leftCommitId = params.left_commit_id;
-      }
-      if (params.right_commit_id) {
-        this.stateService.rightCommitId = params.right_commit_id;
-      }
+      this.stateService.leftCommitId = params.left;
+      this.stateService.rightCommitId = params.right;
 
       // Load changes from local server
-      this.loadService.getDiff(this.stateService.diffId);
+      this.loadService.loadDiff(this.stateService.diffId);
     });
   }
 

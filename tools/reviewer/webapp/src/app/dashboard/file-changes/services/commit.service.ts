@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { BranchInfo, Thread } from '@/shared/proto';
 import { LocalserverService, NotificationService } from '@/shared/services';
 import { StateService } from './state.service';
-import { ThreadService } from './thread.service';
 
 // Bunch of methods related to commits
 @Injectable()
@@ -12,29 +11,20 @@ export class CommitService {
     private localserverService: LocalserverService,
     private notificationService: NotificationService,
     private stateService: StateService,
-    private threadService: ThreadService,
   ) { }
 
-  getCurrentCommitIds(): void {
-    // Commit id before the changed. Left default value.
+  createCurrentCommitIds(): void {
+    // Left default value is commit id before the change.
     const headCommitId: string = this.stateService.branchInfo.getCommitList()[0].getId();
-    // Commit id of last change with the file. Right default value.
+    // Right default value is commit id of last change with the file.
     const lastCommitId: string = this.stateService.file.getCommitId();
 
-    // Use default value, if custom commit id isn't set
+    // Use the default value, if custom commit id isn't set
     this.stateService.leftCommitId = this.stateService.leftCommitId || headCommitId;
     this.stateService.rightCommitId = this.stateService.rightCommitId || lastCommitId;
-
-    // Get list of threads of current commits state
-    this.stateService.localThreads = this.threadService.getLocalThreads(
-      this.stateService.diff,
-      this.stateService.file,
-      this.stateService.leftCommitId,
-      this.stateService.rightCommitId,
-    );
   }
 
-  // To don't show UI of changes, if commit don't exist
+  // To not show UI of changes, if commit doesn't exist
   contentCheck(): void {
     // If we get empty response, then commit doesn't exist
     if (
@@ -61,17 +51,16 @@ export class CommitService {
 
   // Get block index (0 or 1) depends on commit id
   getBlockIndex(thread: Thread): number {
-    const commitBlockList: string[] = this.stateService.getCommitBlockList();
-    for (let i = 0; i <= 1; i++) {
-      const commitId: string = commitBlockList[i];
+    for (let blockIndex = 0; blockIndex <= 1; blockIndex++) {
+      const commitId: string = this.stateService.getCommitIdByBlockIndex(blockIndex);
       if (commitId === thread.getCommitId()) {
-        return i;
+        return blockIndex;
       }
     }
   }
 
   // Add commit to commit list,
-  // if file exists and doesn't present already in the list.
+  // if file exists and isn't present already in the list.
   private addCommitId(commitId: string): void {
     if (
       commitId &&

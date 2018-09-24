@@ -9,6 +9,7 @@ import {
 } from '@/shared/services';
 import { CommitService } from './commit.service';
 import { StateService } from './state.service';
+import { ThreadService } from './thread.service';
 
 // The service loads basic data, such as diff, branchInfo, and textDiff
 @Injectable()
@@ -20,10 +21,11 @@ export class LoadService {
     private localserverService: LocalserverService,
     private stateService: StateService,
     private commitService: CommitService,
+    private threadService: ThreadService,
   ) { }
 
   // Download diff from firebase
-  getDiff(diffId: string): void {
+  loadDiff(diffId: string): void {
     this.stateService.subscription = this.firebaseService
       .getDiff(diffId)
       .subscribe(diff => {
@@ -33,42 +35,47 @@ export class LoadService {
         }
         this.stateService.diff = diff;
 
-        this.getBranchInfo();
+        this.loadFileDate();
       });
   }
 
-  // Get branchInfo from localserver
-  private getBranchInfo(): void {
+  // Get branchInfo and file from localserver
+  private loadFileDate(): void {
+    // Get branchInfoList from localserver
     this.localserverService
-      .getBranchInfo(
+      .getBranchInfoList(
         this.stateService.diff.getId(),
         this.stateService.diff.getWorkspace(),
       )
       .subscribe(branchInfoList => {
-        // Get file and branchInfo
-        this.localserverService.getFileData(
-          this.stateService.file.getFilenameWithRepo(),
-          branchInfoList,
-        ).subscribe(fileData => {
-          this.stateService.branchInfo = fileData.branchInfo;
-          this.stateService.file = fileData.file;
+        // Get file and branchInfo by branchInfoList
+        try {
+          const { branchInfo, file } = this.localserverService.getFileData(
+            this.stateService.file.getFilenameWithRepo(),
+            branchInfoList,
+          );
+          this.stateService.branchInfo = branchInfo;
+          this.stateService.file = file;
 
-          // Create list with all current commit ids
+          // Create commits
+          this.commitService.createCurrentCommitIds();
           this.commitService.createCommitList(
             this.stateService.file.getFilenameWithRepo(),
             this.stateService.branchInfo,
           );
 
-          this.commitService.getCurrentCommitIds();
-          this.getFileChanges();
-        }, () => {
+          // Create local threads
+          this.threadService.createLocalThreads();
+
+          this.loadFileChanges();
+        } catch (e) {
           this.exceptionService.fileNotFound(this.stateService.diff.getId());
-        });
+        }
       });
   }
 
   // Get file content and changes from localserver
-  private getFileChanges(): void {
+  private loadFileChanges(): void {
     // Create left and right files for request
     const leftFile: File = this.stateService.createFile();
     leftFile.setCommitId(this.stateService.leftCommitId);
@@ -93,8 +100,8 @@ export class LoadService {
 
     // Update url
     const paramList: string[][] = [
-      ['left_commit_id', this.stateService.leftCommitId],
-      ['right_commit_id', this.stateService.rightCommitId],
+      ['left', this.stateService.leftCommitId],
+      ['right', this.stateService.rightCommitId],
     ];
     const queryParams: string = paramList
       .map(commit => commit.join('='))
@@ -108,7 +115,7 @@ export class LoadService {
 
     // Update changes
     this.destroy();
-    this.getDiff(this.stateService.diffId);
+    this.loadDiff(this.stateService.diffId);
   }
 
   destroy(): void {

@@ -11,7 +11,7 @@ import {
 } from '../code-changes.interface';
 import { CommentsService } from '../services';
 
-// The component implements comments of code-changes.
+// The component implements comments of code-changes component.
 // How it looks: https://i.imgur.com/tVusnEd.jpg
 @Component({
   selector: 'line-comments',
@@ -50,32 +50,26 @@ export class CommentsComponent implements OnInit {
     comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());
 
-    this.thread.addComment(comment);
-
     // Send comment to firebase
-    const isNewThread: boolean = this.thread.getCommentList().length === 1;
-    const isError: boolean = this.threadService.addComment(
-      this.blockLine.lineNumber,
-      comment,
-      this.blockIndex,
-      isNewThread,
-    );
-
-    if (isError) {
-      // Comment can't be sent to firebase because of an error.
-      // Delete the comment.
-      const comments: Comment[] = this.thread.getCommentList();
-      comments.splice(comments.length - 1, 1);
-      this.thread.setCommentList(comments);
-    } else {
-      this.textareaControl.reset();
-
-      this.commentsService.saveAsOpen(
+    try {
+      this.threadService.addComment(
         this.blockLine.lineNumber,
-        this.lineIndex,
+        comment,
+        this.thread,
         this.blockIndex,
       );
+    } catch (e) {
+      // No need to reset state, if comment wasn't added
+      return;
     }
+
+    this.textareaControl.reset();
+
+    this.commentsService.saveAsOpen(
+      this.blockLine.lineNumber,
+      this.lineIndex,
+      this.blockIndex,
+    );
   }
 
   deleteComment(index: number): void {

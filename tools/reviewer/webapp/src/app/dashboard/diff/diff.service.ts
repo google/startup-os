@@ -10,8 +10,6 @@ export class DiffService {
   openFile(file: File, diffId: number, commitId?: string): void {
     this.router.navigate([
       'diff/' + diffId + '/' + file.getFilenameWithRepo(),
-    ], { queryParams: {
-       right_commit_id: commitId,
-    } });
+    ], { queryParams: { right: commitId } });
   }
 }

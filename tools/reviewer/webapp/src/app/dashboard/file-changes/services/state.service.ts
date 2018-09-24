@@ -8,6 +8,7 @@ import {
   TextDiff,
   Thread,
 } from '@/shared/proto';
+import { BlockIndex } from '../code-changes';
 
 // The method keeps state of file-changes
 @Injectable()
@@ -35,7 +36,7 @@ export class StateService {
     return file;
   }
 
-  getCommitBlockList(): string[] {
-    return [this.leftCommitId, this.rightCommitId];
+  getCommitIdByBlockIndex(blockIndex: BlockIndex): string {
+    return [this.leftCommitId, this.rightCommitId][blockIndex];
   }
 }

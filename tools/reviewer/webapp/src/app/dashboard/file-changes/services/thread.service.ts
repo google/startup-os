@@ -13,7 +13,7 @@ export class ThreadService {
     private stateService: StateService,
   ) { }
 
-  getLocalThreads(
+  private getLocalThreads(
     diff: Diff,
     file: File,
     leftCommitId: string,
@@ -33,16 +33,24 @@ export class ThreadService {
       });
   }
 
+  createLocalThreads(): void {
+    // Get list of threads of current commits state
+    this.stateService.localThreads = this.getLocalThreads(
+      this.stateService.diff,
+      this.stateService.file,
+      this.stateService.leftCommitId,
+      this.stateService.rightCommitId,
+    );
+  }
+
   // Send diff with new comment to firebase
   addComment(
     lineNumber: number,
     comment: Comment,
+    thread: Thread,
     blockIndex: number,
-    isNewThread: boolean,
-  ): boolean {
-    const commitIds: string[] = this.stateService.getCommitBlockList();
-
-    if (!commitIds[blockIndex]) {
+  ): void {
+    if (!this.stateService.getCommitIdByBlockIndex(blockIndex)) {
       // TODO: Add more UX behavior here
       // For example:
       // Remove button 'add comment' if it's an uncommitted file.
@@ -51,16 +59,16 @@ export class ThreadService {
       this.notificationService
         .error('Comment cannot be added to an uncommitted file');
 
-      // Is error?
-      return true;
+      throw new Error('Comment cannot be added to an uncommitted file');
     }
 
-    if (isNewThread) {
+    thread.addComment(comment);
+    if (thread.getCommentList().length === 1) {
       // Create new thread
       const newThread: Thread = this.createNewThread(
         lineNumber,
-        comment,
-        commitIds[blockIndex],
+        thread.getCommentList(),
+        this.stateService.getCommitIdByBlockIndex(blockIndex),
       );
       this.stateService.diff.addCodeThread(newThread);
     }
@@ -72,13 +80,13 @@ export class ThreadService {
 
   private createNewThread(
     lineNumber: number,
-    comment: Comment,
+    comments: Comment[],
     commitId: string,
   ): Thread {
     const newThread: Thread = new Thread();
     newThread.setLineNumber(lineNumber);
     newThread.setIsDone(false);
-    newThread.addComment(comment);
+    newThread.setCommentList(comments);
     newThread.setRepoId(this.stateService.branchInfo.getRepoId());
     newThread.setCommitId(commitId);
     newThread.setFile(this.stateService.file);
