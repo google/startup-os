@@ -4,7 +4,7 @@ version: 2
 # We use a docker image as the basis for our build, so that all the toolchains we use
 # are already installed and the build can start running right away. It also guarantees
 # the environment is portable and reproducible on your local machine.
-var_1: &docker_image angular/ngcontainer:0.6.0
+var_1: &docker_image angular/ngcontainer:0.3.2
 
 # Each job will inherit these defaults
 anchor_1: &job_defaults
