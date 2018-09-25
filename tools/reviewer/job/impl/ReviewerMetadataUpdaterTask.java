@@ -19,7 +19,7 @@ package com.google.startupos.tools.reviewer.tools.reviewer.job.impl;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.flogger.FluentLogger;
-import com.google.startupos.tools.reviewer.tools.reviewer.job.Job;
+import com.google.startupos.tools.reviewer.tools.reviewer.job.ReviewerJob;
 import com.google.startupos.tools.reviewer.tools.reviewer.job.tasks.Task;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreClient;
@@ -40,6 +40,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+/**
+ * This task clones (or pulls) the repo, specified in `repo_url` command line argument Then it
+ * checks whether `GLOBAL_REGISTRY_FILE` was changed as compared to previous version If it did,
+ * newly updated version is posted to Firestore in proto and binary formats to
+ * `REVIEWER_REGISTRY_DOCUMENT_NAME` and `REVIEWER_REGISTRY_DOCUMENT_NAME_BIN` documents in
+ * `REVIEWER_REGISTRY_COLLECTION` collection
+ */
 public class ReviewerMetadataUpdaterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
@@ -80,7 +87,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
     if (this.firestoreClient == null) {
       FileInputStream serviceAccount = null;
       try {
-        serviceAccount = new FileInputStream(Job.serviceAccountJson.get());
+        serviceAccount = new FileInputStream(ReviewerJob.serviceAccountJson.get());
         ServiceAccountCredentials cred =
             (ServiceAccountCredentials)
                 GoogleCredentials.fromStream(serviceAccount)
@@ -123,21 +130,25 @@ public class ReviewerMetadataUpdaterTask implements Task {
   public void run() {
     if (lock.tryLock()) {
       try {
+        initializeFirestoreClientIfNull();
+
+        GitRepo repo = gitRepoFactory.create(REPO_DIRECTORY);
+
+        if (fileUtils.folderEmptyOrNotExists(REPO_DIRECTORY)) {
+          repo.cloneRepo(ReviewerJob.repoUrl.get(), REPO_DIRECTORY);
+        } else {
+          repo.pull();
+        }
+
         String globalRegistryFilePath =
             fileUtils.joinToAbsolutePath(REPO_DIRECTORY, GLOBAL_REGISTRY_FILE);
-        initializeFirestoreClientIfNull();
-        if (storedChecksum == null) {
+        String newChecksum = md5ForFile(globalRegistryFilePath);
 
-          GitRepo repo = gitRepoFactory.create(REPO_DIRECTORY);
-
-          if (fileUtils.folderEmptyOrNotExists(REPO_DIRECTORY)) {
-            repo.cloneRepo(Job.repoUrl.get(), REPO_DIRECTORY);
-          } else {
-            repo.pull();
-          }
-
-          storedChecksum = md5ForFile(globalRegistryFilePath);
-          log.atInfo().log("Computed checksum: %s", storedChecksum);
+        if (!newChecksum.equals(storedChecksum)) {
+          log.atInfo()
+              .log(
+                  "New checksum not equal to stored one: new %s, stored %s",
+                  newChecksum, storedChecksum);
 
           ReviewerRegistry reg =
               (ReviewerRegistry)
@@ -145,29 +156,15 @@ public class ReviewerMetadataUpdaterTask implements Task {
                       globalRegistryFilePath, ReviewerRegistry.newBuilder());
 
           uploadProtoToFirestore(reg);
+
+          storedChecksum = newChecksum;
+
         } else {
-
-          String newChecksum = md5ForFile(globalRegistryFilePath);
-          if (!newChecksum.equals(storedChecksum)) {
-            log.atInfo()
-                .log(
-                    "Checksum not equal to stored: found %s, expected %s",
-                    newChecksum, storedChecksum);
-
-            ReviewerRegistry reg =
-                (ReviewerRegistry)
-                    fileUtils.readPrototxtUnchecked(
-                        globalRegistryFilePath, ReviewerRegistry.newBuilder());
-
-            uploadProtoToFirestore(reg);
-
-            storedChecksum = newChecksum;
-          } else {
-            log.atInfo().log("Checksum equals to stored: found %s,", storedChecksum);
-          }
+          log.atInfo().log("Checksum equals to stored: found %s,", storedChecksum);
         }
-      } catch (IOException ignored) {
 
+      } catch (IOException exception) {
+        exception.printStackTrace();
       } finally {
         lock.unlock();
       }

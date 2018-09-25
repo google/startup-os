@@ -1,7 +1,7 @@
 java_binary(
     name = "job",
     srcs = [
-        "Job.java",
+        "ReviewerJob.java",
         "impl/ReviewerMetadataUpdaterTask.java",
         "tasks/Task.java",
         "tasks/TaskExecutor.java",

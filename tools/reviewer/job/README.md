@@ -2,14 +2,14 @@
 
 ## Purpose
 
-Job is a standalone tool designed to be ran on a 
+Job is a standalone tool designed to be run on a 
 separate cloud machine (Heroku/Google Compute Platform) as a
 supplement to Reviewer workflow.
 
 ## Architecture
 
 Each second, a timer task `TaskExecutor` asks each task instance
-whether it wants to be ran by `shouldRun` and if so, runs it on a
+whether it wants to be run by `shouldRun` and if so, runs it on a
 separate thread from thread pool.
 
 

@@ -39,9 +39,9 @@ public class TaskExecutor extends TimerTask {
 
   @Override
   public void run() {
-    for (Task tsk : tasks) {
-      if (tsk.shouldRun()) {
-        threadPool.execute(tsk);
+    for (Task task : tasks) {
+      if (task.shouldRun()) {
+        threadPool.execute(task);
       }
     }
   }
