@@ -56,7 +56,11 @@ export class DiffDiscussionComponent implements OnInit, OnChanges {
       // We can't open a file of a diff thread
       return;
     }
-    this.diffService.openFile(thread.getFile(), this.diff.getId());
+    this.diffService.openFile(
+      thread.getFile(),
+      this.diff.getId(),
+      thread.getCommitId(),
+    );
   }
 
   getUsername(comment: Comment): string {

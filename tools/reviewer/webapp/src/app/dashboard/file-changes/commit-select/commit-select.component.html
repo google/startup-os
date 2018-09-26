@@ -1,0 +1,15 @@
+<div class="select">
+  <div class="title">
+    <span>{{ title }}</span>
+  </div>
+  <mat-form-field>
+    <mat-select [(ngModel)]="select" (change)="onChange()">
+      <mat-option
+        *ngFor="let commitId of stateService.commitIdList"
+        [value]="commitId"
+      >
+        {{ commitId }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
