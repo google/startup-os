@@ -107,6 +107,10 @@ public class FirestoreClient {
     createProtoDocument(path, null, proto);
   }
 
+  // TODO: merge createProtoDocument and createDocument to
+  // createDocument(String path, String documentId, bool binaryFormat, bool jsonFormat)
+
+  // TODO: check whether path starts with slash
   public void createProtoDocument(String path, String documentId, Message proto) {
     byte[] protoBytes = proto.toByteArray();
     String base64BinaryString = Base64.getEncoder().encodeToString(protoBytes);
@@ -118,6 +122,7 @@ public class FirestoreClient {
     createDocument(path, null, proto);
   }
 
+  // TODO: check whether path starts with slash
   public void createDocument(String path, String documentId, MessageOrBuilder proto) {
     try {
       createDocument(path, documentId, FirestoreJsonFormat.printer().print(proto));

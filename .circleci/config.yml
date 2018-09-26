@@ -31,7 +31,7 @@ jobs:
           key: "v3-bazel_cache"
       - run: './tools/pre-commit.sh'
       - run: sudo apt update
-      - run: sudo apt -y install yapf3 python3-pkg-resources
+      - run: sudo apt -y install yapf3 python3-pkg-resources libstdc++6
       - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
       - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
