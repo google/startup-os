@@ -1,4 +1,4 @@
-package(default_visibility = ["//visibility:private"])
+package(default_visibility = ["//tools/reviewer:__subpackages__"])
 
 exports_files(["global_registry.prototxt"])
 

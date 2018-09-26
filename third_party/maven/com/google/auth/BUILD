@@ -4,7 +4,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvncom/google/auth/google_auth_library_credentials",
@@ -17,7 +17,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvncom/google/auth/google_auth_library_oauth2_http",
