@@ -25,7 +25,10 @@ import java.io.IOException;
 
 /*
  * To read Diff:
- *  bazel run //tools/reviewer/job/sync:github_sync_tool -- --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+ *  bazel run //tools/reviewer/job/sync:github_sync_tool -- read --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+ *
+ * To write Diff:
+ * bazel run //tools/reviewer/job/sync:github_sync_tool -- write --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
  */
 public class GitHubSync {
   // TODO: Add checking input Flags
@@ -43,10 +46,30 @@ public class GitHubSync {
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
+    GitHubSync gitHubSync = new GitHubSync();
     ReviewerBot bot = new ReviewerBot(login.get(), password.get());
-    GitHubReader reader = new GitHubReader(bot);
+    GitHubClient gitHubClient = new GitHubClient(bot);
+
+    if (args.length != 0) {
+      if (args[0].equals("read")) {
+        gitHubSync.readDiff(gitHubClient);
+      } else if (args[0].equals("write")) {
+        // Use real diff instead default instance
+        Diff diff = Diff.getDefaultInstance();
+        gitHubSync.writeDiff(gitHubClient, diff);
+      }
+    }
+  }
+
+  private void readDiff(GitHubClient gitHubClient) throws IOException {
+    GitHubReader reader = new GitHubReader(gitHubClient);
     Diff diff = reader.getDiff(repoName.get(), diffNumber.get());
     System.out.println(diff);
+  }
+
+  private void writeDiff(GitHubClient gitHubClient, Diff diff) throws IOException {
+    GitHubWriter writer = new GitHubWriter(gitHubClient);
+    writer.writeDiff(diff, repoName.get());
   }
 }
 

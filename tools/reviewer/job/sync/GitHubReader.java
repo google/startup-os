@@ -19,24 +19,17 @@ package com.google.startupos.tools.reviewer.job.sync;
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.repo.Protos;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.net.HttpURLConnection.HTTP_OK;
 
 public class GitHubReader {
   private static final String PR_REQUEST = "https://api.github.com/repos/%s/pulls/%d";
@@ -46,10 +39,10 @@ public class GitHubReader {
   private static final String PR_COMMENTS_REQUEST =
       "https://api.github.com/repos/%s/issues/%d/comments";
 
-  private final ReviewerBot bot;
+  private final GitHubClient gitHubClient;
 
-  GitHubReader(ReviewerBot bot) {
-    this.bot = bot;
+  GitHubReader(GitHubClient gitHubClient) {
+    this.gitHubClient = gitHubClient;
   }
 
   private class PullRequest {
@@ -70,13 +63,13 @@ public class GitHubReader {
     pr.created_timestamp = Instant.parse(pullRequest.getString("created_at")).getEpochSecond();
     pr.modified_timestamp = Instant.parse(pullRequest.getString("updated_at")).getEpochSecond();
     pr.repoId = pullRequest.getJSONObject("head").getJSONObject("repo").getString("name");
-    // TODO: Change prAuthorLogin if PR will be created by ReviewerBot
+    // TODO: Change prAuthorLogin if PR was created by ReviewerBot
     pr.prAuthorLogin = pullRequest.getJSONObject("user").getString("login");
     return pr;
   }
 
   public Diff getDiff(String repo, int diffNumber) throws IOException {
-    String prResponse = getResponse(String.format(PR_REQUEST, repo, diffNumber), bot);
+    String prResponse = gitHubClient.getResponse(String.format(PR_REQUEST, repo, diffNumber));
     PullRequest pr = processPullRequest(prResponse);
     return Diff.newBuilder()
         .setId(pr.diffId)
@@ -95,7 +88,7 @@ public class GitHubReader {
 
   private ImmutableList<Thread> getCodeThreads(PullRequest pr, String request) throws IOException {
     List<Thread> result = new ArrayList<>();
-    JSONArray response = new JSONArray(getResponse(request, bot));
+    JSONArray response = new JSONArray(gitHubClient.getResponse(request));
     List<String> commentedFiles = new ArrayList<>();
     List<JSONObject> codeComments = new ArrayList<>();
     for (Object item : response) {
@@ -106,8 +99,7 @@ public class GitHubReader {
     commentedFiles = commentedFiles.stream().distinct().collect(Collectors.toList());
 
     for (String fileName : commentedFiles) {
-      ImmutableList<JSONObject> fileComments =
-          getCodeCommentsByFilename(codeComments, fileName);
+      ImmutableList<JSONObject> fileComments = getCodeCommentsByFilename(codeComments, fileName);
       List<Integer> lines =
           fileComments
               .stream()
@@ -183,14 +175,15 @@ public class GitHubReader {
     String right = diffHunk.split(" ")[2].substring(1);
     boolean wasLeftEmpty = Integer.parseInt(left.split(",")[1]) == 0;
     // If the file is new we огіе return the "position".
-    // Otherwise, we count the position by adding 3 to the position from which the "diff_hunk"
-    // begins.
-    return wasLeftEmpty ? position : Integer.parseInt(right.split(",")[0]) + 3;
+    // Otherwise, we count the position by adding position of comment to the position from which the
+    // "diff_hunk"
+    // begins and subtracting 2.
+    return wasLeftEmpty ? position : Integer.parseInt(right.split(",")[0]) + position - 2;
   }
 
   private Thread getDiffThread(String request) throws IOException {
     Thread.Builder thread = Thread.newBuilder();
-    JSONArray response = new JSONArray(getResponse(request, bot));
+    JSONArray response = new JSONArray(gitHubClient.getResponse(request));
     response.forEach(
         item -> {
           JSONObject comment = (JSONObject) item;
@@ -198,7 +191,7 @@ public class GitHubReader {
               .addComment(
                   Comment.newBuilder()
                       .setContent(comment.getString("body"))
-                      .setTimestamp(Instant.parse(comment.getString("updated_at")).getEpochSecond())
+                      .setTimestamp(Instant.parse(comment.getString("updated_at")).toEpochMilli())
                       .setCreatedBy(
                           getUserEmail(
                               String.format(
@@ -212,33 +205,10 @@ public class GitHubReader {
 
   private String getUserEmail(String request) {
     try {
-      return new JSONObject(getResponse(request, bot)).get("email").toString();
+      return new JSONObject(gitHubClient.getResponse(request)).getString("email");
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private String getResponse(String request, ReviewerBot bot) throws IOException {
-    StringBuilder response = new StringBuilder();
-    URL url = new URL(request);
-    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setRequestProperty(
-        "Authorization",
-        "Basic "
-            + Base64.getEncoder()
-                .encodeToString((bot.getLogin() + ":" + bot.getPassword()).getBytes()));
-    connection.setRequestMethod("GET");
-    try (BufferedReader reader =
-        new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        response.append(line);
-      }
-    }
-    if (connection.getResponseCode() != HTTP_OK) {
-      throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
-    }
-    return response.toString();
   }
 }
 

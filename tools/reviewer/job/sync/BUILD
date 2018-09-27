@@ -1,9 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
 java_library(
-    name = "github_reader_and_writer",
+    name = "github_sync",
     srcs = [
+        "GitHubClient.java",
         "GitHubReader.java",
+        "GitHubWriter.java",
         "ReviewerBot.java",
     ],
     deps = [
@@ -24,7 +26,7 @@ java_binary(
     ],
     main_class = "com.google.startupos.tools.reviewer.job.sync.GitHubSync",
     deps = [
-        ":github_reader_and_writer",
+        ":github_sync",
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//tools/reviewer/local_server/service:code_review_java_grpc",
