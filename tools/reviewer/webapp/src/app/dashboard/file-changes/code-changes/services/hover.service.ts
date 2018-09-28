@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 
-import { BlockLine } from '../code-changes.interface';
+import { BlockLine, BlockIndex } from '../code-changes.interface';
 
 // Functions related mouse cursor and its hovering
 @Injectable()
 export class HoverService {
   hoveredLineNumber: number;
-  hoveredBlockIndex: number;
+  hoveredBlockIndex: BlockIndex;
   isLineHovered: boolean = false;
 
-  mouseOver(block: BlockLine, blockIndex: number): void {
+  mouseOver(block: BlockLine, blockIndex: BlockIndex): void {
     if (block.isPlaceholder) {
       return;
     }
@@ -22,7 +22,7 @@ export class HoverService {
     this.isLineHovered = false;
   }
 
-  isHovered(block: BlockLine, blockIndex: number): boolean {
+  isHovered(block: BlockLine, blockIndex: BlockIndex): boolean {
     return (
       this.isLineHovered &&
       this.hoveredLineNumber === block.lineNumber &&

@@ -1,4 +1,10 @@
 .file-header,
 .code-changes {
-  padding: 10px 30px;
+  padding: 10px 30px 0 30px;
+}
+
+.commit-menu {
+  margin-top: 20px;
+  margin-left: 30px;
+  display: flex;
 }

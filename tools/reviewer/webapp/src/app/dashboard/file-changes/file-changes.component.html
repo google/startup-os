@@ -1,19 +1,40 @@
 <!-- Loading -->
-<page-loading [isLoading]="fileChangesService.isLoading"></page-loading>
+<page-loading [isLoading]="stateService.isLoading"></page-loading>
 
 <!-- Header -->
-<div class="file-header" *ngIf="!fileChangesService.isLoading">
-  <div><a routerLink="/diff/{{ fileChangesService.diff.getId() }}">
-    Back
-  </a></div>
-  <div><span>{{ fileChangesService.file.getFilenameWithRepo() }}</span></div>
+<div class="file-header" *ngIf="!stateService.isLoading">
+  <div class="back-button">
+    <a routerLink="/diff/{{ stateService.diffId }}">
+      Back
+    </a>
+  </div>
+  <div class="filename">
+    <span>{{ stateService.file.getFilenameWithRepo() }}</span>
+  </div>
+</div>
+
+<!-- Commit Menu -->
+<div class="commit-menu" *ngIf="!stateService.isLoading">
+  <commit-select
+    title="Left commit id"
+    [commitId]="stateService.leftCommitId"
+    (selectChanges)="commitSelectService.leftSelectChanged($event)"
+  ></commit-select>
+  <commit-select
+    title="Right commit id"
+    [commitId]="stateService.rightCommitId"
+    (selectChanges)="commitSelectService.rightSelectChanged($event)"
+  ></commit-select>
 </div>
 
 <!-- Code changes -->
-<div class="code-changes" *ngIf="!fileChangesService.isLoading">
+<div
+  class="code-changes"
+  *ngIf="!stateService.isLoading && stateService.isCommitFound"
+>
   <code-changes
-    [textDiff]="fileChangesService.textDiff"
-    [language]="language"
-    [threads]="fileChangesService.localThreads"
+    [textDiff]="stateService.textDiff"
+    [language]="stateService.language"
+    [threads]="stateService.localThreads"
   ></code-changes>
 </div>

@@ -13,6 +13,11 @@ import {
 import { EncodingService } from './encoding.service';
 import { NotificationService } from './notification.service';
 
+export interface FileData {
+  branchInfo: BranchInfo;
+  file: File;
+}
+
 @Injectable()
 export class LocalserverService {
   constructor(
@@ -21,7 +26,7 @@ export class LocalserverService {
     private notificationService: NotificationService,
   ) { }
 
-  getBranchInfo(id: number, workspace: string): Observable<BranchInfo[]> {
+  getBranchInfoList(id: number, workspace: string): Observable<BranchInfo[]> {
     return new Observable(observer => {
       // Create diff files request
       const diffFilesRequest: DiffFilesRequest = new DiffFilesRequest();
@@ -49,7 +54,7 @@ export class LocalserverService {
 
           observer.next(diffFilesResponse.getBranchinfoList());
         }, () => {
-          this.error();
+          this.localserverError();
           observer.error();
         });
     });
@@ -81,20 +86,19 @@ export class LocalserverService {
 
           observer.next(textDiffResponse);
         }, () => {
-          this.error();
+          this.localserverError();
           observer.error();
         });
     });
   }
 
+  // Get all newest files of a diff by id and workspace
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
     return new Observable(observer => {
-      this.getBranchInfo(id, workspace).subscribe(branchInfoList => {
+      this.getBranchInfoList(id, workspace).subscribe(branchInfoList => {
         let files: File[] = [];
         for (const branchInfo of branchInfoList) {
-          const branchFiles: File[] = this.getFilesFromBranchInfo(
-            branchInfo,
-          );
+          const branchFiles: File[] = this.getFilesFromBranchInfo(branchInfo);
           files = files.concat(branchFiles);
         }
         observer.next(files);
@@ -102,6 +106,7 @@ export class LocalserverService {
     });
   }
 
+  // Get only newest instances of files from the branch
   getFilesFromBranchInfo(branchInfo: BranchInfo): File[] {
     const fileDictionary: { [filename: string]: File } = {};
     for (const commit of branchInfo.getCommitList()) {
@@ -112,7 +117,7 @@ export class LocalserverService {
     return Object.values(fileDictionary);
   }
 
-  addWithReplace(
+  private addWithReplace(
     fileDictionary: { [filename: string]: File },
     newfiles: File[],
   ): void {
@@ -123,7 +128,48 @@ export class LocalserverService {
     }
   }
 
-  error(): void {
+  // Get file and branchInfo from branchInfo list by filename
+  getFileData(
+    filenameWithRepo: string,
+    branchInfoList: BranchInfo[],
+  ): FileData {
+    for (const branchInfo of branchInfoList) {
+      const files: File[] = this.getFilesFromBranchInfo(branchInfo);
+      for (const file of files) {
+        if (file.getFilenameWithRepo() === filenameWithRepo) {
+          // File found
+          return {
+            branchInfo: branchInfo,
+            file: file,
+          };
+        }
+      }
+    }
+
+    // File not found
+    throw new Error('File not found');
+  }
+
+  getCommitIdList(filenameWithRepo: string, branchInfo: BranchInfo): string[] {
+    const commitIdList: string[] = [];
+
+    // Add HEAD commit id
+    const headCommitId: string = branchInfo.getCommitList()[0].getId();
+    commitIdList.push(headCommitId);
+
+    // Add all commit ids, where the file is present
+    for (const commit of branchInfo.getCommitList()) {
+      for (const file of commit.getFileList()) {
+        if (file.getFilenameWithRepo() === filenameWithRepo) {
+          commitIdList.push(commit.getId());
+        }
+      }
+    }
+
+    return commitIdList;
+  }
+
+  localserverError(): void {
     this.notificationService.error("Local server doesn't respond");
   }
 }

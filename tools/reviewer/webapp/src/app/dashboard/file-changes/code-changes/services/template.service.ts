@@ -13,7 +13,7 @@ export class TemplateService {
   // Get class for a line, based on its parameters
   getLineBackground(
     changesLine: ChangesLine,
-    blockIndex: number,
+    blockIndex: BlockIndex,
     blockLine: BlockLine,
   ): string {
     if (changesLine.isCommentsLine) {
@@ -51,7 +51,7 @@ export class TemplateService {
   }
 
   // Make line highlighted with separate chars
-  highlightChanges(blockLine: BlockLine, blockIndex: number): string {
+  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): string {
     const startIndex: number = blockLine.textChange.getStartIndex();
     const endIndex: number = blockLine.textChange.getEndIndex();
     const className = (blockIndex === BlockIndex.rightFile) ?

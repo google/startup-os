@@ -4,6 +4,7 @@ import {
   BlockLine,
   ChangesLine,
   LineThread,
+  BlockIndex,
 } from '../code-changes.interface';
 import { LineService } from './line.service';
 
@@ -18,14 +19,14 @@ export class CommentsService {
   }
 
   // Add empty thread to the line
-  addEmptyThread(changesLine: ChangesLine, blockIndex: number): LineThread {
+  addEmptyThread(changesLine: ChangesLine, blockIndex: BlockIndex): LineThread {
     const lineThread: LineThread = this.lineService.createLineThread();
     changesLine.commentsLine.blocks[blockIndex].lineThreads.push(lineThread);
     return lineThread;
   }
 
   // Remove all threads with comments from the line
-  closeThreads(changesLine: ChangesLine, blockIndex: number): void {
+  closeThreads(changesLine: ChangesLine, blockIndex: BlockIndex): void {
     const blockLine: BlockLine = changesLine.blocks[blockIndex];
     const threads: LineThread[] = blockLine.lineThreads;
     blockLine.lineThreads = threads.filter(lineThread => {
@@ -38,7 +39,7 @@ export class CommentsService {
   }
 
   // Remove thread by thread index
-  closeThread(blockLine: BlockLine, threadIndex: number, blockIndex: number): void {
+  closeThread(blockLine: BlockLine, threadIndex: number, blockIndex: BlockIndex): void {
     blockLine.lineThreads.splice(threadIndex, 1);
 
     if (blockLine.lineThreads.length === 0) {
@@ -50,13 +51,13 @@ export class CommentsService {
   saveAsOpen(
     lineNumber: number,
     lineIndex: number,
-    blockIndex: number,
+    blockIndex: BlockIndex,
   ): void {
     this.openThreadsMap[blockIndex][lineNumber] = lineIndex;
   }
 
   // Remove from open threads map
-  saveAsClosed(lineNumber: number, blockIndex: number): void {
+  saveAsClosed(lineNumber: number, blockIndex: BlockIndex): void {
     delete this.openThreadsMap[blockIndex][lineNumber];
   }
 }
