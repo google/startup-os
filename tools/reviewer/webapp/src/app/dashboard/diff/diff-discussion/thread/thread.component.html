@@ -1,0 +1,93 @@
+<div class="thread">
+  <!-- Comments -->
+  <div
+    class="comment"
+    [ngClass]="{
+      'comment': true,
+      'resolved-comment': thread.getIsDone(),
+      'unresolved-comment': !thread.getIsDone()
+    }"
+    *ngFor="let comment of thread.getCommentList(); let commentIndex = index;"
+  >
+    <div class="header" (click)="openComment(commentIndex)">
+      <!-- Username and date of the comment -->
+      <div class="username">
+        <span>{{ getUsername(comment) }}</span>
+      </div>
+      <div class="time" *ngIf="isCommentOpenMap[commentIndex]">
+        <span>{{ comment.getTimestamp() | date:'h:mm a, MMM d' }}</span>
+      </div>
+    </div>
+    <!-- Text of the comment -->
+    <div class="message" (click)="openComment(commentIndex)" fxFlex>
+      <span>{{ getContent(comment, commentIndex) }}</span>
+    </div>
+    <!-- Buttons to delete and edit the comment -->
+    <!-- TODO: add functionality to edit -->
+    <div class="buttons">
+      <mat-icon (click)="deleteComment(commentIndex)">more_horiz</mat-icon>
+    </div>
+  </div>
+
+  <!-- Reply panel -->
+  <div
+    [ngClass]="{
+      'comment': true,
+      'reply': true,
+      'resolved-reply': thread.getIsDone(),
+      'unresolved-reply': !thread.getIsDone()
+    }"
+  > 
+    <!-- Line number -->
+    <div class="header">
+      <div class="line-number" *ngIf="isCodeThread()">
+        <span>Line {{ thread.getLineNumber() }}</span>
+      </div>
+    </div>
+    <!-- Message and buttons -->
+    <div class="message" fxFlex>
+      <!-- Textarea for new comment -->
+      <textarea
+        *ngIf="isReply"
+        matInput
+        matTextareaAutosize
+        matAutosizeMinRows="2"
+        [formControl]="textarea"
+      ></textarea>
+      <!-- Buttons -->
+      <div class="action-panel">
+        <div class="resolve" fxFlex>
+          <!-- Resolve checkbox -->
+          <mat-checkbox
+            color="primary"
+            [formControl]="resolvedCheckbox"
+          >Resolved</mat-checkbox>
+        </div>
+        <div class="buttons" *ngIf="!isReply && !thread.getIsDone()">
+          <!-- Button to open reply -->
+          <button
+            class="cr-light-button"
+            mat-raised-button
+            color="primary"
+           (click)="toggleReply()"
+          >Reply</button>
+        </div>
+        <div class="buttons" *ngIf="isReply">
+          <!-- Button to close reply -->
+          <button
+            class="cr-light-button"
+            mat-raised-button
+            (click)="toggleReply()"
+          >Cancel</button>
+          <!-- Button to add a comment -->
+          <button
+            class="cr-light-button"
+            mat-raised-button
+            color="primary"
+            (click)="addComment()"
+          >Comment</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

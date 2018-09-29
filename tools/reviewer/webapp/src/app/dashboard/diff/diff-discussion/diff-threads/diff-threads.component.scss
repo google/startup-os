@@ -1,0 +1,11 @@
+mat-table {
+  .mat-cell {
+    margin-top: 15px;
+    >.filename {
+      a {
+        font-weight: bold;
+        cursor: pointer;
+      }
+    }
+  }
+}

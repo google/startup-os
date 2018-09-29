@@ -5,7 +5,7 @@ import {
   BlockIndex,
   BlockLine,
   ChangesLine,
-  LineThread,
+  ThreadFrame,
 } from '../code-changes.interface';
 
 // Constructors of line interfaces
@@ -18,7 +18,7 @@ export class LineService {
       lineNumber: 0,
       isChanged: false,
       isPlaceholder: false,
-      lineThreads: [],
+      threadFrames: [],
     };
   }
 
@@ -71,7 +71,7 @@ export class LineService {
     return commentsLine;
   }
 
-  createLineThread(): LineThread {
+  createThreadFrame(): ThreadFrame {
     return {
       isFocus: true,
       thread: new Thread(),

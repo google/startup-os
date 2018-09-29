@@ -1,0 +1,31 @@
+<mat-table [dataSource]="fileGroupsSource">
+  <ng-container matColumnDef="discussions">
+    <mat-header-cell *matHeaderCellDef>
+      Code discussions {{ discussionService.getHeader(threads) }}
+    </mat-header-cell>
+    <mat-cell *matCellDef="let fileGroup; let fileGroupIndex = index;">
+      <!-- Filename -->
+      <div class="file-group">
+        <div class="filename">
+          <a (click)="openFile(fileGroup)">{{ getFilename(fileGroup) }}</a>
+        </div>
+        <!-- Threads -->
+        <cr-thread
+          *ngFor="let thread of fileGroup; let threadIndex = index;"
+          [thread]="thread"
+          (addCommentEmitter)="addComment()"
+          (resolveEmitter)="resolveThread($event)"
+          (deleteCommentEmitter)="deleteComment($event)"
+        ></cr-thread>
+      </div>
+    </mat-cell>
+  </ng-container>
+
+  <mat-header-row
+    class="cr-header"
+    *matHeaderRowDef="displayedColumns"
+  ></mat-header-row>
+  <mat-row
+    *matRowDef="let thread; columns: displayedColumns;"
+  ></mat-row>
+</mat-table>
