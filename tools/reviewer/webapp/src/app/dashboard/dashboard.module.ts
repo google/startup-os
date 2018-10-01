@@ -9,6 +9,7 @@ import { DashboardRoutes } from './dashboard.routing';
 import {
   AddUserDialogComponent,
   DiffComponentList,
+  DiffDiscussionServiceList,
   UserPopupComponent,
 } from './diff';
 import { DiffsComponent } from './diffs';
@@ -34,6 +35,7 @@ import {
   ],
   providers: [
     ...FileChangesServiceList,
+    ...DiffDiscussionServiceList,
   ],
   entryComponents: [
     UserPopupComponent,

@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
+import { randstr64 } from 'rndmjs';
 
 import { Comment, Diff, File, Thread } from '@/shared/proto';
-import { FirebaseService, NotificationService } from '@/shared/services';
-import { StateService } from './state.service';
+import { DiffUpdateService, NotificationService } from '@/shared/services';
 import { BlockIndex } from '../code-changes';
+import { StateService } from './state.service';
 
 // Functions related to threads
 @Injectable()
 export class ThreadService {
   constructor(
     private notificationService: NotificationService,
-    private firebaseService: FirebaseService,
+    private diffUpdateService: DiffUpdateService,
     private stateService: StateService,
   ) { }
 
@@ -74,9 +75,7 @@ export class ThreadService {
       this.stateService.diff.addCodeThread(newThread);
     }
 
-    this.firebaseService.updateDiff(this.stateService.diff).subscribe(() => {
-      this.notificationService.success('Comment is saved in firebase');
-    });
+    this.diffUpdateService.addComment(this.stateService.diff);
   }
 
   private createNewThread(
@@ -92,31 +91,16 @@ export class ThreadService {
     newThread.setCommitId(commitId);
     newThread.setFile(this.stateService.file);
     newThread.setType(Thread.Type.CODE);
+    newThread.setId(randstr64(6));
 
     return newThread;
   }
 
   deleteComment(isDeleteThread: boolean): void {
-    if (isDeleteThread) {
-      // Delete all threads without comments.
-      const threads: Thread[] = this.stateService.diff.getCodeThreadList();
-      threads.forEach((thread, threadIndex) => {
-        if (thread.getCommentList().length === 0) {
-          threads.splice(threadIndex, 1);
-        }
-      });
-      this.stateService.diff.setCodeThreadList(threads);
-    }
-
-    this.firebaseService.updateDiff(this.stateService.diff).subscribe(() => {
-      this.notificationService.success('Comment is deleted');
-    });
+    this.diffUpdateService.deleteComment(this.stateService.diff, isDeleteThread);
   }
 
   resolveThread(isDone: boolean): void {
-    this.firebaseService.updateDiff(this.stateService.diff).subscribe(() => {
-      const threadStatus: string = isDone ? 'resolved' : 'unresolved';
-      this.notificationService.success('Thread is ' + threadStatus);
-    });
+    this.diffUpdateService.resolveThread(this.stateService.diff, isDone);
   }
 }

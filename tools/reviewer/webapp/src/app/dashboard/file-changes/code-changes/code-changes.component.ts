@@ -6,9 +6,9 @@ import {
 } from '@/shared/proto';
 import { CommitService } from '../services';
 import {
+  BlockIndex,
   BlockLine,
   ChangesLine,
-  BlockIndex
 } from './code-changes.interface';
 import {
   ChangesService,
