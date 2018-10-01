@@ -34,8 +34,8 @@
     [ngClass]="{
       'comment': true,
       'reply': true,
-      'resolved-reply': thread.getIsDone(),
-      'unresolved-reply': !thread.getIsDone()
+      'resolved-comment': thread.getIsDone(),
+      'unresolved-comment': !thread.getIsDone()
     }"
   > 
     <!-- Line number -->
@@ -61,31 +61,30 @@
           <mat-checkbox
             color="primary"
             [formControl]="resolvedCheckbox"
-          >Resolved</mat-checkbox>
+            *ngIf="isReply"
+          >{{ getResolveText(resolvedCheckbox.value) }}</mat-checkbox>
         </div>
-        <div class="buttons" *ngIf="!isReply && !thread.getIsDone()">
+        <div class="buttons" *ngIf="!isReply">
           <!-- Button to open reply -->
+          <span class="resolve-status" *ngIf="!isReply">
+            {{ getResolveText(thread.getIsDone()) }}
+          </span>
           <button
-            class="cr-light-button"
-            mat-raised-button
-            color="primary"
+            class="cr-thread-button reply-button"
            (click)="toggleReply()"
           >Reply</button>
         </div>
         <div class="buttons" *ngIf="isReply">
           <!-- Button to close reply -->
           <button
-            class="cr-light-button"
-            mat-raised-button
+            class="cr-thread-button cancel-button"
             (click)="toggleReply()"
           >Cancel</button>
           <!-- Button to add a comment -->
           <button
-            class="cr-light-button"
-            mat-raised-button
-            color="primary"
+            class="cr-thread-button reply-button"
             (click)="addComment()"
-          >Comment</button>
+          >Reply</button>
         </div>
       </div>
     </div>

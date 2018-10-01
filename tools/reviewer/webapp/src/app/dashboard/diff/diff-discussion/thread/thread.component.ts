@@ -38,11 +38,6 @@ export class ThreadComponent implements OnInit, OnDestroy {
       }
     });
 
-    // When checkbox "Resolved" is clicked
-    this.resolvedCheckbox.valueChanges.subscribe((isChecked: boolean) => {
-      this.resolve(isChecked);
-    });
-
     // When user is typing new comment
     this.textarea.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
@@ -63,6 +58,7 @@ export class ThreadComponent implements OnInit, OnDestroy {
     if (state) {
       this.isCommentOpenMap = state.isCommentOpenMap;
       this.isReply = state.isReply;
+      this.resolvedCheckbox.setValue(state.isResolved);
       this.textarea.setValue(state.newComment, { emitEvent: false });
     } else {
       this.initCommentOpenMap();
@@ -73,6 +69,7 @@ export class ThreadComponent implements OnInit, OnDestroy {
     this.threadStateService.threadStateMap[this.thread.getId()] = {
       isCommentOpenMap: this.isCommentOpenMap,
       isReply: this.isReply,
+      isResolved: this.resolvedCheckbox.value,
       newComment: this.textarea.value,
     };
   }
@@ -101,7 +98,9 @@ export class ThreadComponent implements OnInit, OnDestroy {
   // Open/close reply panel
   toggleReply(): void {
     this.isReply = !this.isReply;
-    if (!this.isReply) {
+    if (this.isReply) {
+      this.resolvedCheckbox.setValue(this.thread.getIsDone());
+    } else {
       this.textarea.reset();
     }
     this.saveState();
@@ -128,6 +127,9 @@ export class ThreadComponent implements OnInit, OnDestroy {
     comment.setContent(this.textarea.value);
     comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());
+
+    // Make the thread resolved/unresolved depends on checkbox
+    this.thread.setIsDone(this.resolvedCheckbox.value);
 
     // Add the comment to firebase
     this.thread.addComment(comment);
@@ -160,6 +162,10 @@ export class ThreadComponent implements OnInit, OnDestroy {
       // Delete the comment from firebase
       this.deleteCommentEmitter.emit(isDeleteThread);
     }
+  }
+
+  getResolveText(isResolved: boolean): string {
+    return isResolved ? 'Resolved' : 'Unresolved';
   }
 
   ngOnDestroy() {
