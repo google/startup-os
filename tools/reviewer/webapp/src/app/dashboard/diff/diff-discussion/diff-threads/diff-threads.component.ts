@@ -14,7 +14,7 @@ import { DiscussionService } from '../discussion.service';
   providers: [DiscussionService],
 })
 export class DiffThreadsComponent implements OnInit, OnChanges {
-  displayedColumns = ['discussions'];
+  displayedColumns: string[] = ['discussions'];
   threadsSource: MatTableDataSource<Thread>;
 
   @Input() threads: Thread[];

@@ -17,8 +17,8 @@ import { ThreadState, ThreadStateService } from './thread-state.service';
 export class ThreadComponent implements OnInit, OnDestroy {
   isCommentOpenMap: boolean[] = [];
   isReply: boolean = false;
-  textarea: FormControl = new FormControl();
-  resolvedCheckbox: FormControl = new FormControl();
+  textarea = new FormControl();
+  resolvedCheckbox = new FormControl();
   subscription = new Subscription();
 
   @Input() thread: Thread;
