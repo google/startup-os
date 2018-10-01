@@ -15,7 +15,7 @@ import { DiscussionService } from '../discussion.service';
   providers: [DiscussionService],
 })
 export class CodeThreadsComponent implements OnInit, OnChanges {
-  displayedColumns = ['discussions'];
+  displayedColumns: string[] = ['discussions'];
   // Threads are divided into groups by filenames
   fileGroupsSource: MatTableDataSource<Thread[]>;
 
