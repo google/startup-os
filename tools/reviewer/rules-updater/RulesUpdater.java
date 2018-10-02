@@ -24,6 +24,7 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.ReviewerProtos;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 
+import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 class RulesUpdater {
@@ -48,9 +49,24 @@ class RulesUpdater {
   public static void main(String[] args) {
     Flags.parseCurrentPackage(args);
     FileUtils fileUtils = DaggerCommonComponent.create().getFileUtils();
+    String configPath, outputPath;
+
+    String buildWorkspaceDirectory = System.getenv("BUILD_WORKSPACE_DIRECTORY");
+
+    if (Paths.get(config.get()).isAbsolute()) {
+      configPath = config.get();
+    } else {
+      configPath = Paths.get(buildWorkspaceDirectory, config.get()).toAbsolutePath().toString();
+    }
+
+    if (Paths.get(output.get()).isAbsolute()) {
+      outputPath = output.get();
+    } else {
+      outputPath = Paths.get(buildWorkspaceDirectory, output.get()).toAbsolutePath().toString();
+    }
 
     ReviewerConfig reviewerConfig =
-        (ReviewerConfig) fileUtils.readPrototxtUnchecked(config.get(), ReviewerConfig.newBuilder());
+        (ReviewerConfig) fileUtils.readPrototxtUnchecked(configPath, ReviewerConfig.newBuilder());
 
     String rules =
         String.format(
@@ -62,7 +78,7 @@ class RulesUpdater {
                 .map(email -> String.format(EMAIL_CLAUSE, email))
                 .collect(Collectors.joining(" || ")));
 
-    fileUtils.writeStringUnchecked(rules, output.get());
+    fileUtils.writeStringUnchecked(rules, outputPath);
   }
 }
 
