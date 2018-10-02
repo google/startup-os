@@ -68,7 +68,7 @@
             [blockIndex]="blockIndex"
             [lineIndex]="lineIndex"
             [threadIndex]="threadIndex"
-            *ngFor="let lineThread of blockLine.lineThreads; let threadIndex = index"
+            *ngFor="let threadFrame of blockLine.threadFrames; let threadIndex = index"
           ></line-comments>
         </div>
       </td>

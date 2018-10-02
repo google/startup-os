@@ -1,11 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Diff } from '@/shared/proto';
-import {
-  AuthService,
-  FirebaseService,
-  NotificationService,
-} from '@/shared/services';
+import { AuthService, DiffUpdateService } from '@/shared/services';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements titlebar of the header
@@ -23,8 +19,7 @@ export class DiffHeaderTitlebarComponent {
 
   constructor(
     public authService: AuthService,
-    public firebaseService: FirebaseService,
-    public notificationService: NotificationService,
+    public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
   ) { }
 
@@ -34,15 +29,7 @@ export class DiffHeaderTitlebarComponent {
 
   changeAttention(): void {
     this.diffHeaderService.changeAttention(this.diff.getAuthor());
-
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      const message: string = this.diff.getAuthor().getNeedsAttention() ?
-        'Attention of author is requested' :
-        'Attention of author is canceled';
-      this.notificationService.success(message);
-    }, () => {
-      this.notificationService.error("Attention isn't changed");
-    });
+    this.diffUpdateService.updateAttention(this.diff, 'author');
   }
 
   clickReplyButton() {

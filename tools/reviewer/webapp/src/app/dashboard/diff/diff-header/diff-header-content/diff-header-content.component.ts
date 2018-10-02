@@ -2,11 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { Diff, Reviewer } from '@/shared/proto';
-import {
-  AuthService,
-  FirebaseService,
-  NotificationService,
-} from '@/shared/services';
+import { AuthService, DiffUpdateService } from '@/shared/services';
 import { AddUserDialogComponent } from '../add-user-dialog';
 import { DiffHeaderService } from '../diff-header.service';
 
@@ -25,8 +21,7 @@ export class DiffHeaderContentComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
-    public firebaseService: FirebaseService,
-    public notificationService: NotificationService,
+    public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
     public dialog: MatDialog,
   ) { }
@@ -49,16 +44,8 @@ export class DiffHeaderContentComponent implements OnInit {
     this.diffHeaderService.changeAttention(reviewer);
 
     // Send changes to firebase
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      const username: string = this.authService
-        .getUsername(reviewer.getEmail());
-      const message: string = reviewer.getNeedsAttention() ?
-        `Attention of ${username} is requested` :
-        `Attention of ${username} is canceled`;
-      this.notificationService.success(message);
-    }, () => {
-      this.notificationService.error("Attention isn't changed");
-    });
+    const username: string = this.authService.getUsername(reviewer.getEmail());
+    this.diffUpdateService.updateAttention(this.diff, username);
   }
 
   // Is the email present in the CC list?
@@ -119,12 +106,7 @@ export class DiffHeaderContentComponent implements OnInit {
 
   updateUserListInFirebase(email: string, action: string): void {
     const username: string = this.authService.getUsername(email);
-
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.notificationService.success(username + ' is ' + action);
-    }, () => {
-      this.notificationService.error(username + " isn't " + action);
-    });
+    this.diffUpdateService.customUpdate(this.diff, username + ' is ' + action);
   }
 
   startDescriptionEditMode(): void {
@@ -138,11 +120,7 @@ export class DiffHeaderContentComponent implements OnInit {
 
   saveDescription(): void {
     this.diff.setDescription(this.description);
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.notificationService.success('Description is saved');
-    }, () => {
-      this.notificationService.error("Description isn't saved");
-    });
+    this.diffUpdateService.updateDescription(this.diff);
     this.isDescriptionEditMode = false;
   }
 }

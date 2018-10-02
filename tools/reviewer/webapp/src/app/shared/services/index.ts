@@ -5,10 +5,12 @@ export * from './highlight.service';
 export * from './encoding.service';
 export * from './localserver.service';
 export * from './exception.service';
+export * from './diff-update.service';
 
 // Services
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { DiffUpdateService } from './diff-update.service';
 import { EncodingService } from './encoding.service';
 import { ExceptionService } from './exception.service';
 import { FirebaseService } from './firebase.service';
@@ -24,4 +26,5 @@ export const ServiceList = [
   EncodingService,
   LocalserverService,
   ExceptionService,
+  DiffUpdateService,
 ];

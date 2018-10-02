@@ -1,0 +1,14 @@
+mat-table {
+  .mat-cell {
+    >.file-group {
+      margin-top: 15px;
+      >.filename {
+        margin-bottom: 10px;
+        a {
+          font-weight: bold;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

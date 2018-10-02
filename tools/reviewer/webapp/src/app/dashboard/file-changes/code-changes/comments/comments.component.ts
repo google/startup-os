@@ -35,7 +35,7 @@ export class CommentsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.thread = this.blockLine.lineThreads[this.threadIndex].thread;
+    this.thread = this.blockLine.threadFrames[this.threadIndex].thread;
   }
 
   addComment(): void {
@@ -50,7 +50,7 @@ export class CommentsComponent implements OnInit {
     comment.setCreatedBy(this.authService.userEmail);
     comment.setTimestamp(Date.now());
 
-    // Send comment to firebase
+    // Add comment and send to firebase
     try {
       this.threadService.addComment(
         this.blockLine.lineNumber,
