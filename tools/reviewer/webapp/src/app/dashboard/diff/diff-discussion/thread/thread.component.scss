@@ -7,14 +7,14 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
 .thread {
   border-radius: $border-radius;
   margin-bottom: 15px;
-  max-width: 900px;
+  max-width: 1400px;
   border: 1px solid $border-color;
   >.comment {
     display: flex;
     padding: 10px;
     border-bottom: 1px solid $hr-color;
     >.header {
-      width: 200px;
+      width: 140px;
       >.username {
         span {
           font-weight: bold;
@@ -72,7 +72,7 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         }
         >.buttons {
           button {
-            margin-left: 10px;
+            margin-left: 19px;
           }
           .resolve-status {
             font-size: 14px;
