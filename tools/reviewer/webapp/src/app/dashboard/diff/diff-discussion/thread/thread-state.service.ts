@@ -6,6 +6,7 @@ import { Thread } from '@/shared/proto';
 export interface ThreadState {
   isCommentOpenMap: boolean[];
   isReply: boolean;
+  isResolved: boolean;
   newComment: string;
 }
 

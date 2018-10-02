@@ -1,2 +1,8 @@
-$font-1: 'Heebo', sans-serif;
+@font-face {
+  font-family: opensans;
+  src: url("/assets/fonts/opensans/opensans.ttf");
+  font-style: normal;
+}
+
+$font-1: opensans, sans-serif;
 $default-font: $font-1;

@@ -1,3 +1,5 @@
+@import '../../../styles/fonts';
+
 .mat-toolbar {
   .mat-toolbar-row {
     background-color: #4898fd;
@@ -9,6 +11,7 @@
     .title {
       font-size: 25px;
       cursor: pointer;
+      font-family: $default-font;
     }
   }
   .search {

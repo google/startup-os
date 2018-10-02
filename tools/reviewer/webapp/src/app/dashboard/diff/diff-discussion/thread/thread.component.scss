@@ -1,23 +1,20 @@
-$border-color: rgba(0, 0, 0, 0.15);
-$border: 1px solid $border-color;
+$border-color: #8d8d8d;
+$hr-color: #cccccc;
 $border-radius: 7px;
 $top-radius: #{$border-radius} #{$border-radius} 0px 0px;
 $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
 
 .thread {
-  border-radius: $top-radius;
+  border-radius: $border-radius;
   margin-bottom: 15px;
-  border-top: $border;
-  max-width: 900px;
+  max-width: 1400px;
+  border: 1px solid $border-color;
   >.comment {
     display: flex;
-    border-bottom: $border;
     padding: 10px;
-    border-left: $border;
-    border-right: $border;
+    border-bottom: 1px solid $hr-color;
     >.header {
-      width: 200px;
-      display: block;
+      width: 140px;
       >.username {
         span {
           font-weight: bold;
@@ -48,6 +45,10 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
   }
   >.reply {
     min-height: 52px;
+    >.header {
+      display: flex;
+      align-items: flex-end;
+    }
     >.message {
       display: flex;
       flex-direction: column;
@@ -56,7 +57,7 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         resize: none;
         width: calc(100% - 6px);
         padding: 5px 2px;
-        font-size: 15px;
+        font-size: 14px;
         background: white;
         vertical-align: bottom;
         border-radius: 0;
@@ -71,10 +72,21 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         }
         >.buttons {
           button {
-            margin-left: 10px;
+            margin-left: 19px;
+          }
+          .resolve-status {
+            font-size: 14px;
+            font-weight: 600;
+            color: #24678f;
           }
         }
       }
+    }
+    .reply-button {
+      background: #86d1ff;
+    }
+    .cancel-button {
+      background: #bfbfbf;
     }
   }
 }
@@ -83,16 +95,11 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
 }
 .thread :last-child {
   border-radius: $bottom-radius;
+  border: none;
 }
 .resolved-comment {
   background: #f2faff;
 }
 .unresolved-comment {
   background: #d6f0ff;
-}
-.resolved-reply {
-  background: white;
-}
-.unresolved-reply {
-  background: #f3f3f3;
 }
