@@ -2,9 +2,6 @@
   >.diff-groups {
     >.diff-group {
       >.diff-group-title {
-        >span {
-          font-size: 20px;
-        }
         >.group-name {
           font-weight: bold;
           margin-right: 5px;
@@ -14,7 +11,7 @@
         >.mat-row {
           cursor: pointer;
         }
-
+        
         .mat-column-id {
           flex: 0 0 5%;
         }

@@ -5,7 +5,7 @@ export enum BlockIndex {
   rightFile,
 }
 
-export interface LineThread {
+export interface ThreadFrame {
   thread: Thread;
   // For future improvement.
   // Is "add new comment" interface focused by user cursor?
@@ -21,7 +21,7 @@ export interface BlockLine {
   lineNumber: number;
   // Is the line a placeholder?
   isPlaceholder: boolean;
-  lineThreads: LineThread[];
+  threadFrames: ThreadFrame[];
   isChanged: boolean;
   textChange?: TextChange;
 }

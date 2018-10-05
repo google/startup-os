@@ -113,6 +113,6 @@ export class TemplateService {
 
   // Does the block line contain no comments?
   isEmpty(blockLine: BlockLine): boolean {
-    return blockLine.lineThreads.length === 0;
+    return blockLine.threadFrames.length === 0;
   }
 }

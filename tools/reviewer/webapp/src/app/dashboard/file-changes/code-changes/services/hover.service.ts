@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { BlockLine, BlockIndex } from '../code-changes.interface';
+import { BlockIndex, BlockLine } from '../code-changes.interface';
 
 // Functions related mouse cursor and its hovering
 @Injectable()

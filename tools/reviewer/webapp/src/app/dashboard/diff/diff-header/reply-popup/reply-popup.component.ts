@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { randstr64 } from 'rndmjs';
 
 import {
   Comment,
@@ -6,11 +7,7 @@ import {
   Reviewer,
   Thread,
 } from '@/shared/proto';
-import {
-  AuthService,
-  FirebaseService,
-  NotificationService,
-} from '@/shared/services';
+import { AuthService, DiffUpdateService } from '@/shared/services';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The popup appears when "Reply" button is pushed.
@@ -31,8 +28,7 @@ export class ReplyPopupComponent {
 
   constructor(
     private authService: AuthService,
-    private firebaseService: FirebaseService,
-    private notificationService: NotificationService,
+    private diffUpdateService: DiffUpdateService,
     private diffHeaderService: DiffHeaderService,
   ) { }
 
@@ -80,15 +76,12 @@ export class ReplyPopupComponent {
       diffThread.setIsDone(!this.actionRequired);
       diffThread.addComment(comment);
       diffThread.setType(Thread.Type.DIFF);
+      diffThread.setId(randstr64(6));
       this.diff.addDiffThread(diffThread);
     }
 
-    this.firebaseService.updateDiff(this.diff).subscribe(() => {
-      this.closeReplyPopup();
-      this.notificationService.success('Reply submitted');
-    }, () => {
-      this.notificationService.error("Reply couldn't be submitted");
-    });
+    // Send the update to firebase
+    this.diffUpdateService.submitReply(this.diff).subscribe(() => this.closeReplyPopup());
   }
 
   closeReplyPopup(): void {
