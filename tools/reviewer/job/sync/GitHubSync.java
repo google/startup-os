@@ -47,8 +47,7 @@ public class GitHubSync {
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
     GitHubSync gitHubSync = new GitHubSync();
-    ReviewerBot bot = new ReviewerBot(login.get(), password.get());
-    GitHubClient gitHubClient = new GitHubClient(bot);
+    GitHubClient gitHubClient = new GitHubClient(login.get(), password.get());
 
     if (args.length != 0) {
       if (args[0].equals("read")) {

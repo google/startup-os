@@ -22,8 +22,11 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHComment;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHUserReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHCommentsReq;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -32,82 +35,88 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GitHubReader {
-  private static final String PR_REQUEST = "https://api.github.com/repos/%s/pulls/%d";
-  private static final String USER_EMAIL_REQUEST = "https://api.github.com/users/%s";
-  private static final String PR_CODE_COMMENTS_REQUEST =
-      "https://api.github.com/repos/%s/pulls/%d/comments";
-  private static final String PR_COMMENTS_REQUEST =
-      "https://api.github.com/repos/%s/issues/%d/comments";
-
   private final GitHubClient gitHubClient;
 
   GitHubReader(GitHubClient gitHubClient) {
     this.gitHubClient = gitHubClient;
   }
 
-  private class PullRequest {
-    private long diffId;
-    private String repoId;
-    private String description;
-    private long created_timestamp;
-    private long modified_timestamp;
-    private String prAuthorLogin;
-  }
-
-  private PullRequest processPullRequest(String response) {
-    JSONObject pullRequest = new JSONObject(response);
-    PullRequest pr = new PullRequest();
-    pr.diffId =
-        Long.parseLong(pullRequest.getJSONObject("head").getString("ref").replaceFirst("D", ""));
-    pr.description = pullRequest.getString("body");
-    pr.created_timestamp = Instant.parse(pullRequest.getString("created_at")).getEpochSecond();
-    pr.modified_timestamp = Instant.parse(pullRequest.getString("updated_at")).getEpochSecond();
-    pr.repoId = pullRequest.getJSONObject("head").getJSONObject("repo").getString("name");
-    // TODO: Change prAuthorLogin if PR was created by ReviewerBot
-    pr.prAuthorLogin = pullRequest.getJSONObject("user").getString("login");
-    return pr;
-  }
-
   public Diff getDiff(String repo, int diffNumber) throws IOException {
-    String prResponse = gitHubClient.getResponse(String.format(PR_REQUEST, repo, diffNumber));
-    PullRequest pr = processPullRequest(prResponse);
+    GHPullRequest pr =
+        gitHubClient
+            .getPullRequest(
+                GHPullRequestReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+            .getPullRequest();
     return Diff.newBuilder()
-        .setId(pr.diffId)
+        .setId(Long.parseLong(pr.getTitle().replaceFirst("D", "")))
         .setAuthor(
             Author.newBuilder()
-                .setEmail(getUserEmail(String.format(USER_EMAIL_REQUEST, pr.prAuthorLogin)))
+                .setEmail(
+                    gitHubClient
+                        .getUser(GHUserReq.newBuilder().setLogin(pr.getUser().getLogin()).build())
+                        .getUser()
+                        .getEmail())
                 .build())
-        .setDescription(pr.description)
-        .setCreatedTimestamp(pr.created_timestamp)
-        .setModifiedTimestamp(pr.modified_timestamp)
+        .setDescription(pr.getBody())
+        .setCreatedTimestamp(Instant.parse(pr.getCreatedAt()).toEpochMilli())
+        .setModifiedTimestamp(Instant.parse(pr.getUpdatedAt()).toEpochMilli())
         .addAllCodeThread(
-            getCodeThreads(pr, String.format(PR_CODE_COMMENTS_REQUEST, repo, diffNumber)))
-        .addDiffThread(getDiffThread(String.format(PR_COMMENTS_REQUEST, repo, diffNumber)))
+            getCodeThreads(
+                pr,
+                gitHubClient
+                    .getReviewComments(
+                        GHCommentsReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+                    .getCommentsList()))
+        .addDiffThread(getDiffThread(repo, diffNumber))
         .build();
   }
 
-  private ImmutableList<Thread> getCodeThreads(PullRequest pr, String request) throws IOException {
+  private Thread getDiffThread(String repo, int diffNumber) throws IOException {
+    Thread.Builder diffThread = Thread.newBuilder();
+    List<GHComment> diffComments =
+        gitHubClient
+            .getIssueComments(
+                GHCommentsReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+            .getCommentsList();
+
+    diffComments.forEach(
+        comment ->
+            diffThread.addComment(
+                Comment.newBuilder()
+                    .setContent(comment.getBody())
+                    .setTimestamp(Instant.parse(comment.getUpdatedAt()).getEpochSecond())
+                    .setCreatedBy(
+                        // TODO: Email can be null if the user hides email. Think over how to
+                        // resolve this.
+                        gitHubClient
+                            .getUser(
+                                GHUserReq.newBuilder()
+                                    .setLogin(comment.getUser().getLogin())
+                                    .build())
+                            .getUser()
+                            .getEmail())
+                    .build()));
+    return diffThread.build();
+  }
+
+  private ImmutableList<Thread> getCodeThreads(GHPullRequest pr, List<GHComment> comments) {
     List<Thread> result = new ArrayList<>();
-    JSONArray response = new JSONArray(gitHubClient.getResponse(request));
-    List<String> commentedFiles = new ArrayList<>();
-    List<JSONObject> codeComments = new ArrayList<>();
-    for (Object item : response) {
-      JSONObject comment = (JSONObject) item;
-      commentedFiles.add(comment.getString("path"));
-      codeComments.add(comment);
-    }
-    commentedFiles = commentedFiles.stream().distinct().collect(Collectors.toList());
+
+    List<String> commentedFiles =
+        comments.stream().map(GHComment::getPath).distinct().collect(Collectors.toList());
 
     for (String fileName : commentedFiles) {
-      ImmutableList<JSONObject> fileComments = getCodeCommentsByFilename(codeComments, fileName);
+      ImmutableList<GHComment> fileComments = getCodeCommentsByFilename(comments, fileName);
       List<Integer> lines =
           fileComments
               .stream()
-              .filter(comment -> comment.getString("path").equals(fileName))
+              .filter(comment -> comment.getPath().equals(fileName))
               .map(
                   comment ->
                       getLineNumber(
-                          comment.getString("diff_hunk"), comment.getInt("original_position")))
+                          new DiffHunk(comment.getDiffHunk()),
+                          comment.getPosition(),
+                          comment.getOriginalPosition()))
               .distinct()
               .collect(Collectors.toList());
 
@@ -116,24 +125,27 @@ public class GitHubReader {
     return ImmutableList.copyOf(result);
   }
 
-  private ImmutableList<JSONObject> getCodeCommentsByFilename(
-      List<JSONObject> codeComments, String filename) {
+  private ImmutableList<GHComment> getCodeCommentsByFilename(
+      List<GHComment> codeComments, String filename) {
     return ImmutableList.copyOf(
         codeComments
             .stream()
-            .filter(comment -> comment.getString("path").equals(filename))
+            .filter(comment -> comment.getPath().equals(filename))
             .collect(Collectors.toList()));
   }
 
   private Thread getCodeThreadByFilenameAndLine(
-      ImmutableList<JSONObject> fileComments, int line, PullRequest pr) {
-    ImmutableList<JSONObject> lineComments =
+      ImmutableList<GHComment> fileComments, int line, GHPullRequest pr) {
+    ImmutableList<GHComment> lineComments =
         ImmutableList.copyOf(
             fileComments
                 .stream()
                 .filter(
                     item ->
-                        getLineNumber(item.getString("diff_hunk"), item.getInt("original_position"))
+                        getLineNumber(
+                                new DiffHunk(item.getDiffHunk()),
+                                item.getPosition(),
+                                item.getOriginalPosition())
                             == line)
                 .collect(Collectors.toList()));
 
@@ -141,74 +153,63 @@ public class GitHubReader {
     lineComments.forEach(
         comment ->
             thread
-                .setRepoId(pr.repoId)
-                .setCommitId(comment.getString("original_commit_id"))
+                .setRepoId(pr.getTitle().replace("D", ""))
+                .setCommitId(comment.getOriginalCommitId())
                 .setFile(
                     Protos.File.newBuilder()
-                        .setFilename(comment.getString("path"))
-                        .setRepoId(pr.repoId)
-                        .setFilenameWithRepo(pr.repoId + "/" + comment.getString("path"))
-                        .setUser(getUserEmail(String.format(USER_EMAIL_REQUEST, pr.prAuthorLogin)))
+                        .setFilename(comment.getPath())
+                        .setRepoId(pr.getTitle().replace("D", ""))
+                        .setFilenameWithRepo(pr.getHead().getRepo().getFullName())
+                        .setUser(
+                            gitHubClient
+                                .getUser(
+                                    GHUserReq.newBuilder()
+                                        .setLogin(pr.getUser().getLogin())
+                                        .build())
+                                .getUser()
+                                .getEmail())
                         .build())
                 .setLineNumber(
                     getLineNumber(
-                        comment.getString("diff_hunk"), comment.getInt("original_position")))
+                        new DiffHunk(comment.getDiffHunk()),
+                        comment.getPosition(),
+                        comment.getOriginalPosition()))
                 .addComment(
                     Comment.newBuilder()
-                        .setContent(comment.getString("body"))
-                        .setTimestamp(
-                            Instant.parse(comment.getString("updated_at")).getEpochSecond())
+                        .setContent(comment.getBody())
+                        .setTimestamp(Instant.parse(comment.getUpdatedAt()).getEpochSecond())
                         .setCreatedBy(
                             // TODO: Email can be null if the user hides email. Think over how to
                             // resolve this.
-                            getUserEmail(
-                                String.format(
-                                    USER_EMAIL_REQUEST,
-                                    comment.getJSONObject("user").getString("login"))))
+                            gitHubClient
+                                .getUser(
+                                    GHUserReq.newBuilder()
+                                        .setLogin(comment.getUser().getLogin())
+                                        .build())
+                                .getUser()
+                                .getEmail())
                         .build())
                 .setType(Thread.Type.CODE));
     return thread.build();
   }
 
-  private Integer getLineNumber(String diffHunk, int position) {
-    String left = diffHunk.split(" ")[1].substring(1);
-    String right = diffHunk.split(" ")[2].substring(1);
-    boolean wasLeftEmpty = Integer.parseInt(left.split(",")[1]) == 0;
-    // If the file is new we огіе return the "position".
-    // Otherwise, we count the position by adding position of comment to the position from which the
-    // "diff_hunk"
-    // begins and subtracting 2.
-    return wasLeftEmpty ? position : Integer.parseInt(right.split(",")[0]) + position - 2;
-  }
+  private int getLineNumber(DiffHunk diffHunk, int position, int original_position) {
+    // We are counting amount of `\n+` in diff_hunk.
+    int commentPosition = diffHunk.getHunkBody().split("\\n\\+", -1).length - 1;
 
-  private Thread getDiffThread(String request) throws IOException {
-    Thread.Builder thread = Thread.newBuilder();
-    JSONArray response = new JSONArray(gitHubClient.getResponse(request));
-    response.forEach(
-        item -> {
-          JSONObject comment = (JSONObject) item;
-          thread
-              .addComment(
-                  Comment.newBuilder()
-                      .setContent(comment.getString("body"))
-                      .setTimestamp(Instant.parse(comment.getString("updated_at")).toEpochMilli())
-                      .setCreatedBy(
-                          getUserEmail(
-                              String.format(
-                                  USER_EMAIL_REQUEST,
-                                  comment.getJSONObject("user").getString("login"))))
-                      .build())
-              .setType(Thread.Type.DIFF);
-        });
-    return thread.build();
-  }
-
-  private String getUserEmail(String request) {
-    try {
-      return new JSONObject(gitHubClient.getResponse(request)).getString("email");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if (diffHunk.isNewFileComment()) {
+      return original_position;
     }
+    if (position == 0) {
+      return diffHunk.getHeadStartLine() + 3 + commentPosition;
+    }
+    if (diffHunk.isFileInHeadHasDifferentNumberOfLines()) {
+      return diffHunk.getBaseStartLine() + 5 + commentPosition;
+    }
+    if (diffHunk.isCommentToTheFirstLine()) {
+      return commentPosition;
+    }
+    return diffHunk.getHeadStartLine() + 2 + commentPosition;
   }
 }
 

@@ -1,0 +1,136 @@
+syntax = "proto3";
+
+package com.google.startupos.tools.reviewer.job.sync;
+
+option java_package = "com.google.startupos.tools.reviewer.job.sync";
+option java_outer_classname = "GitHubProtos";
+
+// GitHub User
+message GHUser {
+  int64 id = 1;
+  string email = 2;
+  string name = 3;
+  string login = 4;
+}
+
+message GHUserReq { string login = 1; }
+
+message GHUserResp { GHUser user = 1; }
+
+// GitHub File
+message GHFile {
+  string sha = 1;
+  string filename = 2;
+  string status = 3;
+  string patch = 4;
+  int32 changes = 5;
+}
+
+message GHPullRequestFilesReq {
+  string repo = 1;
+  int32 diff_number = 2;
+}
+
+message GHPullRequestFilesResp { repeated GHFile files = 1; }
+
+// GitHub Comments
+message GHComment {
+  int64 id = 1;
+  string body = 2;
+  string created_at = 3;
+  string updated_at = 4;
+  GHUser user = 5;
+  int32 position = 6;
+  int32 original_position = 7;
+  string diff_hunk = 8;
+  string path = 9;
+  string commit_id = 10;
+  string original_commit_id = 11;
+}
+
+message GHCommentsReq {
+  string repo = 1;
+  int32 diff_number = 2;
+}
+
+message GHCommentsResp { repeated GHComment comments = 1; }
+
+message CreateGHReviewCommentReq {
+  string repo = 1;
+  int32 diff_number = 2;
+  CreateGHReviewCommentReqData request_data = 3;
+}
+
+message CreateGHReviewCommentReqData {
+  string body = 1;
+  string commit_id = 2;
+  string path = 3;
+  int32 position = 4;
+}
+
+message CreateGHPullRequestCommentReq {
+  string repo = 1;
+  int32 diff_number = 2;
+  CreateGHPullRequestCommentReqData request_data = 3;
+}
+
+message CreateGHPullRequestCommentReqData { string body = 1; }
+
+// GitHub Pull Request
+message GHPullRequest {
+  int64 id = 1;
+  int32 number = 2;
+  string state = 3;
+  string title = 4;
+  GHUser user = 5;
+  string body = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  GHCommitPointer head = 9;
+  GHCommitPointer base = 10;
+}
+
+message GHCommitPointer {
+  string label = 1;
+  string ref = 2;
+  string sha = 3;
+  GHUser user = 4;
+  GHRepo repo = 5;
+}
+
+message GHRepo {
+  int64 id = 1;
+  string name = 2;
+  string full_name = 3;
+  bool private = 4;
+  GHUser owner = 5;
+  string description = 6;
+  string created_at = 7;
+  string updated_at = 8;
+  string pushed_at = 9;
+}
+
+message GHPullRequestReq {
+  string repo = 1;
+  int32 diff_number = 2;
+}
+
+message GHPullRequestResp { GHPullRequest pull_request = 1; }
+
+message CreateGHPullRequestReq {
+  string repo = 1;
+  CreateGHPullRequestReqData request_data = 2;
+}
+
+message CreateGHPullRequestReqData {
+  string title = 1;
+  string head = 2;
+  string base = 3;
+  string body = 4;
+}
+
+message CreateGHPullRequestResp { GHPullRequest pull_request = 1; }
+
+message GHPullRequestsReq { string repo = 1; }
+
+message GHPullRequestsResp { repeated GHPullRequest pull_requests = 1; }

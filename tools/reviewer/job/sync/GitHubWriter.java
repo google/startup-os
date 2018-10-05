@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 The StartupOS Authors.
+ * Copyrit 2018 The StartupOS Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,32 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestCommentReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestCommentReqData;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestReqData;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestResp;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHReviewCommentReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHReviewCommentReqData;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHFile;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestFilesReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestsReq;
+import com.google.startupos.tools.reviewer.localserver.service.Protos;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GitHubWriter {
+  private static final String DIFF_HUNK_PATTERN = "@@\\s[-+]\\d+[\\,]\\d+\\s[-+]\\d+[\\,]\\d+\\s@@";
   private final GitHubClient gitHubClient;
 
   GitHubWriter(GitHubClient gitHubClient) {
@@ -33,31 +49,31 @@ public class GitHubWriter {
   }
 
   public void writeDiff(Diff diff, String repo) throws IOException {
-    int prNumber = getPRNumber(diff, repo);
+    int diffNumber = getPRNumber(diff, repo);
 
     for (Thread diffThread : diff.getDiffThreadList()) {
-      for (Comment comment : diffThread.getCommentList()) {
+      for (Protos.Comment comment : diffThread.getCommentList()) {
         createPullRequestComment(
+            repo,
+            diffNumber,
             "Created by: **"
                 + comment.getCreatedBy()
                 + "**\nTime: **"
                 + new Date(comment.getTimestamp())
                 + "**\n"
-                + comment.getContent(),
-            prNumber);
+                + comment.getContent());
       }
     }
 
     for (Thread codeThread : diff.getCodeThreadList()) {
-      for (Comment comment : codeThread.getCommentList()) {
+      for (Protos.Comment comment : codeThread.getCommentList()) {
         String path = codeThread.getFile().getFilename();
-        JSONArray files =
-            new JSONArray(
-                gitHubClient.getResponse(
-                    String.format(
-                        "https://api.github.com/repos/%s/pulls/%d/files", repo, prNumber)));
-        int position = getCommentPosition(codeThread.getLineNumber(), getDiffHunk(files, path));
+        GHFile file = getFileByPath(repo, diffNumber, path);
+        DiffHunk diffHunk = getDiffHunk(getDiffHunks(file.getPatch()), codeThread.getLineNumber());
+        int position = getCommentPosition(diffHunk, codeThread.getLineNumber());
         createReviewComment(
+            repo,
+            diffNumber,
             "Created by: **"
                 + comment.getCreatedBy()
                 + "**\nTime: **"
@@ -66,22 +82,19 @@ public class GitHubWriter {
                 + comment.getContent(),
             codeThread.getCommitId(),
             path,
-            position,
-            prNumber);
+            position);
       }
     }
   }
 
   private int getPRNumber(Diff diff, String repo) {
+    GHPullRequestsReq request = GHPullRequestsReq.newBuilder().setRepo(repo).build();
     try {
-      JSONArray repos =
-          new JSONArray(
-              gitHubClient.getResponse(
-                  String.format("https://api.github.com/repos/%s/pulls", repo)));
-      for (Object item : repos) {
-        JSONObject pr = (JSONObject) item;
-        if (pr.getString("title").equals("D" + diff.getId())) {
-          return pr.getInt("number");
+      List<GHPullRequest> pullRequests =
+          gitHubClient.getPullRequests(request).getPullRequestsList();
+      for (GHPullRequest pr : pullRequests) {
+        if (pr.getTitle().equals("D" + diff.getId())) {
+          return pr.getNumber();
         }
       }
     } catch (IOException e) {
@@ -89,62 +102,127 @@ public class GitHubWriter {
     }
     // Creating new PR if it isn't exist
     return createPullRequest(
-        "D" + diff.getId(), "D" + diff.getId(), "master", diff.getDescription());
+        repo, "D" + diff.getId(), "D" + diff.getId(), "master", diff.getDescription());
   }
 
-  private int createPullRequest(String title, String head, String base, String body) {
-    JSONObject json = new JSONObject();
-    json.put("title", title);
-    json.put("body", body);
-    json.put("head", head);
-    json.put("base", base);
-
-    String request = "https://api.github.com/repos/val-fed/test-repo/pulls";
-    JSONObject response = new JSONObject(gitHubClient.postData(json, request));
-    return response.getInt("number");
+  private int createPullRequest(String repo, String title, String head, String base, String body) {
+    CreateGHPullRequestReq request =
+        CreateGHPullRequestReq.newBuilder()
+            .setRepo(repo)
+            .setRequestData(
+                CreateGHPullRequestReqData.newBuilder()
+                    .setTitle(title)
+                    .setHead(head)
+                    .setBase(base)
+                    .setBody(body)
+                    .build())
+            .build();
+    CreateGHPullRequestResp response = gitHubClient.createPullRequest(request);
+    return response.getPullRequest().getNumber();
   }
 
-  private void createPullRequestComment(String body, int prNumber) {
-    JSONObject json = new JSONObject();
-    json.put("body", body);
-
-    String request =
-        String.format(
-            "https://api.github.com/repos/val-fed/test-repo/issues/%d/comments", prNumber);
-    gitHubClient.postData(json, request);
-  }
-
-  private String getDiffHunk(JSONArray files, String path) {
-    for (Object item : files) {
-      JSONObject file = (JSONObject) item;
-      if (file.getString("filename").equals(path)) {
-        return file.getString("patch");
-      }
-    }
-    throw new RuntimeException("Diff hunk isn't found from file: " + path);
-  }
-
-  private Integer getCommentPosition(int lineNumber, String diffHunk) {
-    String left = diffHunk.split(" ")[1].substring(1);
-    String right = diffHunk.split(" ")[2].substring(1);
-    boolean wasLeftEmpty = Integer.parseInt(left.split(",")[1]) == 0;
-    // If the file is new we огіе return the "lineNumber".
-    // Otherwise, we count the position by subtracting the position from which the "diff_hunk"
-    // begins from "lineNumber" and adding 2.
-    return wasLeftEmpty ? lineNumber : lineNumber - Integer.parseInt(right.split(",")[0]) + 2;
+  private void createPullRequestComment(String repo, int diffNumber, String body) {
+    CreateGHPullRequestCommentReq request =
+        CreateGHPullRequestCommentReq.newBuilder()
+            .setRepo(repo)
+            .setDiffNumber(diffNumber)
+            .setRequestData(CreateGHPullRequestCommentReqData.newBuilder().setBody(body).build())
+            .build();
+    gitHubClient.createPullRequestComment(request);
   }
 
   private void createReviewComment(
-      String body, String commitId, String path, int position, int prNumber) {
-    JSONObject json = new JSONObject();
-    json.put("body", body);
-    json.put("commit_id", commitId);
-    json.put("path", path);
-    json.put("position", position);
+      String repo, int diffNumber, String body, String commitId, String path, int position) {
+    CreateGHReviewCommentReq request =
+        CreateGHReviewCommentReq.newBuilder()
+            .setRepo(repo)
+            .setDiffNumber(diffNumber)
+            .setRequestData(
+                CreateGHReviewCommentReqData.newBuilder()
+                    .setBody(body)
+                    .setCommitId(commitId)
+                    .setPath(path)
+                    .setPosition(position)
+                    .build())
+            .build();
+    gitHubClient.createReviewComment(request);
+  }
 
-    String request =
-        String.format("https://api.github.com/repos/val-fed/test-repo/pulls/%d/comments", prNumber);
-    gitHubClient.postData(json, request);
+  private GHFile getFileByPath(String repo, int diffNumber, String path) throws IOException {
+    List<GHFile> files =
+        gitHubClient
+            .getPullRequestFiles(
+                GHPullRequestFilesReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+            .getFilesList();
+    for (GHFile file : files) {
+      if (file.getFilename().equals(path)) {
+        return file;
+      }
+    }
+    throw new RuntimeException("File not found: " + path);
+  }
+
+  private List<DiffHunk> getDiffHunks(String patch) {
+    List<DiffHunk> result = new ArrayList<>();
+    List<String> bodies =
+        Arrays.stream(patch.split(DIFF_HUNK_PATTERN))
+            .filter(body -> !body.isEmpty())
+            .collect(Collectors.toList());
+    Pattern pattern = Pattern.compile(DIFF_HUNK_PATTERN);
+    Matcher matcher = pattern.matcher(patch);
+    int bodyIndex = 0;
+    while (matcher.find()) {
+      result.add(new DiffHunk(matcher.group() + bodies.get(bodyIndex++)));
+    }
+    return result;
+  }
+
+  private DiffHunk getDiffHunk(List<DiffHunk> diffHunks, int lineNumber) {
+    if (diffHunks.size() == 1) {
+      return diffHunks.get(0);
+    }
+    for (int i = 0; i < diffHunks.size(); i++) {
+      DiffHunk current = diffHunks.get(i);
+      boolean hasNext = i + 1 <= diffHunks.size() - 1;
+      if (!hasNext) {
+        return current;
+      } else {
+        DiffHunk next = diffHunks.get(i + 1);
+        if ((current.getHeadStartLine() < lineNumber) && (next.getHeadStartLine() > lineNumber)) {
+          return current;
+        }
+      }
+    }
+    throw new RuntimeException("The patch doesn't contain a diff hunk for the line: " + lineNumber);
+  }
+
+  // TODO: Check if it works correctly when the head does not contain the line where the comment was
+  // left.
+  private int getCommentPosition(DiffHunk diffHunk, int lineNumber) {
+    int start = diffHunk.getHeadStartLine();
+    if (diffHunk.isNewFileComment() || diffHunk.isCommentToTheFirstLine()) {
+      return lineNumber;
+    } else {
+      lineNumber -= start;
+      int result = start;
+      List<String> newlineSymbols = new ArrayList<>();
+      String patt = "\\n\\s|\\n\\+|\\n\\-";
+      Pattern pattern = Pattern.compile(patt);
+      Matcher matcher = pattern.matcher(diffHunk.getHunkBody());
+      while (matcher.find()) {
+        newlineSymbols.add(matcher.group());
+      }
+      for (String n : newlineSymbols) {
+        if (n.equals("\n") || n.equals("\n+")) {
+          lineNumber--;
+        }
+        if (lineNumber == 0) {
+          return --result - start;
+        }
+        result++;
+      }
+      return result - start;
+    }
   }
 }
 
