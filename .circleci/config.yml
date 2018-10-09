@@ -86,10 +86,7 @@ jobs:
       - run:
           command: git clone https://github.com/hasadna/hasadna /home/circleci/hasadna/
       - run:
-          command: |
-            cd /home/circleci/hasadna/
-            perl -pe 's/#\ MARK:\ StartupOS\ start.*#\ MARK:\ StartupOS\ end/local_repository\(name\="startup_os",\ path="\/home\/circleci\/ng\/")/s' < WORKSPACE > NEW_WORKSPACE
-            mv NEW_WORKSPACE WORKSPACE
+          command: bazel run //tools/deps:workspace_patcher -- --workspace /home/circleci/hasadna/WORKSPACE
       - run:
           command: cd /home/circleci/hasadna/ && ./compile.sh build
           environment:
