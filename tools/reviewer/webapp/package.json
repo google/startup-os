@@ -9,7 +9,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "protoc": "gulp protoc"
+    "protoc": "gulp protoc",
+    "deploy": "firebase deploy --only hosting"
   },
   "devDependencies": {
     "@angular/animations": "^5.2.8",
