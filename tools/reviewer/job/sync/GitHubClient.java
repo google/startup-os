@@ -182,10 +182,7 @@ public class GitHubClient {
   void createReviewComment(CreateGHReviewCommentReq request) {
     try {
       String requestData =
-          JsonFormat.printer()
-              .print(request.getRequestData())
-              .replace("diffNumber", "diff_number")
-              .replace("commitId", "commit_id");
+          JsonFormat.printer().print(request.getRequestData()).replace("commitId", "commit_id");
       doRequest(
           RequestMethod.POST,
           String.format(

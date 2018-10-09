@@ -23,6 +23,7 @@ import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullReq
 import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestResp;
 import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHReviewCommentReq;
 import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHReviewCommentReqData;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestReq;
 import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHFile;
 import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestFilesReq;
@@ -32,16 +33,10 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class GitHubWriter {
-  private static final String DIFF_HUNK_PATTERN = "@@\\s[-+]\\d+[\\,]\\d+\\s[-+]\\d+[\\,]\\d+\\s@@";
   private final GitHubClient gitHubClient;
 
   GitHubWriter(GitHubClient gitHubClient) {
@@ -53,34 +48,49 @@ public class GitHubWriter {
 
     for (Thread diffThread : diff.getDiffThreadList()) {
       for (Protos.Comment comment : diffThread.getCommentList()) {
+        // TODO: Think over what should be in the comment by Reviewer Bot
         createPullRequestComment(
             repo,
             diffNumber,
             "Created by: **"
                 + comment.getCreatedBy()
                 + "**\nTime: **"
-                + new Date(comment.getTimestamp())
+                + Instant.ofEpochSecond(comment.getTimestamp())
                 + "**\n"
                 + comment.getContent());
       }
     }
 
+    List<GHFile> pullRequestFiles =
+        gitHubClient
+            .getPullRequestFiles(
+                GHPullRequestFilesReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+            .getFilesList();
+
+    GHPullRequest pr =
+        gitHubClient
+            .getPullRequest(
+                GHPullRequestReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+            .getPullRequest();
+
     for (Thread codeThread : diff.getCodeThreadList()) {
       for (Protos.Comment comment : codeThread.getCommentList()) {
         String path = codeThread.getFile().getFilename();
-        GHFile file = getFileByPath(repo, diffNumber, path);
-        DiffHunk diffHunk = getDiffHunk(getDiffHunks(file.getPatch()), codeThread.getLineNumber());
-        int position = getCommentPosition(diffHunk, codeThread.getLineNumber());
+        String diffPatchStr = getDiffPatchStrByFilename(pullRequestFiles, path);
+        LineNumberConverter.Side side =
+            getSide(codeThread.getFile().getCommitId(), codeThread.getCommitId());
+        int position = getCommentPosition(diffPatchStr, codeThread.getLineNumber(), side);
+        // TODO: Think over what should be in the comment by Reviewer Bot
         createReviewComment(
             repo,
             diffNumber,
             "Created by: **"
                 + comment.getCreatedBy()
                 + "**\nTime: **"
-                + new Date(comment.getTimestamp())
+                + Instant.ofEpochSecond(comment.getTimestamp()).toString()
                 + "**\n"
                 + comment.getContent(),
-            codeThread.getCommitId(),
+            pr.getHead().getSha(),
             path,
             position);
       }
@@ -114,7 +124,9 @@ public class GitHubWriter {
                     .setTitle(title)
                     .setHead(head)
                     .setBase(base)
-                    .setBody(body)
+                    // TODO: `body`(PullRequest description) can't be empty. Think over the default
+                    // value
+                    .setBody(body.isEmpty() ? "Created by Reviewer Bot" : body)
                     .build())
             .build();
     CreateGHPullRequestResp response = gitHubClient.createPullRequest(request);
@@ -148,81 +160,24 @@ public class GitHubWriter {
     gitHubClient.createReviewComment(request);
   }
 
-  private GHFile getFileByPath(String repo, int diffNumber, String path) throws IOException {
-    List<GHFile> files =
-        gitHubClient
-            .getPullRequestFiles(
-                GHPullRequestFilesReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
-            .getFilesList();
-    for (GHFile file : files) {
-      if (file.getFilename().equals(path)) {
-        return file;
-      }
-    }
-    throw new RuntimeException("File not found: " + path);
+  private int getCommentPosition(
+      String diffPatchStr, int lineNumber, LineNumberConverter.Side side) {
+    return new LineNumberConverter(diffPatchStr).getPosition(lineNumber, side);
   }
 
-  private List<DiffHunk> getDiffHunks(String patch) {
-    List<DiffHunk> result = new ArrayList<>();
-    List<String> bodies =
-        Arrays.stream(patch.split(DIFF_HUNK_PATTERN))
-            .filter(body -> !body.isEmpty())
-            .collect(Collectors.toList());
-    Pattern pattern = Pattern.compile(DIFF_HUNK_PATTERN);
-    Matcher matcher = pattern.matcher(patch);
-    int bodyIndex = 0;
-    while (matcher.find()) {
-      result.add(new DiffHunk(matcher.group() + bodies.get(bodyIndex++)));
-    }
-    return result;
+  private LineNumberConverter.Side getSide(String repoBaseCommitId, String codeThreadCommitId) {
+    return repoBaseCommitId.equals(codeThreadCommitId)
+        ? LineNumberConverter.Side.RIGHT
+        : LineNumberConverter.Side.LEFT;
   }
 
-  private DiffHunk getDiffHunk(List<DiffHunk> diffHunks, int lineNumber) {
-    if (diffHunks.size() == 1) {
-      return diffHunks.get(0);
-    }
-    for (int i = 0; i < diffHunks.size(); i++) {
-      DiffHunk current = diffHunks.get(i);
-      boolean hasNext = i + 1 <= diffHunks.size() - 1;
-      if (!hasNext) {
-        return current;
-      } else {
-        DiffHunk next = diffHunks.get(i + 1);
-        if ((current.getHeadStartLine() < lineNumber) && (next.getHeadStartLine() > lineNumber)) {
-          return current;
-        }
+  private String getDiffPatchStrByFilename(List<GHFile> pullRequestFiles, String filename) {
+    for (GHFile file : pullRequestFiles) {
+      if (file.getFilename().equals(filename)) {
+        return file.getPatch();
       }
     }
-    throw new RuntimeException("The patch doesn't contain a diff hunk for the line: " + lineNumber);
-  }
-
-  // TODO: Check if it works correctly when the head does not contain the line where the comment was
-  // left.
-  private int getCommentPosition(DiffHunk diffHunk, int lineNumber) {
-    int start = diffHunk.getHeadStartLine();
-    if (diffHunk.isNewFileComment() || diffHunk.isCommentToTheFirstLine()) {
-      return lineNumber;
-    } else {
-      lineNumber -= start;
-      int result = start;
-      List<String> newlineSymbols = new ArrayList<>();
-      String patt = "\\n\\s|\\n\\+|\\n\\-";
-      Pattern pattern = Pattern.compile(patt);
-      Matcher matcher = pattern.matcher(diffHunk.getHunkBody());
-      while (matcher.find()) {
-        newlineSymbols.add(matcher.group());
-      }
-      for (String n : newlineSymbols) {
-        if (n.equals("\n") || n.equals("\n+")) {
-          lineNumber--;
-        }
-        if (lineNumber == 0) {
-          return --result - start;
-        }
-        result++;
-      }
-      return result - start;
-    }
+    throw new RuntimeException("`diff_patch` not found for the file: " + filename);
   }
 }
 

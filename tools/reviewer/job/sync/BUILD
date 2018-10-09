@@ -13,10 +13,11 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
-        "DiffHunk.java",
+        "DiffPatch.java",
         "GitHubClient.java",
         "GitHubReader.java",
         "GitHubWriter.java",
+        "LineNumberConverter.java",
     ],
     deps = [
         ":github_api_java_proto",
@@ -26,7 +27,6 @@ java_library(
         "//common/repo:repo_proto",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
-        "//third_party/maven/org/json",
         "//tools/reviewer/local_server/service:code_review_java_proto",
         "//tools/reviewer/local_server/service:code_review_proto",
     ],
