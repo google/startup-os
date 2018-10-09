@@ -18,13 +18,12 @@ export interface FileData {
   file: File;
 }
 
-const LOCALSERVER: string = 'http://localhost:7000';
-const FALLBACKSERVER: string = 'http://35.229.74.104:7000';
-const FUNCTIONS: string = 'https://us-central1-startupos-5f279.cloudfunctions.net';
+const LOCAL_SERVER: string = 'http://localhost:7000';
+const CLOUD_FUNCTIONS: string = 'https://us-central1-startupos-5f279.cloudfunctions.net';
 
 @Injectable()
 export class LocalserverService {
-  server: string = LOCALSERVER;
+  server: string = LOCAL_SERVER;
 
   constructor(
     private http: Http,
@@ -108,9 +107,9 @@ export class LocalserverService {
   private fallback(): Observable<void> {
     return new Observable(observer => {
       // Error is received from the server
-      if (this.server === LOCALSERVER) {
+      if (this.server === LOCAL_SERVER) {
         // If it's local server then use fallback server instead
-        this.server = FUNCTIONS;
+        this.server = CLOUD_FUNCTIONS;
         this.notificationService.warning('Fallback server is used');
         observer.next();
       } else {
