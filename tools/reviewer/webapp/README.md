@@ -20,7 +20,7 @@ Run `npm run protoc` to generate proto functions.
 ## Running the server locally
 Run `npm start` to start a dev server. Navigate to `http://localhost:4200/`  
 Run `npm run build` to make a build.  
-Run `npm run deploy` to publish the app on the server.
+Run `npm run deploy` to publish the app on the server.  
 Run `npm run functions` to update cloud functions on the server.  
 
 How to use firebase hosting:  
