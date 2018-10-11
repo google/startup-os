@@ -24,9 +24,9 @@ import java.nio.file.Paths;
 import java.io.IOException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-// TODO: refactor if more advanced functions/extension is needed
-// We don't want to over-engineer beforehand
 public class WorkspacePatcher {
+  // We need to patch WORKSPACE file to replace
+  // external repo references with local repos
   @FlagDesc(name = "workspace", description = "WORKSPACE file to patch", required = true)
   private static final Flag<String> workspace = Flag.create(".");
 
