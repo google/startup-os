@@ -18,8 +18,13 @@ export interface FileData {
   file: File;
 }
 
+const LOCAL_SERVER: string = 'http://localhost:7000';
+const CLOUD_FUNCTIONS: string = 'https://us-central1-startupos-5f279.cloudfunctions.net';
+
 @Injectable()
 export class LocalserverService {
+  server: string = LOCAL_SERVER;
+
   constructor(
     private http: Http,
     private encodingService: EncodingService,
@@ -38,7 +43,7 @@ export class LocalserverService {
 
       // Send the request to local server
       this.http
-        .get('http://localhost:7000/get_diff_files?request=' + requestBase64)
+        .get(this.server + '/get_diff_files?request=' + requestBase64)
         .map(response => response.text())
         .subscribe(diffFilesResponseBase64 => {
           // Decode response
@@ -49,13 +54,16 @@ export class LocalserverService {
 
           if (diffFilesResponse.getBranchinfoList().length === 0) {
             observer.error();
-            this.notificationService.error('Local server: Branches not found');
+            this.notificationService.error('Server: Branches not found');
           }
 
           observer.next(diffFilesResponse.getBranchinfoList());
         }, () => {
-          this.localserverError();
-          observer.error();
+          this.fallback().subscribe(() => {
+            this.getBranchInfoList(id, workspace).subscribe(
+              branchInfo => observer.next(branchInfo)
+            );
+          }, () => observer.error());
         });
     });
   }
@@ -75,7 +83,7 @@ export class LocalserverService {
 
       // Send the request to local server
       this.http
-        .get('http://localhost:7000/get_text_diff?request=' + requestBase64)
+        .get(this.server + '/get_text_diff?request=' + requestBase64)
         .map(response => response.text())
         .subscribe(textDiffResponseBase64 => {
           // Decode response
@@ -86,9 +94,29 @@ export class LocalserverService {
 
           observer.next(textDiffResponse);
         }, () => {
-          this.localserverError();
-          observer.error();
+          this.fallback().subscribe(() => {
+            this.getFileChanges(leftFile, rightFile).subscribe(
+              textDiffResponse => observer.next(textDiffResponse)
+            );
+          }, () => observer.error());
         });
+    });
+  }
+
+
+  private fallback(): Observable<void> {
+    return new Observable(observer => {
+      // Error is received from the server
+      if (this.server === LOCAL_SERVER) {
+        // If it's local server then use fallback server instead
+        this.server = CLOUD_FUNCTIONS;
+        this.notificationService.warning('Fallback server is used');
+        observer.next();
+      } else {
+        // Fallback server doesn't respond too. Throw an error:
+        this.notificationService.error("Server doesn't respond");
+        observer.error();
+      }
     });
   }
 
@@ -167,9 +195,5 @@ export class LocalserverService {
     }
 
     return commitIdList;
-  }
-
-  localserverError(): void {
-    this.notificationService.error("Local server doesn't respond");
   }
 }
