@@ -6,7 +6,10 @@
   <div class="info" fxFlex="50%">
     <table>
       <!-- Reviewer List -->
-      <tr>
+      <tr
+        (mouseover)="isReviewersHovered = true"
+        (mouseleave)="isReviewersHovered = false"
+      >
         <td>Reviewers</td>
         <td>
           <user-popup
@@ -21,15 +24,21 @@
             {{ authService.getUsername(reviewer.getEmail()) }}
           </span></user-popup>
         </td>
-        <td>
-          <button mat-icon-button color="warn" (click)="addReviewer()">
-            <mat-icon>add_box</mat-icon>
-          </button>
+        <td class="add-button">
+          <img
+            src="/assets/ic-add-person.svg"
+            (click)="addReviewer()"
+            *ngIf="isReviewersHovered"
+            draggable="false"
+          >
         </td>
       </tr>
 
       <!-- CC List -->
-      <tr>
+      <tr
+        (mouseover)="isCCHovered = true"
+        (mouseleave)="isCCHovered = false"
+      >
         <td>CC</td>
         <td>
           <user-popup
@@ -39,10 +48,13 @@
             (removeFromListEmitter)="removeFromCcList($event)"
           ><span>{{ authService.getUsername(email) }}</span></user-popup>
         </td>
-        <td>
-          <button mat-icon-button color="warn" (click)="addCC()">
-            <mat-icon>add_box</mat-icon>
-          </button>
+        <td class="add-button">
+          <img
+            src="/assets/ic-add-person.svg"
+            (click)="addCC()"
+            *ngIf="isCCHovered"
+            draggable="false"
+          >
         </td>
       </tr>
 
@@ -68,29 +80,26 @@
 
   <!-- Description of the diff -->
   <div class="description">
-    <div class="titlebar">
-      <div class="title">Description</div>
-      <div class="edit-button">
-        <!-- Buttons to start editing  -->
-        <button
-          class="cr-light-button"
-          *ngIf="!isDescriptionEditMode"
-          mat-button
-          (click)="startDescriptionEditMode()"
-        >Edit</button>
-      </div>
-    </div>
-
     <!-- Description readonly/textarea -->
-    <div class="description-text" *ngIf="!isDescriptionEditMode">
-      <pre class="description-value" [HTML]="description"></pre>
-    </div>
-    <div class="description-textarea" *ngIf="isDescriptionEditMode">
+    <div
+      class="read-mode"
+      *ngIf="!isDescriptionEditMode"
+      (click)="startDescriptionEditMode()"
+    >
       <textarea
         class="description-text description-value"
         matInput
         matTextareaAutosize
-        matAutosizeMinRows="5"
+        matAutosizeMinRows="1"
+        placeholder="Description..."
+      ></textarea>
+    </div>
+    <div class="edit-mode" *ngIf="isDescriptionEditMode">
+      <textarea
+        class="description-text description-value"
+        matInput
+        matTextareaAutosize
+        matAutosizeMinRows="7"
         placeholder="Leave a comment"
         [(ngModel)]="description"
       ></textarea>
@@ -99,14 +108,13 @@
     <div class="buttons" *ngIf="isDescriptionEditMode">
       <!-- Buttons to stop editing -->
       <button
-        class="cr-light-button"
-        mat-raised-button
-        color="primary"
+        mat-button
+        class="cr-light-button blue-button"
         (click)="saveDescription()"
       >Save</button>
       <button
-        class="cr-light-button"
         mat-button
+        class="cr-light-button grey-button"
         (click)="stopDescriptionEditMode()"
       >Cancel</button>
     </div>

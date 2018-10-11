@@ -17,6 +17,8 @@ import { DiffHeaderService } from '../diff-header.service';
 export class DiffHeaderContentComponent implements OnInit {
   description: string = '';
   isDescriptionEditMode: boolean = false;
+  isReviewersHovered: boolean = false;
+  isCCHovered: boolean = false;
   @Input() diff: Diff;
 
   constructor(
