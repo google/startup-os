@@ -38,6 +38,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+// TODO: Add ability to read comments correctly from previous commits, not only from the latest
+// commit. It can help: https://developer.github.com/v3/repos/commits/#get-a-single-commit
 public class GitHubReader {
   // The regex pattern for newline symbols search:
   // `\\n\\s` - newline with space,
@@ -182,6 +184,8 @@ public class GitHubReader {
                         .setRepoId(pr.getTitle().replace("D", ""))
                         .setFilenameWithRepo(pr.getHead().getRepo().getFullName())
                         .setCommitId(comment.getCommitId())
+                        // TODO: Think over how to save already received user's email from the
+                        // previous iteration. It can reduce the number of requests.
                         .setUser(
                             gitHubClient
                                 .getUser(
@@ -231,9 +235,7 @@ public class GitHubReader {
   }
 
   private String getDiffPatchStrByFilename(List<File> pullRequestFiles, String filename) {
-    System.out.println(filename);
     for (File file : pullRequestFiles) {
-      System.out.println(file.getStatus() + " : " + file.getFilename());
       if (file.getFilename().equals(filename)) {
         return file.getPatch();
       }
