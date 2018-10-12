@@ -19,6 +19,7 @@ export class DiffHeaderContentComponent implements OnInit {
   isDescriptionEditMode: boolean = false;
   isReviewersHovered: boolean = false;
   isCCHovered: boolean = false;
+
   @Input() diff: Diff;
 
   constructor(

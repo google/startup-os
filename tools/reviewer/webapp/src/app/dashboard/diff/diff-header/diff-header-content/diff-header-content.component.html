@@ -92,6 +92,8 @@
         matTextareaAutosize
         matAutosizeMinRows="1"
         placeholder="Description..."
+        [value]="description"
+        readonly
       ></textarea>
     </div>
     <div class="edit-mode" *ngIf="isDescriptionEditMode">
@@ -100,8 +102,9 @@
         matInput
         matTextareaAutosize
         matAutosizeMinRows="7"
-        placeholder="Leave a comment"
+        placeholder="Description..."
         [(ngModel)]="description"
+        [focus]="isDescriptionEditMode"
       ></textarea>
     </div>
 
