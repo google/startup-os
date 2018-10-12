@@ -25,13 +25,19 @@ export class ThreadStateService {
   threadStateMap: ThreadStateMap = {};
   stateChanges = new Subject<Thread.Type>();
 
-  // Save link of new thread in the service
+  // Saves link of new thread in the service
   updateThreadLink(thread: Thread): void {
     this.threadMap[thread.getId()] = thread;
   }
 
-  // Tell thread components that they need to update links
+  // Tells thread components that they need to update links
   updateState(type: Thread.Type): void {
     this.stateChanges.next(type);
+  }
+
+  // Resets state
+  reset(): void {
+    this.threadMap = {};
+    this.threadStateMap = {};
   }
 }

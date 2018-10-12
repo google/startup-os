@@ -1,7 +1,11 @@
+@import '../index';
+
 .email-input {
-  ::ng-deep .mat-input-wrapper{
+  input {
     width: 300px;
+    padding: 2px;
   }
+  margin-bottom: 10px;
 }
 
 .error-message {

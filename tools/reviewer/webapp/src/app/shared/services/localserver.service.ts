@@ -61,7 +61,7 @@ export class LocalserverService {
         }, () => {
           this.fallback().subscribe(() => {
             this.getBranchInfoList(id, workspace).subscribe(
-              branchInfo => observer.next(branchInfo)
+              branchInfo => observer.next(branchInfo),
             );
           }, () => observer.error());
         });
@@ -96,13 +96,12 @@ export class LocalserverService {
         }, () => {
           this.fallback().subscribe(() => {
             this.getFileChanges(leftFile, rightFile).subscribe(
-              textDiffResponse => observer.next(textDiffResponse)
+              textDiffResponse => observer.next(textDiffResponse),
             );
           }, () => observer.error());
         });
     });
   }
-
 
   private fallback(): Observable<void> {
     return new Observable(observer => {
