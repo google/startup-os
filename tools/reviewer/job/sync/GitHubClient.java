@@ -17,20 +17,20 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.protobuf.util.JsonFormat;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHUserReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHUserResp;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestResp;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHCommentsReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHCommentsResp;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestFilesReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestFilesResp;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestResp;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestCommentReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHPullRequestReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateGHReviewCommentReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestsResp;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestsReq;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.UserRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.UserResponse;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestResponse;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CommentsResponse;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesResponse;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestResponse;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestsResponse;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestsRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,10 +46,11 @@ public class GitHubClient {
   private static final String BASE_PATH = "https://api.github.com/";
   private static final String GET_SINGLE_PULL_REQUEST = "repos/%s/pulls/%d";
   private static final String GET_SINGLE_USER = "users/%s";
-  private static final String CREATE_REVIEW_COMMENT_OR_GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST =
+  private static final String CREATE_REVIEW_COMMENT_ON_PULL_REQUEST = "repos/%s/pulls/%d/comments";
+  private static final String GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST =
       "repos/%s/pulls/%d/comments";
-  private static final String CREATE_COMMENT_ON_ISSUE_OR_GET_LIST_COMMENTS_ON_ISSUE =
-      "repos/%s/issues/%d/comments";
+  private static final String CREATE_COMMENT_ON_ISSUE = "repos/%s/issues/%d/comments";
+  private static final String GET_LIST_COMMENTS_ON_ISSUE = "repos/%s/issues/%d/comments";
   private static final String CREATE_PR_OR_GET_LIST_PR = "repos/%s/pulls";
   private static final String GET_PR_FILES_LIST = "repos/%s/pulls/%d/files";
 
@@ -61,8 +62,8 @@ public class GitHubClient {
     this.password = password;
   }
 
-  GHUserResp getUser(GHUserReq request) {
-    GHUserResp.Builder builder = GHUserResp.newBuilder();
+  UserResponse getUser(UserRequest request) {
+    UserResponse.Builder builder = UserResponse.newBuilder();
     try {
       JsonFormat.parser()
           .ignoringUnknownFields()
@@ -77,8 +78,8 @@ public class GitHubClient {
     return builder.build();
   }
 
-  GHCommentsResp getReviewComments(GHCommentsReq request) throws IOException {
-    GHCommentsResp.Builder builder = GHCommentsResp.newBuilder();
+  CommentsResponse getReviewComments(CommentsRequest request) throws IOException {
+    CommentsResponse.Builder builder = CommentsResponse.newBuilder();
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(
@@ -86,7 +87,7 @@ public class GitHubClient {
                 + doRequest(
                     RequestMethod.GET,
                     String.format(
-                        CREATE_REVIEW_COMMENT_OR_GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST,
+                        GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST,
                         request.getRepo(),
                         request.getDiffNumber()))
                 + "}",
@@ -94,8 +95,8 @@ public class GitHubClient {
     return builder.build();
   }
 
-  GHCommentsResp getIssueComments(GHCommentsReq request) throws IOException {
-    GHCommentsResp.Builder builder = GHCommentsResp.newBuilder();
+  CommentsResponse getIssueComments(CommentsRequest request) throws IOException {
+    CommentsResponse.Builder builder = CommentsResponse.newBuilder();
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(
@@ -103,16 +104,14 @@ public class GitHubClient {
                 + doRequest(
                     RequestMethod.GET,
                     String.format(
-                        CREATE_COMMENT_ON_ISSUE_OR_GET_LIST_COMMENTS_ON_ISSUE,
-                        request.getRepo(),
-                        request.getDiffNumber()))
+                        GET_LIST_COMMENTS_ON_ISSUE, request.getRepo(), request.getDiffNumber()))
                 + "}",
             builder);
     return builder.build();
   }
 
-  GHPullRequestResp getPullRequest(GHPullRequestReq request) throws IOException {
-    GHPullRequestResp.Builder builder = GHPullRequestResp.newBuilder();
+  PullRequestResponse getPullRequest(PullRequestRequest request) throws IOException {
+    PullRequestResponse.Builder builder = PullRequestResponse.newBuilder();
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(
@@ -126,8 +125,8 @@ public class GitHubClient {
     return builder.build();
   }
 
-  GHPullRequestsResp getPullRequests(GHPullRequestsReq request) throws IOException {
-    GHPullRequestsResp.Builder builder = GHPullRequestsResp.newBuilder();
+  PullRequestsResponse getPullRequests(PullRequestsRequest request) throws IOException {
+    PullRequestsResponse.Builder builder = PullRequestsResponse.newBuilder();
     String response =
         doRequest(RequestMethod.GET, String.format(CREATE_PR_OR_GET_LIST_PR, request.getRepo()));
     JsonFormat.parser()
@@ -136,8 +135,8 @@ public class GitHubClient {
     return builder.build();
   }
 
-  GHPullRequestFilesResp getPullRequestFiles(GHPullRequestFilesReq request) throws IOException {
-    GHPullRequestFilesResp.Builder builder = GHPullRequestFilesResp.newBuilder();
+  PullRequestFilesResponse getPullRequestFiles(PullRequestFilesRequest request) throws IOException {
+    PullRequestFilesResponse.Builder builder = PullRequestFilesResponse.newBuilder();
     String response =
         doRequest(
             RequestMethod.GET,
@@ -146,7 +145,7 @@ public class GitHubClient {
     return builder.build();
   }
 
-  CreateGHPullRequestResp createPullRequest(CreateGHPullRequestReq request) {
+  CreatePullRequestResponse createPullRequest(CreatePullRequestRequest request) {
     try {
       String requestData = JsonFormat.printer().print(request.getRequestData());
       String response =
@@ -156,7 +155,7 @@ public class GitHubClient {
                   String.format(CREATE_PR_OR_GET_LIST_PR, request.getRepo()),
                   requestData)
               + "}";
-      CreateGHPullRequestResp.Builder builder = CreateGHPullRequestResp.newBuilder();
+      CreatePullRequestResponse.Builder builder = CreatePullRequestResponse.newBuilder();
       JsonFormat.parser().ignoringUnknownFields().merge(response, builder);
       return builder.build();
     } catch (IOException e) {
@@ -164,31 +163,26 @@ public class GitHubClient {
     }
   }
 
-  void createPullRequestComment(CreateGHPullRequestCommentReq request) {
+  void createPullRequestComment(CreatePullRequestCommentRequest request) {
     try {
       String requestData = JsonFormat.printer().print(request.getRequestData());
       doRequest(
           RequestMethod.POST,
-          String.format(
-              CREATE_COMMENT_ON_ISSUE_OR_GET_LIST_COMMENTS_ON_ISSUE,
-              request.getRepo(),
-              request.getDiffNumber()),
+          String.format(CREATE_COMMENT_ON_ISSUE, request.getRepo(), request.getDiffNumber()),
           requestData);
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  void createReviewComment(CreateGHReviewCommentReq request) {
+  void createReviewComment(CreateReviewCommentRequest request) {
     try {
       String requestData =
           JsonFormat.printer().print(request.getRequestData()).replace("commitId", "commit_id");
       doRequest(
           RequestMethod.POST,
           String.format(
-              CREATE_REVIEW_COMMENT_OR_GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST,
-              request.getRepo(),
-              request.getDiffNumber()),
+              CREATE_REVIEW_COMMENT_ON_PULL_REQUEST, request.getRepo(), request.getDiffNumber()),
           requestData);
     } catch (IOException e) {
       e.printStackTrace();

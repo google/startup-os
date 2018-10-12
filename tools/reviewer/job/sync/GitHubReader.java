@@ -22,12 +22,13 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHComment;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHPullRequestReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHUserReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHCommentsReq;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GHFile;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GitHubComment;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.UserRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesRequest;
+import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.File;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -38,6 +39,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class GitHubReader {
+  // The regex pattern for newline symbols search:
+  // `\\n\\s` - newline with space,
+  // `\\n\\+` - newline with `+` character,
+  // `\\n\\-` - newline with `-` character
   private static final String NEW_LINES_PATTERN = "\\n\\s|\\n\\+|\\n\\-";
   private final GitHubClient gitHubClient;
 
@@ -46,10 +51,10 @@ public class GitHubReader {
   }
 
   public Diff getDiff(String repo, int diffNumber) throws IOException {
-    GHPullRequest pr =
+    PullRequest pr =
         gitHubClient
             .getPullRequest(
-                GHPullRequestReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+                PullRequestRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
             .getPullRequest();
     return Diff.newBuilder()
         .setId(Long.parseLong(pr.getTitle().replaceFirst("D", "")))
@@ -57,7 +62,7 @@ public class GitHubReader {
             Author.newBuilder()
                 .setEmail(
                     gitHubClient
-                        .getUser(GHUserReq.newBuilder().setLogin(pr.getUser().getLogin()).build())
+                        .getUser(UserRequest.newBuilder().setLogin(pr.getUser().getLogin()).build())
                         .getUser()
                         .getEmail())
                 .build())
@@ -69,7 +74,10 @@ public class GitHubReader {
                 pr,
                 gitHubClient
                     .getReviewComments(
-                        GHCommentsReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+                        CommentsRequest.newBuilder()
+                            .setRepo(repo)
+                            .setDiffNumber(diffNumber)
+                            .build())
                     .getCommentsList(),
                 repo,
                 diffNumber))
@@ -79,10 +87,10 @@ public class GitHubReader {
 
   private Thread getDiffThread(String repo, int diffNumber) throws IOException {
     Thread.Builder diffThread = Thread.newBuilder();
-    List<GHComment> diffComments =
+    List<GitHubComment> diffComments =
         gitHubClient
             .getIssueComments(
-                GHCommentsReq.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+                CommentsRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
             .getCommentsList();
 
     diffComments.forEach(
@@ -96,7 +104,7 @@ public class GitHubReader {
                         // resolve this.
                         gitHubClient
                             .getUser(
-                                GHUserReq.newBuilder()
+                                UserRequest.newBuilder()
                                     .setLogin(comment.getUser().getLogin())
                                     .build())
                             .getUser()
@@ -106,40 +114,43 @@ public class GitHubReader {
   }
 
   private ImmutableList<Thread> getCodeThreads(
-      GHPullRequest pr, List<GHComment> comments, String repo, int diffNumber) throws IOException {
+      PullRequest pr, List<GitHubComment> comments, String repo, int diffNumber)
+      throws IOException {
     List<Thread> result = new ArrayList<>();
 
     List<String> commentedFiles =
-        comments.stream().map(GHComment::getPath).distinct().collect(Collectors.toList());
+        comments.stream().map(GitHubComment::getPath).distinct().collect(Collectors.toList());
 
-    List<GHFile> pullRequestFiles =
+    List<File> pullRequestFiles =
         gitHubClient
             .getPullRequestFiles(
-                GitHubProtos.GHPullRequestFilesReq.newBuilder()
+                PullRequestFilesRequest.newBuilder()
                     .setRepo(repo)
                     .setDiffNumber(diffNumber)
                     .build())
             .getFilesList();
 
     for (String fileName : commentedFiles) {
-      ImmutableList<GHComment> fileComments = getCodeCommentsByFilename(comments, fileName);
-      List<Integer> lines =
+      ImmutableList<GitHubComment> fileComments = getCodeCommentsByFilename(comments, fileName);
+      List<Integer> positions =
           fileComments
               .stream()
               .filter(comment -> comment.getPath().equals(fileName))
-              .map(GHComment::getPosition)
+              .map(GitHubComment::getPosition)
               .distinct()
               .collect(Collectors.toList());
 
-      lines.forEach(
-          line ->
-              result.add(getCodeThreadByFilenameAndLine(fileComments, line, pr, pullRequestFiles)));
+      positions.forEach(
+          position ->
+              result.add(
+                  getCodeThreadByFilenameAndPosition(
+                      fileComments, position, pr, pullRequestFiles)));
     }
     return ImmutableList.copyOf(result);
   }
 
-  private ImmutableList<GHComment> getCodeCommentsByFilename(
-      List<GHComment> codeComments, String filename) {
+  private ImmutableList<GitHubComment> getCodeCommentsByFilename(
+      List<GitHubComment> codeComments, String filename) {
     return ImmutableList.copyOf(
         codeComments
             .stream()
@@ -147,20 +158,20 @@ public class GitHubReader {
             .collect(Collectors.toList()));
   }
 
-  private Thread getCodeThreadByFilenameAndLine(
-      ImmutableList<GHComment> fileComments,
-      int line,
-      GHPullRequest pr,
-      List<GHFile> pullRequestFiles) {
-    ImmutableList<GHComment> lineComments =
+  private Thread getCodeThreadByFilenameAndPosition(
+      ImmutableList<GitHubComment> fileComments,
+      int position,
+      PullRequest pr,
+      List<File> pullRequestFiles) {
+    ImmutableList<GitHubComment> positionComments =
         ImmutableList.copyOf(
             fileComments
                 .stream()
-                .filter(item -> item.getPosition() == line)
+                .filter(comment -> comment.getPosition() == position)
                 .collect(Collectors.toList()));
 
     Thread.Builder thread = Thread.newBuilder();
-    lineComments.forEach(
+    positionComments.forEach(
         comment ->
             thread
                 .setRepoId(pr.getTitle().replace("D", ""))
@@ -174,7 +185,7 @@ public class GitHubReader {
                         .setUser(
                             gitHubClient
                                 .getUser(
-                                    GHUserReq.newBuilder()
+                                    UserRequest.newBuilder()
                                         .setLogin(pr.getUser().getLogin())
                                         .build())
                                 .getUser()
@@ -184,7 +195,7 @@ public class GitHubReader {
                     getLineNumber(
                         getDiffPatchStrByFilename(pullRequestFiles, comment.getPath()),
                         comment.getPosition(),
-                        getSide(comment.getDiffHunk())))
+                        getCommentSide(comment.getDiffHunk())))
                 .addComment(
                     Comment.newBuilder()
                         .setContent(comment.getBody())
@@ -194,7 +205,7 @@ public class GitHubReader {
                             // resolve this.
                             gitHubClient
                                 .getUser(
-                                    GHUserReq.newBuilder()
+                                    UserRequest.newBuilder()
                                         .setLogin(comment.getUser().getLogin())
                                         .build())
                                 .getUser()
@@ -204,21 +215,25 @@ public class GitHubReader {
     return thread.build();
   }
 
-  private LineNumberConverter.Side getSide(String diffHunkStr) {
+  private LineNumberConverter.Side getCommentSide(String commentDiffHunk) {
     List<String> newLinesSymbols = new ArrayList<>();
     Pattern pattern = Pattern.compile(NEW_LINES_PATTERN);
-    Matcher matcher = pattern.matcher(diffHunkStr);
+    Matcher matcher = pattern.matcher(commentDiffHunk);
     while (matcher.find()) {
       newLinesSymbols.add(matcher.group());
     }
-    String lastNewLineSymbol = newLinesSymbols.get(newLinesSymbols.size() - 1);
-    return lastNewLineSymbol.equals("\n+")
+    String lastNewlineSymbol = newLinesSymbols.get(newLinesSymbols.size() - 1);
+    // If the last newline symbol in comment diff hunk is `\n+`, it means the comment was left to
+    // the right side, otherwise - to the left side.
+    return lastNewlineSymbol.equals("\n+")
         ? LineNumberConverter.Side.RIGHT
         : LineNumberConverter.Side.LEFT;
   }
 
-  private String getDiffPatchStrByFilename(List<GHFile> pullRequestFiles, String filename) {
-    for (GHFile file : pullRequestFiles) {
+  private String getDiffPatchStrByFilename(List<File> pullRequestFiles, String filename) {
+    System.out.println(filename);
+    for (File file : pullRequestFiles) {
+      System.out.println(file.getStatus() + " : " + file.getFilename());
       if (file.getFilename().equals(filename)) {
         return file.getPatch();
       }
@@ -226,8 +241,8 @@ public class GitHubReader {
     throw new RuntimeException("`diff_patch` not found for the file: " + filename);
   }
 
-  private String setThreadCommitId(GHPullRequest pr, GHComment comment) {
-    LineNumberConverter.Side side = getSide(comment.getDiffHunk());
+  private String setThreadCommitId(PullRequest pr, GitHubComment comment) {
+    LineNumberConverter.Side side = getCommentSide(comment.getDiffHunk());
     return side.equals(LineNumberConverter.Side.LEFT)
         ? pr.getBase().getSha()
         : comment.getCommitId();

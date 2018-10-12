@@ -13,11 +13,11 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
-        "DiffPatch.java",
         "GitHubClient.java",
         "GitHubReader.java",
         "GitHubWriter.java",
         "LineNumberConverter.java",
+        "Patch.java",
     ],
     deps = [
         ":github_api_java_proto",

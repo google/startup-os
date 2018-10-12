@@ -32,20 +32,20 @@ public class LineNumberConverter {
   }
 
   private void processDiffPatch(String diffPatchStr) {
-    DiffPatch diffPatch = new DiffPatch(diffPatchStr);
-    List<String> newLineSymbols = diffPatch.getNewLineSymbols();
-    List<DiffPatch.DiffHunk> diffHunks = diffPatch.getDiffHunks();
+    Patch patch = new Patch(diffPatchStr);
+    List<String> newLineSymbols = patch.getNewlineSymbols();
+    List<Patch.DiffHunkHeader> diffHunkHeaders = patch.getDiffHunkHeaders();
     int diffHunkIndex = 0;
     int positionIndex = 1;
 
     positionToLineNumberLeftSide.put(
-        positionIndex, diffHunks.get(diffHunkIndex).getLeftStartLine());
+        positionIndex, diffHunkHeaders.get(diffHunkIndex).getLeftStartLine());
     positionToLineNumberRightSide.put(
-        positionIndex, diffHunks.get(diffHunkIndex).getRightStartLine());
+        positionIndex, diffHunkHeaders.get(diffHunkIndex).getRightStartLine());
     lineNumberToPositionLeftSide.put(
-        diffHunks.get(diffHunkIndex).getLeftStartLine(), positionIndex);
+        diffHunkHeaders.get(diffHunkIndex).getLeftStartLine(), positionIndex);
     lineNumberToPositionRightSide.put(
-        diffHunks.get(diffHunkIndex).getRightStartLine(), positionIndex);
+        diffHunkHeaders.get(diffHunkIndex).getRightStartLine(), positionIndex);
     positionIndex++;
 
     for (String n : newLineSymbols) {
@@ -58,13 +58,13 @@ public class LineNumberConverter {
           {
             ++diffHunkIndex;
             positionToLineNumberLeftSide.put(
-                positionIndex, diffHunks.get(diffHunkIndex).getLeftStartLine());
+                positionIndex, diffHunkHeaders.get(diffHunkIndex).getLeftStartLine());
             positionToLineNumberRightSide.put(
-                positionIndex, diffHunks.get(diffHunkIndex).getRightStartLine());
+                positionIndex, diffHunkHeaders.get(diffHunkIndex).getRightStartLine());
             lineNumberToPositionLeftSide.put(
-                diffHunks.get(diffHunkIndex).getLeftStartLine(), positionIndex);
+                diffHunkHeaders.get(diffHunkIndex).getLeftStartLine(), positionIndex);
             lineNumberToPositionRightSide.put(
-                diffHunks.get(diffHunkIndex).getRightStartLine(), positionIndex);
+                diffHunkHeaders.get(diffHunkIndex).getRightStartLine(), positionIndex);
             positionIndex++;
             break;
           }
