@@ -68,6 +68,22 @@ export class FirebaseService {
     });
   }
 
+  removeDiff(id: string): Observable<void> {
+    return new Observable(observer => {
+      this.diffs
+        .doc(id)
+        .delete()
+        .then(() => {
+          // Accessed
+          observer.next();
+        })
+        .catch(() => {
+          // Permission denied
+          observer.error();
+        });
+    });
+  }
+
   private convertDiffToFirebaseElement(diff: Diff): FirebaseElement {
     // Convert diff to binary
     const binary: Uint8Array = diff.serializeBinary();

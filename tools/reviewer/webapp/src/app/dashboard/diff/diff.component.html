@@ -11,4 +11,18 @@
   <diff-discussion
     [diff]="diff"
   ></diff-discussion>
+
+  <!-- Button to delete the diff -->
+  <div class="cr-titlebar">
+    <div class="title">
+      <span class="bold">Extra actions</span>
+    </div>
+    <div class="buttons" fxFlex>
+      <button
+        mat-button
+        class="cr-light-button grey-button"
+        (click)="deleteDiff()"
+      >Delete Diff</button>
+    </div>
+  </div>
 </ng-container>
