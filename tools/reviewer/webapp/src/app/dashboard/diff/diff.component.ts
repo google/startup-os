@@ -7,6 +7,7 @@ import {
   AuthService,
   ExceptionService,
   FirebaseService,
+  FirebaseStateService,
   LocalserverService,
   NotificationService,
 } from '@/shared/services';
@@ -28,8 +29,9 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private firebaseService: FirebaseService,
+    private firebaseStateService: FirebaseStateService,
+    private router: Router,
     private localserverService: LocalserverService,
     private exceptionService: ExceptionService,
     private notificationService: NotificationService,
@@ -40,7 +42,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     const diffId: string = this.route.snapshot.params['id'];
 
     // Get diff from firebase
-    this.firebaseSubscription = this.firebaseService
+    this.firebaseSubscription = this.firebaseStateService
       .getDiff(diffId)
       .subscribe(diff => {
         if (diff === undefined) {

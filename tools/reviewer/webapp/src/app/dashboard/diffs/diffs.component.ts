@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AuthService, FirebaseService } from '@/shared';
+import { AuthService, FirebaseStateService } from '@/shared';
 import { Diff, Reviewer } from '@/shared/proto';
 
 export enum DiffGroups {
@@ -36,7 +36,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
   firebaseSubscription = new Subscription();
 
   constructor(
-    private firebaseService: FirebaseService,
+    private firebaseStateService: FirebaseStateService,
     private authService: AuthService,
     private router: Router,
   ) {
@@ -65,7 +65,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
 
   // Categorize diffs in specific groups
   categorizeDiffs(userEmail: string) {
-    this.firebaseSubscription = this.firebaseService.getDiffs().subscribe(diffs => {
+    this.firebaseSubscription = this.firebaseStateService.getDiffs().subscribe(diffs => {
       this.diffGroups[DiffGroups.NeedAttention] = [];
       this.diffGroups[DiffGroups.Incoming] = [];
       this.diffGroups[DiffGroups.Outgoing] = [];

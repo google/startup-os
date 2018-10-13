@@ -153,10 +153,6 @@ export class ThreadComponent implements OnInit, OnDestroy {
     }
   }
 
-  getResolveText(isResolved: boolean): string {
-    return isResolved ? 'Resolved' : 'Unresolved';
-  }
-
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }

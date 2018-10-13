@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { File } from '@/shared/proto';
 import {
   ExceptionService,
-  FirebaseService,
+  FirebaseStateService,
   LocalserverService,
 } from '@/shared/services';
 import { CommitService } from './commit.service';
@@ -16,7 +16,7 @@ import { ThreadService } from './thread.service';
 export class LoadService {
   constructor(
     private location: Location,
-    private firebaseService: FirebaseService,
+    private firebaseStateService: FirebaseStateService,
     private exceptionService: ExceptionService,
     private localserverService: LocalserverService,
     private stateService: StateService,
@@ -26,7 +26,7 @@ export class LoadService {
 
   // Load diff from firebase
   loadDiff(diffId: string): void {
-    this.stateService.subscription = this.firebaseService
+    this.stateService.subscription = this.firebaseStateService
       .getDiff(diffId)
       .subscribe(diff => {
         if (diff === undefined) {
