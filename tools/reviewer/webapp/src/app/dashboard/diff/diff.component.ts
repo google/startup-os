@@ -65,7 +65,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     if (this.authService.userEmail !== this.diff.getAuthor().getEmail()) {
       this.notificationService.error('Only author can delete a diff');
     } else {
-      if (confirm('Are you sure you want to delete the diff?')) {
+      if (confirm('Are you sure you want to delete this diff?')) {
         this.isLoading = true;
         this.ngOnDestroy();
         this.firebaseService.removeDiff(this.diff.getId().toString()).subscribe(() => {
