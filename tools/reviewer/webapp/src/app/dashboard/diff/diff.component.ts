@@ -25,7 +25,8 @@ export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   diff: Diff;
   files: File[];
-  firebaseSubscription = new Subscription();
+  onloadSubscription = new Subscription();
+  changesSubscription = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -39,27 +40,44 @@ export class DiffComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    const diffId: string = this.route.snapshot.params['id'];
+    this.loadDiff(this.route.snapshot.params['id']);
+  }
 
-    // Get diff from firebase
-    this.firebaseSubscription = this.firebaseStateService
-      .getDiff(diffId)
+  // Loads diff from firebase
+  loadDiff(id: string): void {
+    this.onloadSubscription = this.firebaseStateService
+      .getDiff(id)
       .subscribe(diff => {
-        if (diff === undefined) {
-          this.exceptionService.diffNotFound();
-          return;
-        }
-        this.diff = diff;
-        // Get files from localserver
-        this.localserverService
-          .getDiffFiles(this.diff.getId(), this.diff.getWorkspace())
-          .subscribe(files => {
-            // Hide deleted files
-            this.files = files.filter(
-              file => file.getAction() !== File.Action.DELETE,
-            );
-            this.isLoading = false;
-          });
+        this.setDiff(diff);
+        this.subscribeOnChanges();
+      });
+  }
+
+  // Each time when diff is changes in firebase, we receive new diff here.
+  subscribeOnChanges(): void {
+    this.changesSubscription = this.firebaseStateService
+      .diffChanges
+      .subscribe(diff => {
+        this.setDiff(diff);
+      });
+  }
+
+  // When diff is received from firebase
+  setDiff(diff: Diff): void {
+    if (diff === undefined) {
+      this.exceptionService.diffNotFound();
+      return;
+    }
+    this.diff = diff;
+    // Get files from localserver
+    this.localserverService
+      .getDiffFiles(this.diff.getId(), this.diff.getWorkspace())
+      .subscribe(files => {
+        // Hide deleted files
+        this.files = files.filter(
+          file => file.getAction() !== File.Action.DELETE,
+        );
+        this.isLoading = false;
       });
   }
 
@@ -79,6 +97,7 @@ export class DiffComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.firebaseSubscription.unsubscribe();
+    this.onloadSubscription.unsubscribe();
+    this.changesSubscription.unsubscribe();
   }
 }
