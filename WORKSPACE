@@ -60,8 +60,8 @@ gmaven_rules()
 # https://docs.bazel.build/versions/master/be/android.html#android_sdk_repository
 android_sdk_repository(
     name = "androidsdk",
-    api_level = 27,
-    build_tools_version = "27.0.3",
+    api_level = 28,
+    build_tools_version = "28.0.3",
 )
 
 http_file(
@@ -180,15 +180,15 @@ http_jar(
 http_file(
     name = "protoc_bin",
     executable = True,
-    sha256 = "84e29b25de6896c6c4b22067fb79472dac13cf54240a7a210ef1cac623f5231d",
-    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-linux-x86_64.zip"]
+    sha256 = "6003de742ea3fcf703cfec1cd4a3380fd143081a2eb0e559065563496af27807",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip"]
 )
 
 http_file(
     name = "protoc_bin_osx",
     executable = True,
-    sha256 = "768a42032718accd12e056447b0d93d42ffcdc27d1b0f21fc1e30a900da94842",
-    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
+    sha256 = "0decc6ce5beed07f8c20361ddeb5ac7666f09cf34572cca530e16814093f9c0c",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-osx-x86_64.zip"]
 )
 
 # clang-format tool download, to be used by Formatter tool
