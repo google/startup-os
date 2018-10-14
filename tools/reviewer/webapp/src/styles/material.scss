@@ -9,15 +9,3 @@ $material-theme: mat-light-theme(
   $material-primary, $material-accent, $material-warn
 );
 @include angular-material-theme($material-theme);
-
-.mat-header-row {
-  padding: 0 23px;
-  min-height: 40px !important;
-  >.mat-header-cell {
-    font-size: 16px;
-  }
-}
-
-.mat-checkbox-frame {
-  background: white !important;
-}

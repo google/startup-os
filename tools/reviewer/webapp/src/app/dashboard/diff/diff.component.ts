@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Diff, File } from '@/shared/proto';
 import {
+  AuthService,
   ExceptionService,
   FirebaseService,
   LocalserverService,
+  NotificationService,
 } from '@/shared/services';
 import { DiffService } from './diff.service';
 
@@ -16,6 +18,7 @@ import { DiffService } from './diff.service';
   selector: 'cr-diff',
   templateUrl: './diff.component.html',
   providers: [DiffService],
+  styleUrls: ['./diff.scss'],
 })
 export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
@@ -25,9 +28,12 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private firebaseService: FirebaseService,
     private localserverService: LocalserverService,
     private exceptionService: ExceptionService,
+    private notificationService: NotificationService,
+    private authService: AuthService,
   ) { }
 
   ngOnInit() {
@@ -53,6 +59,21 @@ export class DiffComponent implements OnInit, OnDestroy {
             this.isLoading = false;
           });
       });
+  }
+
+  deleteDiff(): void {
+    if (this.authService.userEmail !== this.diff.getAuthor().getEmail()) {
+      this.notificationService.error('Only author can delete a diff');
+    } else {
+      if (confirm('Are you sure you want to delete this diff?')) {
+        this.isLoading = true;
+        this.ngOnDestroy();
+        this.firebaseService.removeDiff(this.diff.getId().toString()).subscribe(() => {
+          this.notificationService.success('Diff is deleted');
+          this.router.navigate(['/diffs']);
+        });
+      }
+    }
   }
 
   ngOnDestroy() {

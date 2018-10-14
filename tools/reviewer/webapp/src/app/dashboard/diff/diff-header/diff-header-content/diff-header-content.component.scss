@@ -1,13 +1,15 @@
+@import '../index';
+
 $transparent-grey: rgba(0,0,0,0.54);
-$default-font: 'Heebo', sans-serif;
 
 .header-content {
   display: flex;
   padding: 15px 24px;
+  min-height: 250px;
   >.info {
     padding-right: 20px;
     tr {
-      height: 30px;
+      height: 35px;
       td:first-child {
         color: $transparent-grey;
         width: 120px;
@@ -17,9 +19,16 @@ $default-font: 'Heebo', sans-serif;
           float: left;
         }
       }
+      >.add-button {
+        min-width: 24px;
+      }
     }
     user-popup {
       margin-right: 5px;
+    }
+    img {
+      user-select: none;
+      cursor: pointer;
     }
   }
   >.description {
@@ -35,26 +44,25 @@ $default-font: 'Heebo', sans-serif;
         margin-left: 20px;
       }
     }
-    >.description-text {
-      >.description-value {
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        font-family: $default-font;
-      }
-    }
-    >.description-textarea {
+    >.edit-mode {
       margin-bottom: 15px;
-      >textarea {
-        resize: none;
-        width: calc(100% - 14px);
-        padding: 10px 7px 0 7px;
-        border-radius: 4px;
-        background: white;
-        vertical-align: bottom;
+    }
+    >.buttons {
+      direction: rtl;
+      >.blue-button {
+        margin-left: 15px;
       }
     }
     .description-value {
       font-size: 14px;
+    }
+    textarea {
+      resize: none;
+      width: calc(100% - 14px);
+      padding: 10px 7px 0 7px;
+      border-radius: 4px;
+      background: white;
+      vertical-align: bottom;
     }
   }
 }
