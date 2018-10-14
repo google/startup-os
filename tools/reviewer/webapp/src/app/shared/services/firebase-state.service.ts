@@ -14,10 +14,9 @@ export class FirebaseStateService {
   isDiffLoading: boolean = false;
   isDiffsLoading: boolean = false;
   private diffSubscription = new Subscription();
+  private diffsSubscription = new Subscription();
 
-  constructor(private firebaseService: FirebaseService) {
-    this.connectDiffs();
-  }
+  constructor(private firebaseService: FirebaseService) { }
 
   getDiff(id: string): Observable<Diff> {
     this.connectDiff(id);
@@ -64,14 +63,20 @@ export class FirebaseStateService {
     }
   }
 
-  private connectDiffs(): void {
+  connectDiffs(): void {
     if (this.diffs.length === 0) {
       this.isDiffsLoading = true;
-      this.firebaseService.getDiffs().subscribe(diffs => {
+      this.diffsSubscription.unsubscribe();
+      this.diffsSubscription = this.firebaseService.getDiffs().subscribe(diffs => {
         this.diffs = diffs;
         this.isDiffsLoading = false;
         this.diffsChanges.next(diffs);
       });
     }
+  }
+
+  destroy(): void {
+    this.diffSubscription.unsubscribe();
+    this.diffsSubscription.unsubscribe();
   }
 }
