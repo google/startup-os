@@ -16,18 +16,18 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestCommentRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestCommentRequestData;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestRequestData;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateReviewCommentRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateReviewCommentRequestData;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.File;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestCommentRequestData;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequestData;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequestData;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.File;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestFilesRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestsRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
@@ -36,33 +36,35 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
-public class GitHubWriter {
-  private final GitHubClient gitHubClient;
+/** Writes `tools.reviewer.localserver.service.Protos.Diff` to GitHub using GitHub API */
+public class GithubWriter {
+  private final GithubClient githubClient;
 
-  GitHubWriter(GitHubClient gitHubClient) {
-    this.gitHubClient = gitHubClient;
+  GithubWriter(GithubClient githubClient) {
+    this.githubClient = githubClient;
   }
 
   public void writeDiff(Diff diff, String repo) throws IOException {
-    int diffNumber = getPRNumber(diff, repo);
+    int diffNumber = getGithubPullRequestNumber(diff, repo);
 
     for (Thread diffThread : diff.getDiffThreadList()) {
       for (Comment comment : diffThread.getCommentList()) {
         // TODO: Think over what should be in the comment by Reviewer Bot
+        // TODO: Add link to Reviewer Diff
         createPullRequestComment(
             repo,
             diffNumber,
-            "Created by: **"
+            "Created by: "
                 + comment.getCreatedBy()
-                + "**\nTime: **"
+                + "\nTime: "
                 + Instant.ofEpochSecond(comment.getTimestamp())
-                + "**\n"
+                + "\n"
                 + comment.getContent());
       }
     }
 
     List<File> pullRequestFiles =
-        gitHubClient
+        githubClient
             .getPullRequestFiles(
                 PullRequestFilesRequest.newBuilder()
                     .setRepo(repo)
@@ -71,7 +73,7 @@ public class GitHubWriter {
             .getFilesList();
 
     PullRequest pr =
-        gitHubClient
+        githubClient
             .getPullRequest(
                 PullRequestRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
             .getPullRequest();
@@ -84,14 +86,15 @@ public class GitHubWriter {
             getCommentSide(codeThread.getFile().getCommitId(), codeThread.getCommitId());
         int position = getCommentPosition(diffPatchStr, codeThread.getLineNumber(), side);
         // TODO: Think over what should be in the comment by Reviewer Bot
+        // TODO: Add link to Reviewer Diff
         createReviewComment(
             repo,
             diffNumber,
-            "Created by: **"
+            "Created by: "
                 + comment.getCreatedBy()
-                + "**\nTime: **"
+                + "\nTime: "
                 + Instant.ofEpochSecond(comment.getTimestamp()).toString()
-                + "**\n"
+                + "\n"
                 + comment.getContent(),
             pr.getHead().getSha(),
             path,
@@ -100,10 +103,10 @@ public class GitHubWriter {
     }
   }
 
-  private int getPRNumber(Diff diff, String repo) {
+  private int getGithubPullRequestNumber(Diff diff, String repo) {
     PullRequestsRequest request = PullRequestsRequest.newBuilder().setRepo(repo).build();
     try {
-      List<PullRequest> pullRequests = gitHubClient.getPullRequests(request).getPullRequestsList();
+      List<PullRequest> pullRequests = githubClient.getPullRequests(request).getPullRequestsList();
       for (PullRequest pr : pullRequests) {
         if (pr.getTitle().equals("D" + diff.getId())) {
           return pr.getNumber();
@@ -112,7 +115,7 @@ public class GitHubWriter {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    // Creating new PR if it isn't exist
+    // Create new Pull Request if it doesn't exist
     return createPullRequest(
         repo, "D" + diff.getId(), "D" + diff.getId(), "master", diff.getDescription());
   }
@@ -131,7 +134,7 @@ public class GitHubWriter {
                     .setBody(body.isEmpty() ? "Created by Reviewer Bot" : body)
                     .build())
             .build();
-    CreatePullRequestResponse response = gitHubClient.createPullRequest(request);
+    CreatePullRequestResponse response = githubClient.createPullRequest(request);
     return response.getPullRequest().getNumber();
   }
 
@@ -142,7 +145,7 @@ public class GitHubWriter {
             .setDiffNumber(diffNumber)
             .setRequestData(CreatePullRequestCommentRequestData.newBuilder().setBody(body).build())
             .build();
-    gitHubClient.createPullRequestComment(request);
+    githubClient.createPullRequestComment(request);
   }
 
   private void createReviewComment(
@@ -159,7 +162,7 @@ public class GitHubWriter {
                     .setPosition(position)
                     .build())
             .build();
-    gitHubClient.createReviewComment(request);
+    githubClient.createReviewComment(request);
   }
 
   private int getCommentPosition(String patchStr, int lineNumber, LineNumberConverter.Side side) {
@@ -179,7 +182,7 @@ public class GitHubWriter {
         return file.getPatch();
       }
     }
-    throw new RuntimeException("`patch` not found for the file: " + filename);
+    throw new RuntimeException("`Patch` not found for the file: " + filename);
   }
 }
 

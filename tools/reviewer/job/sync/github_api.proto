@@ -3,7 +3,7 @@ syntax = "proto3";
 package com.google.startupos.tools.reviewer.job.sync;
 
 option java_package = "com.google.startupos.tools.reviewer.job.sync";
-option java_outer_classname = "GitHubProtos";
+option java_outer_classname = "GithubProtos";
 
 // GitHub User
 message User {
@@ -33,8 +33,7 @@ message PullRequestFilesRequest {
 
 message PullRequestFilesResponse { repeated File files = 1; }
 
-// GitHub Comments
-message GitHubComment {
+message GithubComment {
   int64 id = 1;
   string body = 2;
   string created_at = 3;
@@ -53,7 +52,7 @@ message CommentsRequest {
   int32 diff_number = 2;
 }
 
-message CommentsResponse { repeated GitHubComment comments = 1; }
+message CommentsResponse { repeated GithubComment comments = 1; }
 
 message CreateReviewCommentRequest {
   string repo = 1;

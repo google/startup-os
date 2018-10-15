@@ -13,11 +13,11 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
-        "GitHubClient.java",
-        "GitHubReader.java",
-        "GitHubWriter.java",
+        "GithubClient.java",
+        "GithubPatch.java",
+        "GithubReader.java",
+        "GithubWriter.java",
         "LineNumberConverter.java",
-        "Patch.java",
     ],
     deps = [
         ":github_api_java_proto",
@@ -35,9 +35,9 @@ java_library(
 java_binary(
     name = "github_sync_tool",
     srcs = [
-        "GitHubSync.java",
+        "GithubSync.java",
     ],
-    main_class = "com.google.startupos.tools.reviewer.job.sync.GitHubSync",
+    main_class = "com.google.startupos.tools.reviewer.job.sync.GithubSync",
     deps = [
         ":github_sync",
         "//common/flags",

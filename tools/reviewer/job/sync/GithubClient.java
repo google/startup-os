@@ -17,20 +17,20 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.protobuf.util.JsonFormat;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.UserRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.UserResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CommentsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CommentsResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestCommentRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreatePullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CreateReviewCommentRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestsResponse;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.UserRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.UserResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommentsResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestFilesRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestFilesResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestsResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestsRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,36 +42,46 @@ import java.util.Base64;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_OK;
 
-public class GitHubClient {
+/**
+ * Allows sending GitHub API requests and returns responses. It requires a login and a password of
+ * GitHub user.
+ */
+public class GithubClient {
   private static final String BASE_PATH = "https://api.github.com/";
-  private static final String GET_SINGLE_PULL_REQUEST = "repos/%s/pulls/%d";
-  private static final String GET_SINGLE_USER = "users/%s";
+  // https://developer.github.com/v3/pulls/#get-a-single-pull-request
+  private static final String GET_PULL_REQUEST = "repos/%s/pulls/%d";
+  // https://developer.github.com/v3/users/#get-a-single-user
+  private static final String GET_USER = "users/%s";
+  // https://developer.github.com/v3/pulls/comments/#create-a-comment
   private static final String CREATE_REVIEW_COMMENT_ON_PULL_REQUEST = "repos/%s/pulls/%d/comments";
-  private static final String GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST =
-      "repos/%s/pulls/%d/comments";
+  // https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
+  private static final String GET_REVIEW_COMMENTS_ON_PULL_REQUEST = "repos/%s/pulls/%d/comments";
+  // https://developer.github.com/v3/issues/comments/#create-a-comment
   private static final String CREATE_COMMENT_ON_ISSUE = "repos/%s/issues/%d/comments";
-  private static final String GET_LIST_COMMENTS_ON_ISSUE = "repos/%s/issues/%d/comments";
-  private static final String CREATE_PR_OR_GET_LIST_PR = "repos/%s/pulls";
-  private static final String GET_PR_FILES_LIST = "repos/%s/pulls/%d/files";
+  // https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
+  private static final String GET_COMMENTS_ON_ISSUE = "repos/%s/issues/%d/comments";
+  // https://developer.github.com/v3/pulls/#create-a-pull-request
+  private static final String CREATE_PULL_REQUEST = "repos/%s/pulls";
+  // https://developer.github.com/v3/pulls/#list-pull-requests
+  private static final String GET_PULL_REQUESTS = "repos/%s/pulls";
+  // https://developer.github.com/v3/pulls/#list-pull-requests-files
+  private static final String GET_PULL_REQUEST_FILES = "repos/%s/pulls/%d/files";
 
   private final String login;
   private final String password;
 
-  GitHubClient(String login, String password) {
+  GithubClient(String login, String password) {
     this.login = login;
     this.password = password;
   }
 
   UserResponse getUser(UserRequest request) {
     UserResponse.Builder builder = UserResponse.newBuilder();
+    String response = doRequest(RequestMethod.GET, String.format(GET_USER, request.getLogin()));
     try {
       JsonFormat.parser()
           .ignoringUnknownFields()
-          .merge(
-              "{\"user\":"
-                  + doRequest(RequestMethod.GET, String.format(GET_SINGLE_USER, request.getLogin()))
-                  + "}",
-              builder);
+          .merge(String.format("{\"user\":%s}", response), builder);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -80,58 +90,48 @@ public class GitHubClient {
 
   CommentsResponse getReviewComments(CommentsRequest request) throws IOException {
     CommentsResponse.Builder builder = CommentsResponse.newBuilder();
+    String response =
+        doRequest(
+            RequestMethod.GET,
+            String.format(
+                GET_REVIEW_COMMENTS_ON_PULL_REQUEST, request.getRepo(), request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
-        .merge(
-            "{\"comments\":"
-                + doRequest(
-                    RequestMethod.GET,
-                    String.format(
-                        GET_LIST_REVIEW_COMMENTS_ON_PULL_REQUEST,
-                        request.getRepo(),
-                        request.getDiffNumber()))
-                + "}",
-            builder);
+        .merge(String.format("{\"comments\":%s}", response), builder);
     return builder.build();
   }
 
   CommentsResponse getIssueComments(CommentsRequest request) throws IOException {
     CommentsResponse.Builder builder = CommentsResponse.newBuilder();
+    String response =
+        doRequest(
+            RequestMethod.GET,
+            String.format(GET_COMMENTS_ON_ISSUE, request.getRepo(), request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
-        .merge(
-            "{\"comments\":"
-                + doRequest(
-                    RequestMethod.GET,
-                    String.format(
-                        GET_LIST_COMMENTS_ON_ISSUE, request.getRepo(), request.getDiffNumber()))
-                + "}",
-            builder);
+        .merge(String.format("{\"comments\":%s}", response), builder);
     return builder.build();
   }
 
   PullRequestResponse getPullRequest(PullRequestRequest request) throws IOException {
     PullRequestResponse.Builder builder = PullRequestResponse.newBuilder();
+    String response =
+        doRequest(
+            RequestMethod.GET,
+            String.format(GET_PULL_REQUEST, request.getRepo(), request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
-        .merge(
-            "{\"pull_request\":"
-                + doRequest(
-                    RequestMethod.GET,
-                    String.format(
-                        GET_SINGLE_PULL_REQUEST, request.getRepo(), request.getDiffNumber()))
-                + "}",
-            builder);
+        .merge(String.format("{\"pull_request\":%s}", response), builder);
     return builder.build();
   }
 
   PullRequestsResponse getPullRequests(PullRequestsRequest request) throws IOException {
     PullRequestsResponse.Builder builder = PullRequestsResponse.newBuilder();
     String response =
-        doRequest(RequestMethod.GET, String.format(CREATE_PR_OR_GET_LIST_PR, request.getRepo()));
+        doRequest(RequestMethod.GET, String.format(GET_PULL_REQUESTS, request.getRepo()));
     JsonFormat.parser()
         .ignoringUnknownFields()
-        .merge("{\"pull_requests\":" + response + "}", builder);
+        .merge(String.format("{\"pull_requests\":%s}", response), builder);
     return builder.build();
   }
 
@@ -140,8 +140,10 @@ public class GitHubClient {
     String response =
         doRequest(
             RequestMethod.GET,
-            String.format(GET_PR_FILES_LIST, request.getRepo(), request.getDiffNumber()));
-    JsonFormat.parser().ignoringUnknownFields().merge("{\"files\":" + response + "}", builder);
+            String.format(GET_PULL_REQUEST_FILES, request.getRepo(), request.getDiffNumber()));
+    JsonFormat.parser()
+        .ignoringUnknownFields()
+        .merge(String.format("{\"files\":%s}", response), builder);
     return builder.build();
   }
 
@@ -149,14 +151,14 @@ public class GitHubClient {
     try {
       String requestData = JsonFormat.printer().print(request.getRequestData());
       String response =
-          "{\"pull_request\":"
-              + doRequest(
-                  RequestMethod.POST,
-                  String.format(CREATE_PR_OR_GET_LIST_PR, request.getRepo()),
-                  requestData)
-              + "}";
+          doRequest(
+              RequestMethod.POST,
+              String.format(CREATE_PULL_REQUEST, request.getRepo()),
+              requestData);
       CreatePullRequestResponse.Builder builder = CreatePullRequestResponse.newBuilder();
-      JsonFormat.parser().ignoringUnknownFields().merge(response, builder);
+      JsonFormat.parser()
+          .ignoringUnknownFields()
+          .merge(String.format("{\"pull_request\":%s}", response), builder);
       return builder.build();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -208,7 +210,7 @@ public class GitHubClient {
           "Basic " + Base64.getEncoder().encodeToString((login + ":" + password).getBytes()));
       connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-      if (requestMethod.name().equals("POST")) {
+      if (requestMethod.equals(RequestMethod.POST)) {
         connection.setDoOutput(true);
         connection.getOutputStream().write(requestData.getBytes("UTF-8"));
 

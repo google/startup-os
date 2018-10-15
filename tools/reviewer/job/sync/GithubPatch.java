@@ -23,27 +23,27 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Parses `patch` of GitHub Pull Request file. `Patch` of GitHub Pull Request file can involve one
- * or more parts.
+ * Parses `patch` of GitHub Pull Request file. `Patch` of GitHub Pull Request file can involve
+ * one or more parts.
  */
-public class Patch {
-  /**
+public class GithubPatch {
+  /*
    * The regex pattern for all newline symbols search: `\\n\\s` - newline with space, `\\n\\+` -
    * newline with `+` character, `\\n\\-` - newline with `-` character, `\\n` - just newline
    */
   private static final String NEW_LINES_PATTERN = "\\n\\s|\\n\\+|\\n\\-|\\n";
-  /** The regex pattern for DiffHunkHeader headers search. */
+  // The regex pattern for DiffHunkHeader headers search. E.g. `@@ -99,6 +108,16 @@`
   private static final String DIFF_HUNKS_PATTERN = "@@\\s[-]\\d+[\\,\\d]*\\s[+]\\d+[\\,\\d]*\\s@@";
 
   private List<String> newlineSymbols;
   private List<DiffHunkHeader> diffHunkHeaders;
 
   /**
-   * Patch class constructor.
+   * GithubPatch class constructor.
    *
-   * @param diffPatchStr `patch` of GitHub Pull Request file in string format
+   * @param diffPatchStr `patch`(diff) of GitHub Pull Request file in string format
    */
-  public Patch(String diffPatchStr) {
+  public GithubPatch(String diffPatchStr) {
     newlineSymbols = getMatches(diffPatchStr, NEW_LINES_PATTERN);
     diffHunkHeaders =
         getMatches(diffPatchStr, DIFF_HUNKS_PATTERN)
@@ -70,16 +70,22 @@ public class Patch {
   }
 
   /**
-   * A diff hunk header. A part of GitHub Pull Request file's `patch` contains header and body.
-   * Header starts and ends with double `@` characters. E.g. `@@ -99,6 +108,16 @@` `-96,6` relates
-   * to left side(base): `96` is line number in the file where diff hunk starts, `6` - amount of
-   * lines in the DiffHunk. `+108,16` relates to the right side(head): '108' is line number in the
-   * file where diff hunk starts, 16 - amount of lines in the diff hunk.
+   * A diff hunk header.
+   *
+   * <p>A part of GitHub Pull Request file's `patch` contains header and body.
+   *
+   * <p>Header starts and ends with double `@` characters. E.g. `@@ -99,6 +108,16 @@`
+   *
+   * <p>`-96,6` relates to left side(base): `96` is line number in the file where diff hunk starts,
+   * `6` - amount of lines in the DiffHunk.
+   *
+   * <p>`+108,16` relates to the right side(head): '108' is line number in the file where diff hunk
+   * starts, 16 - amount of lines in the diff hunk.
    */
   class DiffHunkHeader {
-    /** Line number in the file where diff hunk starts on the left side */
+    // Line number in the file where diff hunk starts on the left side
     private int leftStartLine;
-    /** Line number in the file where diff hunk starts on the right side */
+    // Line number in the file where diff hunk starts on the right side
     private int rightStartLine;
 
     /**

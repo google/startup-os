@@ -30,12 +30,12 @@ import java.io.IOException;
  * To write Diff:
  * bazel run //tools/reviewer/job/sync:github_sync_tool -- write --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
  */
-public class GitHubSync {
+public class GithubSync {
   // TODO: Add checking input Flags
   @FlagDesc(name = "repo_name", description = "GitHub repository name")
   private static Flag<String> repoName = Flag.create("");
 
-  @FlagDesc(name = "diff_number", description = "PullRequest number")
+  @FlagDesc(name = "diff_number", description = "GitHub PullRequest number")
   private static Flag<Integer> diffNumber = Flag.create(0);
 
   @FlagDesc(name = "login", description = "GitHub login")
@@ -46,28 +46,28 @@ public class GitHubSync {
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
-    GitHubSync gitHubSync = new GitHubSync();
-    GitHubClient gitHubClient = new GitHubClient(login.get(), password.get());
+    GithubSync githubSync = new GithubSync();
+    GithubClient githubClient = new GithubClient(login.get(), password.get());
 
     if (args.length != 0) {
       if (args[0].equals("read")) {
-        gitHubSync.readDiff(gitHubClient);
+        githubSync.readDiff(githubClient);
       } else if (args[0].equals("write")) {
         // Use real diff instead default instance
         Diff diff = Diff.getDefaultInstance();
-        gitHubSync.writeDiff(gitHubClient, diff);
+        githubSync.writeDiff(githubClient, diff);
       }
     }
   }
 
-  private void readDiff(GitHubClient gitHubClient) throws IOException {
-    GitHubReader reader = new GitHubReader(gitHubClient);
+  private void readDiff(GithubClient githubClient) throws IOException {
+    GithubReader reader = new GithubReader(githubClient);
     Diff diff = reader.getDiff(repoName.get(), diffNumber.get());
     System.out.println(diff);
   }
 
-  private void writeDiff(GitHubClient gitHubClient, Diff diff) throws IOException {
-    GitHubWriter writer = new GitHubWriter(gitHubClient);
+  private void writeDiff(GithubClient githubClient, Diff diff) throws IOException {
+    GithubWriter writer = new GithubWriter(githubClient);
     writer.writeDiff(diff, repoName.get());
   }
 }

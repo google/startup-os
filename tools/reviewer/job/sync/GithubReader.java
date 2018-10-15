@@ -22,13 +22,13 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.GitHubComment;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.UserRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.CommentsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.PullRequestFilesRequest;
-import com.google.startupos.tools.reviewer.job.sync.GitHubProtos.File;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.GithubComment;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.UserRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestFilesRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.File;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -38,23 +38,27 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Reads GitHub Pull Request using GitHub API and creates
+ * `tools.reviewer.localserver.service.Protos.Diff`
+ */
 // TODO: Add ability to read comments correctly from previous commits, not only from the latest
 // commit. It can help: https://developer.github.com/v3/repos/commits/#get-a-single-commit
-public class GitHubReader {
+public class GithubReader {
   // The regex pattern for newline symbols search:
   // `\\n\\s` - newline with space,
   // `\\n\\+` - newline with `+` character,
   // `\\n\\-` - newline with `-` character
   private static final String NEW_LINES_PATTERN = "\\n\\s|\\n\\+|\\n\\-";
-  private final GitHubClient gitHubClient;
+  private final GithubClient githubClient;
 
-  GitHubReader(GitHubClient gitHubClient) {
-    this.gitHubClient = gitHubClient;
+  GithubReader(GithubClient githubClient) {
+    this.githubClient = githubClient;
   }
 
   public Diff getDiff(String repo, int diffNumber) throws IOException {
     PullRequest pr =
-        gitHubClient
+        githubClient
             .getPullRequest(
                 PullRequestRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
             .getPullRequest();
@@ -63,7 +67,7 @@ public class GitHubReader {
         .setAuthor(
             Author.newBuilder()
                 .setEmail(
-                    gitHubClient
+                    githubClient
                         .getUser(UserRequest.newBuilder().setLogin(pr.getUser().getLogin()).build())
                         .getUser()
                         .getEmail())
@@ -74,7 +78,7 @@ public class GitHubReader {
         .addAllCodeThread(
             getCodeThreads(
                 pr,
-                gitHubClient
+                githubClient
                     .getReviewComments(
                         CommentsRequest.newBuilder()
                             .setRepo(repo)
@@ -89,8 +93,8 @@ public class GitHubReader {
 
   private Thread getDiffThread(String repo, int diffNumber) throws IOException {
     Thread.Builder diffThread = Thread.newBuilder();
-    List<GitHubComment> diffComments =
-        gitHubClient
+    List<GithubComment> diffComments =
+        githubClient
             .getIssueComments(
                 CommentsRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
             .getCommentsList();
@@ -104,7 +108,7 @@ public class GitHubReader {
                     .setCreatedBy(
                         // TODO: Email can be null if the user hides email. Think over how to
                         // resolve this.
-                        gitHubClient
+                        githubClient
                             .getUser(
                                 UserRequest.newBuilder()
                                     .setLogin(comment.getUser().getLogin())
@@ -116,15 +120,15 @@ public class GitHubReader {
   }
 
   private ImmutableList<Thread> getCodeThreads(
-      PullRequest pr, List<GitHubComment> comments, String repo, int diffNumber)
+      PullRequest pr, List<GithubComment> comments, String repo, int diffNumber)
       throws IOException {
     List<Thread> result = new ArrayList<>();
 
     List<String> commentedFiles =
-        comments.stream().map(GitHubComment::getPath).distinct().collect(Collectors.toList());
+        comments.stream().map(GithubComment::getPath).distinct().collect(Collectors.toList());
 
     List<File> pullRequestFiles =
-        gitHubClient
+        githubClient
             .getPullRequestFiles(
                 PullRequestFilesRequest.newBuilder()
                     .setRepo(repo)
@@ -133,12 +137,12 @@ public class GitHubReader {
             .getFilesList();
 
     for (String fileName : commentedFiles) {
-      ImmutableList<GitHubComment> fileComments = getCodeCommentsByFilename(comments, fileName);
+      ImmutableList<GithubComment> fileComments = getCodeCommentsByFilename(comments, fileName);
       List<Integer> positions =
           fileComments
               .stream()
               .filter(comment -> comment.getPath().equals(fileName))
-              .map(GitHubComment::getPosition)
+              .map(GithubComment::getPosition)
               .distinct()
               .collect(Collectors.toList());
 
@@ -151,8 +155,8 @@ public class GitHubReader {
     return ImmutableList.copyOf(result);
   }
 
-  private ImmutableList<GitHubComment> getCodeCommentsByFilename(
-      List<GitHubComment> codeComments, String filename) {
+  private ImmutableList<GithubComment> getCodeCommentsByFilename(
+      List<GithubComment> codeComments, String filename) {
     return ImmutableList.copyOf(
         codeComments
             .stream()
@@ -161,11 +165,11 @@ public class GitHubReader {
   }
 
   private Thread getCodeThreadByFilenameAndPosition(
-      ImmutableList<GitHubComment> fileComments,
+      ImmutableList<GithubComment> fileComments,
       int position,
       PullRequest pr,
       List<File> pullRequestFiles) {
-    ImmutableList<GitHubComment> positionComments =
+    ImmutableList<GithubComment> positionComments =
         ImmutableList.copyOf(
             fileComments
                 .stream()
@@ -182,12 +186,13 @@ public class GitHubReader {
                     Protos.File.newBuilder()
                         .setFilename(comment.getPath())
                         .setRepoId(pr.getTitle().replace("D", ""))
-                        .setFilenameWithRepo(pr.getHead().getRepo().getFullName())
+                        .setFilenameWithRepo(
+                            pr.getHead().getRepo().getFullName() + comment.getPath())
                         .setCommitId(comment.getCommitId())
                         // TODO: Think over how to save already received user's email from the
                         // previous iteration. It can reduce the number of requests.
                         .setUser(
-                            gitHubClient
+                            githubClient
                                 .getUser(
                                     UserRequest.newBuilder()
                                         .setLogin(pr.getUser().getLogin())
@@ -207,7 +212,7 @@ public class GitHubReader {
                         .setCreatedBy(
                             // TODO: Email can be null if the user hides email. Think over how to
                             // resolve this.
-                            gitHubClient
+                            githubClient
                                 .getUser(
                                     UserRequest.newBuilder()
                                         .setLogin(comment.getUser().getLogin())
@@ -227,8 +232,8 @@ public class GitHubReader {
       newLinesSymbols.add(matcher.group());
     }
     String lastNewlineSymbol = newLinesSymbols.get(newLinesSymbols.size() - 1);
-    // If the last newline symbol in comment diff hunk is `\n+`, it means the comment was left to
-    // the right side, otherwise - to the left side.
+    // If the last newline symbol in the comment's diff hunk is `\n+`, it means the comment is on
+    // the right side. Otherwise, the comment is on the left side.
     return lastNewlineSymbol.equals("\n+")
         ? LineNumberConverter.Side.RIGHT
         : LineNumberConverter.Side.LEFT;
@@ -243,7 +248,7 @@ public class GitHubReader {
     throw new RuntimeException("`diff_patch` not found for the file: " + filename);
   }
 
-  private String setThreadCommitId(PullRequest pr, GitHubComment comment) {
+  private String setThreadCommitId(PullRequest pr, GithubComment comment) {
     LineNumberConverter.Side side = getCommentSide(comment.getDiffHunk());
     return side.equals(LineNumberConverter.Side.LEFT)
         ? pr.getBase().getSha()
@@ -251,7 +256,7 @@ public class GitHubReader {
   }
 
   private int getLineNumber(String diffPatchStr, int position, LineNumberConverter.Side side) {
-    return new LineNumberConverter(diffPatchStr).getLineNumb(position, side);
+    return new LineNumberConverter(diffPatchStr).getLineNumber(position, side);
   }
 }
 
