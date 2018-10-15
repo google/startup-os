@@ -49,23 +49,24 @@ import static java.net.HttpURLConnection.HTTP_OK;
 public class GithubClient {
   private static final String BASE_PATH = "https://api.github.com/";
   // https://developer.github.com/v3/pulls/#get-a-single-pull-request
-  private static final String GET_PULL_REQUEST = "repos/%s/pulls/%d";
+  private static final String GET_PULL_REQUEST = "repos/%s/%s/pulls/%d";
   // https://developer.github.com/v3/users/#get-a-single-user
   private static final String GET_USER = "users/%s";
   // https://developer.github.com/v3/pulls/comments/#create-a-comment
-  private static final String CREATE_REVIEW_COMMENT_ON_PULL_REQUEST = "repos/%s/pulls/%d/comments";
+  private static final String CREATE_REVIEW_COMMENT_ON_PULL_REQUEST =
+      "repos/%s/%s/pulls/%d/comments";
   // https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
-  private static final String GET_REVIEW_COMMENTS_ON_PULL_REQUEST = "repos/%s/pulls/%d/comments";
+  private static final String GET_REVIEW_COMMENTS_ON_PULL_REQUEST = "repos/%s/%s/pulls/%d/comments";
   // https://developer.github.com/v3/issues/comments/#create-a-comment
-  private static final String CREATE_COMMENT_ON_ISSUE = "repos/%s/issues/%d/comments";
+  private static final String CREATE_COMMENT_ON_ISSUE = "repos/%s/%s/issues/%d/comments";
   // https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
-  private static final String GET_COMMENTS_ON_ISSUE = "repos/%s/issues/%d/comments";
+  private static final String GET_COMMENTS_ON_ISSUE = "repos/%s/%s/issues/%d/comments";
   // https://developer.github.com/v3/pulls/#create-a-pull-request
-  private static final String CREATE_PULL_REQUEST = "repos/%s/pulls";
+  private static final String CREATE_PULL_REQUEST = "repos/%s/%s/pulls";
   // https://developer.github.com/v3/pulls/#list-pull-requests
-  private static final String GET_PULL_REQUESTS = "repos/%s/pulls";
+  private static final String GET_PULL_REQUESTS = "repos/%s/%s/pulls";
   // https://developer.github.com/v3/pulls/#list-pull-requests-files
-  private static final String GET_PULL_REQUEST_FILES = "repos/%s/pulls/%d/files";
+  private static final String GET_PULL_REQUEST_FILES = "repos/%s/%s/pulls/%d/files";
 
   private final String login;
   private final String password;
@@ -94,7 +95,10 @@ public class GithubClient {
         doRequest(
             RequestMethod.GET,
             String.format(
-                GET_REVIEW_COMMENTS_ON_PULL_REQUEST, request.getRepo(), request.getDiffNumber()));
+                GET_REVIEW_COMMENTS_ON_PULL_REQUEST,
+                request.getOwner(),
+                request.getRepo(),
+                request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"comments\":%s}", response), builder);
@@ -106,7 +110,11 @@ public class GithubClient {
     String response =
         doRequest(
             RequestMethod.GET,
-            String.format(GET_COMMENTS_ON_ISSUE, request.getRepo(), request.getDiffNumber()));
+            String.format(
+                GET_COMMENTS_ON_ISSUE,
+                request.getOwner(),
+                request.getRepo(),
+                request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"comments\":%s}", response), builder);
@@ -118,7 +126,8 @@ public class GithubClient {
     String response =
         doRequest(
             RequestMethod.GET,
-            String.format(GET_PULL_REQUEST, request.getRepo(), request.getDiffNumber()));
+            String.format(
+                GET_PULL_REQUEST, request.getOwner(), request.getRepo(), request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"pull_request\":%s}", response), builder);
@@ -128,7 +137,9 @@ public class GithubClient {
   PullRequestsResponse getPullRequests(PullRequestsRequest request) throws IOException {
     PullRequestsResponse.Builder builder = PullRequestsResponse.newBuilder();
     String response =
-        doRequest(RequestMethod.GET, String.format(GET_PULL_REQUESTS, request.getRepo()));
+        doRequest(
+            RequestMethod.GET,
+            String.format(GET_PULL_REQUESTS, request.getOwner(), request.getRepo()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"pull_requests\":%s}", response), builder);
@@ -140,7 +151,11 @@ public class GithubClient {
     String response =
         doRequest(
             RequestMethod.GET,
-            String.format(GET_PULL_REQUEST_FILES, request.getRepo(), request.getDiffNumber()));
+            String.format(
+                GET_PULL_REQUEST_FILES,
+                request.getOwner(),
+                request.getRepo(),
+                request.getDiffNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"files\":%s}", response), builder);
@@ -153,7 +168,7 @@ public class GithubClient {
       String response =
           doRequest(
               RequestMethod.POST,
-              String.format(CREATE_PULL_REQUEST, request.getRepo()),
+              String.format(CREATE_PULL_REQUEST, request.getOwner(), request.getRepo()),
               requestData);
       CreatePullRequestResponse.Builder builder = CreatePullRequestResponse.newBuilder();
       JsonFormat.parser()
@@ -170,7 +185,11 @@ public class GithubClient {
       String requestData = JsonFormat.printer().print(request.getRequestData());
       doRequest(
           RequestMethod.POST,
-          String.format(CREATE_COMMENT_ON_ISSUE, request.getRepo(), request.getDiffNumber()),
+          String.format(
+              CREATE_COMMENT_ON_ISSUE,
+              request.getOwner(),
+              request.getRepo(),
+              request.getDiffNumber()),
           requestData);
     } catch (IOException e) {
       e.printStackTrace();
@@ -184,7 +203,10 @@ public class GithubClient {
       doRequest(
           RequestMethod.POST,
           String.format(
-              CREATE_REVIEW_COMMENT_ON_PULL_REQUEST, request.getRepo(), request.getDiffNumber()),
+              CREATE_REVIEW_COMMENT_ON_PULL_REQUEST,
+              request.getOwner(),
+              request.getRepo(),
+              request.getDiffNumber()),
           requestData);
     } catch (IOException e) {
       e.printStackTrace();

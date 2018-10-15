@@ -56,12 +56,19 @@ public class GithubReader {
     this.githubClient = githubClient;
   }
 
-  public Diff getDiff(String repo, int diffNumber) throws IOException {
+  public Diff getDiff(String repoOwner, String repoName, int diffNumber) throws IOException {
     PullRequest pr =
         githubClient
             .getPullRequest(
-                PullRequestRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
-            .getPullRequest();
+                PullRequestRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setDiffNumber(diffNumber)
+                    .build())
+            .getPullRequest()
+            .toBuilder()
+            .setRepoName(repoName)
+            .build();
     return Diff.newBuilder()
         .setId(Long.parseLong(pr.getTitle().replaceFirst("D", "")))
         .setAuthor(
@@ -81,22 +88,29 @@ public class GithubReader {
                 githubClient
                     .getReviewComments(
                         CommentsRequest.newBuilder()
-                            .setRepo(repo)
+                            .setOwner(repoOwner)
+                            .setRepo(repoName)
                             .setDiffNumber(diffNumber)
                             .build())
                     .getCommentsList(),
-                repo,
+                repoOwner,
+                repoName,
                 diffNumber))
-        .addDiffThread(getDiffThread(repo, diffNumber))
+        .addDiffThread(getDiffThread(repoOwner, repoName, diffNumber))
         .build();
   }
 
-  private Thread getDiffThread(String repo, int diffNumber) throws IOException {
+  private Thread getDiffThread(String repoOwner, String repoName, int diffNumber)
+      throws IOException {
     Thread.Builder diffThread = Thread.newBuilder();
     List<GithubComment> diffComments =
         githubClient
             .getIssueComments(
-                CommentsRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+                CommentsRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setDiffNumber(diffNumber)
+                    .build())
             .getCommentsList();
 
     diffComments.forEach(
@@ -120,7 +134,11 @@ public class GithubReader {
   }
 
   private ImmutableList<Thread> getCodeThreads(
-      PullRequest pr, List<GithubComment> comments, String repo, int diffNumber)
+      PullRequest pr,
+      List<GithubComment> comments,
+      String repoOwner,
+      String repoName,
+      int diffNumber)
       throws IOException {
     List<Thread> result = new ArrayList<>();
 
@@ -131,7 +149,8 @@ public class GithubReader {
         githubClient
             .getPullRequestFiles(
                 PullRequestFilesRequest.newBuilder()
-                    .setRepo(repo)
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
                     .setDiffNumber(diffNumber)
                     .build())
             .getFilesList();
@@ -180,14 +199,14 @@ public class GithubReader {
     positionComments.forEach(
         comment ->
             thread
-                .setRepoId(pr.getTitle().replace("D", ""))
+                .setRepoId(pr.getRepoName())
                 .setCommitId(setThreadCommitId(pr, comment))
                 .setFile(
                     Protos.File.newBuilder()
                         .setFilename(comment.getPath())
-                        .setRepoId(pr.getTitle().replace("D", ""))
+                        .setRepoId(pr.getRepoName())
                         .setFilenameWithRepo(
-                            pr.getHead().getRepo().getFullName() + comment.getPath())
+                            pr.getHead().getRepo().getName() + "/" + comment.getPath())
                         .setCommitId(comment.getCommitId())
                         // TODO: Think over how to save already received user's email from the
                         // previous iteration. It can reduce the number of requests.

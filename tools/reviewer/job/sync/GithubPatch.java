@@ -23,8 +23,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * Parses `patch` of GitHub Pull Request file. `Patch` of GitHub Pull Request file can involve
- * one or more parts.
+ * Parses `patch` of GitHub Pull Request file. `Patch` of GitHub Pull Request file can involve one
+ * or more parts.
  */
 public class GithubPatch {
   /*

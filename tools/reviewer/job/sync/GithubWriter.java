@@ -38,21 +38,22 @@ import java.util.List;
 
 /** Writes `tools.reviewer.localserver.service.Protos.Diff` to GitHub using GitHub API */
 public class GithubWriter {
+  private static final String REVIEWER_DIFF_LINK = "https://startupos-5f279.firebaseapp.com/diff/";
   private final GithubClient githubClient;
 
   GithubWriter(GithubClient githubClient) {
     this.githubClient = githubClient;
   }
 
-  public void writeDiff(Diff diff, String repo) throws IOException {
-    int diffNumber = getGithubPullRequestNumber(diff, repo);
+  public void writeDiff(Diff diff, String repoOwner, String repoName) throws IOException {
+    int diffNumber = getGithubPullRequestNumber(diff, repoOwner, repoName);
 
     for (Thread diffThread : diff.getDiffThreadList()) {
       for (Comment comment : diffThread.getCommentList()) {
         // TODO: Think over what should be in the comment by Reviewer Bot
-        // TODO: Add link to Reviewer Diff
         createPullRequestComment(
-            repo,
+            repoOwner,
+            repoName,
             diffNumber,
             "Created by: "
                 + comment.getCreatedBy()
@@ -67,7 +68,8 @@ public class GithubWriter {
         githubClient
             .getPullRequestFiles(
                 PullRequestFilesRequest.newBuilder()
-                    .setRepo(repo)
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
                     .setDiffNumber(diffNumber)
                     .build())
             .getFilesList();
@@ -75,10 +77,16 @@ public class GithubWriter {
     PullRequest pr =
         githubClient
             .getPullRequest(
-                PullRequestRequest.newBuilder().setRepo(repo).setDiffNumber(diffNumber).build())
+                PullRequestRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setDiffNumber(diffNumber)
+                    .build())
             .getPullRequest();
 
     for (Thread codeThread : diff.getCodeThreadList()) {
+      String reviewerLink =
+          REVIEWER_DIFF_LINK + diffNumber + "/" + codeThread.getFile().getFilenameWithRepo();
       for (Comment comment : codeThread.getCommentList()) {
         String path = codeThread.getFile().getFilename();
         String diffPatchStr = getPatchStrByFilename(pullRequestFiles, path);
@@ -86,16 +94,18 @@ public class GithubWriter {
             getCommentSide(codeThread.getFile().getCommitId(), codeThread.getCommitId());
         int position = getCommentPosition(diffPatchStr, codeThread.getLineNumber(), side);
         // TODO: Think over what should be in the comment by Reviewer Bot
-        // TODO: Add link to Reviewer Diff
         createReviewComment(
-            repo,
+            repoOwner,
+            repoName,
             diffNumber,
             "Created by: "
                 + comment.getCreatedBy()
                 + "\nTime: "
                 + Instant.ofEpochSecond(comment.getTimestamp()).toString()
-                + "\n"
-                + comment.getContent(),
+                + "\nBody: "
+                + comment.getContent()
+                + "\nSee in Reviewer: "
+                + reviewerLink,
             pr.getHead().getSha(),
             path,
             position);
@@ -103,8 +113,9 @@ public class GithubWriter {
     }
   }
 
-  private int getGithubPullRequestNumber(Diff diff, String repo) {
-    PullRequestsRequest request = PullRequestsRequest.newBuilder().setRepo(repo).build();
+  private int getGithubPullRequestNumber(Diff diff, String repoOwner, String repoName) {
+    PullRequestsRequest request =
+        PullRequestsRequest.newBuilder().setOwner(repoOwner).setRepo(repoName).build();
     try {
       List<PullRequest> pullRequests = githubClient.getPullRequests(request).getPullRequestsList();
       for (PullRequest pr : pullRequests) {
@@ -117,13 +128,20 @@ public class GithubWriter {
     }
     // Create new Pull Request if it doesn't exist
     return createPullRequest(
-        repo, "D" + diff.getId(), "D" + diff.getId(), "master", diff.getDescription());
+        repoOwner,
+        repoName,
+        "D" + diff.getId(),
+        "D" + diff.getId(),
+        "master",
+        diff.getDescription());
   }
 
-  private int createPullRequest(String repo, String title, String head, String base, String body) {
+  private int createPullRequest(
+      String repoOwner, String repoName, String title, String head, String base, String body) {
     CreatePullRequestRequest request =
         CreatePullRequestRequest.newBuilder()
-            .setRepo(repo)
+            .setOwner(repoOwner)
+            .setRepo(repoName)
             .setRequestData(
                 CreatePullRequestRequestData.newBuilder()
                     .setTitle(title)
@@ -138,10 +156,12 @@ public class GithubWriter {
     return response.getPullRequest().getNumber();
   }
 
-  private void createPullRequestComment(String repo, int diffNumber, String body) {
+  private void createPullRequestComment(
+      String repoOwner, String repoName, int diffNumber, String body) {
     CreatePullRequestCommentRequest request =
         CreatePullRequestCommentRequest.newBuilder()
-            .setRepo(repo)
+            .setOwner(repoOwner)
+            .setRepo(repoName)
             .setDiffNumber(diffNumber)
             .setRequestData(CreatePullRequestCommentRequestData.newBuilder().setBody(body).build())
             .build();
@@ -149,10 +169,17 @@ public class GithubWriter {
   }
 
   private void createReviewComment(
-      String repo, int diffNumber, String body, String commitId, String path, int position) {
+      String repoOwner,
+      String repoName,
+      int diffNumber,
+      String body,
+      String commitId,
+      String path,
+      int position) {
     CreateReviewCommentRequest request =
         CreateReviewCommentRequest.newBuilder()
-            .setRepo(repo)
+            .setOwner(repoOwner)
+            .setRepo(repoName)
             .setDiffNumber(diffNumber)
             .setRequestData(
                 CreateReviewCommentRequestData.newBuilder()

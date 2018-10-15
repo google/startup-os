@@ -27,8 +27,9 @@ message File {
 }
 
 message PullRequestFilesRequest {
-  string repo = 1;
-  int32 diff_number = 2;
+  string owner = 1;
+  string repo = 2;
+  int32 diff_number = 3;
 }
 
 message PullRequestFilesResponse { repeated File files = 1; }
@@ -48,16 +49,18 @@ message GithubComment {
 }
 
 message CommentsRequest {
-  string repo = 1;
-  int32 diff_number = 2;
+  string owner = 1;
+  string repo = 2;
+  int32 diff_number = 3;
 }
 
 message CommentsResponse { repeated GithubComment comments = 1; }
 
 message CreateReviewCommentRequest {
-  string repo = 1;
-  int32 diff_number = 2;
-  CreateReviewCommentRequestData request_data = 3;
+  string owner = 1;
+  string repo = 2;
+  int32 diff_number = 3;
+  CreateReviewCommentRequestData request_data = 4;
 }
 
 message CreateReviewCommentRequestData {
@@ -68,9 +71,10 @@ message CreateReviewCommentRequestData {
 }
 
 message CreatePullRequestCommentRequest {
-  string repo = 1;
-  int32 diff_number = 2;
-  CreatePullRequestCommentRequestData request_data = 3;
+  string owner = 1;
+  string repo = 2;
+  int32 diff_number = 3;
+  CreatePullRequestCommentRequestData request_data = 4;
 }
 
 message CreatePullRequestCommentRequestData { string body = 1; }
@@ -87,6 +91,7 @@ message PullRequest {
   string updated_at = 8;
   CommitPointer head = 9;
   CommitPointer base = 10;
+  string repo_name = 11;
 }
 
 message CommitPointer {
@@ -110,15 +115,17 @@ message Repo {
 }
 
 message PullRequestRequest {
-  string repo = 1;
-  int32 diff_number = 2;
+  string owner = 1;
+  string repo = 2;
+  int32 diff_number = 3;
 }
 
 message PullRequestResponse { PullRequest pull_request = 1; }
 
 message CreatePullRequestRequest {
-  string repo = 1;
-  CreatePullRequestRequestData request_data = 2;
+  string owner = 1;
+  string repo = 2;
+  CreatePullRequestRequestData request_data = 3;
 }
 
 message CreatePullRequestRequestData {
@@ -130,6 +137,9 @@ message CreatePullRequestRequestData {
 
 message CreatePullRequestResponse { PullRequest pull_request = 1; }
 
-message PullRequestsRequest { string repo = 1; }
+message PullRequestsRequest {
+  string owner = 1;
+  string repo = 2;
+}
 
 message PullRequestsResponse { repeated PullRequest pull_requests = 1; }

@@ -25,13 +25,16 @@ import java.io.IOException;
 
 /*
  * To read Diff:
- *  bazel run //tools/reviewer/job/sync:github_sync_tool -- read --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+ *  bazel run //tools/reviewer/job/sync:github_sync_tool -- read --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
  *
  * To write Diff:
- * bazel run //tools/reviewer/job/sync:github_sync_tool -- write --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+ * bazel run //tools/reviewer/job/sync:github_sync_tool -- write --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
  */
 public class GithubSync {
   // TODO: Add checking input Flags
+  @FlagDesc(name = "repo_owner", description = "GitHub repository owner")
+  private static Flag<String> repoOwner = Flag.create("");
+
   @FlagDesc(name = "repo_name", description = "GitHub repository name")
   private static Flag<String> repoName = Flag.create("");
 
@@ -62,13 +65,13 @@ public class GithubSync {
 
   private void readDiff(GithubClient githubClient) throws IOException {
     GithubReader reader = new GithubReader(githubClient);
-    Diff diff = reader.getDiff(repoName.get(), diffNumber.get());
+    Diff diff = reader.getDiff(repoOwner.get(), repoName.get(), diffNumber.get());
     System.out.println(diff);
   }
 
   private void writeDiff(GithubClient githubClient, Diff diff) throws IOException {
     GithubWriter writer = new GithubWriter(githubClient);
-    writer.writeDiff(diff, repoName.get());
+    writer.writeDiff(diff, repoOwner.get(), repoName.get());
   }
 }
 
