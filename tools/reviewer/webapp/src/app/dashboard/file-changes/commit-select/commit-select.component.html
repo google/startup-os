@@ -2,14 +2,12 @@
   <div class="title">
     <span>{{ title }}</span>
   </div>
-  <mat-form-field>
-    <mat-select [(ngModel)]="select" (change)="onChange()">
-      <mat-option
-        *ngFor="let commitId of stateService.commitIdList"
-        [value]="commitId"
-      >
-        {{ commitId }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  <select [(ngModel)]="select" (change)="onChange()">
+    <option
+      *ngFor="let commitId of stateService.commitIdList"
+      [value]="commitId"
+    >
+      {{ commitId }}
+    </option>
+  </select>
 </div>

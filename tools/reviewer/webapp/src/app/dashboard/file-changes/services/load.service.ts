@@ -1,10 +1,10 @@
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 
-import { File } from '@/shared/proto';
+import { Diff, File } from '@/shared/proto';
 import {
   ExceptionService,
-  FirebaseService,
+  FirebaseStateService,
   LocalserverService,
 } from '@/shared/services';
 import { CommitService } from './commit.service';
@@ -16,7 +16,7 @@ import { ThreadService } from './thread.service';
 export class LoadService {
   constructor(
     private location: Location,
-    private firebaseService: FirebaseService,
+    private firebaseStateService: FirebaseStateService,
     private exceptionService: ExceptionService,
     private localserverService: LocalserverService,
     private stateService: StateService,
@@ -24,19 +24,34 @@ export class LoadService {
     private threadService: ThreadService,
   ) { }
 
-  // Load diff from firebase
+  // Loads diff from firebase
   loadDiff(diffId: string): void {
-    this.stateService.subscription = this.firebaseService
+    this.stateService.onloadSubscription = this.firebaseStateService
       .getDiff(diffId)
       .subscribe(diff => {
-        if (diff === undefined) {
-          this.exceptionService.diffNotFound();
-          return;
-        }
-        this.stateService.diff = diff;
-
-        this.loadFileDate();
+        this.setDiff(diff);
+        this.subscribeOnChanges();
       });
+  }
+
+  // Each time when diff is changed in firebase, we receive new diff here.
+  private subscribeOnChanges(): void {
+    this.stateService.changesSubscription = this.firebaseStateService
+      .diffChanges
+      .subscribe(diff => {
+        this.setDiff(diff);
+      });
+  }
+
+  // When diff is received from firebase
+  private setDiff(diff: Diff): void {
+    if (diff === undefined) {
+      this.exceptionService.diffNotFound();
+      return;
+    }
+    this.stateService.diff = diff;
+
+    this.loadFileDate();
   }
 
   // Get branchInfo and file from localserver
@@ -119,6 +134,7 @@ export class LoadService {
   }
 
   destroy(): void {
-    this.stateService.subscription.unsubscribe();
+    this.stateService.onloadSubscription.unsubscribe();
+    this.stateService.changesSubscription.unsubscribe();
   }
 }

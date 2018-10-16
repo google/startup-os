@@ -69,12 +69,12 @@
             color="primary"
             [formControl]="resolvedCheckbox"
             *ngIf="isReply"
-          >{{ getResolveText(resolvedCheckbox.value) }}</mat-checkbox>
+          >Resolved</mat-checkbox>
         </div>
         <div class="buttons" *ngIf="!isReply">
           <!-- Button to open reply -->
           <span class="resolve-status" *ngIf="!isReply && !thread.getIsDone()">
-            {{ getResolveText(thread.getIsDone()) }}
+            Unresolved
           </span>
           <button
             mat-button
