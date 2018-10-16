@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.tools.reviewer.job.tasks;
+package com.google.startupos.tools.reviewer.job.tasks;
 
 public interface Task extends Runnable {
   Boolean shouldRun();

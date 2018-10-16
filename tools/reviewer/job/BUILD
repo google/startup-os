@@ -6,7 +6,7 @@ java_binary(
         "tasks/Task.java",
         "tasks/TaskExecutor.java",
     ],
-    main_class = "com.google.startupos.tools.reviewer.tools.reviewer.job.Job",
+    main_class = "com.google.startupos.tools.reviewer.job.Job",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

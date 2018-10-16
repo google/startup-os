@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.tools.reviewer.job.tasks;
+package com.google.startupos.tools.reviewer.job.tasks;
 
-import com.google.startupos.tools.reviewer.tools.reviewer.job.impl.ReviewerMetadataUpdaterTask;
+import com.google.startupos.tools.reviewer.job.impl.ReviewerMetadataUpdaterTask;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

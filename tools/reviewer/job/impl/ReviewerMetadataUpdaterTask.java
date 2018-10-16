@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.tools.reviewer.job.impl;
+package com.google.startupos.tools.reviewer.job.impl;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.flogger.FluentLogger;
-import com.google.startupos.tools.reviewer.tools.reviewer.job.ReviewerJob;
-import com.google.startupos.tools.reviewer.tools.reviewer.job.tasks.Task;
+import com.google.startupos.tools.reviewer.job.ReviewerJob;
+import com.google.startupos.tools.reviewer.job.tasks.Task;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreClient;
 import com.google.startupos.common.firestore.FirestoreClientFactory;
