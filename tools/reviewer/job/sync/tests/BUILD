@@ -5,7 +5,6 @@ java_test(
     srcs = [
         "LineNumberConverterTest.java",
     ],
-    local = 1,
     test_class = "com.google.startupos.tools.reviewer.job.sync.tests.LineNumberConverterTest",
     deps = [
         "//common",

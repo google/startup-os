@@ -23,7 +23,6 @@ java_test(
     srcs = [
         "CodeReviewServiceTextDiffTest.java",
     ],
-    local = 1,
     test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceTextDiffTest",
     deps = [
         "//common",
@@ -56,7 +55,6 @@ java_test(
     srcs = [
         "CodeReviewServiceGetDiffFilesTest.java",
     ],
-    local = 1,
     test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceGetDiffFilesTest",
     deps = [
         "//common",
