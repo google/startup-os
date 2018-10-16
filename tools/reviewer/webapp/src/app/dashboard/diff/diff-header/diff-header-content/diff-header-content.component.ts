@@ -130,7 +130,7 @@ export class DiffHeaderContentComponent implements OnChanges {
     // tslint:disable-next-line
     const urlRegExp: RegExp = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/g;
 
-    // Thing is we need to escape scecial html chars, but a url contain the chars.
+    // We need to escape special html chars, but a url contains some of the special chars.
     // So we need to highlight urls and escape special chars separately.
     // Implementation: find a url, highlight it, make all text before the url escaped,
     // go to the next url.
@@ -140,7 +140,7 @@ export class DiffHeaderContentComponent implements OnChanges {
     // Get all urls in the description
     const urls: RegExpMatchArray = this.description.match(urlRegExp);
     if (urls) {
-      for (const url of this.description.match(urlRegExp)) {
+      for (const url of urls) {
         const linkIndex: number = clippedDescription.search(urlRegExp);
         // All text before the url
         const commonText: string = clippedDescription.substr(0, linkIndex);
