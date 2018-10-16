@@ -53,6 +53,17 @@ message PongResponse { string message = 1; }
 
 message RemoveWorkspaceRequest { string workspace_name = 1; }
 
+message GithubRepo {
+  string owner = 1;
+  string repo = 2;
+}
+
+message GithubPr {
+  GithubRepo repo = 1;
+  // PR number - essentially an ID
+  int64 number = 2;
+}
+
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues
 //   when attempted (couldn't import another proto) but maybe they've since been
@@ -86,6 +97,8 @@ message Diff {
   repeated string cc = 14;
   // Threads on the whole diff, not on a particular file or line.
   repeated Thread diff_thread = 15;
+  // GitHub PRs associated with this repo.
+  repeated GithubPr github_pr = 16;
 }
 
 message Reviewer {
