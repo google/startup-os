@@ -128,7 +128,7 @@ public class FormatterTool {
       executeWithProcess(
           "/usr/bin/env",
           "bash",
-          "tools/buildtools_wrappers/buildifier.sh",
+          "tools/bazel_tools/buildifier.sh",
           "-mode=fix",
           path.toAbsolutePath().toString());
     }

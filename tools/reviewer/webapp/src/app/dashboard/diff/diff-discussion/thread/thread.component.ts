@@ -110,17 +110,6 @@ export class ThreadComponent implements OnInit, OnDestroy {
     return this.thread.getType() === Thread.Type.CODE;
   }
 
-  // Get clipped comment
-  getContent(comment: Comment, commentIndex: number): string {
-    const maxLength: number = 90;
-    let content: string = comment.getContent();
-    if (!this.isCommentOpenMap[commentIndex] && content.length > maxLength) {
-      // If the comment is too big cut it
-      content = content.substr(0, maxLength) + '...';
-    }
-    return content;
-  }
-
   addComment(): void {
     // Create new comment
     const comment = new Comment();
@@ -162,10 +151,6 @@ export class ThreadComponent implements OnInit, OnDestroy {
       // Delete the comment from firebase
       this.deleteCommentEmitter.emit(isDeleteThread);
     }
-  }
-
-  getResolveText(isResolved: boolean): string {
-    return isResolved ? 'Resolved' : 'Unresolved';
   }
 
   ngOnDestroy() {

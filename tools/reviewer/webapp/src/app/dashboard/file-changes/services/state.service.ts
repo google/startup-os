@@ -25,7 +25,8 @@ export class StateService {
   leftCommitId: string;
   rightCommitId: string;
   commitIdList: string[] = [];
-  subscription = new Subscription();
+  onloadSubscription = new Subscription();
+  changesSubscription = new Subscription();
 
   createFile(): File {
     const file: File = new File();

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { Diff, Reviewer } from '@/shared/proto';
@@ -14,9 +14,12 @@ import { DiffHeaderService } from '../diff-header.service';
   styleUrls: ['./diff-header-content.component.scss'],
   providers: [DiffHeaderService],
 })
-export class DiffHeaderContentComponent implements OnInit {
+export class DiffHeaderContentComponent implements OnChanges {
   description: string = '';
   isDescriptionEditMode: boolean = false;
+  isReviewersHovered: boolean = false;
+  isCCHovered: boolean = false;
+
   @Input() diff: Diff;
 
   constructor(
@@ -26,7 +29,7 @@ export class DiffHeaderContentComponent implements OnInit {
     public dialog: MatDialog,
   ) { }
 
-  ngOnInit() {
+  ngOnChanges() {
     this.description = this.diff.getDescription();
   }
 

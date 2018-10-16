@@ -1,3 +1,5 @@
+@import '../index';
+
 $border-color: #8d8d8d;
 $hr-color: #cccccc;
 $border-radius: 7px;
@@ -14,7 +16,8 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
     padding: 10px;
     border-bottom: 1px solid $hr-color;
     >.header {
-      width: 140px;
+      width: 132px;
+      margin-right: 10px;
       >.username {
         span {
           font-weight: bold;
@@ -42,6 +45,18 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         top: -5px;
       }
     }
+    .ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+  >.comment:first-child {
+    border-radius: $top-radius;
+  }
+  >.comment:last-child {
+    border-radius: $bottom-radius;
+    border: none;
   }
   >.reply {
     min-height: 52px;
@@ -60,8 +75,12 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         font-size: 14px;
         background: white;
         vertical-align: bottom;
-        border-radius: 0;
         margin-bottom: 10px;
+        border-radius: 8px;
+        outline: none;
+        &:focus {
+          box-shadow: 0 0 0 1px #FF7300;
+        }
       }
       >.action-panel {
         display: flex;
@@ -82,20 +101,7 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         }
       }
     }
-    .reply-button {
-      background: #86d1ff;
-    }
-    .cancel-button {
-      background: #bfbfbf;
-    }
   }
-}
-.thread :first-child {
-  border-radius: $top-radius;
-}
-.thread :last-child {
-  border-radius: $bottom-radius;
-  border: none;
 }
 .resolved-comment {
   background: #f2faff;

@@ -11,7 +11,7 @@
   >
     <div class="header" (click)="openComment(commentIndex)">
       <!-- Username and date of the comment -->
-      <div class="username">
+      <div class="username ellipsis">
         <span>{{ getUsername(comment) }}</span>
       </div>
       <div class="time" *ngIf="isCommentOpenMap[commentIndex]">
@@ -19,8 +19,15 @@
       </div>
     </div>
     <!-- Text of the comment -->
-    <div class="message" (click)="openComment(commentIndex)" fxFlex>
-      <span>{{ getContent(comment, commentIndex) }}</span>
+    <div
+      [ngClass]="{
+        'message': true,
+        'ellipsis': !isCommentOpenMap[commentIndex]
+      }"
+      (click)="openComment(commentIndex)"
+      fxFlex
+    >
+      <span>{{ comment.getContent() }}</span>
     </div>
     <!-- Buttons to delete and edit the comment -->
     <!-- TODO: add functionality to edit -->
@@ -62,27 +69,30 @@
             color="primary"
             [formControl]="resolvedCheckbox"
             *ngIf="isReply"
-          >{{ getResolveText(resolvedCheckbox.value) }}</mat-checkbox>
+          >Resolved</mat-checkbox>
         </div>
         <div class="buttons" *ngIf="!isReply">
           <!-- Button to open reply -->
           <span class="resolve-status" *ngIf="!isReply && !thread.getIsDone()">
-            {{ getResolveText(thread.getIsDone()) }}
+            Unresolved
           </span>
           <button
-            class="cr-thread-button reply-button"
+            mat-button
+            class="cr-thread-button sky-button"
            (click)="toggleReply()"
           >Reply</button>
         </div>
         <div class="buttons" *ngIf="isReply">
           <!-- Button to close reply -->
           <button
-            class="cr-thread-button cancel-button"
+            mat-button
+            class="cr-thread-button grey-button"
             (click)="toggleReply()"
           >Cancel</button>
           <!-- Button to add a comment -->
           <button
-            class="cr-thread-button reply-button"
+            mat-button
+            class="cr-thread-button sky-button"
             (click)="addComment()"
           >Reply</button>
         </div>

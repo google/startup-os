@@ -4,65 +4,88 @@ body {
   height: 100%;
   margin: 0px;
   font-family: $default-font;
-}
-
-textarea {
-  font-family: $default-font !important;
-  border: solid 1px $palette-2 !important;
-}
-
-.bold {
-  font-weight: 600;
-}
-
-.cr-titlebar {
-  height: 46px;
-  background: $palette-1;
-  border-bottom: solid 1px $palette-2;
-  padding: 0 23px;
-  display: flex;
-  align-items: center;
-  >.title {
-    >span {
-      font-size: 16px;
-    }
-  }
-  >.buttons {
-    user-select: none;
-    direction: rtl;
-    padding-bottom: 2px;
-    >button {
-      margin-left: 10px;
-    }
-  }
-}
-
-.mat-header-cell,
-.cr-header {
-  background: $palette-3;
-  font-size: 14px !important;
-}
-
-.cr-light-button {
-  height: 30px;
-  width: 100px;
-  line-height: 0 !important;
-  border-radius: 5px !important;
-  >span {
-    font-size: 15px;
+  
+  .mat-toolbar {
     font-family: $default-font;
   }
-}
 
-.cr-thread-button {
-  width: 97px;
-  height: 26px;
-  line-height: 0 !important;
-  border-radius: 8px !important;
-  border: solid 1px #8d8d8d !important;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: $default-font;
-  cursor: pointer;
-  outline: none;
+  .mat-table {
+    font-family: $default-font;
+  }
+
+  textarea {
+    font-family: $default-font;
+    border: solid 1px $palette-2;
+  }
+
+  .bold {
+    font-weight: 600;
+  }
+
+  .cr-titlebar {
+    height: 40px;
+    background: $palette-1;
+    border-bottom: solid 1px $palette-2;
+    padding: 0 23px;
+    display: flex;
+    align-items: center;
+    >.title {
+      >span {
+        font-size: 16px;
+      }
+    }
+    >.buttons {
+      user-select: none;
+      direction: rtl;
+      padding-bottom: 2px;
+      >button {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  .mat-header-row {
+    min-height: 32px;
+  }
+  
+  .mat-checkbox {
+    .mat-checkbox-frame,
+    .mat-checkbox-background {
+      transform: scale(.9);
+    }
+    .mat-checkbox-frame {
+      background: white;
+      border-width: 1px;
+    }
+  }
+
+  .mat-header-cell,
+  .cr-header {
+    background: $palette-3;
+    font-size: 14px;
+  }
+
+  @mixin light-button() {
+    line-height: 0;
+    border-radius: 8px;
+    border: solid 1px #8d8d8d;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .cr-light-button {
+    @include light-button();
+    width: 120px;
+    height: 28px;
+    font-size: 16px;
+    color: black;
+  }
+
+  .cr-thread-button {
+    @include light-button();
+    width: 97px;
+    height: 26px;
+    font-size: 14px;
+  }
 }

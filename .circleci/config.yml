@@ -64,6 +64,8 @@ jobs:
           key: "android_sdk"
           paths:
             - "/home/circleci/android_sdk"
+
+      - save_cache:
           key: "v3-bazel_cache"
           paths:
             - "/home/circleci/.cache/bazel/"

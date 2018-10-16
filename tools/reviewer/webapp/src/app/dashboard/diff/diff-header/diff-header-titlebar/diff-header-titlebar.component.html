@@ -17,15 +17,14 @@
   <diff-status [diff]="diff"></diff-status>
   <div class="buttons" fxFlex>
     <button
-      class="cr-light-button"
-      mat-raised-button
-      color="accent"
+      mat-button
+      class="cr-light-button orange-button"
       (click)="clickReplyButton()"
     >Reply</button>
     <button
-      class="cr-light-button"
-      mat-raised-button
-      color="primary"
+      mat-button
+      class="cr-light-button sky-button"
+      [disabled]="true"
     >Submit</button>
   </div>
 </div>

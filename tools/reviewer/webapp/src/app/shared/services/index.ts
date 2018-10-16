@@ -1,5 +1,6 @@
 export * from './auth.service';
 export * from './firebase.service';
+export * from './firebase-state.service';
 export * from './notification.service';
 export * from './highlight.service';
 export * from './encoding.service';
@@ -13,6 +14,7 @@ import { AuthService } from './auth.service';
 import { DiffUpdateService } from './diff-update.service';
 import { EncodingService } from './encoding.service';
 import { ExceptionService } from './exception.service';
+import { FirebaseStateService } from './firebase-state.service';
 import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { LocalserverService } from './localserver.service';
@@ -21,6 +23,7 @@ export const ServiceList = [
   AuthGuard,
   AuthService,
   FirebaseService,
+  FirebaseStateService,
   HighlightService,
   NotificationService,
   EncodingService,
