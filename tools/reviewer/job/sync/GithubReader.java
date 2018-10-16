@@ -195,32 +195,31 @@ public class GithubReader {
                 .filter(comment -> comment.getPosition() == position)
                 .collect(Collectors.toList()));
 
-    Thread.Builder thread = Thread.newBuilder();
+    Thread.Builder thread =
+        Thread.newBuilder()
+            .setRepoId(pr.getRepoName())
+            .setFile(
+                Protos.File.newBuilder()
+                    .setFilename(positionComments.get(0).getPath())
+                    .setRepoId(pr.getRepoName())
+                    .setFilenameWithRepo(
+                        pr.getHead().getRepo().getName() + "/" + positionComments.get(0).getPath())
+                    .setCommitId(positionComments.get(0).getCommitId())
+                    // TODO: Think over how to save already received user's email from the
+                    // previous iteration. It can reduce the number of requests.
+                    .setUser(
+                        githubClient
+                            .getUser(
+                                UserRequest.newBuilder().setLogin(pr.getUser().getLogin()).build())
+                            .getUser()
+                            .getEmail())
+                    .build())
+            .setType(Thread.Type.CODE);
+
     positionComments.forEach(
         comment ->
             thread
-                // TODO: Set `repoId`, `file`, `lineNumber`, `type` only once, not to override these
-                // values for each comment.
-                .setRepoId(pr.getRepoName())
                 .setCommitId(setThreadCommitId(pr, comment))
-                .setFile(
-                    Protos.File.newBuilder()
-                        .setFilename(comment.getPath())
-                        .setRepoId(pr.getRepoName())
-                        .setFilenameWithRepo(
-                            pr.getHead().getRepo().getName() + "/" + comment.getPath())
-                        .setCommitId(comment.getCommitId())
-                        // TODO: Think over how to save already received user's email from the
-                        // previous iteration. It can reduce the number of requests.
-                        .setUser(
-                            githubClient
-                                .getUser(
-                                    UserRequest.newBuilder()
-                                        .setLogin(pr.getUser().getLogin())
-                                        .build())
-                                .getUser()
-                                .getEmail())
-                        .build())
                 .setLineNumber(
                     getLineNumber(
                         getDiffPatchStrByFilename(pullRequestFiles, comment.getPath()),
@@ -240,8 +239,7 @@ public class GithubReader {
                                         .build())
                                 .getUser()
                                 .getEmail())
-                        .build())
-                .setType(Thread.Type.CODE));
+                        .build()));
     return thread.build();
   }
 
