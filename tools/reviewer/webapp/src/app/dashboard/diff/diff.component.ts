@@ -53,7 +53,7 @@ export class DiffComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Each time when diff is changes in firebase, we receive new diff here.
+  // Each time when diff is changed in firebase, we receive new diff here.
   subscribeOnChanges(): void {
     this.changesSubscription = this.firebaseStateService
       .diffChanges

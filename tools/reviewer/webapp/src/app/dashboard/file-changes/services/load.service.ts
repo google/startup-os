@@ -34,7 +34,7 @@ export class LoadService {
       });
   }
 
-  // Each time when diff is changes in firebase, we receive new diff here.
+  // Each time when diff is changed in firebase, we receive new diff here.
   private subscribeOnChanges(): void {
     this.stateService.changesSubscription = this.firebaseStateService
       .diffChanges
