@@ -32,11 +32,11 @@ else
 fi
 
 
-if [ ! -d "$ANDROID_HOME" ]; then
+if [ ! -d "$ANDROID_HOME"/platforms/android-28 ]; then
 	$DOWNLOAD_COMMAND $URL_BASE/$FILENAME
 	unzip $FILENAME -d $ANDROID_HOME
 	(yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses) || true
-	$ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27" "build-tools;27.0.3"
+	$ANDROID_HOME/tools/bin/sdkmanager "platforms;android-28" "build-tools;28.0.3"
 	echo "Removing $(rm -v $FILENAME)"
 fi
 
