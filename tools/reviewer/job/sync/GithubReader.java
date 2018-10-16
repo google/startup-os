@@ -195,16 +195,23 @@ public class GithubReader {
                 .filter(comment -> comment.getPosition() == position)
                 .collect(Collectors.toList()));
 
+    GithubComment firstComment;
+    if (positionComments.isEmpty()) {
+      throw new RuntimeException("Can not find comments for a position: " + position);
+    } else {
+      firstComment = positionComments.get(0);
+    }
+
     Thread.Builder thread =
         Thread.newBuilder()
             .setRepoId(pr.getRepoName())
             .setFile(
                 Protos.File.newBuilder()
-                    .setFilename(positionComments.get(0).getPath())
+                    .setFilename(firstComment.getPath())
                     .setRepoId(pr.getRepoName())
                     .setFilenameWithRepo(
-                        pr.getHead().getRepo().getName() + "/" + positionComments.get(0).getPath())
-                    .setCommitId(positionComments.get(0).getCommitId())
+                        pr.getHead().getRepo().getName() + "/" + firstComment.getPath())
+                    .setCommitId(firstComment.getCommitId())
                     // TODO: Think over how to save already received user's email from the
                     // previous iteration. It can reduce the number of requests.
                     .setUser(
@@ -214,32 +221,31 @@ public class GithubReader {
                             .getUser()
                             .getEmail())
                     .build())
+            .setCommitId(setThreadCommitId(pr, firstComment))
+            .setLineNumber(
+                getLineNumber(
+                    getDiffPatchStrByFilename(pullRequestFiles, firstComment.getPath()),
+                    firstComment.getPosition(),
+                    getCommentSide(firstComment.getDiffHunk())))
             .setType(Thread.Type.CODE);
 
     positionComments.forEach(
         comment ->
-            thread
-                .setCommitId(setThreadCommitId(pr, comment))
-                .setLineNumber(
-                    getLineNumber(
-                        getDiffPatchStrByFilename(pullRequestFiles, comment.getPath()),
-                        comment.getPosition(),
-                        getCommentSide(comment.getDiffHunk())))
-                .addComment(
-                    Comment.newBuilder()
-                        .setContent(comment.getBody())
-                        .setTimestamp(Instant.parse(comment.getUpdatedAt()).getEpochSecond())
-                        .setCreatedBy(
-                            // TODO: Email can be null if the user hides email. Think over how to
-                            // resolve this.
-                            githubClient
-                                .getUser(
-                                    UserRequest.newBuilder()
-                                        .setLogin(comment.getUser().getLogin())
-                                        .build())
-                                .getUser()
-                                .getEmail())
-                        .build()));
+            thread.addComment(
+                Comment.newBuilder()
+                    .setContent(comment.getBody())
+                    .setTimestamp(Instant.parse(comment.getUpdatedAt()).getEpochSecond())
+                    .setCreatedBy(
+                        // TODO: Email can be null if the user hides email. Think over how to
+                        // resolve this.
+                        githubClient
+                            .getUser(
+                                UserRequest.newBuilder()
+                                    .setLogin(comment.getUser().getLogin())
+                                    .build())
+                            .getUser()
+                            .getEmail())
+                    .build()));
     return thread.build();
   }
 
