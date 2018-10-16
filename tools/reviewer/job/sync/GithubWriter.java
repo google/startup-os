@@ -38,11 +38,12 @@ import java.util.List;
 
 /** Writes `tools.reviewer.localserver.service.Protos.Diff` to GitHub using GitHub API */
 public class GithubWriter {
-  private static final String REVIEWER_DIFF_LINK = "https://startupos-5f279.firebaseapp.com/diff/";
+  private final String reviewerDiffLink;
   private final GithubClient githubClient;
 
-  GithubWriter(GithubClient githubClient) {
+  GithubWriter(GithubClient githubClient, String reviewerDiffLink) {
     this.githubClient = githubClient;
+    this.reviewerDiffLink = reviewerDiffLink;
   }
 
   public void writeDiff(Diff diff, String repoOwner, String repoName) throws IOException {
@@ -86,7 +87,7 @@ public class GithubWriter {
 
     for (Thread codeThread : diff.getCodeThreadList()) {
       String reviewerLink =
-          REVIEWER_DIFF_LINK + diffNumber + "/" + codeThread.getFile().getFilenameWithRepo();
+          reviewerDiffLink + diffNumber + "/" + codeThread.getFile().getFilenameWithRepo();
       for (Comment comment : codeThread.getCommentList()) {
         String path = codeThread.getFile().getFilename();
         String diffPatchStr = getPatchStrByFilename(pullRequestFiles, path);

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The class for determining line number of the file relatively a position in the diff and in the
+ * The class for determining line number of the file relative to a position in the diff and in the
  * opposite direction. `Line number` is the absolute line number in the file. `Position` is line
  * number in the diff(patch). `Position` is unique for the diff.
  */

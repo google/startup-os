@@ -69,17 +69,17 @@ public class GithubPatch {
     return diffHunkHeaders;
   }
 
-  /**
+  /*
    * A diff hunk header.
    *
-   * <p>A part of GitHub Pull Request file's `patch` contains header and body.
+   * A part of GitHub Pull Request file's `patch` contains header and body.
    *
-   * <p>Header starts and ends with double `@` characters. E.g. `@@ -99,6 +108,16 @@`
+   * Header starts and ends with double `@` characters. E.g. `@@ -99,6 +108,16 @@`
    *
-   * <p>`-96,6` relates to left side(base): `96` is line number in the file where diff hunk starts,
+   * `-96,6` relates to left side(base): `96` is line number in the file where diff hunk starts,
    * `6` - amount of lines in the DiffHunk.
    *
-   * <p>`+108,16` relates to the right side(head): '108' is line number in the file where diff hunk
+   * `+108,16` relates to the right side(head): '108' is line number in the file where diff hunk
    * starts, 16 - amount of lines in the diff hunk.
    */
   class DiffHunkHeader {
@@ -96,8 +96,7 @@ public class GithubPatch {
     DiffHunkHeader(String diffHunkHeaderStr) {
       try {
         // Parses diff hunk header and gets line number where diff hunk starts on the left and on
-        // the
-        // right side
+        // the right side
         leftStartLine =
             Integer.parseInt(diffHunkHeaderStr.split(" ")[1].substring(1).split(",")[0]);
         rightStartLine =

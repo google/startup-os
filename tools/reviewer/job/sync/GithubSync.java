@@ -47,6 +47,10 @@ public class GithubSync {
   @FlagDesc(name = "password", description = "GitHub password")
   private static Flag<String> password = Flag.create("");
 
+  @FlagDesc(name = "reviewer_diff_link", description = "Base url to reviewer diff")
+  private static Flag<String> reviewerDiffLink =
+      Flag.create("https://startupos-5f279.firebaseapp.com/diff/");
+
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
     GithubSync githubSync = new GithubSync();
@@ -70,7 +74,7 @@ public class GithubSync {
   }
 
   private void writeDiff(GithubClient githubClient, Diff diff) throws IOException {
-    GithubWriter writer = new GithubWriter(githubClient);
+    GithubWriter writer = new GithubWriter(githubClient, reviewerDiffLink.get());
     writer.writeDiff(diff, repoOwner.get(), repoName.get());
   }
 }

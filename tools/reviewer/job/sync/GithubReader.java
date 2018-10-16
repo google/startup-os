@@ -199,6 +199,8 @@ public class GithubReader {
     positionComments.forEach(
         comment ->
             thread
+                // TODO: Set `repoId`, `file`, `lineNumber`, `type` only once, not to override these
+                // values for each comment.
                 .setRepoId(pr.getRepoName())
                 .setCommitId(setThreadCommitId(pr, comment))
                 .setFile(
