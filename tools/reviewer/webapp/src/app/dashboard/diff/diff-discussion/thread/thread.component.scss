@@ -45,11 +45,6 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         top: -5px;
       }
     }
-    .ellipsis {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   }
   >.comment:first-child {
     border-radius: $top-radius;

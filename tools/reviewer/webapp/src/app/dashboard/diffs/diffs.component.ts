@@ -28,8 +28,8 @@ export class DiffsComponent implements OnInit, OnDestroy {
     'author',
     'status',
     'action',
-    'workspace',
     'reviewers',
+    'workspace',
     'description',
   ];
   diffGroupNameList: string[] = [];

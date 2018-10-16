@@ -4,10 +4,6 @@ body {
   height: 100%;
   margin: 0px;
   font-family: $default-font;
-  
-  .mat-toolbar {
-    font-family: $default-font;
-  }
 
   .mat-table {
     font-family: $default-font;
@@ -65,17 +61,22 @@ body {
     font-size: 14px;
   }
 
-  @mixin light-button() {
+  @mixin cr-button() {
     line-height: 0;
     border-radius: 8px;
     border: solid 1px #8d8d8d;
     font-weight: 600;
     outline: none;
     cursor: pointer;
+    font-family: $default-font;
+  }
+
+  .cr-button {
+    @include cr-button();
   }
 
   .cr-light-button {
-    @include light-button();
+    @include cr-button();
     width: 120px;
     height: 28px;
     font-size: 16px;
@@ -83,9 +84,15 @@ body {
   }
 
   .cr-thread-button {
-    @include light-button();
+    @include cr-button();
     width: 97px;
     height: 26px;
     font-size: 14px;
+  }
+
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

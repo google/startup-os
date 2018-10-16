@@ -1,6 +1,4 @@
 <div class="diff-status">
-  <mat-icon [style.color]="statusList[diff.getStatus()].color">
-    {{ statusList[diff.getStatus()].icon }}
-  </mat-icon>
+  <img [src]="'/assets/status/' + statusList[diff.getStatus()].icon">
   {{ statusList[diff.getStatus()].label }}
 </div>

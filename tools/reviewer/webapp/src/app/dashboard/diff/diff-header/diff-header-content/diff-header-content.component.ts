@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { Diff, Reviewer } from '@/shared/proto';
-import { AuthService, DiffUpdateService } from '@/shared/services';
+import { AuthService, DiffUpdateService, HighlightService } from '@/shared/services';
 import { AddUserDialogComponent } from '../add-user-dialog';
 import { DiffHeaderService } from '../diff-header.service';
 
@@ -23,10 +23,11 @@ export class DiffHeaderContentComponent implements OnChanges {
   @Input() diff: Diff;
 
   constructor(
+    public dialog: MatDialog,
     public authService: AuthService,
     public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
-    public dialog: MatDialog,
+    public highlightService: HighlightService,
   ) { }
 
   ngOnChanges() {
@@ -119,6 +120,50 @@ export class DiffHeaderContentComponent implements OnChanges {
   stopDescriptionEditMode(): void {
     this.description = this.diff.getDescription();
     this.isDescriptionEditMode = false;
+  }
+
+  // Get description, where urls are highlighted as a link, and html escaped
+  getParsedDescription(): string {
+    // The RegExp example is taken from here:
+    // https://stackoverflow.com/a/3809435
+
+    // tslint:disable-next-line
+    const urlRegExp: RegExp = /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/g;
+
+    // Thing is we need to escape scecial html chars, but a url contain the chars.
+    // So we need to highlight urls and escape special chars separately.
+    // Implementation: find a url, highlight it, make all text before the url escaped,
+    // go to the next url.
+    let parsedDescription: string = '';
+    let clippedDescription: string = this.description;
+
+    // Get all urls in the description
+    const urls: RegExpMatchArray = this.description.match(urlRegExp);
+    if (urls) {
+      for (const url of this.description.match(urlRegExp)) {
+        const linkIndex: number = clippedDescription.search(urlRegExp);
+        // All text before the url
+        const commonText: string = clippedDescription.substr(0, linkIndex);
+        parsedDescription +=
+          this.highlightService.htmlSpecialChars(commonText) + // Escape html
+          url.link(url); // Hightlight the url
+        // Cut the part, which we already parsed
+        clippedDescription = clippedDescription.substr(
+          linkIndex + url.length,
+          clippedDescription.length - (linkIndex + url.length),
+        );
+      }
+      // Don't forget about text after last found url
+      parsedDescription += this.highlightService.htmlSpecialChars(clippedDescription);
+
+      return parsedDescription;
+    } else {
+      // Description doesn't contain any links
+
+      // Return a placeholder, if description is empty
+      const placeholder: string = 'Description...';
+      return this.description ? this.description : placeholder;
+    }
   }
 
   saveDescription(): void {

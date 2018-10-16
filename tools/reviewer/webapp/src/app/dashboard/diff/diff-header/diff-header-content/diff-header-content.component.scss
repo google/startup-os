@@ -44,6 +44,19 @@ $transparent-grey: rgba(0,0,0,0.54);
         margin-left: 20px;
       }
     }
+    >.read-mode {
+      cursor: text;
+      user-select: none;
+      user-drag: none;
+      >pre {
+        font-family: opensans;
+        margin: 0;
+        padding-bottom: 10px;
+      }
+      >.empty {
+        color: #979797;
+      }
+    }
     >.edit-mode {
       margin-bottom: 15px;
     }
@@ -53,16 +66,15 @@ $transparent-grey: rgba(0,0,0,0.54);
         margin-left: 15px;
       }
     }
-    .description-value {
+    .description-text {
       font-size: 14px;
-    }
-    textarea {
       resize: none;
       width: calc(100% - 14px);
       padding: 10px 7px 0 7px;
       border-radius: 4px;
       background: white;
       vertical-align: bottom;
+      border: 1px solid #8d8d8d;
     }
   }
 }

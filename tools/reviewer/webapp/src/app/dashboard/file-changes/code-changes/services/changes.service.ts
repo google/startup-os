@@ -60,8 +60,8 @@ export class ChangesService {
     );
 
     // Get spans, which aren't closed on the same line, where they're opened
-    const spans: NodeListOf<HTMLSpanElement> = htmlDocument
-      .getElementsByTagName('span');
+    const spans: HTMLCollectionOf<HTMLSpanElement> = htmlDocument
+      .getElementsByTagName('span') as HTMLCollectionOf<HTMLSpanElement>;
     let multilineSpanList: HTMLSpanElement[] = [];
     Array.from(spans).forEach(span => {
       const innerLines: string[] = span.innerHTML.split('\n');

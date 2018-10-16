@@ -86,19 +86,17 @@
       *ngIf="!isDescriptionEditMode"
       (click)="startDescriptionEditMode()"
     >
-      <textarea
-        class="description-text description-value"
-        matInput
-        matTextareaAutosize
-        matAutosizeMinRows="1"
-        placeholder="Description..."
-        [value]="description"
-        readonly
-      ></textarea>
+      <pre
+        [ngClass]="{
+          'description-text': true,
+          'empty': !description
+        }"
+        [HTML]="getParsedDescription()"
+      ></pre>
     </div>
     <div class="edit-mode" *ngIf="isDescriptionEditMode">
       <textarea
-        class="description-text description-value"
+        class="description-text"
         matInput
         matTextareaAutosize
         matAutosizeMinRows="7"
@@ -107,7 +105,6 @@
         [focus]="isDescriptionEditMode"
       ></textarea>
     </div>
-
     <div class="buttons" *ngIf="isDescriptionEditMode">
       <!-- Buttons to stop editing -->
       <button
