@@ -195,13 +195,16 @@ public class GithubReader {
                 .filter(comment -> comment.getPosition() == position)
                 .collect(Collectors.toList()));
 
-    GithubComment firstComment;
     if (positionComments.isEmpty()) {
-      throw new RuntimeException("Can not find comments for a position: " + position);
-    } else {
-      firstComment = positionComments.get(0);
+      throw new RuntimeException("Can't find comments for a position: " + position);
     }
 
+    /*
+    The thread can have one or more comments.
+    The values of `file`, `repoId`, `commitId`, `lineNumber` and `type` fields are the same for each comment.
+    We get this values from the first comment and set them to the `thread` once.
+     */
+    GithubComment firstComment = positionComments.get(0);
     Thread.Builder thread =
         Thread.newBuilder()
             .setRepoId(pr.getRepoName())
