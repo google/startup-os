@@ -8,6 +8,8 @@ import { DiffStatusComponent } from './';
 import { DashboardRoutes } from './dashboard.routing';
 import {
   AddUserDialogComponent,
+  DeleteCommentDialogComponent,
+  DeleteDiffDialogComponent,
   DiffComponentList,
   DiffDiscussionServiceList,
   UserPopupComponent,
@@ -40,6 +42,8 @@ import {
   entryComponents: [
     UserPopupComponent,
     AddUserDialogComponent,
+    DeleteDiffDialogComponent,
+    DeleteCommentDialogComponent,
   ],
 })
 export class DashboardModule { }

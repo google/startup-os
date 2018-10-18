@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { Comment, Thread } from '@/shared/proto';
 import { AuthService } from '@/shared/services';
+import { DeleteCommentDialogComponent } from '../delete-comment-dialog';
 import { ThreadState, ThreadStateService } from './thread-state.service';
 
 // The component implements a single thread.
@@ -27,6 +29,7 @@ export class ThreadComponent implements OnInit, OnDestroy {
   @Output() deleteCommentEmitter = new EventEmitter<boolean>();
 
   constructor(
+    private dialog: MatDialog,
     private authService: AuthService,
     private threadStateService: ThreadStateService,
   ) {
@@ -140,17 +143,21 @@ export class ThreadComponent implements OnInit, OnDestroy {
   }
 
   deleteComment(commentIndex: number): void {
-    if (confirm('Are you sure you want to delete the comment?')) {
-      // Delete the comment from the thread
-      const comments: Comment[] = this.thread.getCommentList();
-      comments.splice(commentIndex, 1);
-      this.thread.setCommentList(comments);
+    this.dialog.open(DeleteCommentDialogComponent, { width: '380px', autoFocus: false })
+      .afterClosed()
+      .subscribe((isDelete: boolean) => {
+        if (isDelete) {
+          // Delete the comment from the thread
+          const comments: Comment[] = this.thread.getCommentList();
+          comments.splice(commentIndex, 1);
+          this.thread.setCommentList(comments);
 
-      const isDeleteThread: boolean = this.thread.getCommentList().length === 0;
+          const isDeleteThread: boolean = this.thread.getCommentList().length === 0;
 
-      // Delete the comment from firebase
-      this.deleteCommentEmitter.emit(isDeleteThread);
-    }
+          // Delete the comment from firebase
+          this.deleteCommentEmitter.emit(isDeleteThread);
+        }
+      });
   }
 
   ngOnDestroy() {
