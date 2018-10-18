@@ -26,7 +26,7 @@ function _aa_completions()
     cur_word="${COMP_WORDS[COMP_CWORD]}"
     prev_word="${COMP_WORDS[COMP_CWORD-1]}"
 
-    commands="init workspace diff fix sync snapshot add_repo killserver"
+    commands="init workspace sync diff fix review snapshot submit add_repo patch killserver"
     init_options="--base_path --startupos_repo --user"
     add_repo_options="--url --name"
     diff_options="--reviewers --description --buglink"
