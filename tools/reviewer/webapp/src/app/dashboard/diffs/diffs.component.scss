@@ -26,7 +26,12 @@
         }
       }
       >.placeholder {
-        height: 14px;
+        height: 42px;
+        padding: 0 23px;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #5d5d5d;
       }
     }
   }

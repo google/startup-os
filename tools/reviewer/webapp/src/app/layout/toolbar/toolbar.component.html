@@ -1,21 +1,17 @@
-<mat-toolbar *ngIf="authService.isOnline">
-  <mat-toolbar-row>
-    <a routerLink="" fxFlex="10%" fxLayoutAlign="start center">
-      <img src="./assets/icon.png" height="44" width="44">
-    </a>
-    <div class="titlebar" routerLink="">
-      <span class="title">Reviewer</span>
-    </div>
-    <div fxFlex="1 1" class="search">
-      <input type="text">
-    </div>
-    <div>
-      <button mat-icon-button class="search-button">
-        <mat-icon>search</mat-icon>
-      </button>
-    </div>
-    <div class="action">
-      <button mat-raised-button (click)="logout()">Logout</button>
-    </div>
-  </mat-toolbar-row>
-</mat-toolbar>
+<div class="toolbar" *ngIf="authService.isOnline">
+  <div class="label" routerLink="/">
+    <img src="./assets/icon.png">
+    <span>Reviewer</span>
+  </div>
+  <div class="search" fxFlex>
+    <input type="text" fxFlex>
+    <img src="/assets/ic-search.svg">
+  </div>
+  <div class="action">
+    <button
+      class="cr-button logout-button"
+      mat-button
+      (click)="logout()"
+    >Logout</button>
+  </div>
+</div>
