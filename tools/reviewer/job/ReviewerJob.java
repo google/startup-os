@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.tools.reviewer.job;
+package com.google.startupos.tools.reviewer.job;
 
-import com.google.startupos.tools.reviewer.tools.reviewer.job.tasks.TaskExecutor;
+import com.google.startupos.tools.reviewer.job.tasks.TaskExecutor;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
