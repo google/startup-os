@@ -23,7 +23,9 @@ interface ThreadMap {
 export class ThreadStateService {
   threadMap: ThreadMap = {};
   threadStateMap: ThreadStateMap = {};
-  stateChanges = new Subject<Thread.Type>();
+  threadChanges = new Subject<void>();
+  stateChanges = new Subject<void>();
+  openCommentChanges = new Subject<void>();
 
   // Saves link of new thread in the service
   updateThreadLink(thread: Thread): void {
@@ -31,8 +33,20 @@ export class ThreadStateService {
   }
 
   // Tells thread components that they need to update links
-  updateState(type: Thread.Type): void {
-    this.stateChanges.next(type);
+  updateThreadsContent(): void {
+    this.threadChanges.next();
+  }
+
+  // Tells thread components that they need to update their state.
+  // State means "is replying going or not", "text of new comment", "reply checked or not", etc..
+  updateState(): void {
+    this.stateChanges.next();
+  }
+
+  // Tell parent component that a comment is opened.
+  // To changed button from "Expand" to "Collapse"
+  openComment(): void {
+    this.openCommentChanges.next();
   }
 
   // Resets state

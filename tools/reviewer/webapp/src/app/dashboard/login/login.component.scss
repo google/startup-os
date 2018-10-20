@@ -1,0 +1,56 @@
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  >.login-panel {
+    display: flex;
+    width: 383px;
+    height: 369px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #c4c4c4;
+    border-radius: 10px;
+    img {
+      $size: 66px;
+      width: $size;
+      height: $size;
+      user-select: none;
+    }
+    .title {
+      font-size: 34px;
+      font-weight: bold;
+      text-stroke: 0.6px #858585;
+      color: #1668b9;
+    }
+    .description {
+      font-size: 18px;
+      font-weight: 600;
+      color: #4993dd;
+    }
+    button {
+      background-color: #1668b9;
+      color: #f7fAff;
+      font-size: 18px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 241px;
+      height: 39px;
+      cursor: pointer;
+      outline: none;
+      margin-top: 40px;
+    }
+  }
+  >.decoration-left {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+  }
+  >.decoration-right {
+    position: fixed;
+    right: 0;
+    top: 0;
+  }
+}

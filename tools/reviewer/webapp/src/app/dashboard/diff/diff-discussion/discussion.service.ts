@@ -36,13 +36,13 @@ export class DiscussionService {
       .length;
   }
 
-  // If new thread wasn't added or a thread wasn't deleted make links update.
+  // If new thread wasn't added or a thread wasn't deleted then make "links update".
   // Link update means content of each thread will be refreshed, but general threads
   // structure will remain the same.
-  refreshThreads(threads: Thread[], type: Thread.Type): void {
+  refreshThreads(threads: Thread[]): void {
     threads.forEach(thread => {
       this.threadStateService.updateThreadLink(thread);
     });
-    this.threadStateService.updateState(type);
+    this.threadStateService.updateThreadsContent();
   }
 }

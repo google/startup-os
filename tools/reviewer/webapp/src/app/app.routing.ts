@@ -1,13 +1,27 @@
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent, PageNotFoundComponent } from './';
+
+import { AuthGuard } from '@/shared';
+import {
+  DiffComponent,
+  DiffsComponent,
+  FileChangesComponent,
+  LoginComponent,
+  PageNotFoundComponent,
+} from './dashboard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'diffs', pathMatch: 'full' },
   {
-    path: 'diffs',
-    loadChildren: 'app/layout/layout.module#LayoutModule',
+    path: '',
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'diffs', component: DiffsComponent },
+      { path: 'diff/:id', component: DiffComponent },
+      { path: 'diff', children: [{ path: '**', component: FileChangesComponent }] },
+    ],
   },
   { path: 'login', component: LoginComponent },
   { path: '**', component: PageNotFoundComponent },
 ];
+
 export const AppRoutes = RouterModule.forRoot(routes, { useHash: false });

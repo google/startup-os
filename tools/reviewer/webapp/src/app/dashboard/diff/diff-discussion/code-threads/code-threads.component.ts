@@ -45,7 +45,7 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
   private refreshThreads(): void {
     if (this.getThreadsAmount(this.fileGroupsSource.data) === this.threads.length) {
       // Links update
-      this.discussionService.refreshThreads(this.threads, Thread.Type.CODE);
+      this.discussionService.refreshThreads(this.threads);
     } else {
       // Re-build template. Each thread component will be recreated.
       this.initThreads();

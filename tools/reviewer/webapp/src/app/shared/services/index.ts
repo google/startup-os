@@ -1,3 +1,4 @@
+export * from './auth.guard';
 export * from './auth.service';
 export * from './firebase.service';
 export * from './firebase-state.service';

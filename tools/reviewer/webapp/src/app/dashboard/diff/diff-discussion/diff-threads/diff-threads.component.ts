@@ -44,7 +44,7 @@ export class DiffThreadsComponent implements OnInit, OnChanges {
   private refreshThreads(): void {
     if (this.threadsSource.data.length === this.threads.length) {
       // Links update
-      this.discussionService.refreshThreads(this.threads, Thread.Type.DIFF);
+      this.discussionService.refreshThreads(this.threads);
     } else {
       // Re-build template. Each thread component will be recreated.
       this.initThreads();

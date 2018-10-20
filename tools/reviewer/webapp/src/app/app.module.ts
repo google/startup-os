@@ -1,41 +1,57 @@
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import {
-  BrowserAnimationsModule,
-} from '@angular/platform-browser/animations';
 
-import { AngularFireModule } from 'angularfire2';
-import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
-
-import { config } from '../environments/firebase';
 import { AppComponent } from './app.component';
 import { AppRoutes } from './app.routing';
-import { LayoutModule } from './layout/layout.module';
-import { LoginComponent } from './login/login.component';
-import { PageNotFoundComponent } from './page-not-found';
-import { ServiceList } from './shared/services';
+import {
+  AddUserDialogComponent,
+  DashboardComponentList,
+  DashboardServiceList,
+  DeleteCommentDialogComponent,
+  DeleteDiffDialogComponent,
+  UserPopupComponent,
+} from './dashboard';
+import {
+  FirebaseImports,
+  FirebaseServices,
+  MaterialImports,
+} from './import';
+import { LayoutComponentList } from './layout';
+import {
+  DirectiveList,
+  PipeList,
+  ServiceList,
+} from './shared';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    PageNotFoundComponent,
+    ...DashboardComponentList,
+    ...LayoutComponentList,
+    ...PipeList,
+    ...DirectiveList,
   ],
   imports: [
     HttpModule,
-    AngularFireModule.initializeApp(config),
-    AngularFirestoreModule,
-    AngularFireAuthModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     AppRoutes,
-    BrowserAnimationsModule,
-    LayoutModule,
+    ...MaterialImports,
+    ...FirebaseImports,
   ],
   providers: [
-    AngularFireDatabase,
-    AngularFireAuth,
+    ...FirebaseServices,
     ...ServiceList,
+    ...DashboardServiceList,
+  ],
+  entryComponents: [
+    UserPopupComponent,
+    AddUserDialogComponent,
+    DeleteDiffDialogComponent,
+    DeleteCommentDialogComponent,
   ],
   bootstrap: [AppComponent],
 })

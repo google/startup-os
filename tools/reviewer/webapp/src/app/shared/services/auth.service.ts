@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
@@ -10,7 +11,8 @@ export class AuthService {
   userEmail: string;
 
   constructor(
-    public angularFireAuth: AngularFireAuth,
+    private router: Router,
+    private angularFireAuth: AngularFireAuth,
     private firebaseStateService: FirebaseStateService,
   ) {
     this.angularFireAuth.authState.subscribe(userData => {
@@ -18,6 +20,8 @@ export class AuthService {
       if (this.isOnline) {
         this.userEmail = userData.email;
         this.firebaseStateService.connectDiffs();
+      } else {
+        this.router.navigate(['/login']);
       }
     });
   }

@@ -1,6 +1,6 @@
 <div class="header-content cr-header">
   <!--
-    Block with main information of the diff
+    This's a block with main information of the diff
     Reviewers, CC list, workspace, created time, etc.
   -->
   <div class="info" fxFlex="50%">
@@ -20,7 +20,10 @@
             (changeAttentionEmitter)="changeAttention($event)"
             [isRemoveFromList]="true"
             (removeFromListEmitter)="removeFromReviewerList($event)"
-          ><span [ngClass]="{'bold': reviewer.getNeedsAttention()}">
+          ><span [ngClass]="{
+            'bold': reviewer.getNeedsAttention(),
+            'approved': reviewer.getApproved()
+          }">
             {{ authService.getUsername(reviewer.getEmail()) }}
           </span></user-popup>
         </td>

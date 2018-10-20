@@ -9,13 +9,10 @@ import { AuthService } from '@/shared';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  constructor(private authService: AuthService, private router: Router) {
-    this.authService.angularFireAuth.authState.subscribe(auth => {
-      if (auth) {
-        this.router.navigate(['']);
-      }
-    });
-  }
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) { }
 
   loginUsingGoogle(): void {
     this.authService.loginWithGoogle().then(() => {

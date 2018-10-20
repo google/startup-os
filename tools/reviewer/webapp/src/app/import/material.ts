@@ -1,5 +1,3 @@
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {
   MatButtonModule,
@@ -16,13 +14,10 @@ import {
   MatTableModule,
   MatToolbarModule,
 } from '@angular/material';
-import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { PageLoadingComponent } from '@/page-loading';
-import { DirectiveList } from './directives';
-import { PipeList } from './pipes';
-
-const SharedModules = [
+export const MaterialImports = [
+  BrowserAnimationsModule,
   FlexLayoutModule,
   MatButtonModule,
   MatCardModule,
@@ -38,25 +33,3 @@ const SharedModules = [
   MatCheckboxModule,
   MatSelectModule,
 ];
-
-const Declarations = [
-  ...DirectiveList,
-  ...PipeList,
-  PageLoadingComponent,
-];
-
-@NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-    ...SharedModules,
-  ],
-  exports: [
-    SharedModules,
-    ...Declarations,
-  ],
-  declarations: [
-    ...Declarations,
-  ],
-})
-export class SharedModule { }
