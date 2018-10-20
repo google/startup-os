@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
 import { Diff, Thread } from '@/shared/proto';
@@ -8,6 +9,7 @@ import { NotificationService } from './notification.service';
 @Injectable()
 export class DiffUpdateService {
   constructor(
+    private router: Router,
     private firebaseService: FirebaseService,
     private notificationService: NotificationService,
   ) { }
@@ -63,6 +65,13 @@ export class DiffUpdateService {
   customUpdate(diff: Diff, message: string): void {
     this.firebaseService.updateDiff(diff).subscribe(() => {
       this.notificationService.success(message);
+    });
+  }
+
+  deleteDiff(diff: Diff): void {
+    this.firebaseService.removeDiff(diff.getId().toString()).subscribe(() => {
+      this.notificationService.success('Diff is deleted');
+      this.router.navigate(['/diffs']);
     });
   }
 }

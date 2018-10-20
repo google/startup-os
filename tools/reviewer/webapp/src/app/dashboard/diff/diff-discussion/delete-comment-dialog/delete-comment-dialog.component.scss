@@ -1,0 +1,15 @@
+@import '../index';
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 23px;
+  >div {
+    width: 298px;
+    text-align: center;
+  }
+}
+.buttons {
+  display: flex;
+  justify-content: center;
+}
