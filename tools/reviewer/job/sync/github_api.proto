@@ -5,13 +5,15 @@ package com.google.startupos.tools.reviewer.job.sync;
 option java_package = "com.google.startupos.tools.reviewer.job.sync";
 option java_outer_classname = "GithubProtos";
 
+import "tools/reviewer/job/sync/full_github_pr.proto";
+// TODO: Delete unused messages
 // GitHub User
-message User {
-  int64 id = 1;
-  string email = 2;
-  string name = 3;
-  string login = 4;
-}
+// message User {
+//  int64 id = 1;
+//  string email = 2;
+//  string name = 3;
+//  string login = 4;
+//}
 
 message UserRequest { string login = 1; }
 
@@ -29,37 +31,37 @@ message File {
 message PullRequestFilesRequest {
   string owner = 1;
   string repo = 2;
-  int32 diff_number = 3;
+  int64 number = 3;
 }
 
 message PullRequestFilesResponse { repeated File files = 1; }
 
-message GithubComment {
-  int64 id = 1;
-  string body = 2;
-  string created_at = 3;
-  string updated_at = 4;
-  User user = 5;
-  int32 position = 6;
-  int32 original_position = 7;
-  string diff_hunk = 8;
-  string path = 9;
-  string commit_id = 10;
-  string original_commit_id = 11;
-}
+// message GithubComment {
+//  int64 id = 1;
+//  string body = 2;
+//  string created_at = 3;
+//  string updated_at = 4;
+//  User user = 5;
+//  int32 position = 6;
+//  int32 original_position = 7;
+//  string diff_hunk = 8;
+//  string path = 9;
+//  string commit_id = 10;
+//  string original_commit_id = 11;
+//}
 
 message CommentsRequest {
   string owner = 1;
   string repo = 2;
-  int32 diff_number = 3;
+  int64 number = 3;
 }
 
-message CommentsResponse { repeated GithubComment comments = 1; }
+message IssueCommentsResponse { repeated IssueComment issue_comment = 1; }
 
 message CreateReviewCommentRequest {
   string owner = 1;
   string repo = 2;
-  int32 diff_number = 3;
+  int64 diff_number = 3;
   CreateReviewCommentRequestData request_data = 4;
 }
 
@@ -68,56 +70,39 @@ message CreateReviewCommentRequestData {
   string commit_id = 2;
   string path = 3;
   int32 position = 4;
+  int32 in_reply_to = 5;
 }
 
-message CreatePullRequestCommentRequest {
+message CreateIssueCommentRequest {
   string owner = 1;
   string repo = 2;
-  int32 diff_number = 3;
-  CreatePullRequestCommentRequestData request_data = 4;
+  int64 number = 3;
+  CreateIssueCommentRequestData request_data = 4;
 }
 
-message CreatePullRequestCommentRequestData { string body = 1; }
+message CreateIssueCommentRequestData { string body = 1; }
 
-// GitHub Pull Request
-message PullRequest {
-  int64 id = 1;
-  int32 number = 2;
-  string state = 3;
-  string title = 4;
-  User user = 5;
-  string body = 6;
-  string created_at = 7;
-  string updated_at = 8;
-  CommitPointer head = 9;
-  CommitPointer base = 10;
-  string repo_name = 11;
+message ReviewsRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
 }
 
-message CommitPointer {
-  string label = 1;
-  string ref = 2;
-  string sha = 3;
-  User user = 4;
-  Repo repo = 5;
+message ReviewsResponse { repeated Review reviews = 1; }
+
+message ReviewCommentsRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+  int64 review_id = 4;
 }
 
-message Repo {
-  int64 id = 1;
-  string name = 2;
-  string full_name = 3;
-  bool private = 4;
-  User owner = 5;
-  string description = 6;
-  string created_at = 7;
-  string updated_at = 8;
-  string pushed_at = 9;
-}
+message ReviewCommentsResponse { repeated ReviewComment review_comments = 1; }
 
 message PullRequestRequest {
   string owner = 1;
   string repo = 2;
-  int32 diff_number = 3;
+  int64 number = 3;
 }
 
 message PullRequestResponse { PullRequest pull_request = 1; }
@@ -143,3 +128,24 @@ message PullRequestsRequest {
 }
 
 message PullRequestsResponse { repeated PullRequest pull_requests = 1; }
+
+message CreatePullRequestReviewRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+  CreatePullRequestReviewRequestData request_data = 4;
+}
+
+message CreatePullRequestReviewRequestData {
+  string commit_id = 1;
+  //  required field
+  string body = 2;
+  string event = 3;
+  repeated ReviewCommentRequestData comments = 4;
+}
+
+message ReviewCommentRequestData {
+  string path = 1;
+  int64 position = 2;
+  string body = 3;
+}

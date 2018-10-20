@@ -16,201 +16,116 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestCommentRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestCommentRequestData;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestReviewRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestReviewRequestData;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequestData;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequestData;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.File;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestFilesRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestsRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Review;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.List;
-
-/** Writes `tools.reviewer.localserver.service.Protos.Diff` to GitHub using GitHub API */
+/**
+ * Writes `tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest` to GitHub using GitHub API
+ */
 public class GithubWriter {
-  private final String reviewerDiffLink;
   private final GithubClient githubClient;
 
-  GithubWriter(GithubClient githubClient, String reviewerDiffLink) {
+  GithubWriter(GithubClient githubClient) {
     this.githubClient = githubClient;
-    this.reviewerDiffLink = reviewerDiffLink;
   }
 
-  public void writeDiff(Diff diff, String repoOwner, String repoName) throws IOException {
-    int diffNumber = getGithubPullRequestNumber(diff, repoOwner, repoName);
+  public void writePullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
+    long pullRequestNumber =
+        pullRequest.getNumber() == 0
+            ? createPullRequest(pullRequest, repoOwner, repoName)
+            : pullRequest.getNumber();
 
-    for (Thread diffThread : diff.getDiffThreadList()) {
-      for (Comment comment : diffThread.getCommentList()) {
-        // TODO: Think over what should be in the comment by Reviewer Bot
-        createPullRequestComment(
-            repoOwner,
-            repoName,
-            diffNumber,
-            "Created by: "
-                + comment.getCreatedBy()
-                + "\nTime: "
-                + Instant.ofEpochSecond(comment.getTimestamp())
-                + "\n"
-                + comment.getContent());
-      }
+    for (Review review : pullRequest.getReviewsList()) {
+      createReview(repoOwner, repoName, review, pullRequestNumber);
     }
 
-    List<File> pullRequestFiles =
-        githubClient
-            .getPullRequestFiles(
-                PullRequestFilesRequest.newBuilder()
-                    .setOwner(repoOwner)
-                    .setRepo(repoName)
-                    .setDiffNumber(diffNumber)
-                    .build())
-            .getFilesList();
-
-    PullRequest pr =
-        githubClient
-            .getPullRequest(
-                PullRequestRequest.newBuilder()
-                    .setOwner(repoOwner)
-                    .setRepo(repoName)
-                    .setDiffNumber(diffNumber)
-                    .build())
-            .getPullRequest();
-
-    for (Thread codeThread : diff.getCodeThreadList()) {
-      String reviewerLink =
-          reviewerDiffLink + diffNumber + "/" + codeThread.getFile().getFilenameWithRepo();
-      for (Comment comment : codeThread.getCommentList()) {
-        String path = codeThread.getFile().getFilename();
-        String diffPatchStr = getPatchStrByFilename(pullRequestFiles, path);
-        LineNumberConverter.Side side =
-            getCommentSide(codeThread.getFile().getCommitId(), codeThread.getCommitId());
-        int position = getCommentPosition(diffPatchStr, codeThread.getLineNumber(), side);
-        // TODO: Think over what should be in the comment by Reviewer Bot
-        createReviewComment(
-            repoOwner,
-            repoName,
-            diffNumber,
-            "Created by: "
-                + comment.getCreatedBy()
-                + "\nTime: "
-                + Instant.ofEpochSecond(comment.getTimestamp()).toString()
-                + "\nBody: "
-                + comment.getContent()
-                + "\nSee in Reviewer: "
-                + reviewerLink,
-            pr.getHead().getSha(),
-            path,
-            position);
-      }
+    for (IssueComment issueComment : pullRequest.getIssueCommentList()) {
+      createIssueComment(repoOwner, repoName, pullRequestNumber, issueComment);
     }
   }
 
-  private int getGithubPullRequestNumber(Diff diff, String repoOwner, String repoName) {
-    PullRequestsRequest request =
-        PullRequestsRequest.newBuilder().setOwner(repoOwner).setRepo(repoName).build();
-    try {
-      List<PullRequest> pullRequests = githubClient.getPullRequests(request).getPullRequestsList();
-      for (PullRequest pr : pullRequests) {
-        if (pr.getTitle().equals("D" + diff.getId())) {
-          return pr.getNumber();
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    // Create new Pull Request if it doesn't exist
-    return createPullRequest(
-        repoOwner,
-        repoName,
-        "D" + diff.getId(),
-        "D" + diff.getId(),
-        "master",
-        diff.getDescription());
-  }
-
-  private int createPullRequest(
-      String repoOwner, String repoName, String title, String head, String base, String body) {
-    CreatePullRequestRequest request =
-        CreatePullRequestRequest.newBuilder()
+  private void createIssueComment(
+      String repoOwner, String repoName, long pullRequestNumber, IssueComment issueComment) {
+    githubClient.createIssueComment(
+        GithubProtos.CreateIssueCommentRequest.newBuilder()
             .setOwner(repoOwner)
             .setRepo(repoName)
+            .setNumber(pullRequestNumber)
             .setRequestData(
-                CreatePullRequestRequestData.newBuilder()
-                    .setTitle(title)
-                    .setHead(head)
-                    .setBase(base)
-                    // TODO: `body`(PullRequest description) can't be empty. Think over the default
-                    // value
-                    .setBody(body.isEmpty() ? "Created by Reviewer Bot" : body)
+                GithubProtos.CreateIssueCommentRequestData.newBuilder()
+                    // TODO: Add additional info to text message and link to Reviewer
+                    .setBody(issueComment.getBody())
                     .build())
-            .build();
-    CreatePullRequestResponse response = githubClient.createPullRequest(request);
-    return response.getPullRequest().getNumber();
+            .build());
   }
 
-  private void createPullRequestComment(
-      String repoOwner, String repoName, int diffNumber, String body) {
-    CreatePullRequestCommentRequest request =
-        CreatePullRequestCommentRequest.newBuilder()
+  private void createReview(
+      String repoOwner, String repoName, Review review, long pullRequestNumber) {
+    CreatePullRequestReviewRequestData.Builder requestDataBuilder =
+        CreatePullRequestReviewRequestData.newBuilder();
+    requestDataBuilder
+        .setCommitId(review.getCommitId())
+        .setBody(review.getBody())
+        .setEvent(setEvent(review.getState()));
+
+    review
+        .getReviewCommentList()
+        .forEach(
+            reviewComment ->
+                requestDataBuilder.addComments(
+                    GithubProtos.ReviewCommentRequestData.newBuilder()
+                        .setPath(reviewComment.getPath())
+                        .setPosition(reviewComment.getPosition())
+                        // TODO: Add additional info to text message and link to Reviewer
+                        .setBody(reviewComment.getBody())
+                        .build()));
+
+    githubClient.createPullRequestReview(
+        CreatePullRequestReviewRequest.newBuilder()
             .setOwner(repoOwner)
             .setRepo(repoName)
-            .setDiffNumber(diffNumber)
-            .setRequestData(CreatePullRequestCommentRequestData.newBuilder().setBody(body).build())
-            .build();
-    githubClient.createPullRequestComment(request);
+            .setNumber(pullRequestNumber)
+            .setRequestData(requestDataBuilder.build())
+            .build());
   }
 
-  private void createReviewComment(
-      String repoOwner,
-      String repoName,
-      int diffNumber,
-      String body,
-      String commitId,
-      String path,
-      int position) {
-    CreateReviewCommentRequest request =
-        CreateReviewCommentRequest.newBuilder()
-            .setOwner(repoOwner)
-            .setRepo(repoName)
-            .setDiffNumber(diffNumber)
-            .setRequestData(
-                CreateReviewCommentRequestData.newBuilder()
-                    .setBody(body)
-                    .setCommitId(commitId)
-                    .setPath(path)
-                    .setPosition(position)
-                    .build())
-            .build();
-    githubClient.createReviewComment(request);
+  private long createPullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
+    return githubClient
+        .createPullRequest(
+            CreatePullRequestRequest.newBuilder()
+                .setOwner(repoOwner)
+                .setRepo(repoName)
+                .setRequestData(
+                    CreatePullRequestRequestData.newBuilder()
+                        .setTitle(pullRequest.getTitle())
+                        .setHead(pullRequest.getHead().getRef())
+                        .setBase(pullRequest.getBase().getRef())
+                        // Body can't be empty
+                        .setBody(
+                            pullRequest.getBody().isEmpty()
+                                ? "Created by ReviewerBot"
+                                : pullRequest.getBody())
+                        .build())
+                .build())
+        .getPullRequest()
+        .getNumber();
   }
 
-  private int getCommentPosition(String patchStr, int lineNumber, LineNumberConverter.Side side) {
-    return new LineNumberConverter(patchStr).getPosition(lineNumber, side);
-  }
-
-  private LineNumberConverter.Side getCommentSide(
-      String repoBaseCommitId, String codeThreadCommitId) {
-    return repoBaseCommitId.equals(codeThreadCommitId)
-        ? LineNumberConverter.Side.RIGHT
-        : LineNumberConverter.Side.LEFT;
-  }
-
-  private String getPatchStrByFilename(List<File> pullRequestFiles, String filename) {
-    for (File file : pullRequestFiles) {
-      if (file.getFilename().equals(filename)) {
-        return file.getPatch();
-      }
+  private String setEvent(Review.State state) {
+    if (state.equals(Review.State.APPROVED)) {
+      return "APPROVE";
+    } else if (state.equals(Review.State.CHANGES_REQUESTED)) {
+      return "REQUEST_CHANGES";
+    } else if (state.equals(Review.State.COMMENTED)) {
+      return "COMMENT";
+    } else {
+      return "PENDING";
     }
-    throw new RuntimeException("`Patch` not found for the file: " + filename);
   }
 }
 

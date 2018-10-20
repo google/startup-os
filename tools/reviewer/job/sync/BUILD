@@ -2,12 +2,27 @@ package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "github_api_proto",
-    srcs = ["github_api.proto"],
+    srcs = [
+        "github_api.proto",
+    ],
+    deps = [":full_github_pr_proto"],
 )
 
 java_proto_library(
     name = "github_api_java_proto",
-    deps = ["github_api_proto"],
+    deps = [
+        "github_api_proto",
+    ],
+)
+
+proto_library(
+    name = "full_github_pr_proto",
+    srcs = ["full_github_pr.proto"],
+)
+
+java_proto_library(
+    name = "full_github_pr_java_proto",
+    deps = ["full_github_pr_proto"],
 )
 
 java_library(
@@ -20,6 +35,8 @@ java_library(
         "LineNumberConverter.java",
     ],
     deps = [
+        ":full_github_pr_java_proto",
+        ":full_github_pr_proto",
         ":github_api_java_proto",
         ":github_api_proto",
         "//common",
@@ -39,6 +56,8 @@ java_binary(
     ],
     main_class = "com.google.startupos.tools.reviewer.job.sync.GithubSync",
     deps = [
+        ":full_github_pr_java_proto",
+        ":full_github_pr_proto",
         ":github_sync",
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",

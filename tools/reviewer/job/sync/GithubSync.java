@@ -19,7 +19,8 @@ package com.google.startupos.tools.reviewer.job.sync;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 
 import java.io.IOException;
 
@@ -58,24 +59,26 @@ public class GithubSync {
 
     if (args.length != 0) {
       if (args[0].equals("read")) {
-        githubSync.readDiff(githubClient);
+        githubSync.readPullRequest(githubClient);
       } else if (args[0].equals("write")) {
-        // Use real diff instead default instance
-        Diff diff = Diff.getDefaultInstance();
-        githubSync.writeDiff(githubClient, diff);
+        // Use real PullRequest instead default instance
+        PullRequest pullRequest = PullRequest.getDefaultInstance();
+        githubSync.writePullRequest(githubClient, pullRequest);
       }
     }
   }
 
-  private void readDiff(GithubClient githubClient) throws IOException {
+  private PullRequest readPullRequest(GithubClient githubClient) throws IOException {
     GithubReader reader = new GithubReader(githubClient);
-    Diff diff = reader.getDiff(repoOwner.get(), repoName.get(), diffNumber.get());
+    GithubPullRequestProtos.PullRequest diff =
+        reader.getPullRequest(repoOwner.get(), repoName.get(), diffNumber.get());
     System.out.println(diff);
+    return diff;
   }
 
-  private void writeDiff(GithubClient githubClient, Diff diff) throws IOException {
-    GithubWriter writer = new GithubWriter(githubClient, reviewerDiffLink.get());
-    writer.writeDiff(diff, repoOwner.get(), repoName.get());
+  private void writePullRequest(GithubClient githubClient, PullRequest pullRequest) {
+    GithubWriter writer = new GithubWriter(githubClient);
+    writer.writePullRequest(pullRequest, repoOwner.get(), repoName.get());
   }
 }
 
