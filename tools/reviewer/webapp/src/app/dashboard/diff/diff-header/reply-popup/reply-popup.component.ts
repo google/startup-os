@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { randstr64 } from 'rndmjs';
 
 import {
@@ -18,11 +18,12 @@ import { DiffHeaderService } from '../diff-header.service';
   styleUrls: ['./reply-popup.component.scss'],
   providers: [DiffHeaderService],
 })
-export class ReplyPopupComponent {
+export class ReplyPopupComponent implements OnInit {
   isLoading: boolean = false;
   message: string = '';
-  approved: boolean = true;
+  approved: boolean = false;
   actionRequired: boolean = false;
+  reviewer: Reviewer;
   @Input() diff: Diff;
   @Output() toggleReplyPopup = new EventEmitter<boolean>();
 
@@ -32,36 +33,42 @@ export class ReplyPopupComponent {
     private diffHeaderService: DiffHeaderService,
   ) { }
 
+  ngOnInit() {
+    // Set "Approved" checkbox to current approve value
+    this.reviewer = this.diffHeaderService.getReviewer(
+      this.diff,
+      this.authService.userEmail,
+    );
+    if (this.reviewer) {
+      // Only if current user is present in reviewer list
+      this.approved = this.reviewer.getApproved();
+    }
+  }
+
   reply(): void {
     this.isLoading = true;
     this.diff.getAuthor().setNeedsAttention(true);
 
     if (this.authService.userEmail === this.diff.getAuthor().getEmail()) {
-      // Current user is the author
+      // Current user is an author
 
       // Set attention of all reviewers
       for (const reviewer of this.diff.getReviewerList()) {
         reviewer.setNeedsAttention(true);
       }
     } else {
-      // Current user isn't the author
+      // Current user isn't an author
 
-      // Get reviewer from user email
-      let reviewer: Reviewer = this.diffHeaderService.getReviewer(
-        this.diff,
-        this.authService.userEmail,
-      );
-
-      if (!reviewer) {
+      if (!this.reviewer) {
         // If current user isn't present in reviewer list,
         // then create new reviewer
-        reviewer = new Reviewer();
-        reviewer.setEmail(this.authService.userEmail);
-        this.diff.addReviewer(reviewer);
+        this.reviewer = new Reviewer();
+        this.reviewer.setEmail(this.authService.userEmail);
+        this.diff.addReviewer(this.reviewer);
       }
 
-      reviewer.setApproved(this.approved);
-      reviewer.setNeedsAttention(false);
+      this.reviewer.setApproved(this.approved);
+      this.reviewer.setNeedsAttention(false);
     }
 
     // Add the message as a DiffThread
