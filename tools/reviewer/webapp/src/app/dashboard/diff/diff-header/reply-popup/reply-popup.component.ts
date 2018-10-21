@@ -21,7 +21,7 @@ import { DiffHeaderService } from '../diff-header.service';
 export class ReplyPopupComponent {
   isLoading: boolean = false;
   message: string = '';
-  approved: boolean = false;
+  approved: boolean = true;
   actionRequired: boolean = false;
   @Input() diff: Diff;
   @Output() toggleReplyPopup = new EventEmitter<boolean>();
