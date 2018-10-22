@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { BranchInfo, Thread } from '@/shared/proto';
-import { LocalserverService, NotificationService } from '@/shared/services';
+import { BranchInfo, Thread } from '@/core/proto';
+import { LocalserverService, NotificationService } from '@/core/services';
 import { BlockIndex } from '../code-changes/code-changes.interface';
 import { StateService } from './state.service';
 

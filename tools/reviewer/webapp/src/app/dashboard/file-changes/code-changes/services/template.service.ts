@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { HighlightService } from '@/shared/services';
+import { HighlightService } from '@/core/services';
 import {
   BlockIndex,
   BlockLine,

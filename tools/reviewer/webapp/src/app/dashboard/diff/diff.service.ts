@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { File } from '@/shared/proto';
+import { File } from '@/core/proto';
 
 @Injectable()
 export class DiffService {

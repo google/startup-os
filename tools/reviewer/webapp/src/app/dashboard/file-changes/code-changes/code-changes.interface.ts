@@ -1,4 +1,4 @@
-import { TextChange, Thread } from '@/shared/proto';
+import { TextChange, Thread } from '@/core/proto';
 
 export enum BlockIndex {
   leftFile,

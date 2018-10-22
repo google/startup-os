@@ -9,7 +9,7 @@ import {
   File,
   TextDiffRequest,
   TextDiffResponse,
-} from '@/shared/proto';
+} from '@/core/proto';
 import { EncodingService } from './encoding.service';
 import { NotificationService } from './notification.service';
 

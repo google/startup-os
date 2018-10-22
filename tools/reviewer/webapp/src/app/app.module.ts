@@ -1,58 +1,28 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { AppRoutes } from './app.routing';
-import {
-  AddUserDialogComponent,
-  DashboardComponentList,
-  DashboardServiceList,
-  DeleteCommentDialogComponent,
-  DeleteDiffDialogComponent,
-  UserPopupComponent,
-} from './dashboard';
-import {
-  FirebaseImports,
-  FirebaseServices,
-  MaterialImports,
-} from './import';
-import { LayoutComponentList } from './layout';
-import {
-  DirectiveList,
-  PipeList,
-  ServiceList,
-} from './shared';
+import { CoreModule } from './core';
+import { LoginComponent } from './login';
+import { PageNotFoundComponent } from './page-not-found';
+import { SharedModule } from './shared';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ...DashboardComponentList,
-    ...LayoutComponentList,
-    ...PipeList,
-    ...DirectiveList,
+    PageNotFoundComponent,
+    LoginComponent,
   ],
   imports: [
-    HttpModule,
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AppRoutes,
-    ...MaterialImports,
-    ...FirebaseImports,
+    BrowserModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    CoreModule,
+    SharedModule,
   ],
-  providers: [
-    ...FirebaseServices,
-    ...ServiceList,
-    ...DashboardServiceList,
-  ],
-  entryComponents: [
-    UserPopupComponent,
-    AddUserDialogComponent,
-    DeleteDiffDialogComponent,
-    DeleteCommentDialogComponent,
-  ],
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

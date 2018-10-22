@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material';
 
-import { Diff, File, Thread } from '@/shared/proto';
-import { DiffUpdateService } from '@/shared/services';
+import { Diff, File, Thread } from '@/core/proto';
+import { DiffUpdateService } from '@/core/services';
 import { DiffService } from '../../diff.service';
 import { DiscussionService } from '../discussion.service';
 

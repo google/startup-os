@@ -7,7 +7,7 @@ import {
   File,
   TextDiff,
   Thread,
-} from '@/shared/proto';
+} from '@/core/proto';
 import { BlockIndex } from '../code-changes';
 
 // The method keeps state of file-changes

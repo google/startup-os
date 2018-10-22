@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { of } from 'rxjs/observable/of';
 
-import { Diff } from '@/shared/proto';
+import { Diff } from '@/core/proto';
 import { FirebaseService } from './firebase.service';
 
 @Injectable()

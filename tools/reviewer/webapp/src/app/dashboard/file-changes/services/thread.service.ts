@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { randstr64 } from 'rndmjs';
 
-import { Comment, Diff, File, Thread } from '@/shared/proto';
-import { DiffUpdateService, NotificationService } from '@/shared/services';
+import { Comment, Diff, File, Thread } from '@/core/proto';
+import { DiffUpdateService, NotificationService } from '@/core/services';
 import { BlockIndex } from '../code-changes';
 import { StateService } from './state.service';
 

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Diff } from '@/shared/proto';
+import { Diff } from '@/core/proto';
 import { Status, statusList } from './status-list';
 
 @Component({

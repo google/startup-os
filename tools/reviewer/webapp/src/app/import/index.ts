@@ -1,2 +1,2 @@
-export * from './material';
-export * from './firebase';
+export * from './material.module';
+export * from './firebase.module';

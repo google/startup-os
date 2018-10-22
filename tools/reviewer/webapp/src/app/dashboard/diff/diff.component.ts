@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { Diff, File } from '@/shared/proto';
+import { Diff, File } from '@/core/proto';
 import {
   AuthService,
   DiffUpdateService,
@@ -11,7 +11,7 @@ import {
   FirebaseStateService,
   LocalserverService,
   NotificationService,
-} from '@/shared/services';
+} from '@/core/services';
 import { DeleteDiffDialogComponent, DeleteDiffReturn } from './delete-diff-dialog';
 import { DiffService } from './diff.service';
 

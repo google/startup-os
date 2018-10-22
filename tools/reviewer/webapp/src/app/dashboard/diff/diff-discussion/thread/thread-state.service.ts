@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Thread } from '@/shared/proto';
+import { Thread } from '@/core/proto';
 
 export interface ThreadState {
   isCommentOpenMap: boolean[];

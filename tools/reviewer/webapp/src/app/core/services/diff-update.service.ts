@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { Diff, Thread } from '@/shared/proto';
+import { Diff, Thread } from '@/core/proto';
 import { FirebaseService } from './firebase.service';
 import { NotificationService } from './notification.service';
 

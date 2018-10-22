@@ -1,4 +1,4 @@
-import { AuthService } from '@/shared';
+import { AuthService } from '@/core';
 import { Component } from '@angular/core';
 
 @Component({
@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./toolbar.component.scss'],
 })
 export class ToolbarComponent {
-  constructor(private authService: AuthService) { }
+  constructor(public authService: AuthService) { }
 
   logout(): void {
     this.authService.logout();

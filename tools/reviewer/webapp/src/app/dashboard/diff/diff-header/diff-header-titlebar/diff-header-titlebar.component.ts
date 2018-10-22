@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Diff } from '@/shared/proto';
-import { AuthService, DiffUpdateService } from '@/shared/services';
+import { Diff } from '@/core/proto';
+import { AuthService, DiffUpdateService } from '@/core/services';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements titlebar of the header

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { randstr64 } from 'rndmjs';
 
 import {
@@ -6,8 +6,8 @@ import {
   Diff,
   Reviewer,
   Thread,
-} from '@/shared/proto';
-import { AuthService, DiffUpdateService } from '@/shared/services';
+} from '@/core/proto';
+import { AuthService, DiffUpdateService } from '@/core/services';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The popup appears when "Reply" button is pushed.

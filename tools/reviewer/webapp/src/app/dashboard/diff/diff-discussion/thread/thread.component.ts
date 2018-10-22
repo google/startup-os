@@ -4,8 +4,8 @@ import { MatDialog } from '@angular/material';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { Comment, Thread } from '@/shared/proto';
-import { AuthService } from '@/shared/services';
+import { Comment, Thread } from '@/core/proto';
+import { AuthService } from '@/core/services';
 import { DeleteCommentDialogComponent } from '../delete-comment-dialog';
 import { ThreadState, ThreadStateService } from './thread-state.service';
 

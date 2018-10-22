@@ -1,4 +1,5 @@
-import { FlexLayoutModule } from '@angular/flex-layout';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import {
   MatButtonModule,
   MatCardModule,
@@ -14,11 +15,9 @@ import {
   MatTableModule,
   MatToolbarModule,
 } from '@angular/material';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-export const MaterialImports = [
-  BrowserAnimationsModule,
-  FlexLayoutModule,
+const MaterialImports = [
+  CommonModule,
   MatButtonModule,
   MatCardModule,
   MatFormFieldModule,
@@ -33,3 +32,11 @@ export const MaterialImports = [
   MatCheckboxModule,
   MatSelectModule,
 ];
+
+@NgModule({
+  imports: MaterialImports,
+  declarations: [],
+  providers: [],
+  exports: MaterialImports,
+})
+export class MaterialModule { }

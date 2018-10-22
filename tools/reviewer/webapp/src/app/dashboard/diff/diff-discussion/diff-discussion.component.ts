@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Diff } from '@/shared/proto';
+import { Diff } from '@/core/proto';
 import { ThreadState, ThreadStateService } from './thread';
 
 // The component implements UI of discussions of a diff

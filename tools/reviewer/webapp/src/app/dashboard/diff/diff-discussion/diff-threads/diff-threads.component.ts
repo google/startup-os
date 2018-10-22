@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material';
 
-import { Diff, Thread } from '@/shared/proto';
-import { DiffUpdateService } from '@/shared/services';
+import { Diff, Thread } from '@/core/proto';
+import { DiffUpdateService } from '@/core/services';
 import { DiscussionService } from '../discussion.service';
 
 // The component implements diff threads on diff page.

@@ -4,8 +4,8 @@ import {
   ChangeType,
   TextChange,
   TextDiff,
-} from '@/shared/proto';
-import { HighlightService } from '@/shared/services';
+} from '@/core/proto';
+import { HighlightService } from '@/core/services';
 import {
   BlockIndex, BlockLine, ChangesLine,
 } from '../code-changes.interface';
