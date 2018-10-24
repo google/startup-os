@@ -16,9 +16,12 @@
 
 package com.google.startupos.tools.reviewer.aa.commands;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.File;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -107,6 +110,8 @@ public class SyncCommand implements AaCommand {
                 System.out.println(
                     String.format("[%s/%s]: removing temp branch", workspaceName, repoName));
                 repo.removeBranch("temp_branch_for_sync");
+                ImmutableList<File> files = repo.getUncommittedFiles();
+                files.forEach(file -> file.toBuilder().setPatch(repo.getDiff(file.getPatch())));
               });
     } catch (Exception e) {
       revertChanges(repoToInitialBranch);

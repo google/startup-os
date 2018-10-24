@@ -16,19 +16,21 @@
 
 package com.google.startupos.tools.reviewer.localserver.service.tests;
 
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
-import io.grpc.StatusRuntimeException;
-import java.util.concurrent.TimeUnit;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
+
+import java.util.concurrent.TimeUnit;
 
 /* Test tool for CodeReviewService.
  *
@@ -114,6 +116,15 @@ public class TestTool {
 
   public void runGetDiffFiles(String workspace, long diffNumber) {
     System.out.println(getDiffFiles(workspace, diffNumber));
+  }
+
+  public Diff getDiff(long diffNumber) {
+    DiffRequest request = DiffRequest.newBuilder().setDiffId(diffNumber).build();
+    return blockingStub.getDiff(request);
+  }
+
+  public void runGetDiff(long diffNumber) {
+    System.out.println(getDiff(diffNumber));
   }
 
   public static void main(String[] args) {

@@ -462,5 +462,57 @@ public class GitRepoTest {
 
     assertFalse(repo.isMerged(TEST_BRANCH));
   }
+
+  @Test
+  public void testGetDiffWhenOneFile() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        "New file content\n", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
+
+    assertTrue(
+        gitRepo
+            .getDiff(TEST_FILE)
+            .contains(
+                "--- a/test_file.txt\n"
+                    + "+++ b/test_file.txt\n"
+                    + "@@ -1 +1 @@\n"
+                    + "-Some test file contents\n"
+                    + "+New file content\n"));
+  }
+
+  @Test
+  public void testGetDiffWhenTwoFiles() {
+    fileUtils.writeStringUnchecked("file1 content\n", fileUtils.joinPaths(repoFolder, "file1.txt"));
+    fileUtils.writeStringUnchecked("file2 content\n", fileUtils.joinPaths(repoFolder, "file2.txt"));
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        "new file content(file1)\n", fileUtils.joinPaths(repoFolder, "file1.txt"));
+    fileUtils.writeStringUnchecked(
+        "new file content(file2)\n", fileUtils.joinPaths(repoFolder, "file2.txt"));
+    repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
+
+    assertTrue(
+        gitRepo
+            .getDiff("file1.txt")
+            .contains(
+                "--- a/file1.txt\n"
+                    + "+++ b/file1.txt\n"
+                    + "@@ -1 +1 @@\n"
+                    + "-file1 content\n"
+                    + "+new file content(file1)"));
+    assertTrue(
+        gitRepo
+            .getDiff("file2.txt")
+            .contains(
+                "--- a/file2.txt\n"
+                    + "+++ b/file2.txt\n"
+                    + "@@ -1 +1 @@\n"
+                    + "-file2 content\n"
+                    + "+new file content(file2)"));
+  }
 }
 

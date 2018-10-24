@@ -16,12 +16,15 @@
 
 package com.google.startupos.tools.reviewer.aa.commands;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.File;
+
 import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -71,6 +74,8 @@ public class PatchCommand implements AaCommand {
                           ANSI_YELLOW + ANSI_BOLD + currentBranchName + ANSI_RESET, branchName));
                 } else {
                   repo.merge(branchName, true);
+                  ImmutableList<File> files = repo.getUncommittedFiles();
+                  files.forEach(file -> file.toBuilder().setPatch(repo.getDiff(file.getPatch())));
                 }
               });
     } catch (IOException e) {

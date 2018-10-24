@@ -374,6 +374,10 @@ public class GitRepo implements Repo {
     }
   }
 
+  public String getDiff(String patch) {
+    return runCommand("diff master -- " + patch).stdout;
+  }
+
   @VisibleForTesting
   public ImmutableList<String> getTagList() {
     return splitLines(runCommand("tag").stdout);

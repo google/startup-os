@@ -154,6 +154,19 @@ public class DiffCommand implements AaCommand {
       diffBuilder.setBug(buglink.get());
     }
 
+    try {
+      fileUtils
+          .listContents(workspacePath)
+          .forEach(
+              path -> {
+                GitRepo repo = this.gitRepoFactory.create(path);
+                repo.getUncommittedFiles()
+                    .forEach(file -> file.toBuilder().setPatch(repo.getDiff(file.getPatch())));
+              });
+    } catch (Exception e) {
+      throw new RuntimeException("Can not set `patch(diff)` for file. " + e.getCause());
+    }
+
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 
     return diffBuilder.build();

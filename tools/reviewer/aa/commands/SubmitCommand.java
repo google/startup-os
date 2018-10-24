@@ -16,9 +16,11 @@
 
 package com.google.startupos.tools.reviewer.aa.commands;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
@@ -116,6 +118,8 @@ public class SubmitCommand implements AaCommand {
                 repo.removeBranch(diffBranchName);
                 System.out.println(String.format("[%s]: pushing to remote", repoName));
                 repo.push(diffBranchName);
+                ImmutableList<File> files = repo.getUncommittedFiles();
+                files.forEach(file -> file.toBuilder().setPatch(repo.getDiff(file.getPatch())));
               });
     } catch (IOException e) {
       e.printStackTrace();

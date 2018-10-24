@@ -44,6 +44,8 @@ message File {
   // Empty if referring to a local file
   string commit_id = 5;
   Action action = 6;
+  // git diff(patch) beetwen master branch and head commit
+  string patch = 9;
 }
 
 message Commit {

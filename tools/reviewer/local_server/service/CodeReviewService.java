@@ -18,6 +18,7 @@ package com.google.startupos.tools.reviewer.localserver.service;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.firestore.FirestoreClientFactory;
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
@@ -333,12 +334,14 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
-                Repo repo = repoFactory.create(path);
+                GitRepo repo = repoFactory.create(path);
                 if (!isHead) {
                   ImmutableList<Commit> commits =
                       addWorkspaceAndRepoToCommits(repo.getCommits(branch), workspace, repoName);
                   ImmutableList<File> uncommittedFiles =
                       addWorkspaceAndRepoToFiles(repo.getUncommittedFiles(), workspace, repoName);
+                  uncommittedFiles.forEach(
+                      file -> file.toBuilder().setPatch(repo.getDiff(file.getPatch())));
                   response.addBranchInfo(
                       BranchInfo.newBuilder()
                           .setDiffId(request.getDiffId())
