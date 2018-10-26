@@ -36,9 +36,7 @@ java_library(
     ],
     deps = [
         ":full_github_pr_java_proto",
-        ":full_github_pr_proto",
         ":github_api_java_proto",
-        ":github_api_proto",
         "//common",
         "//common/repo:repo_java_proto",
         "//common/repo:repo_proto",
@@ -57,7 +55,6 @@ java_binary(
     main_class = "com.google.startupos.tools.reviewer.job.sync.GithubSync",
     deps = [
         ":full_github_pr_java_proto",
-        ":full_github_pr_proto",
         ":github_sync",
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",

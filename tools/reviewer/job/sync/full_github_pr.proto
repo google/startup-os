@@ -5,8 +5,6 @@ package com.google.startupos.tools.reviewer.job.sync;
 option java_package = "com.google.startupos.tools.reviewer.job.sync";
 option java_outer_classname = "GithubPullRequestProtos";
 
-// TODO: Add Commit and patch(diff) field to each commit to have ability convert
-// GitHub position to Reviewer line_number
 message PullRequest {
 
   int64 id = 1;
@@ -22,6 +20,8 @@ message PullRequest {
   repeated IssueComment issueComment = 10;
   CommitPointer base = 11;
   CommitPointer head = 12;
+  string repo = 13;
+  repeated CommitInfo commits_info = 14;
 }
 
 message CommitPointer {
@@ -32,10 +32,11 @@ message CommitPointer {
 
 message Review {
   enum State {
-    APPROVED = 0;
-    CHANGES_REQUESTED = 1;
-    COMMENTED = 2;
-    PENDING = 3;
+    UNKNOWN = 0;
+    APPROVED = 1;
+    CHANGES_REQUESTED = 2;
+    COMMENTED = 3;
+    PENDING = 4;
   }
 
   int64 id = 1;
@@ -81,4 +82,38 @@ message IssueComment {
 message User {
   string login = 1;
   int64 id = 2;
+  string email = 3;
+}
+
+message CommitInfo {
+  string sha = 1;
+  Commit commit = 2;
+  User author = 3;
+  User committer = 4;
+  repeated Tree parents = 5;
+  repeated File files = 6;
+
+  message Commit {
+    User author = 1;
+    User commiter = 2;
+    string message = 3;
+    Tree tree = 4;
+    int32 comment_count = 5;
+
+    message User {
+      string name = 1;
+      string email = 2;
+      string date = 3;
+    }
+  }
+  message Tree { string sha = 1; }
+
+  message File {
+    string filename = 1;
+    int32 additions = 2;
+    int32 deletions = 3;
+    int32 changes = 4;
+    string status = 5;
+    string patch = 6;
+  }
 }

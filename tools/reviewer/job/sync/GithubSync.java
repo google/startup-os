@@ -25,12 +25,16 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Pull
 import java.io.IOException;
 
 /*
- * To read Diff:
- *  bazel run //tools/reviewer/job/sync:github_sync_tool -- read --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
- *
- * To write Diff:
- * bazel run //tools/reviewer/job/sync:github_sync_tool -- write --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
- */
+* To read GitHub PullRequest:
+*  bazel run //tools/reviewer/job/sync:github_sync_tool -- read --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+*
+* To create GitHub PullRequest from scratch
+* bazel run //tools/reviewer/job/sync:github_sync_tool -- create --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+*
+* To update existing GitHub PullRequest
+* bazel run //tools/reviewer/job/sync:github_sync_tool -- update --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
+
+*/
 public class GithubSync {
   // TODO: Add checking input Flags
   @FlagDesc(name = "repo_owner", description = "GitHub repository owner")
@@ -58,12 +62,22 @@ public class GithubSync {
     GithubClient githubClient = new GithubClient(login.get(), password.get());
 
     if (args.length != 0) {
-      if (args[0].equals("read")) {
-        githubSync.readPullRequest(githubClient);
-      } else if (args[0].equals("write")) {
-        // Use real PullRequest instead default instance
-        PullRequest pullRequest = PullRequest.getDefaultInstance();
-        githubSync.writePullRequest(githubClient, pullRequest);
+      switch (args[0]) {
+        case "read":
+          githubSync.readPullRequest(githubClient);
+          break;
+        case "create": {
+          // Use real PullRequest message instead default instance
+          PullRequest pullRequest = PullRequest.getDefaultInstance();
+          githubSync.createPullRequest(githubClient, pullRequest);
+          break;
+        }
+        case "update": {
+          // Use real PullRequest message instead default instance
+          PullRequest pullRequest = PullRequest.getDefaultInstance();
+          githubSync.updatePullRequest(githubClient, pullRequest);
+          break;
+        }
       }
     }
   }
@@ -76,9 +90,15 @@ public class GithubSync {
     return diff;
   }
 
-  private void writePullRequest(GithubClient githubClient, PullRequest pullRequest) {
+  private void createPullRequest(GithubClient githubClient, PullRequest pullRequest) {
     GithubWriter writer = new GithubWriter(githubClient);
-    writer.writePullRequest(pullRequest, repoOwner.get(), repoName.get());
+    writer.createPullRequest(pullRequest, repoOwner.get(), repoName.get());
+  }
+
+  private void updatePullRequest(GithubClient githubClient, PullRequest pullRequest)
+      throws IOException {
+    GithubWriter writer = new GithubWriter(githubClient);
+    writer.updatePullRequest(pullRequest, repoOwner.get(), repoName.get());
   }
 }
 

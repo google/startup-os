@@ -17,12 +17,18 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestReviewRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestReviewRequestData;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequestData;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Review;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Writes `tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest` to GitHub using GitHub API
@@ -34,30 +40,97 @@ public class GithubWriter {
     this.githubClient = githubClient;
   }
 
-  public void writePullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
+  /**
+   * Creates GitHub PullRequest, GitHub Reviews and GitHub IssueComments from scratch
+   *
+   * @param pullRequest Proto message from which will be created GitHub PullRequest
+   * @param repoOwner Owner of GirHub repository
+   * @param repoName Name GirHub repository
+   * @return GitHub repository number
+   */
+  public long createPullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
     long pullRequestNumber =
-        pullRequest.getNumber() == 0
-            ? createPullRequest(pullRequest, repoOwner, repoName)
-            : pullRequest.getNumber();
+        githubClient
+            .createPullRequest(
+                CreatePullRequestRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setRequestData(
+                        CreatePullRequestRequest.CreatePullRequestRequestData.newBuilder()
+                            .setTitle(pullRequest.getTitle())
+                            .setHead(pullRequest.getHead().getRef())
+                            .setBase(pullRequest.getBase().getRef())
+                            .setBody(pullRequest.getBody())
+                            .build())
+                    .build())
+            .getPullRequest()
+            .getNumber();
 
-    for (Review review : pullRequest.getReviewsList()) {
-      createReview(repoOwner, repoName, review, pullRequestNumber);
-    }
+    pullRequest
+        .getReviewsList()
+        .forEach(review -> createReview(repoOwner, repoName, review, pullRequestNumber));
+    pullRequest
+        .getIssueCommentList()
+        .forEach(
+            issueComment ->
+                createIssueComment(repoOwner, repoName, pullRequestNumber, issueComment));
+    return pullRequestNumber;
+  }
 
-    for (IssueComment issueComment : pullRequest.getIssueCommentList()) {
-      createIssueComment(repoOwner, repoName, pullRequestNumber, issueComment);
-    }
+  /**
+   * Updates GitHub PullRequest. Adds new GitHub Reviews and GitHub IssueComments to existing GitHub
+   * PullRequest
+   *
+   * @param newPullRequest Proto message from which will be updated GitHub PullRequest
+   * @param repoOwner Owner of GirHub repository
+   * @param repoName Name GirHub repository
+   */
+  public void updatePullRequest(PullRequest newPullRequest, String repoOwner, String repoName)
+      throws IOException {
+    List<Review> alreadyExistingGithubReviews =
+        githubClient
+            .getReviews(
+                ReviewsRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setNumber(newPullRequest.getNumber())
+                    .build())
+            .getReviewsList();
+    List<Long> alreadyExistingGithubReviewIds =
+        alreadyExistingGithubReviews.stream().map(Review::getId).collect(Collectors.toList());
+
+    List<Review> reviewsToWrite = new LinkedList<>(newPullRequest.getReviewsList());
+    reviewsToWrite.removeIf(review -> alreadyExistingGithubReviewIds.contains(review.getId()));
+    reviewsToWrite.forEach(
+        review -> createReview(repoOwner, repoName, review, newPullRequest.getNumber()));
+
+    List<IssueComment> alreadyExistingGithubIssueComments =
+        githubClient
+            .getIssueComments(
+                IssueCommentsRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setNumber(newPullRequest.getNumber())
+                    .build())
+            .getIssueCommentList();
+
+    List<IssueComment> issueCommentsToWrite =
+        new LinkedList<>(newPullRequest.getIssueCommentList());
+    issueCommentsToWrite.removeIf(alreadyExistingGithubIssueComments::contains);
+    issueCommentsToWrite.forEach(
+        issueComment ->
+            createIssueComment(repoOwner, repoName, newPullRequest.getNumber(), issueComment));
   }
 
   private void createIssueComment(
       String repoOwner, String repoName, long pullRequestNumber, IssueComment issueComment) {
     githubClient.createIssueComment(
-        GithubProtos.CreateIssueCommentRequest.newBuilder()
+        CreateIssueCommentRequest.newBuilder()
             .setOwner(repoOwner)
             .setRepo(repoName)
             .setNumber(pullRequestNumber)
             .setRequestData(
-                GithubProtos.CreateIssueCommentRequestData.newBuilder()
+                CreateIssueCommentRequest.CreateIssueCommentRequestData.newBuilder()
                     // TODO: Add additional info to text message and link to Reviewer
                     .setBody(issueComment.getBody())
                     .build())
@@ -66,8 +139,8 @@ public class GithubWriter {
 
   private void createReview(
       String repoOwner, String repoName, Review review, long pullRequestNumber) {
-    CreatePullRequestReviewRequestData.Builder requestDataBuilder =
-        CreatePullRequestReviewRequestData.newBuilder();
+    CreatePullRequestReviewRequest.CreatePullRequestReviewRequestData.Builder requestDataBuilder =
+        CreatePullRequestReviewRequest.CreatePullRequestReviewRequestData.newBuilder();
     requestDataBuilder
         .setCommitId(review.getCommitId())
         .setBody(review.getBody())
@@ -78,7 +151,8 @@ public class GithubWriter {
         .forEach(
             reviewComment ->
                 requestDataBuilder.addComments(
-                    GithubProtos.ReviewCommentRequestData.newBuilder()
+                    CreatePullRequestReviewRequest.CreatePullRequestReviewRequestData
+                        .ReviewCommentRequestData.newBuilder()
                         .setPath(reviewComment.getPath())
                         .setPosition(reviewComment.getPosition())
                         // TODO: Add additional info to text message and link to Reviewer
@@ -92,28 +166,6 @@ public class GithubWriter {
             .setNumber(pullRequestNumber)
             .setRequestData(requestDataBuilder.build())
             .build());
-  }
-
-  private long createPullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
-    return githubClient
-        .createPullRequest(
-            CreatePullRequestRequest.newBuilder()
-                .setOwner(repoOwner)
-                .setRepo(repoName)
-                .setRequestData(
-                    CreatePullRequestRequestData.newBuilder()
-                        .setTitle(pullRequest.getTitle())
-                        .setHead(pullRequest.getHead().getRef())
-                        .setBase(pullRequest.getBase().getRef())
-                        // Body can't be empty
-                        .setBody(
-                            pullRequest.getBody().isEmpty()
-                                ? "Created by ReviewerBot"
-                                : pullRequest.getBody())
-                        .build())
-                .build())
-        .getPullRequest()
-        .getNumber();
   }
 
   private String setEvent(Review.State state) {
