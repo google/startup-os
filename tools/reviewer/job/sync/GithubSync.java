@@ -64,20 +64,24 @@ public class GithubSync {
     if (args.length != 0) {
       switch (args[0]) {
         case "read":
-          githubSync.readPullRequest(githubClient);
-          break;
-        case "create": {
-          // Use real PullRequest message instead default instance
-          PullRequest pullRequest = PullRequest.getDefaultInstance();
-          githubSync.createPullRequest(githubClient, pullRequest);
-          break;
-        }
-        case "update": {
-          // Use real PullRequest message instead default instance
-          PullRequest pullRequest = PullRequest.getDefaultInstance();
-          githubSync.updatePullRequest(githubClient, pullRequest);
-          break;
-        }
+          {
+            githubSync.readPullRequest(githubClient);
+            break;
+          }
+        case "create":
+          {
+            // Use real PullRequest message instead default instance
+            PullRequest pullRequest = PullRequest.getDefaultInstance();
+            githubSync.createPullRequest(githubClient, pullRequest);
+            break;
+          }
+        case "update":
+          {
+            // Use real PullRequest message instead default instance
+            PullRequest pullRequest = PullRequest.getDefaultInstance();
+            githubSync.updatePullRequest(githubClient, pullRequest);
+            break;
+          }
       }
     }
   }
