@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
-import { Diff, Reviewer } from '@/shared/proto';
-import { AuthService, DiffUpdateService, HighlightService } from '@/shared/services';
+import { Diff, Reviewer } from '@/core/proto';
+import { AuthService, DiffUpdateService, HighlightService } from '@/core/services';
 import { AddUserDialogComponent } from '../add-user-dialog';
 import { DiffHeaderService } from '../diff-header.service';
 

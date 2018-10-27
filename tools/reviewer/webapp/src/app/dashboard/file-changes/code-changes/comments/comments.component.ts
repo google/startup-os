@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { Comment, Thread } from '@/shared/proto';
-import { AuthService } from '@/shared/services';
+import { Comment, Thread } from '@/core/proto';
+import { AuthService } from '@/core/services';
 import { ThreadService } from '../../services';
 import {
   BlockIndex,

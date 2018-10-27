@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material';
 
-import { Diff, File, Thread } from '@/shared/proto';
-import { DiffUpdateService } from '@/shared/services';
+import { Diff, File, Thread } from '@/core/proto';
+import { DiffUpdateService } from '@/core/services';
 import { DiffService } from '../../diff.service';
 import { DiscussionService } from '../discussion.service';
 
@@ -45,7 +45,7 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
   private refreshThreads(): void {
     if (this.getThreadsAmount(this.fileGroupsSource.data) === this.threads.length) {
       // Links update
-      this.discussionService.refreshThreads(this.threads, Thread.Type.CODE);
+      this.discussionService.refreshThreads(this.threads);
     } else {
       // Re-build template. Each thread component will be recreated.
       this.initThreads();

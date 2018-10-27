@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Author, Diff, Reviewer } from '@/shared/proto';
+import { Author, Diff, Reviewer } from '@/core/proto';
 
 // Service with useful methods, which can be reused
 // through diff header and its children

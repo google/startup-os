@@ -1,42 +1,28 @@
 import { NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
-import {
-  BrowserAnimationsModule,
-} from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AngularFireModule } from 'angularfire2';
-import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
-
-import { config } from '../environments/firebase';
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { AppRoutes } from './app.routing';
-import { LayoutModule } from './layout/layout.module';
-import { LoginComponent } from './login/login.component';
+import { CoreModule } from './core';
+import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
-import { ServiceList } from './shared/services';
+import { SharedModule } from './shared';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
     PageNotFoundComponent,
+    LoginComponent,
   ],
   imports: [
-    HttpModule,
-    AngularFireModule.initializeApp(config),
-    AngularFirestoreModule,
-    AngularFireAuthModule,
-    AppRoutes,
+    BrowserModule,
     BrowserAnimationsModule,
-    LayoutModule,
+    AppRoutingModule,
+    CoreModule,
+    SharedModule,
   ],
-  providers: [
-    AngularFireDatabase,
-    AngularFireAuth,
-    ...ServiceList,
-  ],
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

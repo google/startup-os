@@ -17,6 +17,9 @@ body {
   .bold {
     font-weight: 600;
   }
+  .approved {
+    color: #0d912c;
+  }
 
   .cr-titlebar {
     height: 40px;
@@ -40,6 +43,15 @@ body {
     }
   }
 
+  .cr-table-placeholder {
+    height: 42px;
+    padding: 0 23px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #5d5d5d;
+  }
+
   .mat-header-row {
     min-height: 32px;
   }
@@ -61,6 +73,10 @@ body {
     font-size: 14px;
   }
 
+  .mat-button {
+    font-family: $default-font;
+  }
+
   @mixin cr-button() {
     line-height: 0;
     border-radius: 8px;
@@ -68,7 +84,6 @@ body {
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    font-family: $default-font;
   }
 
   .cr-button {

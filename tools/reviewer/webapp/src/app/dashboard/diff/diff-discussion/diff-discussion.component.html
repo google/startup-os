@@ -7,11 +7,12 @@
     <button
       mat-button
       class="cr-light-button sky-button"
-      [disabled]="true"
-    >Expand</button>
+      [disabled]="!isThreadExist()"
+      (click)="toggleComments()"
+    >{{ isExpanded ? 'Collapse' : 'Expand' }}</button>
   </div>
 </div>
-<div class="cr-header">
+<div class="cr-header" *ngIf="isThreadExist()">
   <!-- Diff threads -->
   <diff-threads
     [threads]="diff.getDiffThreadList()"
@@ -23,4 +24,7 @@
     [threads]="diff.getCodeThreadList()"
     [diff]="diff"
   ></code-threads>
+</div>
+<div class="cr-table-placeholder" *ngIf="!isThreadExist()">
+  No Discussion yet
 </div>

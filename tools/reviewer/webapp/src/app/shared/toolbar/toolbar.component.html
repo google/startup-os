@@ -1,0 +1,17 @@
+<div class="toolbar" *ngIf="authService.isOnline">
+  <div class="label" routerLink="/">
+    <img src="./assets/logo.png">
+    <span>Reviewer</span>
+  </div>
+  <div class="search" fxFlex>
+    <input type="text" fxFlex>
+    <img src="/assets/ic-search.svg">
+  </div>
+  <div class="action">
+    <button
+      class="cr-button logout-button"
+      mat-button
+      (click)="logout()"
+    >Logout</button>
+  </div>
+</div>

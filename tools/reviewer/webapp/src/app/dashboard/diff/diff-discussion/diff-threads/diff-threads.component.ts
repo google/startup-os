@@ -1,8 +1,8 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material';
 
-import { Diff, Thread } from '@/shared/proto';
-import { DiffUpdateService } from '@/shared/services';
+import { Diff, Thread } from '@/core/proto';
+import { DiffUpdateService } from '@/core/services';
 import { DiscussionService } from '../discussion.service';
 
 // The component implements diff threads on diff page.
@@ -44,7 +44,7 @@ export class DiffThreadsComponent implements OnInit, OnChanges {
   private refreshThreads(): void {
     if (this.threadsSource.data.length === this.threads.length) {
       // Links update
-      this.discussionService.refreshThreads(this.threads, Thread.Type.DIFF);
+      this.discussionService.refreshThreads(this.threads);
     } else {
       // Re-build template. Each thread component will be recreated.
       this.initThreads();

@@ -3,7 +3,7 @@ import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import {
   TextDiff,
   Thread,
-} from '@/shared/proto';
+} from '@/core/proto';
 import { CommitService } from '../services';
 import {
   BlockIndex,

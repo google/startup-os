@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Thread } from '@/shared/proto';
+import { Thread } from '@/core/proto';
 import {
   BlockIndex,
   BlockLine,
