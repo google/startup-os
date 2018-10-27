@@ -97,7 +97,7 @@ public class DiffCommand implements AaCommand {
         Diff.newBuilder()
             .setWorkspace(workspaceName)
             .setDescription(description.get())
-            .setBug(buglink.get())
+            .addIssue(buglink.get())
             .addAllReviewer(getReviewers(reviewers.get()))
             .setId(response.getLastDiffId())
             .setCreatedTimestamp(currentTime)
@@ -151,7 +151,7 @@ public class DiffCommand implements AaCommand {
 
     if (!buglink.get().isEmpty()) {
       // replace buglink if specified
-      diffBuilder.setBug(buglink.get());
+      diffBuilder.addIssue(buglink.get());
     }
 
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
