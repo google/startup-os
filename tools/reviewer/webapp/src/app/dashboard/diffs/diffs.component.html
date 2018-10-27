@@ -49,7 +49,13 @@
       <ng-container matColumnDef="reviewers">
         <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          {{ getUsernames(diff.getReviewerList()) }}
+          <span
+            [ngClass]="{
+              'bold': reviewer.getNeedsAttention(),
+              'approved': reviewer.getApproved()
+            }"
+            *ngFor="let reviewer of diff.getReviewerList(); let i = index;"
+          >{{ getUsername(reviewer, i, diff) }}</span>
         </mat-cell>
       </ng-container>
 

@@ -1,9 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { Diff, Reviewer } from '@/core/proto';
 import { AuthService, DiffUpdateService, HighlightService } from '@/core/services';
-import { AddUserDialogComponent } from '../add-user-dialog';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements content of the header
@@ -17,13 +15,10 @@ import { DiffHeaderService } from '../diff-header.service';
 export class DiffHeaderContentComponent implements OnChanges {
   description: string = '';
   isDescriptionEditMode: boolean = false;
-  isReviewersHovered: boolean = false;
-  isCCHovered: boolean = false;
 
   @Input() diff: Diff;
 
   constructor(
-    public dialog: MatDialog,
     public authService: AuthService,
     public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
@@ -62,32 +57,43 @@ export class DiffHeaderContentComponent implements OnChanges {
     return false;
   }
 
-  // Open "add reviewer" dialog
-  addReviewer(): void {
-    this.openDialog().afterClosed().subscribe((email: string) => {
-      if (email && !this.diffHeaderService.getReviewer(this.diff, email)) {
-        const reviewer = new Reviewer();
-        reviewer.setEmail(email);
-        reviewer.setNeedsAttention(true);
-        reviewer.setApproved(false);
-        this.diff.addReviewer(reviewer);
-        this.saveUserToFirebase(email);
-      }
-    });
+  addReviewer(email: string): void {
+    if (email && !this.diffHeaderService.getReviewer(this.diff, email)) {
+      const reviewer = new Reviewer();
+      reviewer.setEmail(email);
+      reviewer.setNeedsAttention(true);
+      reviewer.setApproved(false);
+      this.diff.addReviewer(reviewer);
+      this.saveUserToFirebase(email);
+    }
   }
 
-  // Open "add cc" dialog
-  addCC(): void {
-    this.openDialog().afterClosed().subscribe((email: string) => {
-      if (email && !this.isCcAlreadyPresent(this.diff, email)) {
-        this.diff.addCc(email);
-        this.saveUserToFirebase(email);
-      }
-    });
+  addCC(email: string): void {
+    if (email && !this.isCcAlreadyPresent(this.diff, email)) {
+      this.diff.addCc(email);
+      this.saveUserToFirebase(email);
+    }
   }
 
-  openDialog(): MatDialogRef<AddUserDialogComponent> {
-    return this.dialog.open(AddUserDialogComponent);
+  addIssue(issue: string): void {
+    this.diff.addIssue(issue);
+    this.diffUpdateService.updateIssueList(this.diff);
+  }
+
+  removeIssue(issueToRemove: string): void {
+    const issues: string[] = this.diff.getIssueList().filter(issue => issue !== issueToRemove);
+    this.diff.setIssueList(issues);
+    this.diffUpdateService.updateIssueList(this.diff);
+  }
+
+  getIssueNumber(issue: string): string {
+    // 'https://github.com/google/startup-os/issues/317' -> [url, '317']
+    const urlMatchArray: RegExpMatchArray = issue.match(/^.+?\/(\d+)$/);
+    if (urlMatchArray && urlMatchArray[1]) {
+      return urlMatchArray[1];
+    } else {
+      return 'Not Found';
+    }
   }
 
   removeFromReviewerList(email: string): void {

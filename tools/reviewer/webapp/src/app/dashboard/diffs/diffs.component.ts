@@ -156,10 +156,12 @@ export class DiffsComponent implements OnInit, OnDestroy {
     this.router.navigate(['diff/', diffId]);
   }
 
-  getUsernames(reviewerList: Reviewer[]): string {
-    return reviewerList
-      .map(reviewer => this.authService.getUsername(reviewer.getEmail()))
-      .join(', ');
+  getUsername(reviewer: Reviewer, index: number, diff: Diff): string {
+    let username: string = this.authService.getUsername(reviewer.getEmail());
+    if (index < diff.getReviewerList().length - 1) {
+      username += ', ';
+    }
+    return username;
   }
 
   ngOnDestroy() {

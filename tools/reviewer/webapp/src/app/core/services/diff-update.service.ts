@@ -74,4 +74,8 @@ export class DiffUpdateService {
       this.router.navigate(['/diffs']);
     });
   }
+
+  updateIssueList(diff: Diff): void {
+    this.customUpdate(diff, 'Issues are updated');
+  }
 }

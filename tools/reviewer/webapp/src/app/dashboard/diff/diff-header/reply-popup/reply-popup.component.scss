@@ -30,6 +30,11 @@
         padding: 5px;
         font-size: 14px;
         background: white;
+        border-radius: 8px;
+        outline: none;
+        &:focus {
+          box-shadow: 0 0 0 1px #FF7300;
+        }
       }
     }
     >.buttons {

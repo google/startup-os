@@ -10,7 +10,7 @@ import {
 import { DiffDiscussionServiceList } from './diff-discussion';
 import { DiffFilesComponent } from './diff-files';
 import {
-  AddUserDialogComponent,
+  AddUserPopupComponent,
   DiffHeaderComponentList,
   UserPopupComponent,
 } from './diff-header';
@@ -36,7 +36,7 @@ import { DiffComponent } from './diff.component';
     DeleteDiffDialogComponent,
     DeleteCommentDialogComponent,
     UserPopupComponent,
-    AddUserDialogComponent,
+    AddUserPopupComponent,
   ],
 })
 export class DiffModule { }
