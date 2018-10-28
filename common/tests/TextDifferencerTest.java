@@ -69,8 +69,6 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder().setText("").setType(ChangeType.LINE_PLACEHOLDER).build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText(rightContents)
@@ -98,8 +96,6 @@ public class TextDifferencerTest {
                     .setEndIndex(9)
                     .setGlobalEndIndex(9)
                     .build())
-            .addRightChange(
-                TextChange.newBuilder().setText("").setType(ChangeType.LINE_PLACEHOLDER).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
