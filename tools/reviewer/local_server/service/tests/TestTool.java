@@ -17,6 +17,7 @@
 package com.google.startupos.tools.reviewer.localserver.service.tests;
 
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
 import io.grpc.ManagedChannel;
@@ -114,6 +115,16 @@ public class TestTool {
 
   public void runGetDiffFiles(String workspace, long diffNumber) {
     System.out.println(getDiffFiles(workspace, diffNumber));
+  }
+
+  public Diff getDiff(long diffNumber) {
+    DiffRequest request = DiffRequest.newBuilder().setDiffId(diffNumber).build();
+
+    return blockingStub.getDiff(request);
+  }
+
+  public void runGetDiff(long diffNumber) {
+    System.out.println(getDiff(diffNumber));
   }
 
   public static void main(String[] args) {
