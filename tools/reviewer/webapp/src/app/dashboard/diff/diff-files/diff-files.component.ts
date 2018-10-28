@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { File } from '@/shared/proto';
+import { File } from '@/core/proto';
 import { DiffService } from '../diff.service';
 
 // The component implements UI of file list of the diff

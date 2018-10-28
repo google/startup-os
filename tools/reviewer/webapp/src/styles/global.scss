@@ -4,10 +4,6 @@ body {
   height: 100%;
   margin: 0px;
   font-family: $default-font;
-  
-  .mat-toolbar {
-    font-family: $default-font;
-  }
 
   .mat-table {
     font-family: $default-font;
@@ -20,6 +16,9 @@ body {
 
   .bold {
     font-weight: 600;
+  }
+  .approved {
+    color: #0d912c;
   }
 
   .cr-titlebar {
@@ -44,6 +43,15 @@ body {
     }
   }
 
+  .cr-table-placeholder {
+    height: 42px;
+    padding: 0 23px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #5d5d5d;
+  }
+
   .mat-header-row {
     min-height: 32px;
   }
@@ -65,7 +73,11 @@ body {
     font-size: 14px;
   }
 
-  @mixin light-button() {
+  .mat-button {
+    font-family: $default-font;
+  }
+
+  @mixin cr-button() {
     line-height: 0;
     border-radius: 8px;
     border: solid 1px #8d8d8d;
@@ -74,8 +86,12 @@ body {
     cursor: pointer;
   }
 
+  .cr-button {
+    @include cr-button();
+  }
+
   .cr-light-button {
-    @include light-button();
+    @include cr-button();
     width: 120px;
     height: 28px;
     font-size: 16px;
@@ -83,9 +99,15 @@ body {
   }
 
   .cr-thread-button {
-    @include light-button();
+    @include cr-button();
     width: 97px;
     height: 26px;
     font-size: 14px;
+  }
+
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

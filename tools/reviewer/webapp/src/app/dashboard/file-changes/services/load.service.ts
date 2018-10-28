@@ -1,12 +1,12 @@
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 
-import { Diff, File } from '@/shared/proto';
+import { Diff, File } from '@/core/proto';
 import {
   ExceptionService,
   FirebaseStateService,
   LocalserverService,
-} from '@/shared/services';
+} from '@/core/services';
 import { CommitService } from './commit.service';
 import { StateService } from './state.service';
 import { ThreadService } from './thread.service';

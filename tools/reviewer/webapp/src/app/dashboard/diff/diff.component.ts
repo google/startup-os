@@ -1,16 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { Diff, File } from '@/shared/proto';
+import { Diff, File } from '@/core/proto';
 import {
   AuthService,
+  DiffUpdateService,
   ExceptionService,
-  FirebaseService,
   FirebaseStateService,
   LocalserverService,
   NotificationService,
-} from '@/shared/services';
+} from '@/core/services';
+import { DeleteDiffDialogComponent, DeleteDiffReturn } from './delete-diff-dialog';
 import { DiffService } from './diff.service';
 
 // The component implements diff page
@@ -30,13 +32,13 @@ export class DiffComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private firebaseService: FirebaseService,
+    private dialog: MatDialog,
     private firebaseStateService: FirebaseStateService,
-    private router: Router,
     private localserverService: LocalserverService,
     private exceptionService: ExceptionService,
     private notificationService: NotificationService,
     private authService: AuthService,
+    private diffUpdateService: DiffUpdateService,
   ) { }
 
   ngOnInit() {
@@ -85,14 +87,24 @@ export class DiffComponent implements OnInit, OnDestroy {
     if (this.authService.userEmail !== this.diff.getAuthor().getEmail()) {
       this.notificationService.error('Only author can delete a diff');
     } else {
-      if (confirm('Are you sure you want to delete this diff?')) {
-        this.isLoading = true;
-        this.ngOnDestroy();
-        this.firebaseService.removeDiff(this.diff.getId().toString()).subscribe(() => {
-          this.notificationService.success('Diff is deleted');
-          this.router.navigate(['/diffs']);
+      // Check that user sure about it
+      this.dialog.open(
+        DeleteDiffDialogComponent,
+        { data: this.diff },
+      )
+        .afterClosed()
+        .subscribe((deleteDiffReturn: DeleteDiffReturn) => {
+          // User answered
+          if (deleteDiffReturn && deleteDiffReturn.isDeleteDiff) {
+            // Delete the diff
+            this.isLoading = true;
+            this.ngOnDestroy();
+            this.diffUpdateService.deleteDiff(this.diff);
+            if (deleteDiffReturn.isDeleteWorkspace) {
+              // TODO: delete workspace
+            }
+          }
         });
-      }
     }
   }
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+import { HighlightService } from '@/core/services';
 import {
   BlockIndex,
   BlockLine,
@@ -10,6 +11,8 @@ import {
 // So most complicated code is located here and is called by template.
 @Injectable()
 export class TemplateService {
+  constructor(private highlightService: HighlightService) { }
+
   // Get class for a line, based on its parameters
   getLineBackground(
     changesLine: ChangesLine,
@@ -30,24 +33,6 @@ export class TemplateService {
     } else {
       return 'code-line';
     }
-  }
-
-  // Replace html special chars with html entities
-  htmlSpecialChars(code: string): string {
-    const findSpecialChars: RegExp = /[&<>"'`=\/]/g;
-    return code.replace(findSpecialChars, char => {
-      switch (char) {
-        case '&': return '&amp;';
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '"': return '&quot;';
-        case "'": return '&#39;';
-        case '/': return '&#x2F;';
-        case '`': return '&#x60;';
-        case '=': return '&#x3D;';
-        default: return char;
-      }
-    });
   }
 
   // Make line highlighted with separate chars
@@ -99,9 +84,9 @@ export class TemplateService {
     );
 
     // Escape html special chars
-    leftPart = this.htmlSpecialChars(leftPart);
-    changedPart = this.htmlSpecialChars(changedPart);
-    rightPart = this.htmlSpecialChars(rightPart);
+    leftPart = this.highlightService.htmlSpecialChars(leftPart);
+    changedPart = this.highlightService.htmlSpecialChars(changedPart);
+    rightPart = this.highlightService.htmlSpecialChars(rightPart);
 
     // Highlight changed part
     const span: HTMLSpanElement = document.createElement('span');

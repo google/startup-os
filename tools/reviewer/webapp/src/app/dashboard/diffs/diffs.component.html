@@ -46,13 +46,6 @@
         </mat-cell>
       </ng-container>
 
-      <ng-container matColumnDef="workspace">
-        <mat-header-cell *matHeaderCellDef> Workspace </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
-          {{ diff.getWorkspace() }}
-        </mat-cell>
-      </ng-container>
-
       <ng-container matColumnDef="reviewers">
         <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
         <mat-cell *matCellDef="let diff">
@@ -60,9 +53,16 @@
         </mat-cell>
       </ng-container>
 
+      <ng-container matColumnDef="workspace">
+        <mat-header-cell *matHeaderCellDef> Workspace </mat-header-cell>
+        <mat-cell *matCellDef="let diff">
+          {{ diff.getWorkspace() }}
+        </mat-cell>
+      </ng-container>
+
       <ng-container matColumnDef="description">
         <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
+        <mat-cell class="ellipsis" *matCellDef="let diff">
           {{ diff.getDescription() }}
         </mat-cell>
       </ng-container>
@@ -77,6 +77,8 @@
       ></mat-row>
     </mat-table>
     <!-- Show the placeholder, if group contains no diffs -->
-    <div class="cr-header placeholder" *ngIf="diffGroup.length === 0"></div>
+    <div class="cr-table-placeholder" *ngIf="diffGroup.length === 0">
+      No Diffs
+    </div>
   </div>
 </div>

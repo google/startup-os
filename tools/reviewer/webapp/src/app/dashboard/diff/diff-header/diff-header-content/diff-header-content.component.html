@@ -1,6 +1,6 @@
 <div class="header-content cr-header">
   <!--
-    Block with main information of the diff
+    This is a block with main information of the diff
     Reviewers, CC list, workspace, created time, etc.
   -->
   <div class="info" fxFlex="50%">
@@ -20,7 +20,10 @@
             (changeAttentionEmitter)="changeAttention($event)"
             [isRemoveFromList]="true"
             (removeFromListEmitter)="removeFromReviewerList($event)"
-          ><span [ngClass]="{'bold': reviewer.getNeedsAttention()}">
+          ><span [ngClass]="{
+            'bold': reviewer.getNeedsAttention(),
+            'approved': reviewer.getApproved()
+          }">
             {{ authService.getUsername(reviewer.getEmail()) }}
           </span></user-popup>
         </td>
@@ -86,19 +89,17 @@
       *ngIf="!isDescriptionEditMode"
       (click)="startDescriptionEditMode()"
     >
-      <textarea
-        class="description-text description-value"
-        matInput
-        matTextareaAutosize
-        matAutosizeMinRows="1"
-        placeholder="Description..."
-        [value]="description"
-        readonly
-      ></textarea>
+      <pre
+        [ngClass]="{
+          'description-text': true,
+          'empty': !description
+        }"
+        [HTML]="getParsedDescription()"
+      ></pre>
     </div>
     <div class="edit-mode" *ngIf="isDescriptionEditMode">
       <textarea
-        class="description-text description-value"
+        class="description-text"
         matInput
         matTextareaAutosize
         matAutosizeMinRows="7"
@@ -107,7 +108,6 @@
         [focus]="isDescriptionEditMode"
       ></textarea>
     </div>
-
     <div class="buttons" *ngIf="isDescriptionEditMode">
       <!-- Buttons to stop editing -->
       <button

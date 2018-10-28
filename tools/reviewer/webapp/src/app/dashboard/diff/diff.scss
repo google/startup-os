@@ -2,6 +2,7 @@ $palette-blue: #6daeff;
 $palette-sky: #86d1ff;
 $palette-orange: #ffc75a;
 $palette-grey: #d1d1d1;
+$palette-red: #fc7273;
 
 .blue-button {
   background: $palette-blue;
@@ -27,4 +28,16 @@ $palette-grey: #d1d1d1;
 
 .grey-button {
   background: $palette-grey;
+}
+
+.red-button {
+  background: $palette-red;
+  margin-left: 15px;
+  min-width: 163px;
+}
+
+.cr-dialog-button {
+  width: auto;
+  min-width: 136px;
+  color: #232323;
 }

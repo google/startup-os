@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AuthService, FirebaseStateService } from '@/shared';
-import { Diff, Reviewer } from '@/shared/proto';
+import { AuthService, FirebaseStateService } from '@/core';
+import { Diff, Reviewer } from '@/core/proto';
 
 export enum DiffGroups {
   NeedAttention,
@@ -28,8 +28,8 @@ export class DiffsComponent implements OnInit, OnDestroy {
     'author',
     'status',
     'action',
-    'workspace',
     'reviewers',
+    'workspace',
     'description',
   ];
   diffGroupNameList: string[] = [];

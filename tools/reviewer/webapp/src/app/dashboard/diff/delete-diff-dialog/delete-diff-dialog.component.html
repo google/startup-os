@@ -1,0 +1,32 @@
+<div class="title">
+  <div class="bold">Are you absolutely sure?</div>
+  <div>This action <span class="bold">cannot</span> be undone!</div>
+</div>
+<div class="diff-id">
+  <input
+    [ngClass]="{'wrong-id': isError}"
+    type="number"
+    placeholder="Diff number"
+    [(ngModel)]="diffId"
+    (focus)="onFocus()"
+    fxFlex
+  >
+</div>
+<div class="workspace">
+  <mat-checkbox
+    color="primary"
+    [(ngModel)]="isWorkspace" 
+  >Also delete workspace</mat-checkbox>
+</div>
+<div class="buttons">
+  <button
+    mat-button
+    class="cr-light-button cr-dialog-button grey-button"
+    (click)="close()"
+  >Cancel</button>
+  <button
+    mat-button
+    class="cr-light-button cr-dialog-button red-button"
+    (click)="delete()"
+  >Delete the Diff</button>
+</div>
