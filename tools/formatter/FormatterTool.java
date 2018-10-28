@@ -104,6 +104,7 @@ public class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
+      System.out.println(path);
       executeWithRuntime("yapf -i " + path.toAbsolutePath().toString());
     }
   }
@@ -158,6 +159,9 @@ public class FormatterTool {
   @FlagDesc(name = "ignore_directories", description = "Ignored directories, split by comma")
   private static final Flag<String> ignoreDirectories = Flag.create("");
 
+  @FlagDesc(name = "ignore_node_modules", description = "Ignore node_modules folder")
+  private static final Flag<Boolean> ignoreNodeModules = Flag.create(true);
+
   private static boolean isJava(Path file) {
     return getExtension(file).equals(".java");
   }
@@ -195,6 +199,11 @@ public class FormatterTool {
             || (isPython(file) && python.get())
             || (isCpp(file) && cpp.get())
             || (isBuild(file) && build.get()));
+    if (ignoreNodeModules.get()) {
+      if (file.normalize().toString().contains("node_modules")) {
+        return false;
+      }
+    }
     boolean inIgnoredDirectory = ignoredDirectories.stream().anyMatch(file::startsWith);
     return formatByExtension && !inIgnoredDirectory;
   }

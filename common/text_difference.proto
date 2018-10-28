@@ -19,7 +19,7 @@ enum ChangeType {
   // Text deleted from the source. Only for left-side change.
   DELETE = 3;
 
-  // Text from source was replaced. Both both sides.
+  // Text from source was replaced on both sides.
   REPLACE = 5;
 
   // An empty line for an addition/deletion on the other side. Note that
