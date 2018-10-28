@@ -10,15 +10,17 @@ enum ChangeType {
   // Unused.
   TYPE_UNUSED = 0;
 
-  // No change has occurred. The source is equal to the
-  // destination.
+  // No change has occurred. The source is equal to the destination.
   NO_CHANGE = 1;
 
-  // A new character was added to the source. Only for right-side change.
+  // New text was added to the source. Only for right-side change.
   ADD = 2;
 
-  // A character was deleted from the source. Only for left-side change.
+  // Text deleted from the source. Only for left-side change.
   DELETE = 3;
+
+  // Text from source was replaced. Both both sides.
+  REPLACE = 5;
 
   // An empty line for an addition/deletion on the other side. Note that
   // this is not a newline in the original file.
@@ -53,23 +55,10 @@ message TextChange {
   int32 placeholder_line_count = 8;
 }
 
-message DiffPatchMatchDiff2 {
-  repeated DiffPatchMatchChange left_change = 1;
-  repeated DiffPatchMatchChange right_change = 2;
-}
-
-// Intermediate proto for DiffPatchMatch change.
-message DiffPatchMatchChange2 {
-  string text = 1;
-  ChangeType type = 2;
-  int32 global_left_start_index = 3;
-  int32 global_left_end_index = 4;
-  int32 global_right_start_index = 5;
-  int32 global_right_end_index = 6;
-}
-
 // Intermediate proto for DiffPatchMatch change.
 message DiffPatchMatchChange {
   string text = 1;
+  // For REPLACE, this is the replacing text, on the right.
+  string replacing_text = 3;
   ChangeType type = 2;
 }

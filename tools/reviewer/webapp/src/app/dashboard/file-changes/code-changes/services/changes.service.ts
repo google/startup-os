@@ -90,21 +90,6 @@ export class ChangesService {
     return htmlDocument.getElementsByTagName('body')[0].innerHTML;
   }
 
-  // TODO: remove the method, when the issue will be fix
-  tempFixChangesLineNumber(textChanges: TextChange[]): void {
-    let delimiter: number = 0;
-    textChanges.forEach(textChange => {
-      switch (textChange.getType()) {
-        case ChangeType.DELETE:
-        case ChangeType.ADD:
-          textChange.setLineNumber(textChange.getLineNumber() - delimiter);
-          break;
-        case ChangeType.LINE_PLACEHOLDER:
-          delimiter++;
-      }
-    });
-  }
-
   // Convert two lists with code (left and right)
   // to one list with code changes
   synchronizeBlockLines(
@@ -115,9 +100,6 @@ export class ChangesService {
       changesLines: ChangesLine[];
       changesLinesMap: { [id: number]: number }[];
     } {
-    this.tempFixChangesLineNumber(textDiff.getLeftChangeList());
-    this.tempFixChangesLineNumber(textDiff.getRightChangeList());
-
     this.applyChanges(textDiff.getLeftChangeList(), leftBlockLines);
     this.applyChanges(textDiff.getRightChangeList(), rightBlockLines);
 
@@ -181,8 +163,7 @@ export class ChangesService {
       if (textChange.getType() === ChangeType.LINE_PLACEHOLDER) {
         // Add placeholder
         blockLines.splice(
-          // LineNumber + 1 because we want to add placeholder after the line
-          textChange.getLineNumber() + 1,
+          textChange.getLineNumber(),
           0,
           this.lineService.createPlaceholder(),
         );
