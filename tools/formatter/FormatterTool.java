@@ -104,7 +104,6 @@ public class FormatterTool {
 
     @Override
     public void format(Path path) throws IOException {
-      System.out.println(path);
       executeWithRuntime("yapf -i " + path.toAbsolutePath().toString());
     }
   }
