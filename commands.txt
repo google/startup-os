@@ -1,15 +1,12 @@
 # Fix formatting of BUILD file with `buildifier`
 # (https://github.com/bazelbuild/buildtools/tree/master/buildifier)
 # Note that all paths should be absolute
-bazel run //tools:buildifier -- -mode=fix `pwd`/…
-
+fff
 # Find unused dependencies with `unused_deps`
 # (https://github.com/bazelbuild/buildtools/blob/master/unused_deps/)
 bazel run //tools:unused_deps -- <BUILD target, e.g //folder:target>
-
-
-# Bash completion
-# This assumes you've installed `bazel` via APT or Homebrew
+# xxxxBash compleon
+# xxxxThis assumes you've installed `bazel` via APT or Homebrew
 # To enable bundled-in autocomplete for `bazel`, run completion.sh
 # completion.sh present at https://github.com/google/startup-os/tree/master/tools
 sh tools/completion.sh

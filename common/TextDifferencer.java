@@ -71,7 +71,43 @@ public class TextDifferencer {
       }
       previousChangeType = change.getType();
     }
+    normalize(result);
     return ImmutableList.copyOf(result);
+  }
+
+  // Normalize changes so they look better
+  private void normalize(List<DiffPatchMatchChange> changes) {
+    for (int i = 0; i < changes.size() - 1; i++) {
+      DiffPatchMatchChange change = changes.get(i);
+      if (change.getType() == ChangeType.REPLACE) {
+        DiffPatchMatchChange nextChange = changes.get(i + 1);
+        // If we're REPLACE and either text or replacing_text doesn't end in \n, and the next
+        // change is NO_CHANGE, and it starts with \n, then move the \n to the REPLACE change.
+        // Example:
+        // REPLACE: text="aaa", replacing_text="bbb\n"
+        // NO_CHANGE: text="\nccc\n"
+        // After normalization:
+        // REPLACE: text="aaa\n", replacing_text="bbb\n\n"
+        // NO_CHANGE: text="ccc\n"
+        if (nextChange.getType() == ChangeType.NO_CHANGE
+            && nextChange.getText().startsWith("\n")
+            && (!change.getText().endsWith("\n") || !change.getReplacingText().endsWith("\n"))) {
+          changes.set(
+              i,
+              change
+                  .toBuilder()
+                  .setText(change.getText() + "\n")
+                  .setReplacingText(change.getReplacingText() + "\n")
+                  .build());
+          changes.set(
+            i + 1,
+            nextChange
+                .toBuilder()
+                .setText(nextChange.getText().substring(1))
+                .build());
+        }
+      }
+    }
   }
 
   private DiffPatchMatchChange makeReplaceChange(DiffPatchMatchChange change) {
@@ -95,9 +131,9 @@ public class TextDifferencer {
     ImmutableList.Builder<TextChange> result = ImmutableList.builder();
     StringBuilder sb = new StringBuilder();
     int lineNumber = 0;
-    int globalIndex = 0;
     int lineIndex = 0;
-    int nextGlobalStartIndex = 0;
+    System.out.println("*************** CHANGES **************");
+    System.out.println(changes);
 
     for (DiffPatchMatchChange change : changes) {
       ChangeType changeType = change.getType();
@@ -114,18 +150,7 @@ public class TextDifferencer {
         char currentChar = changeText.charAt(i);
         if (currentChar == '\n') {
           if (changeType == ChangeType.NO_CHANGE || changeType == sideOperation) {
-            result.add(
-                TextChange.newBuilder()
-                    .setText(sb.toString())
-                    .setType(changeType)
-                    .setLineNumber(lineNumber)
-                    .setGlobalStartIndex(nextGlobalStartIndex)
-                    .setGlobalEndIndex(globalIndex)
-                    .setStartIndex(lineIndex - sb.toString().length())
-                    .setEndIndex(lineIndex)
-                    .build());
-            // We add 1 to skip the newline
-            nextGlobalStartIndex = globalIndex + 1;
+            result.add(getTextChange(sb.toString(), lineNumber, lineIndex, changeType));
           } else {
             result.add(
                 TextChange.newBuilder()
@@ -142,24 +167,11 @@ public class TextDifferencer {
           }
           sb.append(currentChar);
         }
-        if (changeType == ChangeType.NO_CHANGE || changeType == sideOperation) {
-          globalIndex++;
-        }
       }
       // Check for leftover from last line
       if (sb.length() > 0) {
         if (changeType == ChangeType.NO_CHANGE || changeType == sideOperation) {
-          result.add(
-              TextChange.newBuilder()
-                  .setText(sb.toString())
-                  .setType(changeType)
-                  .setLineNumber(lineNumber)
-                  .setGlobalStartIndex(nextGlobalStartIndex)
-                  .setGlobalEndIndex(globalIndex)
-                  .setStartIndex(lineIndex - sb.toString().length())
-                  .setEndIndex(lineIndex)
-                  .build());
-          nextGlobalStartIndex = globalIndex;
+          result.add(getTextChange(sb.toString(), lineNumber, lineIndex, changeType));
         }
       }
       // Add placeholders for REPLACE
@@ -175,14 +187,43 @@ public class TextDifferencer {
           result.add(
               TextChange.newBuilder()
                   .setType(ChangeType.LINE_PLACEHOLDER)
-                  .setLineNumber(lineNumber + i + 1) // A newline is a placeholder on the next line
+                  .setLineNumber(lineNumber + i)
                   .build());
         }
         lineNumber += addPlaceholderCount;
       }
       sb = new StringBuilder();
     }
-    return result.build();
+    return normalize(result.build());
+  }
+
+  // Normalize changes, e.g combine subsequent changes of the same type
+  private ImmutableList<TextChange> normalize(ImmutableList<TextChange> changes) {
+    ArrayList<TextChange> result = new ArrayList(changes);
+    for (int i = 0; i < result.size() - 1; i++) {
+      TextChange change = result.get(i);
+      TextChange nextChange = result.get(i + 1);
+      if (change.getType() == nextChange.getType() && change.getLineNumber() == nextChange.getLineNumber()
+          && change.getEndIndex() == nextChange.getStartIndex()) {
+        // Merge changes
+        result.set(i, change.toBuilder()
+            .setText(change.getText() + nextChange.getText())
+            .setEndIndex(nextChange.getEndIndex()).build());
+        result.remove(i + 1);
+      }
+    }
+    return ImmutableList.copyOf(result);
+  }
+
+  private TextChange getTextChange(
+      String text, int lineNumber, int lineIndex, ChangeType changeType) {
+    return TextChange.newBuilder()
+        .setText(text)
+        .setType(changeType)
+        .setLineNumber(lineNumber)
+        .setStartIndex(lineIndex - text.length())
+        .setEndIndex(lineIndex)
+        .build();
   }
 
   public TextDiff getTextDiff(String leftContents, String rightContents) {
@@ -199,6 +240,8 @@ public class TextDifferencer {
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
+    System.out.println("*************** DIFF **************");
+    System.out.println(diff);
     return diff;
   }
 

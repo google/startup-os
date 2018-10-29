@@ -35,6 +35,7 @@ message TextDiff {
 }
 
 message TextChange {
+  reserved 6, 7, 8;
   // The string being changed. Used for debugging purposes.
   string text = 1;
 
@@ -43,16 +44,9 @@ message TextChange {
 
   int32 line_number = 3;
 
-  // Coordinates of a change in one line.
-  // Leave it empty, if whole line was changed.
+  // Indices of a change in the line. Leave it empty if whole line was changed.
   int32 start_index = 4;
   int32 end_index = 5;
-  // Indices relative to whole document
-  int32 global_start_index = 6;
-  int32 global_end_index = 7;
-
-  // Number of placeholder lines, used for Type.LINE_PLACEHOLDER.
-  int32 placeholder_line_count = 8;
 }
 
 // Intermediate proto for DiffPatchMatch change.

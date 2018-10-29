@@ -150,6 +150,8 @@ export class ChangesService {
     textChanges.forEach(textChange => {
       switch (textChange.getType()) {
         case ChangeType.DELETE:
+          //blockLines[textChange.getLineNumber()].isChanged = true;
+          //blockLines[textChange.getLineNumber()].textChange = textChange;
         case ChangeType.ADD:
           // Highlight changes
           blockLines[textChange.getLineNumber()].isChanged = true;
@@ -167,7 +169,6 @@ export class ChangesService {
           0,
           this.lineService.createPlaceholder(),
         );
-        // TODO: to use placeholderLineCount ?
       }
     });
   }
