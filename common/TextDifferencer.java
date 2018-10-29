@@ -100,11 +100,7 @@ public class TextDifferencer {
                   .setReplacingText(change.getReplacingText() + "\n")
                   .build());
           changes.set(
-            i + 1,
-            nextChange
-                .toBuilder()
-                .setText(nextChange.getText().substring(1))
-                .build());
+              i + 1, nextChange.toBuilder().setText(nextChange.getText().substring(1)).build());
         }
       }
     }
@@ -203,12 +199,17 @@ public class TextDifferencer {
     for (int i = 0; i < result.size() - 1; i++) {
       TextChange change = result.get(i);
       TextChange nextChange = result.get(i + 1);
-      if (change.getType() == nextChange.getType() && change.getLineNumber() == nextChange.getLineNumber()
+      if (change.getType() == nextChange.getType()
+          && change.getLineNumber() == nextChange.getLineNumber()
           && change.getEndIndex() == nextChange.getStartIndex()) {
         // Merge changes
-        result.set(i, change.toBuilder()
-            .setText(change.getText() + nextChange.getText())
-            .setEndIndex(nextChange.getEndIndex()).build());
+        result.set(
+            i,
+            change
+                .toBuilder()
+                .setText(change.getText() + nextChange.getText())
+                .setEndIndex(nextChange.getEndIndex())
+                .build());
         result.remove(i + 1);
       }
     }
