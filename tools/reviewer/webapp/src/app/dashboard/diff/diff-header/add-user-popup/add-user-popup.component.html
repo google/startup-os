@@ -1,0 +1,26 @@
+<div class="open-button" (click)="open()">
+  <ng-content></ng-content>
+</div>
+<ng-container *ngIf="isVisible">
+  <mat-card class="user-popup">
+    <div class="email-input">
+      <input fxFlex placeholder="Email" [focus]="isVisible" [(ngModel)]="email">
+    </div>
+    <div class="buttons">
+      <button
+        mat-button
+        class="cr-light-button grey-button"
+        (click)="close()"
+      >Cancel</button>
+      <button
+        mat-button
+        class="cr-light-button blue-button"
+        (click)="add()"
+      >Add</button>
+    </div>
+    <div class="error-message" *ngIf="isEmailInvalid">
+      Email is invalid
+    </div>
+  </mat-card>
+  <div class="popup-overlay" (click)="close()"></div>
+</ng-container>

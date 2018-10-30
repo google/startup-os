@@ -97,8 +97,10 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
     );
   }
 
-  getFilename(threads: Thread[]): string {
-    return threads[0].getFile().getFilenameWithRepo();
+  getFileLabel(threads: Thread[]): string {
+    // Example: /project/path/to/file (3 conversations)
+    const filename: string = threads[0].getFile().getFilenameWithRepo();
+    return filename + ` (${this.discussionService.getConversationLabel(threads.length)})`;
   }
 
   addComment(): void {

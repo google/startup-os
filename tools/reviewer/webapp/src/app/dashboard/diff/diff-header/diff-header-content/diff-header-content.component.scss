@@ -14,13 +14,18 @@ $transparent-grey: rgba(0,0,0,0.54);
         color: $transparent-grey;
         width: 120px;
       }
-      td:nth-child(3) {
-        >.mat-icon-button {
-          float: left;
+      td:nth-child(2) {
+        >div {
+          display: flex;
+          >user-popup {
+            margin-right: 5px;
+          }
+          >.add-button {
+            display: inline-block;
+            margin-left: 10px;
+            min-height: 20px;
+          }
         }
-      }
-      >.add-button {
-        min-width: 24px;
       }
     }
     user-popup {

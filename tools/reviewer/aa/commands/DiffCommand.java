@@ -85,6 +85,14 @@ public class DiffCommand implements AaCommand {
             .collect(Collectors.toList()));
   }
 
+  private ImmutableList<String> getIssues(String issuesInput) {
+    return ImmutableList.copyOf(
+        Arrays.stream(issuesInput.split(","))
+            .map(String::trim)
+            .filter(x -> !x.isEmpty())
+            .collect(Collectors.toList()));
+  }
+
   private Diff createDiff() {
     DiffNumberResponse response =
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
@@ -97,7 +105,7 @@ public class DiffCommand implements AaCommand {
         Diff.newBuilder()
             .setWorkspace(workspaceName)
             .setDescription(description.get())
-            .setBug(buglink.get())
+            .addAllIssue(getIssues(buglink.get()))
             .addAllReviewer(getReviewers(reviewers.get()))
             .setId(response.getLastDiffId())
             .setCreatedTimestamp(currentTime)
@@ -151,7 +159,7 @@ public class DiffCommand implements AaCommand {
 
     if (!buglink.get().isEmpty()) {
       // replace buglink if specified
-      diffBuilder.setBug(buglink.get());
+      diffBuilder.addAllIssue(getIssues(buglink.get()));
     }
 
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));

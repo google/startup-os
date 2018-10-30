@@ -33,7 +33,7 @@ export class UserPopupComponent {
 
   @HostListener('mouseleave')
   mouseleave() {
-    this.isHovered = false;
+    this.close();
   }
 
   close() {

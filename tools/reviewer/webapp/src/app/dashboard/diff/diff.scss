@@ -2,6 +2,7 @@ $palette-blue: #6daeff;
 $palette-sky: #86d1ff;
 $palette-orange: #ffc75a;
 $palette-grey: #d1d1d1;
+$palette-ivory: #ebebeb;
 $palette-red: #fc7273;
 
 .blue-button {
@@ -28,6 +29,10 @@ $palette-red: #fc7273;
 
 .grey-button {
   background: $palette-grey;
+}
+
+.ivory-button {
+  background: $palette-ivory;
 }
 
 .red-button {

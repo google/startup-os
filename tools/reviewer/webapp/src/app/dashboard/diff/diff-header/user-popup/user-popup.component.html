@@ -1,10 +1,20 @@
 <ng-content></ng-content>
 <mat-card class="user-popup" *ngIf="isHovered">
   <span class="user-email">{{ email }}</span>
-  <button mat-button *ngIf="isChangeAttention" (click)="changeAttention()">
+  <button
+    class="cr-light-button ivory-button"
+    mat-button
+    *ngIf="isChangeAttention"
+    (click)="changeAttention()"
+  >
     {{ isAttentionRequired? 'Attention not needed' : 'Ask for attention' }}
   </button>
-  <button mat-button *ngIf="isRemoveFromList" (click)="removeFromList()">
-    Remove from the list
+  <button
+    class="cr-light-button ivory-button"
+    mat-button
+    *ngIf="isRemoveFromList"
+    (click)="removeFromList()"
+  >
+    Remove
   </button>
 </mat-card>
