@@ -178,3 +178,4 @@ public class DiffCommand implements AaCommand {
     return true;
   }
 }
+
