@@ -5,141 +5,112 @@ package com.google.startupos.tools.reviewer.job.sync;
 option java_package = "com.google.startupos.tools.reviewer.job.sync";
 option java_outer_classname = "GithubProtos";
 
-// GitHub User
-message User {
-  int64 id = 1;
-  string email = 2;
-  string name = 3;
-  string login = 4;
-}
+import "tools/reviewer/job/sync/full_github_pr.proto";
 
-message UserRequest { string login = 1; }
-
-message UserResponse { User user = 1; }
-
-// GitHub File
-message File {
-  string sha = 1;
-  string filename = 2;
-  string status = 3;
-  string patch = 4;
-  int32 changes = 5;
-}
-
-message PullRequestFilesRequest {
-  string owner = 1;
-  string repo = 2;
-  int32 diff_number = 3;
-}
-
-message PullRequestFilesResponse { repeated File files = 1; }
-
-message GithubComment {
-  int64 id = 1;
-  string body = 2;
-  string created_at = 3;
-  string updated_at = 4;
-  User user = 5;
-  int32 position = 6;
-  int32 original_position = 7;
-  string diff_hunk = 8;
-  string path = 9;
-  string commit_id = 10;
-  string original_commit_id = 11;
-}
-
-message CommentsRequest {
-  string owner = 1;
-  string repo = 2;
-  int32 diff_number = 3;
-}
-
-message CommentsResponse { repeated GithubComment comments = 1; }
-
-message CreateReviewCommentRequest {
-  string owner = 1;
-  string repo = 2;
-  int32 diff_number = 3;
-  CreateReviewCommentRequestData request_data = 4;
-}
-
-message CreateReviewCommentRequestData {
-  string body = 1;
-  string commit_id = 2;
-  string path = 3;
-  int32 position = 4;
-}
-
-message CreatePullRequestCommentRequest {
-  string owner = 1;
-  string repo = 2;
-  int32 diff_number = 3;
-  CreatePullRequestCommentRequestData request_data = 4;
-}
-
-message CreatePullRequestCommentRequestData { string body = 1; }
-
-// GitHub Pull Request
-message PullRequest {
-  int64 id = 1;
-  int32 number = 2;
-  string state = 3;
-  string title = 4;
-  User user = 5;
-  string body = 6;
-  string created_at = 7;
-  string updated_at = 8;
-  CommitPointer head = 9;
-  CommitPointer base = 10;
-  string repo_name = 11;
-}
-
-message CommitPointer {
-  string label = 1;
-  string ref = 2;
-  string sha = 3;
-  User user = 4;
-  Repo repo = 5;
-}
-
-message Repo {
-  int64 id = 1;
-  string name = 2;
-  string full_name = 3;
-  bool private = 4;
-  User owner = 5;
-  string description = 6;
-  string created_at = 7;
-  string updated_at = 8;
-  string pushed_at = 9;
-}
-
+// https://developer.github.com/v3/pulls/#get-a-single-pull-request
 message PullRequestRequest {
   string owner = 1;
   string repo = 2;
-  int32 diff_number = 3;
+  int64 number = 3;
 }
 
 message PullRequestResponse { PullRequest pull_request = 1; }
 
+// https://developer.github.com/v3/pulls/#create-a-pull-request
 message CreatePullRequestRequest {
   string owner = 1;
   string repo = 2;
   CreatePullRequestRequestData request_data = 3;
-}
 
-message CreatePullRequestRequestData {
-  string title = 1;
-  string head = 2;
-  string base = 3;
-  string body = 4;
+  message CreatePullRequestRequestData {
+    string title = 1;
+    string head = 2;
+    string base = 3;
+    string body = 4;
+  }
 }
 
 message CreatePullRequestResponse { PullRequest pull_request = 1; }
 
-message PullRequestsRequest {
+// https://developer.github.com/v3/issues/comments/#list-comments-on-an-issue
+message IssueCommentsRequest {
   string owner = 1;
   string repo = 2;
+  int64 number = 3;
 }
 
-message PullRequestsResponse { repeated PullRequest pull_requests = 1; }
+message IssueCommentsResponse { repeated IssueComment issue_comment = 1; }
+
+// https://developer.github.com/v3/issues/comments/#create-a-comment
+message CreateIssueCommentRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+  CreateIssueCommentRequestData request_data = 4;
+
+  message CreateIssueCommentRequestData { string body = 1; }
+}
+
+// https://developer.github.com/v3/pulls/reviews/#list-reviews-on-a-pull-request
+message ReviewsRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+}
+
+message ReviewsResponse { repeated Review reviews = 1; }
+
+// https://developer.github.com/v3/pulls/reviews/#get-comments-for-a-single-review
+message ReviewCommentsRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+  int64 review_id = 4;
+}
+
+message ReviewCommentsResponse { repeated ReviewComment review_comments = 1; }
+
+// https://developer.github.com/v3/pulls/reviews/#create-a-pull-request-review
+message CreatePullRequestReviewRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+  CreatePullRequestReviewRequestData request_data = 4;
+
+  message CreatePullRequestReviewRequestData {
+    string commit_id = 1;
+    //  required field
+    string body = 2;
+    string event = 3;
+    repeated ReviewCommentRequestData comments = 4;
+
+    message ReviewCommentRequestData {
+      string path = 1;
+      int64 position = 2;
+      string body = 3;
+    }
+  }
+}
+
+// https://developer.github.com/v3/repos/commits/#get-a-single-commit
+message CommitRequest {
+  string owner = 1;
+  string repo = 2;
+  string sha = 3;
+}
+
+message CommitResponse { CommitInfo commit = 1; }
+
+// https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
+message CommitsRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+}
+
+message CommitsResponse { repeated CommitInfo commits = 1; }
+
+// https://developer.github.com/v3/users/#get-a-single-user
+message UserRequest { string login = 1; }
+
+message UserResponse { User user = 1; }
