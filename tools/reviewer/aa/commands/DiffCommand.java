@@ -88,7 +88,8 @@ public class DiffCommand implements AaCommand {
   private ImmutableList<String> getIssues(String issuesInput) {
     return ImmutableList.copyOf(
         Arrays.stream(issuesInput.split(","))
-            .filter(x -> !x.equals(""))
+            .map(String::trim)
+            .filter(x -> !x.isEmpty())
             .collect(Collectors.toList()));
   }
 
