@@ -95,7 +95,7 @@ message CommitInfo {
 
   message Commit {
     User author = 1;
-    User commiter = 2;
+    User committer = 2;
     string message = 3;
     Tree tree = 4;
     int32 comment_count = 5;
