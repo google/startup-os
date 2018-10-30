@@ -354,6 +354,11 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public boolean fileExists(String commitId, String path) {
+    return runCommand("--no-pager show " + commitId + ":" + path, false).stderr.isEmpty();
+  }
+
+  @Override
   public String getFileContents(String commitId, String path) {
     return runCommand("--no-pager show " + commitId + ":" + path).stdout;
   }

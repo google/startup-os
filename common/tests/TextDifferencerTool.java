@@ -114,8 +114,6 @@ public class TextDifferencerTool {
         leftLine += getLeftText(change);
         leftStringLength += change.getText().length();
         iLeft++;
-        String indexString =
-            leftFileContents.substring(change.getGlobalStartIndex(), change.getGlobalEndIndex());
       }
       while (iRight < textDiff.getRightChangeList().size()
           && textDiff.getRightChangeList().get(iRight).getLineNumber() == lineNumber) {
