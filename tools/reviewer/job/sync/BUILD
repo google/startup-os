@@ -28,6 +28,7 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
+        "DiffReader.java",
         "GithubClient.java",
         "GithubPatch.java",
         "GithubReader.java",
@@ -42,8 +43,13 @@ java_library(
         "//common/repo:repo_proto",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
+        "//third_party/maven/io/grpc:grpc_core",
+        "//third_party/maven/io/grpc:grpc_netty",
+        "//third_party/maven/org/slf4j:slf4j_simple",
+        "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
         "//tools/reviewer/local_server/service:code_review_proto",
+        "//tools/reviewer/local_server/service:code_review_service",
     ],
 )
 
