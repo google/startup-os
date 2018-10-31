@@ -368,6 +368,11 @@ public class GitRepo implements Repo {
     return commandResult.stdout.trim().replace("\n", "");
   }
 
+  // Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git)
+  public String getRemoteURL() {
+    return runCommand("remote get-url origin").stdout;
+  }
+
   private void switchToMasterBranch() {
     if (!currentBranch().equals("master")) {
       switchBranch("master");

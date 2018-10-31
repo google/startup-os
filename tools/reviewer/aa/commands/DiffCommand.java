@@ -16,6 +16,8 @@
 package com.google.startupos.tools.reviewer.aa.commands;
 
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubRepo;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
@@ -31,11 +33,13 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffReques
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+
 import java.nio.file.Paths;
 import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -127,6 +131,7 @@ public class DiffCommand implements AaCommand {
                     String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
                 repo.switchBranch(branchName);
               });
+      addGithubRepo(diffBuilder);
     } catch (Exception e) {
       repoToInitialBranch.forEach(
           (repo, initialBranch) -> {
@@ -162,6 +167,7 @@ public class DiffCommand implements AaCommand {
       diffBuilder.addAllIssue(getIssues(buglink.get()));
     }
 
+    addGithubRepo(diffBuilder);
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 
     return diffBuilder.build();
@@ -177,6 +183,39 @@ public class DiffCommand implements AaCommand {
     // TODO: Rename createDiff to createOrUpdateDiff
     codeReviewBlockingStub.createDiff(request);
     return true;
+  }
+
+  private void addGithubRepo(Diff.Builder diffBuilder) {
+    List<String> alreadySettingGithubRepoNames =
+        diffBuilder
+            .getGithubPrList()
+            .stream()
+            .map(githubPr -> githubPr.getRepo().getRepo())
+            .collect(Collectors.toList());
+    try {
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
+          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
+          .filter(fileUtils::folderExists)
+          .forEach(
+              path -> {
+                String repoName = Paths.get(path).getFileName().toString();
+                GitRepo repo = this.gitRepoFactory.create(path);
+                String repoURL = repo.getRemoteURL();
+                String repoOwner = repoURL.split("/")[3];
+
+                if (!alreadySettingGithubRepoNames.contains(repoName)) {
+                  diffBuilder.addGithubPr(
+                      GithubPr.newBuilder()
+                          .setRepo(
+                              GithubRepo.newBuilder().setRepo(repoName).setOwner(repoOwner).build())
+                          .build());
+                }
+              });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }
 
