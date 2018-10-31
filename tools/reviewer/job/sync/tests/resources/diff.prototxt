@@ -81,10 +81,55 @@ code_thread {
   }
   id: "6SlSl-"
 }
+code_thread {
+  repo_id: "test-repo2"
+  commit_id: "base_sha2"
+  file {
+    filename: "repo2_file.txt"
+    workspace: "ws2"
+    repo_id: "test-repo2"
+    commit_id: "head_sha2"
+    action: MODIFY
+    filename_with_repo: "test-repo2/repo2_file.txt"
+  }
+  line_number: 10
+  comment {
+    content: "L 10"
+    timestamp: 1540966440592
+    created_by: "test.reviewer@test.com"
+  }
+  id: "MeJN0K"
+}
+code_thread {
+  repo_id: "test-repo2"
+  commit_id: "head_sha2"
+  file {
+    filename: "repo2_file.txt"
+    workspace: "ws2"
+    repo_id: "test-repo2"
+    commit_id: "head_sha2"
+    action: MODIFY
+    filename_with_repo: "test-repo2/repo2_file.txt"
+  }
+  line_number: 6
+  comment {
+    content: "R 6"
+    timestamp: 1540894721782
+    created_by: "test.reviewer@test.com"
+  }
+  id: "yv1dFg"
+}
 github_pr {
  repo {
   owner: "test-owner";
   repo: "test-repo";
  }
  number: 120
+}
+github_pr {
+ repo {
+  owner: "test-owner2";
+  repo: "test-repo2";
+ }
+ number: 220
 }

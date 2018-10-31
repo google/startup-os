@@ -21,6 +21,7 @@ java_test(
     data = [
         "resources/diff.prototxt",
         "resources/pull_request.prototxt",
+        "resources/pull_request_2.prototxt",
     ],
     test_class = "com.google.startupos.tools.reviewer.job.sync.tests.DiffConverterTest",
     deps = [
