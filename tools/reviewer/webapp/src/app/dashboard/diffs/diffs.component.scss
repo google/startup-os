@@ -1,5 +1,14 @@
 :host {
-  >.diff-groups {
+  >.dashboard {
+    >.dashboard-header {
+      display: flex;
+      padding: 10px 24px;
+      background: #f3f3f3;
+      >.dashboard-title {
+        font-size: 20px;
+        margin-right: 10px;
+      }
+    }
     >.diff-group {
       >.diff-group-title {
         >.group-name {
@@ -13,16 +22,21 @@
         }
         
         .mat-column-id {
-          flex: 0 0 5%;
+          flex: 0 0 7%;
         }
         .mat-column-author,
-        .mat-column-status,
-        .mat-column-action {
-          flex: 0 0 12%;
+        .mat-column-status, 
+        .mat-column-workspace {
+          flex: 0 0 11%;
         }
-        .mat-column-reviewers,
-        .mat-column-description {
+        .mat-column-action {
+          flex: 0 0 15%;
+        }
+        .mat-column-reviewers {
           flex: 0 0 20%;
+        }
+        .mat-column-description {
+          flex: 0 0 25%;
         }
       }
     }

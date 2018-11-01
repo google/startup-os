@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Comment, Thread } from '@/core/proto';
-import { AuthService } from '@/core/services';
+import { UserService } from '@/core/services';
 import { ThreadService } from '../../services';
 import {
   BlockIndex,
@@ -30,7 +30,7 @@ export class CommentsComponent implements OnInit {
 
   constructor(
     private commentsService: CommentsService,
-    public authService: AuthService,
+    public userService: UserService,
     private threadService: ThreadService,
   ) { }
 
@@ -47,7 +47,7 @@ export class CommentsComponent implements OnInit {
     // Create new proto comment
     const comment: Comment = new Comment();
     comment.setContent(this.textareaControl.value);
-    comment.setCreatedBy(this.authService.userEmail);
+    comment.setCreatedBy(this.userService.email);
     comment.setTimestamp(Date.now());
 
     // Add comment and send to firebase

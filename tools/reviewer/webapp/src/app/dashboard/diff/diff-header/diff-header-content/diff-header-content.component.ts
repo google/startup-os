@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
 
 import { Diff, Reviewer } from '@/core/proto';
-import { AuthService, DiffUpdateService, HighlightService } from '@/core/services';
+import { DiffUpdateService, HighlightService, UserService } from '@/core/services';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements content of the header
@@ -19,7 +19,7 @@ export class DiffHeaderContentComponent implements OnChanges {
   @Input() diff: Diff;
 
   constructor(
-    public authService: AuthService,
+    public userService: UserService,
     public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
     public highlightService: HighlightService,
@@ -43,7 +43,7 @@ export class DiffHeaderContentComponent implements OnChanges {
     this.diffHeaderService.changeAttention(reviewer);
 
     // Send changes to firebase
-    const username: string = this.authService.getUsername(reviewer.getEmail());
+    const username: string = this.userService.getUsername(reviewer.getEmail());
     this.diffUpdateService.updateAttention(this.diff, username);
   }
 
@@ -115,7 +115,7 @@ export class DiffHeaderContentComponent implements OnChanges {
   }
 
   updateUserListInFirebase(email: string, action: string): void {
-    const username: string = this.authService.getUsername(email);
+    const username: string = this.userService.getUsername(email);
     this.diffUpdateService.customUpdate(this.diff, username + ' is ' + action);
   }
 

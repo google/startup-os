@@ -10,7 +10,7 @@
     >Expand</button>
   </div>
 </div>
-<div class="cr-header" *ngIf="files.length > 0">
+<div *ngIf="files.length > 0">
   <mat-table [dataSource]="files">
       <ng-container matColumnDef="filename">
         <mat-header-cell *matHeaderCellDef> File </mat-header-cell>

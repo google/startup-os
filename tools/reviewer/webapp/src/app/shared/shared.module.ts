@@ -11,12 +11,14 @@ import { DiffStatusComponent } from './diff-status';
 import { DirectiveList } from './directives';
 import { PageLoadingComponent } from './page-loading';
 import { PipeList } from './pipes';
+import { SpeechArrowComponent } from './speech-arrow';
 import { ToolbarComponent } from './toolbar';
 
 const Declarations = [
   DiffStatusComponent,
   PageLoadingComponent,
   ToolbarComponent,
+  SpeechArrowComponent,
   ...PipeList,
   ...DirectiveList,
 ];

@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { Comment, Thread } from '@/core/proto';
-import { AuthService } from '@/core/services';
+import { UserService } from '@/core/services';
 import { DeleteCommentDialogComponent } from '../delete-comment-dialog';
 import { ThreadState, ThreadStateService } from './thread-state.service';
 
@@ -31,7 +31,7 @@ export class ThreadComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    private authService: AuthService,
+    private userService: UserService,
     private threadStateService: ThreadStateService,
   ) {
     // When firebase sends updated diff
@@ -103,7 +103,7 @@ export class ThreadComponent implements OnInit, OnDestroy {
   }
 
   getUsername(comment: Comment): string {
-    return this.authService.getUsername(comment.getCreatedBy());
+    return this.userService.getUsername(comment.getCreatedBy());
   }
 
   // Make a comment maximized by clicking on it. Full text and date.
@@ -132,7 +132,7 @@ export class ThreadComponent implements OnInit, OnDestroy {
     // Create new comment
     const comment = new Comment();
     comment.setContent(this.textarea.value);
-    comment.setCreatedBy(this.authService.userEmail);
+    comment.setCreatedBy(this.userService.email);
     comment.setTimestamp(Date.now());
 
     // Make the thread resolved/unresolved depends on checkbox
