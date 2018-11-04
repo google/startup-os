@@ -34,11 +34,7 @@ public class TextDifferencerTest {
   private TextDifferencer differencer;
 
   private TextChange textChange(
-      String text,
-      ChangeType type,
-      int lineNumber,
-      int startIndex,
-      int endIndex) {
+      String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
     return TextChange.newBuilder()
         .setText(text)
         .setType(type)
