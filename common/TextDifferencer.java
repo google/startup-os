@@ -52,9 +52,7 @@ public class TextDifferencer {
     ImmutableList.Builder<TextChange> result = ImmutableList.builder();
     StringBuilder sb = new StringBuilder();
     int lineNumber = 0;
-    int globalIndex = 0;
     int lineIndex = 0;
-    int nextGlobalStartIndex = 0;
 
     for (DiffMatchPatch.Diff diff : diffs) {
       Operation operation = diff.operation;
@@ -66,13 +64,9 @@ public class TextDifferencer {
                     .setText(sb.toString())
                     .setType(getChangeType(operation))
                     .setLineNumber(lineNumber)
-                    .setGlobalStartIndex(nextGlobalStartIndex)
-                    .setGlobalEndIndex(globalIndex)
                     .setStartIndex(lineIndex - sb.toString().length())
                     .setEndIndex(lineIndex)
                     .build());
-            // We add 1 to skip the newline
-            nextGlobalStartIndex = globalIndex + 1;
           } else {
             result.add(
                 TextChange.newBuilder()
@@ -89,9 +83,6 @@ public class TextDifferencer {
           }
           sb.append(diff.text.charAt(i));
         }
-        if (operation == Operation.EQUAL || operation == sideOperation) {
-          globalIndex++;
-        }
       }
       // Check for leftover from last line
       if (sb.length() > 0) {
@@ -101,12 +92,9 @@ public class TextDifferencer {
                   .setText(sb.toString())
                   .setType(getChangeType(diff.operation))
                   .setLineNumber(lineNumber)
-                  .setGlobalStartIndex(nextGlobalStartIndex)
-                  .setGlobalEndIndex(globalIndex)
                   .setStartIndex(lineIndex - sb.toString().length())
                   .setEndIndex(lineIndex)
                   .build());
-          nextGlobalStartIndex = globalIndex;
         }
       }
 
