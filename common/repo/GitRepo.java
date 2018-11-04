@@ -36,6 +36,13 @@ import java.util.stream.Collectors;
 
 @AutoFactory
 public class GitRepo implements Repo {
+  // Git warnings to ignore:
+  // TODO: Figure out if this warning is really harmless, as git does checkout the branch.
+  private static final String AMBIGUOUS_REFNAME = "warning: refname '.*' is ambiguous\\.\n";
+  // If we got this message, things are probably ok. Full form:
+  // Create a pull request for '<branch>' on GitHub by visiting: <url>>
+  private static final String GITHUB_PR_MESSAGE = ".*Create a pull request.*";
+
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
   private final FileUtils fileUtils;
@@ -91,7 +98,8 @@ public class GitRepo implements Repo {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    if (!result.stderr.isEmpty() && throwException) {
+    if (!result.stderr.replaceAll(AMBIGUOUS_REFNAME, "").replaceAll(GITHUB_PR_MESSAGE, "").isEmpty()
+        && throwException) {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
@@ -346,6 +354,11 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public boolean fileExists(String commitId, String path) {
+    return runCommand("--no-pager show " + commitId + ":" + path, false).stderr.isEmpty();
+  }
+
+  @Override
   public String getFileContents(String commitId, String path) {
     return runCommand("--no-pager show " + commitId + ":" + path).stdout;
   }
@@ -391,4 +404,3 @@ public class GitRepo implements Repo {
     return commandResult.stderr.isEmpty();
   }
 }
-
