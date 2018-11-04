@@ -95,6 +95,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     return repoFactory.create(repoPath);
   }
 
+  // Returns null when file does not exist in head repo
   private String readTextFile(File file) throws IOException {
     if (file.getFilename().isEmpty()) {
       throw new IllegalArgumentException("File does not have a filename:\n" + file);
@@ -105,8 +106,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     try {
       if (file.getWorkspace().isEmpty()) {
         // It's a file in head
-        return getHeadRepo(file.getRepoId())
-            .getFileContents(file.getCommitId(), file.getFilename());
+        Repo headRepo = getHeadRepo(file.getRepoId());
+        if (headRepo.fileExists(file.getCommitId(), file.getFilename())) {
+          return headRepo.getFileContents(file.getCommitId(), file.getFilename());
+        } else {
+          return null;
+        }
       } else {
         // It's a file in a workspace
         if (file.getUser().isEmpty()) {
