@@ -61,8 +61,6 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder().setText("").setType(ChangeType.LINE_PLACEHOLDER).build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText(rightContents)
@@ -88,8 +86,6 @@ public class TextDifferencerTest {
                     .setType(ChangeType.DELETE)
                     .setEndIndex(9)
                     .build())
-            .addRightChange(
-                TextChange.newBuilder().setText("").setType(ChangeType.LINE_PLACEHOLDER).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
@@ -168,15 +164,8 @@ public class TextDifferencerTest {
         TextDiff.newBuilder()
             .addLeftChange(
                 TextChange.newBuilder()
-                    .setText("With ")
+                    .setText("With Change.")
                     .setType(ChangeType.NO_CHANGE)
-                    .setEndIndex(5)
-                    .build())
-            .addLeftChange(
-                TextChange.newBuilder()
-                    .setText("Change.")
-                    .setType(ChangeType.NO_CHANGE)
-                    .setStartIndex(5)
                     .setEndIndex(12)
                     .build())
             .addRightChange(
