@@ -1,5 +1,3 @@
-@import '../index';
-
 $border-color: #8d8d8d;
 $hr-color: #cccccc;
 $border-radius: 7px;
@@ -34,6 +32,11 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
         word-wrap: break-word;
       }
     }
+    >.ellipsis {
+      span {
+        color: #808080;
+      }
+    }
     >.buttons {
       user-select: none;
       position: relative;
@@ -58,6 +61,12 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
     >.header {
       display: flex;
       align-items: flex-end;
+      >.line-number {
+        span {
+          color: #232323;
+          font-size: 12px;
+        }
+      }
     }
     >.message {
       display: flex;

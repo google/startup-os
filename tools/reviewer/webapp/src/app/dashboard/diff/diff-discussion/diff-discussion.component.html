@@ -12,7 +12,7 @@
     >{{ isExpanded ? 'Collapse' : 'Expand' }}</button>
   </div>
 </div>
-<div class="cr-header" *ngIf="isThreadExist()">
+<div *ngIf="isThreadExist()">
   <!-- Diff threads -->
   <diff-threads
     [threads]="diff.getDiffThreadList()"

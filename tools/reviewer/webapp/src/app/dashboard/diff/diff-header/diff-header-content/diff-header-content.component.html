@@ -22,7 +22,7 @@
               'bold': reviewer.getNeedsAttention(),
               'approved': reviewer.getApproved()
             }">
-              {{ authService.getUsername(reviewer.getEmail()) }}
+              {{ userService.getUsername(reviewer.getEmail()) }}
             </span></user-popup>
 
             <!-- Add Reviewer button -->
@@ -44,7 +44,7 @@
               [email]="email"
               [isRemoveFromList]="true"
               (removeFromListEmitter)="removeFromCcList($event)"
-            ><span>{{ authService.getUsername(email) }}</span></user-popup>
+            ><span>{{ userService.getUsername(email) }}</span></user-popup>
 
             <!-- Add CC button -->
             <add-user-popup class="add-button" (returnEmailEmitter)="addCC($event)"><img
