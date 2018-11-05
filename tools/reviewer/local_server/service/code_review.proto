@@ -87,6 +87,7 @@ message Diff {
   repeated string cc = 14;
   // Threads on the whole diff, not on a particular file or line
   repeated Thread diff_thread = 15;
+  string modified_by = 16;
 }
 
 message Reviewer {

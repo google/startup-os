@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { Diff } from '@/core/proto';
 import { EncodingService } from './encoding.service';
+import { UserService } from './user.service';
 
 interface FirebaseElement {
   proto: string;
@@ -19,6 +20,7 @@ export class FirebaseService {
   constructor(
     private db: AngularFirestore,
     private encodingService: EncodingService,
+    private userService: UserService,
   ) {
     this.diffs = this.db.collection('reviewer/data/diff');
   }
@@ -52,6 +54,7 @@ export class FirebaseService {
     // Unix timestamp in milliseconds
     const currentTimestampMs: number = Date.now();
     diff.setModifiedTimestamp(currentTimestampMs);
+    diff.setModifiedBy(this.userService.email);
 
     return new Observable(observer => {
       this.diffs
