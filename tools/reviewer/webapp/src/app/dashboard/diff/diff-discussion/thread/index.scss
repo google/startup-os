@@ -1,0 +1,44 @@
+$border-color: #8d8d8d;
+$hr-color: #cccccc;
+$border-radius: 7px;
+$top-radius: #{$border-radius} #{$border-radius} 0px 0px;
+$bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
+
+.comment {
+  display: flex;
+  padding: 7px 19px 7px 11px;
+  border-bottom: 1px solid $hr-color;
+  >.header {
+    width: 132px;
+    margin-right: 10px;
+  }
+}
+.resolved-comment {
+  background: #f2faff;
+}
+.unresolved-comment {
+  background: #d6f0ff;
+}
+.edit-comment {
+  background: #86d1ff;
+}
+textarea {
+  $padding: 14px;
+  resize: none;
+  width: calc(100% - 2*$padding);
+  padding: 8px $padding;
+  font-size: 14px;
+  background: white;
+  vertical-align: bottom;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  outline: none;
+  &:focus {
+    box-shadow: 0 0 0 1px #FF7300;
+  }
+}
+.comment-buttons {
+  button {
+    margin-left: 19px;
+  }
+}

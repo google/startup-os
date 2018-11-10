@@ -4,6 +4,7 @@ $palette-orange: #ffc75a;
 $palette-grey: #d1d1d1;
 $palette-ivory: #ebebeb;
 $palette-red: #fc7273;
+$palette-sea: #1daaff;
 
 body {
   .mat-button {
@@ -51,7 +52,13 @@ body {
       background: $palette-grey;
     }
   }
-
+  
+  .sea-button {
+    background: $palette-sea;
+    &[disabled] {
+      background: $palette-grey;
+    }
+  }
 
   .orange-button {
     background: $palette-orange;

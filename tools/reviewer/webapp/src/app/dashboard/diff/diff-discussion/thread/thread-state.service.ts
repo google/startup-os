@@ -5,9 +5,16 @@ import { Thread } from '@/core/proto';
 
 export interface ThreadState {
   isCommentOpenMap: boolean[];
+  isCommentEditingMap: boolean[];
+  isMenuVisibleMap: boolean[];
   isReply: boolean;
   isResolved: boolean;
   newComment: string;
+  editComments: CommentStateMap;
+}
+
+interface CommentStateMap {
+  [index: number]: string;
 }
 
 interface ThreadStateMap {
@@ -47,6 +54,19 @@ export class ThreadStateService {
   // To changed button from "Expand" to "Collapse"
   openComment(): void {
     this.openCommentChanges.next();
+  }
+
+  // Create empty ThreadState
+  initThreadState(): ThreadState {
+    return {
+      isCommentOpenMap: [],
+      isCommentEditingMap: [],
+      isMenuVisibleMap: [],
+      isReply: false,
+      isResolved: false,
+      newComment: '',
+      editComments: {},
+    };
   }
 
   // Resets state

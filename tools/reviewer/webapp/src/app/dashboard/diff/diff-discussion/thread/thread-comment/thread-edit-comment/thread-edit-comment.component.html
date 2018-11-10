@@ -1,0 +1,21 @@
+<!-- Editing of the comment -->
+<textarea
+  matInput
+  matTextareaAutosize
+  matAutosizeMinRows="2"
+  [formControl]="textarea"
+></textarea>
+<div class="comment-buttons">
+  <!-- Button to close editing -->
+  <button
+    mat-button
+    class="cr-thread-button grey-button"
+    (click)="close()"
+  >Cancel</button>
+  <!-- Button to edit a comment -->
+  <button
+    mat-button
+    class="cr-thread-button sea-button"
+    (click)="save()"
+  >Save</button>
+</div>

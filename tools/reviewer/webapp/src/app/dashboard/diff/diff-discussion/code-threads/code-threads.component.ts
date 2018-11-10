@@ -1,8 +1,6 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
 
 import { Diff, File, Thread } from '@/core/proto';
-import { DiffUpdateService } from '@/core/services';
 import { DiffService } from '../../diff.service';
 import { DiscussionService } from '../discussion.service';
 
@@ -15,15 +13,13 @@ import { DiscussionService } from '../discussion.service';
   providers: [DiscussionService],
 })
 export class CodeThreadsComponent implements OnInit, OnChanges {
-  displayedColumns: string[] = ['discussions'];
   // Threads are divided into groups by filenames
-  fileGroupsSource: MatTableDataSource<Thread[]>;
+  fileGroupList: Thread[][] = [];
 
   @Input() threads: Thread[];
   @Input() diff: Diff;
 
   constructor(
-    private diffUpdateService: DiffUpdateService,
     private diffService: DiffService,
     public discussionService: DiscussionService,
   ) { }
@@ -33,17 +29,17 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
-    if (this.fileGroupsSource) {
+    if (this.fileGroupList) {
       this.refreshThreads();
     }
   }
 
   private initThreads(): void {
-    this.fileGroupsSource = new MatTableDataSource(this.getSortedGroups(this.threads.slice()));
+    this.fileGroupList = this.getSortedGroups(this.threads.slice());
   }
 
   private refreshThreads(): void {
-    if (this.getThreadsAmount(this.fileGroupsSource.data) === this.threads.length) {
+    if (this.getThreadsAmount(this.fileGroupList) === this.threads.length) {
       // Links update
       this.discussionService.refreshThreads(this.threads);
     } else {
@@ -101,17 +97,5 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
     // Example: /project/path/to/file (3 conversations)
     const filename: string = threads[0].getFile().getFilenameWithRepo();
     return filename + ` (${this.discussionService.getConversationLabel(threads.length)})`;
-  }
-
-  addComment(): void {
-    this.diffUpdateService.addComment(this.diff);
-  }
-
-  resolveThread(isChecked: boolean): void {
-    this.diffUpdateService.resolveThread(this.diff, isChecked);
-  }
-
-  deleteComment(isDeleteThread: boolean): void {
-    this.diffUpdateService.deleteComment(this.diff, isDeleteThread);
   }
 }

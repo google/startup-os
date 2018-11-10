@@ -75,7 +75,7 @@ export class ThreadService {
       this.stateService.diff.addCodeThread(newThread);
     }
 
-    this.diffUpdateService.addComment(this.stateService.diff);
+    this.diffUpdateService.saveComment(this.stateService.diff);
   }
 
   private createNewThread(

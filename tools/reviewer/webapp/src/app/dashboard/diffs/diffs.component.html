@@ -3,17 +3,6 @@
 
 <!-- Dashboard -->
 <div class="dashboard" *ngIf="!isLoading">
-  <!-- Select dashboard panel -->
-  <div class="dashboard-header">
-    <span class="dashboard-title">
-      <span class="bold">
-        {{ userService.getUsername(selectDashboardService.selectedEmail) }}
-      </span>
-      dashboard
-    </span>
-    <select-dashboard-popup></select-dashboard-popup>
-  </div>
-  
   <!-- Diff groups -->
   <div
     class="diff-group"

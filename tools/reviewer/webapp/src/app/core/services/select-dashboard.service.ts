@@ -12,6 +12,7 @@ export class SelectDashboardService {
 
   constructor(private router: Router) { }
 
+  // Creates user list
   addUniqueUsers(diff: Diff): void {
     this.addUniqueUser(diff.getAuthor().getEmail());
     for (const reviewer of diff.getReviewerList()) {
@@ -22,15 +23,26 @@ export class SelectDashboardService {
     }
   }
 
+  // Opens dashboard with the email
   selectDashboard(email: string): void {
-    this.router.navigate(['diffs'], { queryParams: { email: email } });
-    this.selectedEmail = email;
-    this.dashboardChanges.next(email);
+    if (this.isDashboardInit) {
+      this.router.navigate(['diffs'], { queryParams: { email: email } });
+      this.selectedEmail = email;
+      this.dashboardChanges.next(email);
+    }
+  }
+
+  isDashboardInit(): boolean {
+    return this.uniqueUsers.length > 0;
   }
 
   private addUniqueUser(email: string): void {
     if (email && this.uniqueUsers.indexOf(email) === -1) {
       this.uniqueUsers.push(email);
     }
+  }
+
+  refresh(): void {
+    this.uniqueUsers = [];
   }
 }

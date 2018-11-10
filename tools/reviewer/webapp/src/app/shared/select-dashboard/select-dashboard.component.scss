@@ -1,0 +1,45 @@
+:host {
+  position: relative;
+  .dashboard-button {
+    cursor: pointer;
+    background: #d7efff;
+    padding: 0 18px;
+    border: solid 1px #979797;
+    font-size: 16px;
+    border-radius: 8px;
+    user-select: none;
+    height: 30px;
+    line-height: 0;
+  }
+  .dashboards {
+    top: 40px;
+    position: absolute;
+    background: white;
+    padding: 15px;
+    border: solid 2px #8c8c8c;
+    border-radius: 8px;
+    box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.5);
+    margin-top: 5px;
+    z-index: 2;
+    >.user {
+      >.mat-button {
+        width: 100%;
+      }
+    }
+    >speech-arrow {
+      $speech-arrow: 15px;
+      line-height: $speech-arrow;
+      top: -$speech-arrow;
+      left: 30px;
+      position: absolute;
+    }
+  }
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+  }
+}

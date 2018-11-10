@@ -2,9 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { FirebaseStateService, UserService } from '@/core';
 import { Diff, Reviewer } from '@/core/proto';
-import { SelectDashboardService } from './select-dashboard-popup';
+import { FirebaseStateService, SelectDashboardService, UserService } from '@/core/services';
 
 export enum DiffGroups {
   NeedAttention,
@@ -36,6 +35,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
   diffGroupNameList: string[] = [];
   onloadSubscription = new Subscription();
   changesSubscription = new Subscription();
+  dashboardSubscription = new Subscription();
 
   constructor(
     private firebaseStateService: FirebaseStateService,
@@ -52,7 +52,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
     this.diffGroupNameList[DiffGroups.Submitted] = 'Submitted Diffs';
 
     // When dashboard is changed or opened first time
-    this.selectDashboardService.dashboardChanges.subscribe(email => {
+    this.dashboardSubscription = this.selectDashboardService.dashboardChanges.subscribe(email => {
       this.loadDiffs(email);
     });
   }
@@ -97,6 +97,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
     this.diffGroups[DiffGroups.Pending] = [];
     this.diffGroups[DiffGroups.Submitted] = [];
 
+    this.selectDashboardService.refresh();
     for (const diff of diffs) {
       this.selectDashboardService.addUniqueUsers(diff);
 
@@ -183,5 +184,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.onloadSubscription.unsubscribe();
     this.changesSubscription.unsubscribe();
+    this.dashboardSubscription.unsubscribe();
+    this.selectDashboardService.refresh();
   }
 }
