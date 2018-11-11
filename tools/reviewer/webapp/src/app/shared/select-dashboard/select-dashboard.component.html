@@ -16,10 +16,12 @@
       bordercolor="#8c8c8c"
       [shadow]=[2,2,2,0.8]
     ></speech-arrow>
-    <div class="user" *ngFor="let email of selectDashboardService.uniqueUsers">
-      <button mat-button (click)="openDashboard(email)">
-        {{ userService.getUsername(email) }}
-      </button>
+    <div class="users">
+      <div class="user" *ngFor="let email of selectDashboardService.uniqueUsers">
+        <button mat-button (click)="openDashboard(email)">
+          {{ userService.getUsername(email) }}
+        </button>
+      </div>
     </div>
   </div>
   <div class="popup-overlay" (click)="hide()"></div>
