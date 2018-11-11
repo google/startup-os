@@ -34,6 +34,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+
 
 @AutoFactory
 public class GitRepo implements Repo {
@@ -207,6 +210,7 @@ public class GitRepo implements Repo {
   }
 
   private File.Action getAction(String changeType) {
+    // TODO: Add UU
     switch (changeType) {
       case "A":
         return File.Action.ADD;
@@ -218,6 +222,8 @@ public class GitRepo implements Repo {
         return File.Action.RENAME;
       case "M":
         return File.Action.MODIFY;
+      case "U":
+        return File.Action.MODIFY;
       case "AM":
         return File.Action.COPY;
       case "C":
@@ -225,7 +231,11 @@ public class GitRepo implements Repo {
       case "??":
         return File.Action.ADD;
       default:
-        throw new IllegalStateException("Unknown change type " + changeType);
+        if (changeType.length() > 1) {
+          return getAction(changeType.substring(0, 1));
+        } else {
+          throw new IllegalStateException("Unknown change type " + changeType);
+        }
     }
   }
 

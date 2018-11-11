@@ -92,7 +92,7 @@ public class TestTool {
     File rightFile =
         File.newBuilder()
             .setRepoId("startup-os")
-            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setCommitId("dbee600438f322e2db4085b4cd7a27212fe1ef40")
             .setFilename("WORKSPACE")
             .build();
     System.out.println(getTextDiff(leftFile, rightFile));
