@@ -208,19 +208,57 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
+    File file1 = req.getLeftFile();
+    File file2 = req.getRightFile();
+    if (!file1.getFilename().equals(file2.getFilename()) || !file1.getRepoId().equals(file2.getRepoId())
+        || !file1.getWorkspace().equals(file2.getWorkspace())) {
+      String message = "Files should have the same workspace, repo and filename:\n" + file1 + file2;
+      responseObserver.onError(
+          Status.NOT_FOUND
+              .withDescription(message)
+              .asException());
+      throw new IllegalArgumentException(message);
+    }
+    Repo repo = null;
+    if (file1.getWorkspace().isEmpty() || !workspaceExists(file1.getWorkspace())) {
+      // It's files in head
+      repo = getHeadRepo(file1.getRepoId());
+    } else {
+      // It's files in a workspace
+      if (file1.getUser().isEmpty()) {
+        // It's the current user
+        repo = repoFactory.create(fileUtils.joinToAbsolutePath(
+          basePath, "ws", file1.getWorkspace(), file1.getRepoId()));
+      } else {
+        // It's a different user. Currently not supported.
+        throw new UnsupportedOperationException("Not supporting different users");
+      }
+    }
+    if (repo == null) {
+      responseObserver.onError(
+          Status.NOT_FOUND
+              .withDescription(String.format("TextDiffRequest: %s", req))
+              .asException());
+      throw new IllegalStateException("Repo not found");
+    }
+    String wordDiffString = repo.getTextDiff(file1, file2, true);
+    System.out.println("YYYYYYYYYYYYYYYYYYYYYYYYYY");
+    System.out.println(wordDiffString);
+    System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZ");
+    // System.out.println(wordDiffString);
     try {
-      String leftFileContents = readTextFile(req.getLeftFile());
-      String rightFileContents = readTextFile(req.getRightFile());
+      String leftText = readTextFile(req.getLeftFile());
+      String rightText = readTextFile(req.getRightFile());
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .setTextDiff(textDifferencer.getTextDiff(leftFileContents, rightFileContents))
+              .setTextDiff(textDifferencer.getTextDiff2(leftText, rightText, wordDiffString))
               .build());
     } catch (IOException e) {
       responseObserver.onError(
           Status.NOT_FOUND
               .withDescription(String.format("TextDiffRequest: %s", req))
               .asException());
-    }
+    }  
     responseObserver.onCompleted();
   }
 

@@ -67,6 +67,8 @@ public interface Repo {
 
   boolean fileExists(String commitId, String path);
 
+  String getTextDiff(File file1, File file2, boolean wordDiff);
+
   String getFileContents(String commitId, String path);
   /* Get current branch name */
   String currentBranch();

@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
-
+import com.google.startupos.common.Strings;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+
 
 @AutoFactory
 public class GitRepo implements Repo {
@@ -103,6 +106,23 @@ public class GitRepo implements Repo {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
+    return result;
+  }
+
+  private CommandResult runCommand2(String command) {
+    CommandResult result = new CommandResult();
+    try {
+      List<String> fullCommand = new ArrayList<>(gitCommandBase);
+      fullCommand.addAll(Arrays.asList(command.split(" ")));
+      String[] fullCommandArray = fullCommand.toArray(new String[0]);
+      result.command = String.join(" ", fullCommand);    
+      ProcessBuilder builder = new ProcessBuilder(fullCommandArray);
+      builder.redirectErrorStream(true);
+      Process process = builder.start();
+      result.stdout = readLines(process.getInputStream());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }    
     return result;
   }
 
@@ -361,6 +381,32 @@ public class GitRepo implements Repo {
   @Override
   public String getFileContents(String commitId, String path) {
     return runCommand("--no-pager show " + commitId + ":" + path).stdout;
+  }
+
+  @Override
+  public String getTextDiff(File file1, File file2, boolean wordDiff) {
+    if (!file1.getFilename().equals(file2.getFilename()) || !file1.getRepoId().equals(file2.getRepoId())
+        || !file1.getWorkspace().equals(file2.getWorkspace())) {
+      throw new IllegalArgumentException(
+          "Files should have the same repo and filename:\n" + file1 + file2);
+    }
+    String wordDiffString = wordDiff ? "--word-diff=plain --word-diff-regex=\".\" " : "";
+    try {
+      System.setOut(new PrintStream(new FileOutputStream("/tmp/test.txt")));
+      CommandResult commandResult = runCommand2("diff --no-color --inter-hunk-context=1000000 " + wordDiffString + file1.getCommitId() + " " + file2.getCommitId() + " -- " + file1.getFilename());
+      String result = commandResult.stdout;
+
+      System.out.println("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+      System.out.println(commandResult.command);
+      System.out.println(result);
+      System.out.println(commandResult.stderr);
+      System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
+      // Remove first 5 lines, which are just header lines
+      return result.substring(Strings.ordinalIndexOf(result, "\n", 5) + 1);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   @Override

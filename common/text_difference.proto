@@ -56,3 +56,27 @@ message DiffPatchMatchChange {
   string replacing_text = 3;
   ChangeType type = 2;
 }
+
+message DiffTag {
+  /** Describes the type of the tag. */
+  enum Type {
+    // Unused.
+    TAG_TYPE_UNUSED = 0;
+
+    OPEN_ADD = 1;
+
+    CLOSE_ADD = 2;
+
+    OPEN_DELETE = 3;
+
+    CLOSE_DELETE = 4;
+  }
+  int32 index = 1;
+  Type type = 2;
+}
+
+// Intermediate proto for DiffPatchMatch change.
+message DiffLine {
+  string text = 1;
+  repeated DiffTag tag = 2;
+}

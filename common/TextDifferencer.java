@@ -18,22 +18,37 @@ package com.google.startupos.common;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.Protos.TextChange;
 import com.google.startupos.common.Protos.DiffPatchMatchChange;
+import com.google.startupos.common.Protos.DiffLine;
+import com.google.startupos.common.Protos.DiffTag;
+import com.google.startupos.common.repo.Protos.File;
 import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.lang.Math;
 import java.lang.StringBuilder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /** Text differencer for finding the diff between 2 text documents. */
 public class TextDifferencer {
+  private static final String DIFF_TAGS_REGEX = "(\\{\\+|\\+\\}|\\[\\-|\\-\\])";
+  private static final Pattern DIFF_TAGS_PATTERN = Pattern.compile(DIFF_TAGS_REGEX);
+  static final Map<String, DiffTag.Type> TAG_MAP = ImmutableMap.of(
+    "{+", DiffTag.Type.OPEN_ADD,
+    "+}", DiffTag.Type.CLOSE_ADD,
+    "[-", DiffTag.Type.OPEN_DELETE,
+    "-]", DiffTag.Type.CLOSE_DELETE
+  );
 
   @Inject
   public TextDifferencer() {}
@@ -225,6 +240,123 @@ public class TextDifferencer {
         .setStartIndex(lineIndex - text.length())
         .setEndIndex(lineIndex)
         .build();
+  }
+
+  private boolean isOpen(DiffTag tag) {
+    return (tag.getType() == DiffTag.Type.OPEN_ADD || tag.getType() == DiffTag.Type.OPEN_DELETE);
+  }
+
+  private boolean isClose(DiffTag tag) {
+    return (tag.getType() == DiffTag.Type.CLOSE_ADD || tag.getType() == DiffTag.Type.CLOSE_DELETE);
+  }
+
+  private boolean isAdd(DiffTag tag) {
+    return (tag.getType() == DiffTag.Type.OPEN_ADD || tag.getType() == DiffTag.Type.CLOSE_ADD);
+  }
+
+  private boolean isDelete(DiffTag tag) {
+    return (tag.getType() == DiffTag.Type.OPEN_DELETE || tag.getType() == DiffTag.Type.CLOSE_DELETE);
+  }
+
+  private boolean tagsBothAddOrBothDelete(DiffTag tag1, DiffTag tag2) {
+    return ((isAdd(tag1) && isAdd(tag2)) || (isDelete(tag1) && isDelete(tag2)));
+  }
+
+  // Is this whole line a single change, with no characters unchanged?
+  private boolean isFullLineChange(DiffLine diffLine) {
+    return diffLine.getTagList().size() == 2 && diffLine.getTagList().get(0).getIndex() == 0 && diffLine.getTagList().get(1).getIndex() == diffLine.getText().length();
+  }  
+
+  private DiffLine getDiffLine(String diffLineString) {
+    // We assume original code does not have the escape sequences {+,+},{-,-}
+    DiffLine.Builder result = DiffLine.newBuilder();
+    result.setText(diffLineString.replaceAll(DIFF_TAGS_REGEX, ""));
+    Matcher matcher = DIFF_TAGS_PATTERN.matcher(diffLineString);
+    int matchedTags = 0;
+    while (matcher.find()) {
+      // We correct the index to the index of the string without the tags.
+      int tagIndex = matcher.start() - matchedTags * 2;
+      result.addTag(DiffTag.newBuilder().setIndex(tagIndex).setType(TAG_MAP.get(matcher.group())).build());
+      matchedTags += 1;
+    }
+    DiffLine diffLine = result.build();
+    // Validate diffLine:
+    validateDiffLine(diffLine);
+    return diffLine;
+  }
+
+  private void validateDiffLine(DiffLine diffLine) {
+    if (diffLine.getTagList().size() % 2 == 1) {
+      throw new IllegalStateException("Line should have an even number of tags");
+    }
+    for (int i = 0; i < diffLine.getTagList().size(); i++) {
+      DiffTag tag = diffLine.getTagList().get(i);
+      if (i % 2 == 0 && isClose(tag)) {
+        throw new IllegalStateException(
+            "Even tags should be open, but tag " + i + " is " + tag.getType() + " for line:\n" + diffLine);
+      }
+      if (i % 2 == 1 && isOpen(tag)) {
+        throw new IllegalStateException(
+            "Even tags should be close, but tag " + i + " is " + tag.getType() + " for line:\n" + diffLine);
+      }  
+      if (i % 2 == 1 && i > 0) {
+        DiffTag prevTag = diffLine.getTagList().get(i - 1);
+        if (!tagsBothAddOrBothDelete(prevTag, tag)) {
+          throw new IllegalStateException(
+            "Tags at " + (i - 1) + " and " + i + " should both be ADD or DELETE, but are " + prevTag.getType() + " and " + tag.getType() + " for line:\n" + diffLine);
+        }
+      }
+    }
+  }
+
+  public TextDiff getTextDiff2(String leftText, String rightText, String gitTextWordDiff) {
+    if (leftText.matches(DIFF_TAGS_REGEX)) {
+      throw new IllegalArgumentException("Left text should not contain {+,+},{-,-}");
+    }
+    if (rightText.matches(DIFF_TAGS_REGEX)) {
+      throw new IllegalArgumentException("Right text should not contain {+,+},{-,-}");
+    }
+    TextDiff.Builder result = TextDiff.newBuilder();
+    int lineNumber = 0;
+    for (String line : gitTextWordDiff.split("\n")) {
+      DiffLine diffLine = getDiffLine(line);
+      System.out.println("OOOOOOOOOOOOOOOOOOOOOOOOOOOO\n" + diffLine);
+      // Counters for add and delete segments, to corrent indices
+      int addCharCount = 0;
+      int deleteCharCount = 0;
+      for (int i = 0; i < diffLine.getTagList().size(); i += 2) {
+        DiffTag tag1 = diffLine.getTagList().get(i);
+        DiffTag tag2 = diffLine.getTagList().get(i + 1);
+        String text = diffLine.getText().substring(tag1.getIndex(), tag2.getIndex());
+        ChangeType type = isAdd(tag1) ? ChangeType.ADD : ChangeType.DELETE;
+        // index is relative to text, which includes both ADD and DELETE segments. We use the
+        // offset to correct the index for an ADD-only or DELETE-only string.
+        int indexOffset = isAdd(tag1) ? deleteCharCount : addCharCount;
+        TextChange change = TextChange.newBuilder()
+            .setText(text)
+            .setType(type)
+            .setLineNumber(lineNumber)
+            .setStartIndex(tag1.getIndex() - indexOffset)
+            .setEndIndex(tag2.getIndex() - indexOffset)
+            .build();
+        if (type == ChangeType.ADD) {
+          result.addRightChange(change);
+          addCharCount += change.getText().length();
+        } else {
+          result.addLeftChange(change);
+          deleteCharCount += change.getText().length();
+        }
+        
+      }
+      lineNumber++;
+    }
+
+    result.setLeftFileContents(leftText)
+        .setRightFileContents(rightText)
+        .build();
+    System.out.println("*************** TEXT DIFF **************");
+    System.out.println(result);
+    return result.build();
   }
 
   public TextDiff getTextDiff(String leftContents, String rightContents) {

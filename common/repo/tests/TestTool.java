@@ -37,6 +37,7 @@ public class TestTool {
 
   void run(String[] args) {
     if (args.length > 0) {
+      System.out.println("XXXXXXXXXXXXXX args[0]: " + args[0]);
       String command = args[0];
       Repo repo = repoFactory.create(System.getenv("BUILD_WORKSPACE_DIRECTORY"));
       switch (command) {
@@ -89,6 +90,12 @@ public class TestTool {
           for (String branch : repo.listBranches()) {
             System.out.println(branch);
           }
+          break;
+        case "getTextDiff":
+          System.out.println("XXXXXXXXXXXXXX args[1]: " + args[1]);
+          File file1 = File.newBuilder().setCommitId(args[1]).setFilename("tools/aa/AaModule.java").build();
+          File file2 = File.newBuilder().setCommitId(args[2]).setFilename("tools/aa/AaModule.java").build();
+          System.out.println(repo.getTextDiff(file1, file2, true));
           break;
         default:
           System.out.println("Unknown command");
