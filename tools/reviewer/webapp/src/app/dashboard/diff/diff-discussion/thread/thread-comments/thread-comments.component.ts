@@ -8,11 +8,11 @@ import { DeleteCommentDialogComponent } from '../../delete-comment-dialog';
 import { ThreadState, ThreadStateService } from '../thread-state.service';
 
 @Component({
-  selector: 'thread-comment',
-  templateUrl: './thread-comment.component.html',
-  styleUrls: ['./thread-comment.component.scss'],
+  selector: 'thread-comments',
+  templateUrl: './thread-comments.component.html',
+  styleUrls: ['./thread-comments.component.scss'],
 })
-export class ThreadCommentComponent implements OnDestroy {
+export class ThreadCommentsComponent implements OnDestroy {
   isCommentOpenMap: boolean[] = [];
   isCommentEditingMap: boolean[] = [];
   isMenuVisibleMap: boolean[] = [];

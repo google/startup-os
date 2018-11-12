@@ -45,7 +45,12 @@ export class ThreadReplyComponent {
   // Updates state after rebuilding template
   getState(): void {
     this.state = this.threadStateService.threadStateMap[this.thread.getId()];
-    if (this.state && this.state.isReply && this.state.isResolved && this.state.newComment) {
+    if (
+      this.state &&
+      this.state.isReply !== undefined &&
+      this.state.isResolved !== undefined &&
+      this.state.newComment !== undefined
+    ) {
       this.isReply = this.state.isReply;
       this.setResolveCheckbox(this.state.isResolved);
       this.textarea.setValue(this.state.newComment, { emitEvent: false });
@@ -64,7 +69,6 @@ export class ThreadReplyComponent {
     this.state.isReply = this.isReply;
     this.state.isResolved = this.resolvedCheckbox.value;
     this.state.newComment = this.textarea.value;
-
     this.threadStateService.threadStateMap[this.thread.getId()] = this.state;
   }
 

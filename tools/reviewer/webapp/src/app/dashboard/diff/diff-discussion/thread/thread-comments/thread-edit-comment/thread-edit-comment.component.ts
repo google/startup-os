@@ -53,7 +53,10 @@ export class ThreadEditCommentComponent implements OnInit {
   // Updates state after rebuilding template
   getState(): void {
     this.state = this.threadStateService.threadStateMap[this.thread.getId()];
-    if (this.state && this.state.editComments[this.commentIndex]) {
+    if (
+      this.state &&
+      this.state.editComments[this.commentIndex] !== undefined
+    ) {
       this.textarea.setValue(this.state.editComments[this.commentIndex], { emitEvent: false });
     } else {
       // Default values:
