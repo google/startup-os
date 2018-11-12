@@ -17,7 +17,6 @@
       >.email-input {
         margin-bottom: 18px;
         input {
-          width: 300px;
           height: 30px;
           padding: 0 8px;
           border-radius: 8px;
@@ -33,6 +32,9 @@
         display: flex;
         >.blue-button {
           margin-left: 10px;
+        }
+        .mat-button {
+          width: 150px;
         }
       }
       >.error-message {

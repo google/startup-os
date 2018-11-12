@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 
 import { UserService } from '@/core';
-import { SelectDashboardService } from './select-dashboard.service';
+import { SelectDashboardService } from '@/core/services';
 
 @Component({
-  selector: 'select-dashboard-popup',
-  templateUrl: './select-dashboard-popup.component.html',
-  styleUrls: ['./select-dashboard-popup.component.scss'],
+  selector: 'select-dashboard',
+  templateUrl: './select-dashboard.component.html',
+  styleUrls: ['./select-dashboard.component.scss'],
 })
-export class SelectDashboardPopupComponent {
+export class SelectDashboardComponent {
   isVisible: boolean = false;
 
   constructor(
@@ -27,9 +27,5 @@ export class SelectDashboardPopupComponent {
   openDashboard(email: string): void {
     this.selectDashboardService.selectDashboard(email);
     this.hide();
-  }
-
-  home(): void {
-    this.openDashboard(this.userService.email);
   }
 }

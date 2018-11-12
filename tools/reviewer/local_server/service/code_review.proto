@@ -128,4 +128,5 @@ message Comment {
   string content = 1;
   int64 timestamp = 2;
   string created_by = 3;
+  bool is_modified = 4;
 }

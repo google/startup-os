@@ -9,6 +9,7 @@ export * from './localserver.service';
 export * from './exception.service';
 export * from './diff-update.service';
 export * from './user.service';
+export * from './select-dashboard.service';
 
 // Services
 import { AuthGuard } from './auth.guard';
@@ -21,6 +22,7 @@ import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { LocalserverService } from './localserver.service';
 import { NotificationService } from './notification.service';
+import { SelectDashboardService } from './select-dashboard.service';
 import { UserService } from './user.service';
 export const ServiceList = [
   AuthGuard,
@@ -34,4 +36,5 @@ export const ServiceList = [
   ExceptionService,
   DiffUpdateService,
   UserService,
+  SelectDashboardService,
 ];

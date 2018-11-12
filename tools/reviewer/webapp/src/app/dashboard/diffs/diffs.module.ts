@@ -4,7 +4,6 @@ import { SharedModule } from '@/shared';
 
 import { DiffsRoutingModule } from './diffs-routing.module';
 import { DiffsComponent } from './diffs.component';
-import { SelectDashboardPopupComponent, SelectDashboardService } from './select-dashboard-popup';
 
 @NgModule({
   imports: [
@@ -13,9 +12,7 @@ import { SelectDashboardPopupComponent, SelectDashboardService } from './select-
   ],
   declarations: [
     DiffsComponent,
-    SelectDashboardPopupComponent,
   ],
-  providers: [SelectDashboardService],
-  entryComponents: [SelectDashboardPopupComponent],
+  providers: [],
 })
 export class DiffsModule { }

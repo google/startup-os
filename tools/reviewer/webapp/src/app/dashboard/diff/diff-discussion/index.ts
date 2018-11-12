@@ -10,12 +10,12 @@ import { CodeThreadsComponent } from './code-threads';
 import { DeleteCommentDialogComponent } from './delete-comment-dialog';
 import { DiffDiscussionComponent } from './diff-discussion.component';
 import { DiffThreadsComponent } from './diff-threads';
-import { ThreadComponent } from './thread';
+import { ThreadComponentComponentList } from './thread';
 export const DiffDiscussionComponentList = [
   DiffDiscussionComponent,
   CodeThreadsComponent,
   DiffThreadsComponent,
-  ThreadComponent,
+  ...ThreadComponentComponentList,
   DeleteCommentDialogComponent,
 ];
 

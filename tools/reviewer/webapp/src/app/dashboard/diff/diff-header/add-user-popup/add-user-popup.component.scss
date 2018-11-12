@@ -6,7 +6,7 @@
     left: -$left;
     >.user-popup {
       $speech-arrow: 15px;
-      margin-top: 15px;
+      margin-top: $speech-arrow;
       position: relative;
       z-index: 2;
       background: white;

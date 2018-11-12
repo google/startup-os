@@ -1,8 +1,6 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
 
 import { Diff, Thread } from '@/core/proto';
-import { DiffUpdateService } from '@/core/services';
 import { DiscussionService } from '../discussion.service';
 
 // The component implements diff threads on diff page.
@@ -14,52 +12,35 @@ import { DiscussionService } from '../discussion.service';
   providers: [DiscussionService],
 })
 export class DiffThreadsComponent implements OnInit, OnChanges {
-  displayedColumns: string[] = ['discussions'];
-  threadsSource: MatTableDataSource<Thread>;
+  threadList: Thread[] = [];
 
   @Input() threads: Thread[];
   @Input() diff: Diff;
 
-  constructor(
-    private diffUpdateService: DiffUpdateService,
-    public discussionService: DiscussionService,
-  ) { }
+  constructor(public discussionService: DiscussionService) { }
 
   ngOnInit() {
     this.initThreads();
   }
 
   ngOnChanges() {
-   if (this.threadsSource) {
+   if (this.threadList) {
      this.refreshThreads();
    }
   }
 
   private initThreads(): void {
-    const threads: Thread[] = this.threads.slice();
-    this.discussionService.sortThreads(threads);
-    this.threadsSource = new MatTableDataSource(threads);
+    this.threadList = this.threads.slice();
+    this.discussionService.sortThreads(this.threadList);
   }
 
   private refreshThreads(): void {
-    if (this.threadsSource.data.length === this.threads.length) {
+    if (this.threadList.length === this.threads.length) {
       // Links update
       this.discussionService.refreshThreads(this.threads);
     } else {
       // Re-build template. Each thread component will be recreated.
       this.initThreads();
     }
-  }
-
-  addComment(): void {
-    this.diffUpdateService.addComment(this.diff);
-  }
-
-  resolveThread(isChecked: boolean): void {
-    this.diffUpdateService.resolveThread(this.diff, isChecked);
-  }
-
-  deleteComment(isDeleteThread: boolean): void {
-    this.diffUpdateService.deleteComment(this.diff, isDeleteThread);
   }
 }
