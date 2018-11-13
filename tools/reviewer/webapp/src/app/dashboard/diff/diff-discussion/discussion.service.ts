@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
 
 import { Thread } from '@/core/proto';
-import { ThreadStateService } from './thread';
 
 // Methods, which can be reused in code and diff thread components
 @Injectable()
 export class DiscussionService {
-  constructor(private threadStateService: ThreadStateService) { }
-
   compareLastTimestamps(a: Thread, b: Thread): number {
     const aLastIndex: number = a.getCommentList().length - 1;
     const bLastIndex: number = b.getCommentList().length - 1;
@@ -40,15 +37,5 @@ export class DiscussionService {
     return threads
       .filter(thread => !thread.getIsDone())
       .length;
-  }
-
-  // If new thread wasn't added or a thread wasn't deleted then make "links update".
-  // Link update means content of each thread will be refreshed, but general threads
-  // structure will remain the same.
-  refreshThreads(threads: Thread[]): void {
-    threads.forEach(thread => {
-      this.threadStateService.updateThreadLink(thread);
-    });
-    this.threadStateService.updateThreadsContent();
   }
 }

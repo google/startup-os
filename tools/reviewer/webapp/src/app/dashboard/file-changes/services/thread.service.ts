@@ -95,12 +95,4 @@ export class ThreadService {
 
     return newThread;
   }
-
-  deleteComment(isDeleteThread: boolean): void {
-    this.diffUpdateService.deleteComment(this.stateService.diff, isDeleteThread);
-  }
-
-  resolveThread(isDone: boolean): void {
-    this.diffUpdateService.resolveThread(this.stateService.diff, isDone);
-  }
 }

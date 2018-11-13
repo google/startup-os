@@ -7,12 +7,15 @@
   }"
   *ngFor="let comment of thread.getCommentList(); let commentIndex = index;"
 >
-  <div class="header" (click)="openComment(commentIndex)">
+  <div class="header" (click)="expandComment(comment)">
     <!-- Username and date of the comment -->
     <div class="username ellipsis">
       <span>{{ getUsername(comment) }}</span>
     </div>
-    <div class="time" *ngIf="isCommentOpenMap[commentIndex] || isCommentEditingMap[commentIndex]">
+    <div
+      class="time"
+      *ngIf="commentExpandedMap[comment.getId()] || isCommentEditingMap[commentIndex]"
+    >
       <span>{{ comment.getTimestamp() | date:'h:mm a, MMM d' }}</span>
     </div>
   </div>
@@ -22,22 +25,24 @@
       <div
         class="message"
         [ngClass]="{
-          'ellipsis': !isCommentOpenMap[commentIndex]
+          'ellipsis': !commentExpandedMap[comment.getId()]
         }"
-        (click)="openComment(commentIndex)"
+        (click)="expandComment(comment)"
         fxFlex
       >
         <span>{{ comment.getContent() }}</span>
-        <span class="edited" *ngIf="isCommentOpenMap[commentIndex] && isModified(commentIndex)">
+        <span
+          class="edited"
+          *ngIf="commentExpandedMap[comment.getId()] && isModified(commentIndex)"
+        >
           (Edited)
         </span>
       </div>
       <!-- Buttons to delete/edit the comment -->
       <comment-menu
-        [isMenuVisible]="isMenuVisibleMap[commentIndex]"
         (editEmitter)="editComment(commentIndex)"
         (deleteEmitter)="deleteComment(commentIndex)"
-        (toggleEmitter)="saveMenuState(commentIndex, $event)"
+        (toggleEmitter)="saveMenuState($event)"
       ></comment-menu>
     </div>
     <thread-edit-comment

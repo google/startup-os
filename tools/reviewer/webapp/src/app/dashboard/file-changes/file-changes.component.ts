@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { UserService } from '@/core/services';
 import { CommitSelectService } from './commit-select';
 import {
   CommitService,
@@ -33,6 +34,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
     private extensionService: ExtensionService,
     public commitService: CommitService,
     public commitSelectService: CommitSelectService,
+    public userService: UserService,
   ) {
     this.stateService.isLoading = true;
     this.stateService.isCommitFound = true;
@@ -60,6 +62,10 @@ export class FileChangesComponent implements OnInit, OnDestroy {
       // Load changes from local server
       this.loadService.loadDiff(this.stateService.diffId);
     });
+  }
+
+  getAuthor(): string {
+    return this.userService.getUsername(this.stateService.diff.getAuthor().getEmail());
   }
 
   ngOnDestroy() {

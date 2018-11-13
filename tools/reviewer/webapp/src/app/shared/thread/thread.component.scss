@@ -1,0 +1,9 @@
+@import './index';
+
+.thread {
+  $border-width: 1px;
+  border-radius: $border-radius + $border-width;
+  max-width: 1400px;
+  border: $border-width solid $border-color;
+  margin: 0 22px;
+}

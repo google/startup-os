@@ -18,8 +18,8 @@ export class CommentMenuComponent {
   }
 
   edit(): void {
-    this.toggle();
     this.editEmitter.emit();
+    this.toggle();
   }
 
   delete(): void {

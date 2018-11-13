@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { Diff } from '@/core/proto';
-import { ThreadState, ThreadStateService } from './thread';
+import { ThreadStateService } from './thread-state.service';
 
 // The component implements UI of discussions of a diff
 // How it looks: https://i.imgur.com/p7YnDl8.jpg
@@ -15,22 +15,17 @@ export class DiffDiscussionComponent {
 
   @Input() diff: Diff;
 
-  constructor(private threadStateService: ThreadStateService) {
-    this.threadStateService.reset();
+  constructor(private threadStateService: ThreadStateService) { }
 
-    this.threadStateService.openCommentChanges.subscribe(() => {
-      this.isExpanded = true;
-    });
+  // Changes "Expand" button to "Collapse", when at least one comment is expanded
+  commentExpanded(): void {
+    this.isExpanded = true;
   }
 
-  // Expand or collapse threads
+  // Expands or collapses all threads
   toggleComments(): void {
     this.isExpanded = !this.isExpanded;
-    for (const id in this.threadStateService.threadStateMap) {
-      const threadState: ThreadState = this.threadStateService.threadStateMap[id];
-      threadState.isCommentOpenMap = threadState.isCommentOpenMap.map(() => this.isExpanded);
-    }
-    this.threadStateService.updateState();
+    this.threadStateService.toggle(this.isExpanded);
   }
 
   isThreadExist(): boolean {

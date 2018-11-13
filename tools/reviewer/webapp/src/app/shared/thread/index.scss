@@ -7,7 +7,6 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
 .comment {
   display: flex;
   padding: 7px 19px 7px 11px;
-  border-bottom: 1px solid $hr-color;
   >.header {
     width: 132px;
     margin-right: 10px;
@@ -23,16 +22,14 @@ $bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
   background: #86d1ff;
 }
 textarea {
-  $padding: 14px;
-  resize: none;
-  width: calc(100% - 2*$padding);
-  padding: 8px $padding;
+  padding: 8px 14px 0 14px;
   font-size: 14px;
   background: white;
   vertical-align: bottom;
   margin-bottom: 10px;
   border-radius: 8px;
   outline: none;
+  resize: none;
   &:focus {
     box-shadow: 0 0 0 1px #FF7300;
   }

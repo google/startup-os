@@ -13,6 +13,7 @@ import { PageLoadingComponent } from './page-loading';
 import { PipeList } from './pipes';
 import { SelectDashboardComponent } from './select-dashboard';
 import { SpeechArrowComponent } from './speech-arrow';
+import { DeleteCommentDialogComponent, ThreadComponentComponentList } from './thread';
 import { ToolbarComponent } from './toolbar';
 
 const Declarations = [
@@ -21,6 +22,7 @@ const Declarations = [
   ToolbarComponent,
   SpeechArrowComponent,
   SelectDashboardComponent,
+  ...ThreadComponentComponentList,
   ...PipeList,
   ...DirectiveList,
 ];
@@ -45,5 +47,6 @@ const Modules = [
     ...Declarations,
     ...Modules,
   ],
+  entryComponents: [DeleteCommentDialogComponent],
 })
 export class SharedModule { }
