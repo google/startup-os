@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { AuthService, FirebaseStateService } from '@/core';
 import { Diff, Reviewer } from '@/core/proto';
+import { FirebaseStateService, SelectDashboardService, UserService } from '@/core/services';
 
 export enum DiffGroups {
   NeedAttention,
@@ -35,11 +35,13 @@ export class DiffsComponent implements OnInit, OnDestroy {
   diffGroupNameList: string[] = [];
   onloadSubscription = new Subscription();
   changesSubscription = new Subscription();
+  dashboardSubscription = new Subscription();
 
   constructor(
     private firebaseStateService: FirebaseStateService,
-    private authService: AuthService,
+    private userService: UserService,
     private router: Router,
+    private selectDashboardService: SelectDashboardService,
   ) {
     this.diffGroupNameList[DiffGroups.NeedAttention] = 'Need Attention';
     this.diffGroupNameList[DiffGroups.Incoming] = 'Incoming Diffs';
@@ -48,6 +50,11 @@ export class DiffsComponent implements OnInit, OnDestroy {
     this.diffGroupNameList[DiffGroups.Draft] = 'Draft Diffs';
     this.diffGroupNameList[DiffGroups.Pending] = 'Pending Diffs';
     this.diffGroupNameList[DiffGroups.Submitted] = 'Submitted Diffs';
+
+    // When dashboard is changed or opened first time
+    this.dashboardSubscription = this.selectDashboardService.dashboardChanges.subscribe(email => {
+      this.loadDiffs(email);
+    });
   }
 
   ngOnInit() {
@@ -57,10 +64,10 @@ export class DiffsComponent implements OnInit, OnDestroy {
 
     if (urlEmail) {
       // Show the page from a view of the user from url.
-      this.loadDiffs(urlEmail);
+      this.selectDashboardService.selectDashboard(urlEmail);
     } else {
       // Show the page from current login view.
-      this.loadDiffs(this.authService.userEmail);
+      this.selectDashboardService.selectDashboard(this.userService.email);
     }
   }
 
@@ -90,7 +97,10 @@ export class DiffsComponent implements OnInit, OnDestroy {
     this.diffGroups[DiffGroups.Pending] = [];
     this.diffGroups[DiffGroups.Submitted] = [];
 
+    this.selectDashboardService.refresh();
     for (const diff of diffs) {
+      this.selectDashboardService.addUniqueUsers(diff);
+
       if (diff.getAuthor().getEmail() === userEmail) {
         // Current user is an author of the diff
         switch (diff.getStatus()) {
@@ -156,14 +166,25 @@ export class DiffsComponent implements OnInit, OnDestroy {
     this.router.navigate(['diff/', diffId]);
   }
 
-  getUsernames(reviewerList: Reviewer[]): string {
-    return reviewerList
-      .map(reviewer => this.authService.getUsername(reviewer.getEmail()))
-      .join(', ');
+  getUsername(reviewer: Reviewer, index: number, diff: Diff): string {
+    let username: string = this.userService.getUsername(reviewer.getEmail());
+    if (index < diff.getReviewerList().length - 1) {
+      username += ', ';
+    }
+    return username;
+  }
+
+  getModifiedBy(diff: Diff): string {
+    const username: string = this.userService.getUsername(diff.getModifiedBy());
+    if (username) {
+      return 'by ' + username;
+    }
   }
 
   ngOnDestroy() {
     this.onloadSubscription.unsubscribe();
     this.changesSubscription.unsubscribe();
+    this.dashboardSubscription.unsubscribe();
+    this.selectDashboardService.refresh();
   }
 }

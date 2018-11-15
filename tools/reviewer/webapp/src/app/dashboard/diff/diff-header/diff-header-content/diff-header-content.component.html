@@ -6,66 +6,77 @@
   <div class="info" fxFlex="50%">
     <table>
       <!-- Reviewer List -->
-      <tr
-        (mouseover)="isReviewersHovered = true"
-        (mouseleave)="isReviewersHovered = false"
-      >
+      <tr>
         <td>Reviewers</td>
         <td>
-          <user-popup
-            *ngFor="let reviewer of diff.getReviewerList()"
-            [email]="reviewer.getEmail()"
-            [isAttentionRequired]="reviewer.getNeedsAttention()"
-            [isChangeAttention]="true"
-            (changeAttentionEmitter)="changeAttention($event)"
-            [isRemoveFromList]="true"
-            (removeFromListEmitter)="removeFromReviewerList($event)"
-          ><span [ngClass]="{
-            'bold': reviewer.getNeedsAttention(),
-            'approved': reviewer.getApproved()
-          }">
-            {{ authService.getUsername(reviewer.getEmail()) }}
-          </span></user-popup>
-        </td>
-        <td class="add-button">
-          <img
-            src="/assets/ic-add-person.svg"
-            (click)="addReviewer()"
-            *ngIf="isReviewersHovered"
-            draggable="false"
-          >
+          <div>
+            <user-popup
+              *ngFor="let reviewer of diff.getReviewerList()"
+              [email]="reviewer.getEmail()"
+              [isAttentionRequired]="reviewer.getNeedsAttention()"
+              [isChangeAttention]="true"
+              (changeAttentionEmitter)="changeAttention($event)"
+              [isRemoveFromList]="true"
+              (removeFromListEmitter)="removeFromReviewerList($event)"
+            ><span [ngClass]="{
+              'bold': reviewer.getNeedsAttention(),
+              'approved': reviewer.getApproved()
+            }">
+              {{ userService.getUsername(reviewer.getEmail()) }}
+            </span></user-popup>
+
+            <!-- Add Reviewer button -->
+            <add-user-popup class="add-button" (returnEmailEmitter)="addReviewer($event)"><img
+              src="/assets/ic-add-person.svg"
+              draggable="false"
+            ></add-user-popup>
+          </div>
         </td>
       </tr>
 
       <!-- CC List -->
-      <tr
-        (mouseover)="isCCHovered = true"
-        (mouseleave)="isCCHovered = false"
-      >
+      <tr>
         <td>CC</td>
         <td>
-          <user-popup
-            *ngFor="let email of diff.getCcList()"
-            [email]="email"
-            [isRemoveFromList]="true"
-            (removeFromListEmitter)="removeFromCcList($event)"
-          ><span>{{ authService.getUsername(email) }}</span></user-popup>
-        </td>
-        <td class="add-button">
-          <img
-            src="/assets/ic-add-person.svg"
-            (click)="addCC()"
-            *ngIf="isCCHovered"
-            draggable="false"
-          >
+          <div>
+            <user-popup
+              *ngFor="let email of diff.getCcList()"
+              [email]="email"
+              [isRemoveFromList]="true"
+              (removeFromListEmitter)="removeFromCcList($event)"
+            ><span>{{ userService.getUsername(email) }}</span></user-popup>
+
+            <!-- Add CC button -->
+            <add-user-popup class="add-button" (returnEmailEmitter)="addCC($event)"><img
+              src="/assets/ic-add-person.svg"
+              draggable="false"
+            ></add-user-popup>
+          </div>
         </td>
       </tr>
 
-      <!-- Text info -->
+      <!-- Issue List -->
       <tr>
-        <td>Bug</td>
-        <td>{{ diff.getBug() }}</td>
+        <td>Issues</td>
+        <td>
+          <div>
+            <user-popup
+              *ngFor="let issue of diff.getIssueList()"
+              [email]="issue"
+              [isRemoveFromList]="true"
+              (removeFromListEmitter)="removeIssue($event)"
+            ><a [href]="issue">{{ getIssueNumber(issue) }}</a></user-popup>
+            
+            <!-- Add Issue button -->
+            <add-issue-popup class="add-button" (returnEmailEmitter)="addIssue($event)"><img
+              src="/assets/ic-add-issue.svg"
+              draggable="false"
+            ></add-issue-popup>
+          </div>
+        </td>
       </tr>
+
+      <!-- Issues and Date -->
       <tr>
         <td>Workspace</td>
         <td>{{ diff.getWorkspace() }}</td>

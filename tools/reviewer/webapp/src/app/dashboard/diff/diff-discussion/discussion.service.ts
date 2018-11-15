@@ -23,10 +23,16 @@ export class DiscussionService {
     threads.sort((a, b) => this.compareLastTimestamps(a, b));
   }
 
+  getConversationLabel(length: number): string {
+    // Example: 6 conversations
+    const conversations: string = (length > 1) ? 'conversations' : 'conversation';
+    return length + ' ' + conversations;
+  }
+
   // Get text of header of threads
   getHeader(threads: Thread[]): string {
-    const conversations: string = (threads.length > 1) ? 'conversations' : 'conversation';
-    return `(${threads.length} ${conversations}, ` +
+    // Example: (6 conversations, 3 unresolved)
+    return `(${this.getConversationLabel(threads.length)}, ` +
       `${this.getUnresolvedThreads(threads)} unresolved)`;
   }
 

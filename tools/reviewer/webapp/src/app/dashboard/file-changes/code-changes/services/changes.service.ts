@@ -177,16 +177,19 @@ export class ChangesService {
   }
 
   addPlaceholders(textChanges: TextChange[], blockLines: BlockLine[]): void {
+    let previousLineNumber: number = 0;
     textChanges.forEach(textChange => {
       if (textChange.getType() === ChangeType.LINE_PLACEHOLDER) {
         // Add placeholder
         blockLines.splice(
           // LineNumber + 1 because we want to add placeholder after the line
-          textChange.getLineNumber() + 1,
+          previousLineNumber + 1,
           0,
           this.lineService.createPlaceholder(),
         );
-        // TODO: to use placeholderLineCount ?
+      } else {
+        // Remember number of the line to know where to put next placeholder
+        previousLineNumber = textChange.getLineNumber();
       }
     });
   }

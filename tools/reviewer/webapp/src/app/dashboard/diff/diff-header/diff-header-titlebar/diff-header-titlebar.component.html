@@ -21,10 +21,19 @@
       class="cr-light-button orange-button"
       (click)="clickReplyButton()"
     >Reply</button>
-    <button
-      mat-button
-      class="cr-light-button sky-button"
-      [disabled]="true"
-    >Submit</button>
+    <ng-container *ngIf="isAuthor()">
+      <button
+        mat-button
+        class="cr-light-button sky-button"
+        *ngIf="isDraft()"
+        (click)="startReview()"
+      >Start Review</button>
+      <button
+        mat-button
+        class="cr-light-button sky-button"
+        *ngIf="!isDraft()"
+        (click)="submit()"
+      >Submit</button>
+    </ng-container>
   </div>
 </div>

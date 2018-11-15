@@ -10,7 +10,6 @@
     color: #d7efff;
     font-size: 25px;
     font-weight: bold;
-    margin-right: 30px;
     cursor: pointer;
     outline: none;
     user-select: none;
@@ -20,6 +19,9 @@
       height: $size;
       width: $size;
     }
+  }
+  >select-dashboard {
+    margin: 0 20px;
   }
   >.search {
     height: 33px;

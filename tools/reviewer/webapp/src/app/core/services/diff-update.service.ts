@@ -14,7 +14,7 @@ export class DiffUpdateService {
     private notificationService: NotificationService,
   ) { }
 
-  addComment(diff: Diff): void {
+  saveComment(diff: Diff): void {
     this.customUpdate(diff, 'Comment is saved in firebase');
   }
 
@@ -73,5 +73,9 @@ export class DiffUpdateService {
       this.notificationService.success('Diff is deleted');
       this.router.navigate(['/diffs']);
     });
+  }
+
+  updateIssueList(diff: Diff): void {
+    this.customUpdate(diff, 'Issues are updated');
   }
 }
