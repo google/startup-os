@@ -16,32 +16,31 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestReviewRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.DeleteIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.DeleteReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.EditIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.EditReviewCommentRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Review;
-
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 
 /**
  * Writes `tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest` to GitHub using GitHub API
  */
 public class GithubWriter {
   private final GithubClient githubClient;
+  private final String reviewerUrl;
 
-  GithubWriter(GithubClient githubClient) {
+  GithubWriter(GithubClient githubClient, String reviewerUrl) {
     this.githubClient = githubClient;
+    this.reviewerUrl = reviewerUrl;
   }
 
   /**
-   * Creates GitHub PullRequest, GitHub Reviews and GitHub IssueComments from scratch
+   * Creates GitHub PullRequest from scratch
    *
    * @param pullRequest Proto message from which will be created GitHub PullRequest
    * @param repoOwner Owner of GirHub repository
@@ -49,135 +48,138 @@ public class GithubWriter {
    * @return GitHub repository number
    */
   public long createPullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
-    long pullRequestNumber =
-        githubClient
-            .createPullRequest(
-                CreatePullRequestRequest.newBuilder()
-                    .setOwner(repoOwner)
-                    .setRepo(repoName)
-                    .setRequestData(
-                        CreatePullRequestRequest.CreatePullRequestRequestData.newBuilder()
-                            .setTitle(pullRequest.getTitle())
-                            .setHead(pullRequest.getHead().getRef())
-                            .setBase(pullRequest.getBase().getRef())
-                            .setBody(pullRequest.getBody())
-                            .build())
-                    .build())
-            .getPullRequest()
-            .getNumber();
-
-    pullRequest
-        .getReviewsList()
-        .forEach(review -> createReview(repoOwner, repoName, review, pullRequestNumber));
-    pullRequest
-        .getIssueCommentList()
-        .forEach(
-            issueComment ->
-                createIssueComment(repoOwner, repoName, pullRequestNumber, issueComment));
-    return pullRequestNumber;
+    return githubClient
+        .createPullRequest(
+            CreatePullRequestRequest.newBuilder()
+                .setOwner(repoOwner)
+                .setRepo(repoName)
+                .setRequestData(
+                    CreatePullRequestRequest.CreatePullRequestRequestData.newBuilder()
+                        .setTitle(pullRequest.getTitle())
+                        .setHead(pullRequest.getHead().getRef())
+                        .setBase(pullRequest.getBase().getRef())
+                        .setBody(pullRequest.getBody())
+                        .build())
+                .build())
+        .getPullRequest()
+        .getNumber();
   }
 
-  /**
-   * Updates GitHub PullRequest. Adds new GitHub Reviews and GitHub IssueComments to existing GitHub
-   * PullRequest
-   *
-   * @param newPullRequest Proto message from which will be updated GitHub PullRequest
-   * @param repoOwner Owner of GirHub repository
-   * @param repoName Name GirHub repository
-   */
-  public void updatePullRequest(PullRequest newPullRequest, String repoOwner, String repoName)
-      throws IOException {
-    List<Review> alreadyExistingGithubReviews =
-        githubClient
-            .getReviews(
-                ReviewsRequest.newBuilder()
-                    .setOwner(repoOwner)
-                    .setRepo(repoName)
-                    .setNumber(newPullRequest.getNumber())
-                    .build())
-            .getReviewsList();
-    List<Long> alreadyExistingGithubReviewIds =
-        alreadyExistingGithubReviews.stream().map(Review::getId).collect(Collectors.toList());
-
-    List<Review> reviewsToWrite = new LinkedList<>(newPullRequest.getReviewsList());
-    reviewsToWrite.removeIf(review -> alreadyExistingGithubReviewIds.contains(review.getId()));
-    reviewsToWrite.forEach(
-        review -> createReview(repoOwner, repoName, review, newPullRequest.getNumber()));
-
-    List<IssueComment> alreadyExistingGithubIssueComments =
-        githubClient
-            .getIssueComments(
-                IssueCommentsRequest.newBuilder()
-                    .setOwner(repoOwner)
-                    .setRepo(repoName)
-                    .setNumber(newPullRequest.getNumber())
-                    .build())
-            .getIssueCommentList();
-
-    List<IssueComment> issueCommentsToWrite =
-        new LinkedList<>(newPullRequest.getIssueCommentList());
-    issueCommentsToWrite.removeIf(alreadyExistingGithubIssueComments::contains);
-    issueCommentsToWrite.forEach(
-        issueComment ->
-            createIssueComment(repoOwner, repoName, newPullRequest.getNumber(), issueComment));
-  }
-
-  private void createIssueComment(
-      String repoOwner, String repoName, long pullRequestNumber, IssueComment issueComment) {
-    githubClient.createIssueComment(
-        CreateIssueCommentRequest.newBuilder()
-            .setOwner(repoOwner)
-            .setRepo(repoName)
-            .setNumber(pullRequestNumber)
-            .setRequestData(
-                CreateIssueCommentRequest.CreateIssueCommentRequestData.newBuilder()
-                    // TODO: Add additional info to text message and link to Reviewer
-                    .setBody(issueComment.getBody())
-                    .build())
-            .build());
-  }
-
-  private void createReview(
-      String repoOwner, String repoName, Review review, long pullRequestNumber) {
-    CreatePullRequestReviewRequest.CreatePullRequestReviewRequestData.Builder requestDataBuilder =
-        CreatePullRequestReviewRequest.CreatePullRequestReviewRequestData.newBuilder();
-    requestDataBuilder
-        .setCommitId(review.getCommitId())
-        .setBody(review.getBody())
-        .setEvent(setEvent(review.getState()));
-
-    review
-        .getReviewCommentList()
-        .forEach(
-            reviewComment ->
-                requestDataBuilder.addComments(
-                    CreatePullRequestReviewRequest.CreatePullRequestReviewRequestData
-                        .ReviewCommentRequestData.newBuilder()
+  public long createReviewComment(
+      String repoOwner,
+      String repoName,
+      long pullRequestNumber,
+      ReviewComment reviewComment,
+      PullRequest pullRequest) {
+    final String reviewerLink =
+        reviewerUrl
+            + pullRequest.getAssociatedReviewerDiff()
+            + "/"
+            + pullRequest.getRepo()
+            + "/"
+            + reviewComment.getPath();
+    return githubClient
+        .createReviewComment(
+            CreateReviewCommentRequest.newBuilder()
+                .setOwner(repoOwner)
+                .setRepo(repoName)
+                .setNumber(pullRequestNumber)
+                .setRequestData(
+                    CreateReviewCommentRequest.CreateReviewCommentRequestData.newBuilder()
+                        .setBody(
+                            "Author: "
+                                + reviewComment.getUser().getEmail()
+                                + "\nCreated time: "
+                                + reviewComment.getCreatedAt()
+                                + "\nBody: "
+                                + reviewComment.getBody()
+                                + "\nSee in Reviewer: "
+                                + reviewerLink)
+                        .setCommitId(reviewComment.getCommitId())
                         .setPath(reviewComment.getPath())
                         .setPosition(reviewComment.getPosition())
-                        // TODO: Add additional info to text message and link to Reviewer
-                        .setBody(reviewComment.getBody())
-                        .build()));
+                        .build())
+                .build())
+        .getReviewComment()
+        .getId();
+  }
 
-    githubClient.createPullRequestReview(
-        CreatePullRequestReviewRequest.newBuilder()
+  public long createIssueComment(
+      String repoOwner,
+      String repoName,
+      long pullRequestNumber,
+      IssueComment issueComment,
+      long diffId) {
+    final String reviewerLink = reviewerUrl + diffId;
+    return githubClient
+        .createIssueComment(
+            CreateIssueCommentRequest.newBuilder()
+                .setOwner(repoOwner)
+                .setRepo(repoName)
+                .setNumber(pullRequestNumber)
+                .setRequestData(
+                    CreateIssueCommentRequest.CreateIssueCommentRequestData.newBuilder()
+                        .setBody(
+                            "Author: "
+                                + issueComment.getUser().getEmail()
+                                + "\nCreated time: "
+                                + issueComment.getCreatedAt()
+                                + "\nBody: "
+                                + issueComment.getBody()
+                                + "\nSee in Reviewer: "
+                                + reviewerLink)
+                        .build())
+                .build())
+        .getIssueComment()
+        .getId();
+  }
+
+  // TODO: We can edit only own comments. Think over how to edit others comments.
+  public void editIssueComment(String repoOwner, String repoName, long commentId, String newBody) {
+    githubClient.editIssueComment(
+        EditIssueCommentRequest.newBuilder()
             .setOwner(repoOwner)
             .setRepo(repoName)
-            .setNumber(pullRequestNumber)
-            .setRequestData(requestDataBuilder.build())
+            .setCommentId(commentId)
+            .setRequestData(
+                EditIssueCommentRequest.EditIssueCommentRequestData.newBuilder()
+                    .setBody(newBody)
+                    .build())
             .build());
   }
 
-  private String setEvent(Review.State state) {
-    if (state.equals(Review.State.APPROVED)) {
-      return "APPROVE";
-    } else if (state.equals(Review.State.CHANGES_REQUESTED)) {
-      return "REQUEST_CHANGES";
-    } else if (state.equals(Review.State.COMMENTED)) {
-      return "COMMENT";
-    } else {
-      return "PENDING";
-    }
+  // TODO: We can delete only own comments. Think over how to edit others comments.
+  public void deleteIssueComment(String repoOwner, String repoName, long commentId) {
+    githubClient.deleteIssueComment(
+        DeleteIssueCommentRequest.newBuilder()
+            .setOwner(repoOwner)
+            .setRepo(repoName)
+            .setCommentId(commentId)
+            .build());
+  }
+
+  // TODO: We can edit only own comments. Think over how to edit others comments.
+  public void editReviewComment(String repoOwner, String repoName, long commentId, String newBody) {
+    githubClient.editReviewComment(
+        EditReviewCommentRequest.newBuilder()
+            .setOwner(repoOwner)
+            .setRepo(repoName)
+            .setCommentId(commentId)
+            .setRequestData(
+                EditReviewCommentRequest.EditReviewCommentRequestData.newBuilder()
+                    .setBody(newBody)
+                    .build())
+            .build());
+  }
+
+  // TODO: We can delete only own comments. Think over how to edit others comments.
+  public void deleteReviewComment(String repoOwner, String repoName, long commentId) {
+    githubClient.deleteReviewComment(
+        DeleteReviewCommentRequest.newBuilder()
+            .setOwner(repoOwner)
+            .setRepo(repoName)
+            .setCommentId(commentId)
+            .build());
   }
 }
 

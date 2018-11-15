@@ -25,7 +25,6 @@ import java.util.Map;
  * opposite direction. `Line number` is the absolute line number in the file. `Position` is line
  * number in the diff(patch). `Position` is unique for the diff.
  */
-// TODO: Add tests to check the correctness of the converting
 public class LineNumberConverter {
   /*
   The comment can be on the left side or on the right side.
@@ -77,6 +76,8 @@ public class LineNumberConverter {
     return side.equals(Side.LEFT)
         ? lineNumberToPositionLeftSide.get(lineNumber)
         : lineNumberToPositionRightSide.get(lineNumber);
+
+    //    return lineNumberToPositionRightSide.get(lineNumber);
   }
 
   private void processDiffPatch(String diffPatchStr) {

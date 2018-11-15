@@ -20,7 +20,6 @@ import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitPointer;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Review;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
 import com.google.startupos.tools.reviewer.localserver.service.Protos;
@@ -32,12 +31,7 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DiffConverter {
@@ -55,33 +49,58 @@ public class DiffConverter {
 
   public List<PullRequest> convertDiffToPullRequests(Diff diff) throws IOException {
     List<PullRequest> pullRequests = new ArrayList<>();
+
     for (GithubPr githubPr : diff.getGithubPrList()) {
       PullRequest.Builder pullRequest = PullRequest.newBuilder();
 
+      if (githubPr.getNumber() != 0) {
+        pullRequest.setNumber(githubPr.getNumber());
+      }
       pullRequest
-          .setNumber(githubPr.getNumber())
           .setState(getPullRequestState(diff.getStatus()))
           .setTitle("D" + diff.getId())
           .setUser(User.newBuilder().setEmail(diff.getAuthor().getEmail()).build())
-          .setBody(diff.getDescription())
+          // TODO: Set more informative message for default description
+          .setBody(diff.getDescription().isEmpty() ? "Default description" : diff.getDescription())
           .setCreatedAt(Instant.ofEpochMilli(diff.getCreatedTimestamp()).toString())
           .setUpdatedAt(Instant.ofEpochMilli(diff.getModifiedTimestamp()).toString())
-          .addAllReviews(
-              getReviews(
-                  diff.getCodeThreadList()
-                      .stream()
-                      .filter(thread -> thread.getRepoId().equals(githubPr.getRepo().getRepo()))
-                      .collect(Collectors.toList()),
-                  diff.getStatus(),
-                  githubPr))
-          .addAllIssueComment(getIssueComments(diff.getDiffThreadList()))
-          .setBase(getCommitPointer(githubPr, CommitPointerType.BASE))
-          .setHead(getCommitPointer(githubPr, CommitPointerType.HEAD))
+          .setBase(getCommitPointer(githubPr, CommitPointerType.BASE, "D" + diff.getId()))
+          .setHead(getCommitPointer(githubPr, CommitPointerType.HEAD, "D" + diff.getId()))
           .setRepo(githubPr.getRepo().getRepo())
-          .addAllCommitsInfo(getCommits(githubPr));
+          .addAllReviewComment(getReviewCommentsByRepoName(diff, githubPr))
+          .addAllIssueComment(getIssueComments(diff, githubPr))
+          .setOwner(githubPr.getRepo().getOwner())
+          .setAssociatedReviewerDiff(diff.getId());
       pullRequests.add(pullRequest.build());
     }
     return pullRequests;
+  }
+
+  private List<ReviewComment> getReviewCommentsByRepoName(Diff diff, GithubPr githubPr) {
+    List<ReviewComment> result = new ArrayList<>();
+    List<Thread> codeThreads =
+        diff.getCodeThreadList()
+            .stream()
+            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo().getRepo()))
+            .collect(Collectors.toList());
+
+    for (Thread thread : codeThreads) {
+      for (Comment comment : thread.getCommentList()) {
+        ReviewComment.Builder githubComment = ReviewComment.newBuilder();
+        githubComment
+            .setPath(thread.getFile().getFilename())
+            .setId(comment.getGithubCommentId())
+            .setPosition(getReviewCommentPosition(thread, githubPr))
+            .setCommitId(thread.getFile().getCommitId())
+            .setUser(User.newBuilder().setEmail(comment.getCreatedBy()).build())
+            .setBody(comment.getContent())
+            .setCreatedAt(String.valueOf(Instant.ofEpochMilli(comment.getTimestamp())))
+            .setReviewerThreadId(thread.getId())
+            .build();
+        result.add(githubComment.build());
+      }
+    }
+    return result;
   }
 
   // TODO: Check if the state is correct
@@ -93,128 +112,32 @@ public class DiffConverter {
     }
   }
 
-  private CommitPointer getCommitPointer(GithubPr githubPr, CommitPointerType commitPointerType)
+  private CommitPointer getCommitPointer(
+      GithubPr githubPr, CommitPointerType commitPointerType, String headBranch)
       throws IOException {
-    // We suppose GitHub Pull Request already exists in GitHub
-    PullRequest existingPullRequest =
-        githubClient
-            .getPullRequest(
-                GithubProtos.PullRequestRequest.newBuilder()
-                    .setOwner(githubPr.getRepo().getOwner())
-                    .setRepo(githubPr.getRepo().getRepo())
-                    .setNumber(githubPr.getNumber())
-                    .build())
-            .getPullRequest();
 
-    if (commitPointerType.equals(CommitPointerType.BASE)) {
-      return existingPullRequest.getBase();
+    if (githubPr.getNumber() == 0) {
+      CommitPointer.Builder commitPointer = CommitPointer.newBuilder();
+      commitPointer.setRef(
+          commitPointerType.equals(CommitPointerType.BASE) ? "master" : headBranch);
+      return commitPointer.build();
     } else {
-      return existingPullRequest.getHead();
-    }
-  }
-
-  private List<GithubPullRequestProtos.CommitInfo> getCommits(GithubPr githubPr)
-      throws IOException {
-    List<GithubPullRequestProtos.CommitInfo> pullRequestCommits =
-        githubClient
-            .getCommits(
-                GithubProtos.CommitsRequest.newBuilder()
-                    .setOwner(githubPr.getRepo().getOwner())
-                    .setRepo(githubPr.getRepo().getRepo())
-                    .setNumber(githubPr.getNumber())
-                    .build())
-            .getCommitsList();
-    /* `https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request` request doesn't provide
-    files information. We send additional requests to get it. */
-    List<GithubPullRequestProtos.CommitInfo> result = new ArrayList<>();
-    for (GithubPullRequestProtos.CommitInfo commit : pullRequestCommits) {
-      result.add(
+      PullRequest existingPullRequest =
           githubClient
-              .getCommit(
-                  GithubProtos.CommitRequest.newBuilder()
+              .getPullRequest(
+                  GithubProtos.PullRequestRequest.newBuilder()
                       .setOwner(githubPr.getRepo().getOwner())
                       .setRepo(githubPr.getRepo().getRepo())
-                      .setSha(commit.getSha())
+                      .setNumber(githubPr.getNumber())
                       .build())
-              .getCommit());
-    }
-    return result;
-  }
+              .getPullRequest();
 
-  private List<Review> getReviews(List<Thread> codeThreads, Diff.Status status, GithubPr githubPr) {
-    List<Review> result = new ArrayList<>();
-
-    Set<String> commitIds = new HashSet<>();
-    codeThreads.forEach(thread -> commitIds.add(thread.getFile().getCommitId()));
-
-    for (String commitId : commitIds) {
-      List<Thread> threadsByCommit =
-          codeThreads
-              .stream()
-              .filter(thread -> commitId.equals(thread.getFile().getCommitId()))
-              .collect(Collectors.toList());
-
-      Set<String> authors = new HashSet<>();
-      threadsByCommit.forEach(
-          thread ->
-              thread.getCommentList().forEach(comment -> authors.add(comment.getCreatedBy())));
-
-      Map<String, Map<Thread, Comment>> authorToThreadToComment = new HashMap<>();
-      for (String author : authors) {
-        Map<Thread, Comment> threadToComment = new HashMap<>();
-        for (Thread thread : threadsByCommit) {
-          for (Comment comment : thread.getCommentList()) {
-            if (comment.getCreatedBy().equals(author)) {
-              threadToComment.put(thread, comment);
-            }
-          }
-          authorToThreadToComment.put(author, threadToComment);
-        }
+      if (commitPointerType.equals(CommitPointerType.BASE)) {
+        return existingPullRequest.getBase();
+      } else {
+        return existingPullRequest.getHead();
       }
-
-      authorToThreadToComment.forEach(
-          (author, comments) ->
-              result.add(
-                  Review.newBuilder()
-                      .setUser(User.newBuilder().setEmail(author).build())
-                      .setBody("Created by Reviewer")
-                      .setCommitId(commitId)
-                      .setState(getReviewState(status))
-                      .addAllReviewComment(getReviewComments(comments, githubPr))
-                      .build()));
     }
-    return result;
-  }
-
-  // TODO: Check if the state is correct
-  private Review.State getReviewState(Diff.Status status) {
-    if (status.equals(Diff.Status.ACCEPTED)) {
-      return Review.State.APPROVED;
-    }
-    if (status.equals(Diff.Status.NEEDS_MORE_WORK)) {
-      return Review.State.CHANGES_REQUESTED;
-    }
-    if (status.equals(Diff.Status.UNDER_REVIEW)) {
-      return Review.State.COMMENTED;
-    }
-    return Review.State.UNKNOWN;
-  }
-
-  private List<ReviewComment> getReviewComments(Map<Thread, Comment> comments, GithubPr githubPr) {
-    List<ReviewComment> reviewComments = new ArrayList<>();
-
-    comments.forEach(
-        ((thread, comment) ->
-            reviewComments.add(
-                ReviewComment.newBuilder()
-                    .setPath(thread.getFile().getFilename())
-                    .setCommitId(thread.getFile().getCommitId())
-                    .setUser(User.newBuilder().setEmail(comment.getCreatedBy()).build())
-                    .setBody(comment.getContent())
-                    .setCreatedAt(Instant.ofEpochMilli(comment.getTimestamp()).toString())
-                    .setPosition(getReviewCommentPosition(thread, githubPr))
-                    .build())));
-    return reviewComments;
   }
 
   private int getReviewCommentPosition(Thread thread, GithubPr githubPr) {
@@ -252,8 +175,13 @@ public class DiffConverter {
     return converter.getPosition(thread.getLineNumber(), commentSide);
   }
 
-  private List<IssueComment> getIssueComments(List<Thread> diffThreads) {
+  private List<IssueComment> getIssueComments(Diff diff, GithubPr githubPr) {
     List<IssueComment> result = new ArrayList<>();
+    List<Thread> diffThreads =
+        diff.getDiffThreadList()
+            .stream()
+            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo().getRepo()))
+            .collect(Collectors.toList());
     for (Protos.Thread thread : diffThreads) {
       thread
           .getCommentList()
@@ -261,8 +189,9 @@ public class DiffConverter {
               comment ->
                   result.add(
                       IssueComment.newBuilder()
+                          .setId(comment.getGithubCommentId())
                           .setBody(comment.getContent())
-                          .setCreatedAt(new Date(comment.getTimestamp()).toString())
+                          .setCreatedAt(Instant.ofEpochMilli(comment.getTimestamp()).toString())
                           .setUser(
                               GithubPullRequestProtos.User.newBuilder()
                                   .setEmail(comment.getCreatedBy())
