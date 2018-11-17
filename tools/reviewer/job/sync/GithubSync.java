@@ -54,11 +54,11 @@ public class GithubSync {
 
     // Go over all Reviewer Diff numbers to sync
     for (long diffNumber : diffsToSync.get()) {
-      sycnWithGithub(githubClient, diffNumber);
+      syncWithGithub(githubClient, diffNumber);
     }
   }
 
-  private static void sycnWithGithub(GithubClient githubClient, long diffNumber)
+  private static void syncWithGithub(GithubClient githubClient, long diffNumber)
       throws IOException {
     DiffWriter diffWriter = new DiffWriter();
     DiffReader diffReader = new DiffReader();

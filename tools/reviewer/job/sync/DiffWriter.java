@@ -16,26 +16,21 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 
 // TODO: Implement methods
 public class DiffWriter {
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
+
   public void addGithubPrNumber(
       long diffId, String owner, String repo, long githubPullRequestNumber) {
-    System.out.println(
-        "Diff \'"
-            + diffId
-            + "\' is updated.\n"
-            + "Added GitHub PullRequest number \'"
-            + githubPullRequestNumber
-            + "\' to GithubPr:\n"
-            + "owner - \'"
-            + owner
-            + "\',\n"
-            + "repo - \'"
-            + repo
-            + "\'\n");
+    log.atInfo()
+        .log(
+            "Diff with id *%s* is updated. "
+                + "Added the number *%s* of GitHub Pull Request to Reviewer GithubPr(owner: %s, repo: %s)",
+            diffId, githubPullRequestNumber, owner, repo);
   }
 
   public void addGithubReviewCommentId(
@@ -44,46 +39,27 @@ public class DiffWriter {
       long githubReviewCommentId,
       String createdBy,
       String timestamp) {
-    System.out.println(
-        "Diff \'"
-            + diffId
-            + "\' is updated.\n"
-            + "Added GitHub Review comment id \'"
-            + githubReviewCommentId
-            + "\' to code comment:\n"
-            + "Reviewer thread id - \'"
-            + reviewerThreadId
-            + "\',\n"
-            + "created by - \'"
-            + createdBy
-            + "\',\n"
-            + "timestamp - \'"
-            + timestamp
-            + "\'\n");
+    log.atInfo()
+        .log(
+            "Diff with id *%s* is updated. "
+                + "Added the id *%s* of GitHub review comment to the Reviewer "
+                + "code comment(thread id: %s, created_by: %s, timestamp: %s)",
+            diffId, githubReviewCommentId, reviewerThreadId, createdBy, timestamp);
   }
 
   public void updateCodeComment(
       long diffId, String reviewerThreadId, long githubReviewCommentId, String content) {
-    System.out.println(
-        "Diff \'"
-            + diffId
-            + "\' is updated.\n"
-            + "Updated code comment:\n"
-            + "Reviewer thread id - \'"
-            + reviewerThreadId
-            + "\',\n"
-            + "GitHub Review Comment id - \'"
-            + githubReviewCommentId
-            + "\',\n"
-            + "comment content - \'"
-            + content
-            + "\'\n");
+    log.atInfo()
+        .log(
+            "Diff with id *%s* is updated. "
+                + "Updated Reviewer code comment(thread id: %s, github_comment_id: %s). New content: %s",
+            diffId, reviewerThreadId, githubReviewCommentId, content);
   }
 
   // TODO: Change the method signature to work with reviewer.localserver.service.Protos.Thread
   public void addCodeComment(long diffId, ReviewComment comment) {
-    System.out.println(
-        "Diff \'" + diffId + "\' is updated.\n" + "Added new code comment: \n" + comment + "\n");
+    log.atInfo()
+        .log("Diff with id *%s* is updated. Added new Reviewer code comment: %s", diffId, comment);
   }
 
   public void addGithubIssueCommentId(
@@ -92,46 +68,27 @@ public class DiffWriter {
       long githubIssueCommentId,
       String createdBy,
       String timestamp) {
-    System.out.println(
-        "Diff \'"
-            + diffId
-            + "\' is updated.\n"
-            + "Added GitHub Issue comment id \'"
-            + githubIssueCommentId
-            + "\' to diff comment:\n"
-            + "Reviewer thread id - \'"
-            + reviewerThreadId
-            + "\',\n"
-            + "created by - \'"
-            + createdBy
-            + "\',\n"
-            + "timestamp - \'"
-            + timestamp
-            + "\'\n");
+    log.atInfo()
+        .log(
+            "Diff with id *%s* is updated. "
+                + "Added the id *%s* of GitHub issue comment to the Reviewer "
+                + "diff comment(thread id: %s, created_by: %s, timestamp: %s)",
+            diffId, githubIssueCommentId, reviewerThreadId, createdBy, timestamp);
   }
 
   public void updateDiffComment(
       long diffId, String reviewerThreadId, long githubIssueCommentId, String content) {
-    System.out.println(
-        "Diff \'"
-            + diffId
-            + "\' is updated.\n"
-            + "Updated diff comment:\n"
-            + "Reviewer thread id - \'"
-            + reviewerThreadId
-            + "\',\n"
-            + "GitHub Issue Comment id - \'"
-            + githubIssueCommentId
-            + "\',\n"
-            + "comment content - \'"
-            + content
-            + "\'\n");
+    log.atInfo()
+        .log(
+            "Diff with id *%s* is updated. "
+                + "Updated Reviewer diff comment(thread id: %s, github_comment_id: %s). New content: %s",
+            diffId, reviewerThreadId, githubIssueCommentId, content);
   }
 
   // TODO: Change the method signature to work with reviewer.localserver.service.Protos.Thread
   public void addDiffComment(long diffId, IssueComment comment) {
-    System.out.println(
-        "Diff \'" + diffId + "\' is updated.\n" + "Added new diff comment: \n" + comment + "\n");
+    log.atInfo()
+        .log("Diff with id *%s* is updated. Added new Reviewer diff comment: %s", diffId, comment);
   }
 }
 

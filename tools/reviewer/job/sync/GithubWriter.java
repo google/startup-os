@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateIssueCommentRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequest;
@@ -31,6 +32,8 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Revi
  * Writes `tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest` to GitHub using GitHub API
  */
 public class GithubWriter {
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
+
   private final GithubClient githubClient;
   private final String reviewerUrl;
 
@@ -48,21 +51,27 @@ public class GithubWriter {
    * @return GitHub repository number
    */
   public long createPullRequest(PullRequest pullRequest, String repoOwner, String repoName) {
-    return githubClient
-        .createPullRequest(
-            CreatePullRequestRequest.newBuilder()
-                .setOwner(repoOwner)
-                .setRepo(repoName)
-                .setRequestData(
-                    CreatePullRequestRequest.CreatePullRequestRequestData.newBuilder()
-                        .setTitle(pullRequest.getTitle())
-                        .setHead(pullRequest.getHead().getRef())
-                        .setBase(pullRequest.getBase().getRef())
-                        .setBody(pullRequest.getBody())
-                        .build())
-                .build())
-        .getPullRequest()
-        .getNumber();
+    long pullRequestNumber =
+        githubClient
+            .createPullRequest(
+                CreatePullRequestRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setRequestData(
+                        CreatePullRequestRequest.CreatePullRequestRequestData.newBuilder()
+                            .setTitle(pullRequest.getTitle())
+                            .setHead(pullRequest.getHead().getRef())
+                            .setBase(pullRequest.getBase().getRef())
+                            .setBody(pullRequest.getBody())
+                            .build())
+                    .build())
+            .getPullRequest()
+            .getNumber();
+    log.atInfo()
+        .log(
+            "Pull Request with number *%s* was CREATED on GitHub(owner: %s, name: %s).",
+            pullRequestNumber, repoOwner, repoName);
+    return pullRequestNumber;
   }
 
   public long createReviewComment(
@@ -78,30 +87,36 @@ public class GithubWriter {
             + pullRequest.getRepo()
             + "/"
             + reviewComment.getPath();
-    return githubClient
-        .createReviewComment(
-            CreateReviewCommentRequest.newBuilder()
-                .setOwner(repoOwner)
-                .setRepo(repoName)
-                .setNumber(pullRequestNumber)
-                .setRequestData(
-                    CreateReviewCommentRequest.CreateReviewCommentRequestData.newBuilder()
-                        .setBody(
-                            "Author: "
-                                + reviewComment.getUser().getEmail()
-                                + "\nCreated time: "
-                                + reviewComment.getCreatedAt()
-                                + "\nBody: "
-                                + reviewComment.getBody()
-                                + "\nSee in Reviewer: "
-                                + reviewerLink)
-                        .setCommitId(reviewComment.getCommitId())
-                        .setPath(reviewComment.getPath())
-                        .setPosition(reviewComment.getPosition())
-                        .build())
-                .build())
-        .getReviewComment()
-        .getId();
+    long reviewCommentId =
+        githubClient
+            .createReviewComment(
+                CreateReviewCommentRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setNumber(pullRequestNumber)
+                    .setRequestData(
+                        CreateReviewCommentRequest.CreateReviewCommentRequestData.newBuilder()
+                            .setBody(
+                                "Author: "
+                                    + reviewComment.getUser().getEmail()
+                                    + "\nCreated time: "
+                                    + reviewComment.getCreatedAt()
+                                    + "\nBody: "
+                                    + reviewComment.getBody()
+                                    + "\nSee in Reviewer: "
+                                    + reviewerLink)
+                            .setCommitId(reviewComment.getCommitId())
+                            .setPath(reviewComment.getPath())
+                            .setPosition(reviewComment.getPosition())
+                            .build())
+                    .build())
+            .getReviewComment()
+            .getId();
+    log.atInfo()
+        .log(
+            "Review comment with id *%s* was СREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
+            reviewCommentId, repoOwner, repoName, pullRequestNumber, reviewComment);
+    return reviewCommentId;
   }
 
   public long createIssueComment(
@@ -111,27 +126,33 @@ public class GithubWriter {
       IssueComment issueComment,
       long diffId) {
     final String reviewerLink = reviewerUrl + diffId;
-    return githubClient
-        .createIssueComment(
-            CreateIssueCommentRequest.newBuilder()
-                .setOwner(repoOwner)
-                .setRepo(repoName)
-                .setNumber(pullRequestNumber)
-                .setRequestData(
-                    CreateIssueCommentRequest.CreateIssueCommentRequestData.newBuilder()
-                        .setBody(
-                            "Author: "
-                                + issueComment.getUser().getEmail()
-                                + "\nCreated time: "
-                                + issueComment.getCreatedAt()
-                                + "\nBody: "
-                                + issueComment.getBody()
-                                + "\nSee in Reviewer: "
-                                + reviewerLink)
-                        .build())
-                .build())
-        .getIssueComment()
-        .getId();
+    long issueCommentId =
+        githubClient
+            .createIssueComment(
+                CreateIssueCommentRequest.newBuilder()
+                    .setOwner(repoOwner)
+                    .setRepo(repoName)
+                    .setNumber(pullRequestNumber)
+                    .setRequestData(
+                        CreateIssueCommentRequest.CreateIssueCommentRequestData.newBuilder()
+                            .setBody(
+                                "Author: "
+                                    + issueComment.getUser().getEmail()
+                                    + "\nCreated time: "
+                                    + issueComment.getCreatedAt()
+                                    + "\nBody: "
+                                    + issueComment.getBody()
+                                    + "\nSee in Reviewer: "
+                                    + reviewerLink)
+                            .build())
+                    .build())
+            .getIssueComment()
+            .getId();
+    log.atInfo()
+        .log(
+            "Issue comment with id *%s* was СREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
+            issueCommentId, repoOwner, repoName, pullRequestNumber, issueComment);
+    return issueCommentId;
   }
 
   // TODO: We can edit only own comments. Think over how to edit others comments.
@@ -146,6 +167,10 @@ public class GithubWriter {
                     .setBody(newBody)
                     .build())
             .build());
+    log.atInfo()
+        .log(
+            "Issue comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
+            commentId, repoOwner, repoName, newBody);
   }
 
   // TODO: We can delete only own comments. Think over how to edit others comments.
@@ -156,6 +181,10 @@ public class GithubWriter {
             .setRepo(repoName)
             .setCommentId(commentId)
             .build());
+    log.atInfo()
+        .log(
+            "Issue comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
+            commentId, repoOwner, repoName);
   }
 
   // TODO: We can edit only own comments. Think over how to edit others comments.
@@ -170,6 +199,10 @@ public class GithubWriter {
                     .setBody(newBody)
                     .build())
             .build());
+    log.atInfo()
+        .log(
+            "Review comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
+            commentId, repoOwner, repoName, newBody);
   }
 
   // TODO: We can delete only own comments. Think over how to edit others comments.
@@ -180,6 +213,10 @@ public class GithubWriter {
             .setRepo(repoName)
             .setCommentId(commentId)
             .build());
+    log.atInfo()
+        .log(
+            "Review comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
+            commentId, repoOwner, repoName);
   }
 }
 
