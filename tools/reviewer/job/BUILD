@@ -2,7 +2,7 @@ java_binary(
     name = "job",
     srcs = [
         "ReviewerJob.java",
-        "impl/CITask.java",
+        "impl/CiTask.java",
         "impl/FirestoreTaskBase.java",
         "impl/ReviewerMetadataUpdaterTask.java",
         "tasks/Task.java",

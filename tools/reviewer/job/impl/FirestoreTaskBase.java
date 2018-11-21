@@ -20,6 +20,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.startupos.common.firestore.FirestoreClient;
 import com.google.startupos.common.firestore.FirestoreClientFactory;
+import com.google.startupos.tools.reviewer.job.ReviewerJob;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,8 +39,7 @@ public abstract class FirestoreTaskBase {
       FileInputStream serviceAccount = null;
       try {
         serviceAccount =
-            new FileInputStream(
-                com.google.startupos.tools.reviewer.job.ReviewerJob.serviceAccountJson.get());
+            new FileInputStream(ReviewerJob.serviceAccountJson.get());
         ServiceAccountCredentials cred =
             (ServiceAccountCredentials)
                 GoogleCredentials.fromStream(serviceAccount)

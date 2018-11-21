@@ -31,9 +31,10 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class CITask extends FirestoreTaskBase implements Task {
+public class CiTask extends FirestoreTaskBase implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
+  // we acquire a lock to process single CIRequest at a time
   private final ReentrantLock lock = new ReentrantLock();
 
   private FileUtils fileUtils;
@@ -43,7 +44,7 @@ public class CITask extends FirestoreTaskBase implements Task {
   private static String CI_RESPONSES_PATH = "/reviewer/ci/responses";
 
   @Inject
-  public CITask(
+  public CiTask(
       FileUtils fileUtils,
       GitRepoFactory gitRepoFactory,
       FirestoreClientFactory firestoreClientFactory) {
@@ -87,10 +88,14 @@ public class CITask extends FirestoreTaskBase implements Task {
 
           GitRepo gitRepo = this.gitRepoFactory.create(repoPath);
 
-          if (fileUtils.folderEmptyOrNotExists(repoPath)) {
-            gitRepo.cloneRepo(repo.getUrl(), repoPath);
-          } else {
-            gitRepo.pull();
+          try {
+            if (fileUtils.folderEmptyOrNotExists(repoPath)) {
+              gitRepo.cloneRepo(repo.getUrl(), repoPath);
+            } else {
+              gitRepo.pull();
+            }
+          } catch (IOException e) {
+            throw new RuntimeException(e);
           }
 
           gitRepo.switchBranch(target.getCommitId());
@@ -104,15 +109,12 @@ public class CITask extends FirestoreTaskBase implements Task {
               CIResponse.TargetResult.newBuilder()
                   .setTarget(target)
                   .setSuccess(result.exitValue == 0)
-                  // TODO: log truncation strategy?
+                   // TODO: Firestore's limit is 1MB. Truncate log to 950Kb, to leave room for the rest of the message.
                   .setLog(result.stderr)
                   .build());
         }
 
         firestoreClient.createDocument(CI_RESPONSES_PATH, responseBuilder.build());
-      } catch (IOException e) {
-        // TODO: store in Firestore?
-        e.printStackTrace();
       } finally {
         lock.unlock();
       }
