@@ -22,7 +22,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+/**
+ * Class allowing to interact with system utils such as `bash`
+ */
 public class CommandLine {
+  /**
+   * Result of command execution
+   */
   public static class CommandResult {
     public String command;
     public String stdout;
@@ -30,6 +36,12 @@ public class CommandLine {
     public Integer exitValue;
   }
 
+  /**
+   * Consumes lines from input stream; returns result as String
+   * @param inputStream stream to consume lines from
+   * @return String containing lines from stream
+   * @throws IOException
+   */
   private static String readLines(InputStream inputStream) throws IOException {
     StringBuffer output = new StringBuffer();
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
@@ -41,16 +53,23 @@ public class CommandLine {
     return output.toString();
   }
 
+  /**
+   * Consumes stdout, stderr and exit code of command execution
+   * @param command command to run
+   * @return command execution result
+   */
   public static CommandResult runCommandForError(String command) {
     CommandResult result = new CommandResult();
     try {
       Process process =
-          new ProcessBuilder(Arrays.asList(command.split(" "))).redirectErrorStream(true).start();
+          new ProcessBuilder(Arrays.asList(command.split(" ")))
+                  .redirectErrorStream(true) // redirects stderr to stdout
+                  .start();
       result.stderr = readLines(process.getInputStream());
       result.exitValue = process.exitValue();
     } catch (IOException e) {
       e.printStackTrace();
-      // thrown exception obviously means command execution was not successul
+      // Thrown exception means command execution was not successful.
       result.exitValue = 1;
     }
     return result;

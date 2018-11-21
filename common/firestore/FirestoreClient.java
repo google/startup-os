@@ -156,6 +156,7 @@ public class FirestoreClient {
    */
   public Message popDocument(String path, Message.Builder proto) {
     try {
+      // this is *document* list, containing 'Firestore-flavored' JSON documents
       String documentList = this.httpGet(getGetUrl(path));
       JsonElement element = new JsonParser().parse(documentList);
       JsonArray documents = element.getAsJsonObject().getAsJsonArray("documents");
