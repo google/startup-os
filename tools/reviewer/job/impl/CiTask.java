@@ -109,7 +109,8 @@ public class CiTask extends FirestoreTaskBase implements Task {
               CIResponse.TargetResult.newBuilder()
                   .setTarget(target)
                   .setSuccess(result.exitValue == 0)
-                   // TODO: Firestore's limit is 1MB. Truncate log to 950Kb, to leave room for the rest of the message.
+                  // TODO: Firestore's limit is 1MB. Truncate log to 950Kb, to leave room for the
+                  // rest of the message.
                   .setLog(result.stderr)
                   .build());
         }

@@ -22,13 +22,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
-/**
- * Class allowing to interact with system utils such as `bash`
- */
+/** Class allowing to interact with system utils such as `bash` */
 public class CommandLine {
-  /**
-   * Result of command execution
-   */
+  /** Result of command execution */
   public static class CommandResult {
     public String command;
     public String stdout;
@@ -38,6 +34,7 @@ public class CommandLine {
 
   /**
    * Consumes lines from input stream; returns result as String
+   *
    * @param inputStream stream to consume lines from
    * @return String containing lines from stream
    * @throws IOException
@@ -55,6 +52,7 @@ public class CommandLine {
 
   /**
    * Consumes stdout, stderr and exit code of command execution
+   *
    * @param command command to run
    * @return command execution result
    */
@@ -63,8 +61,8 @@ public class CommandLine {
     try {
       Process process =
           new ProcessBuilder(Arrays.asList(command.split(" ")))
-                  .redirectErrorStream(true) // redirects stderr to stdout
-                  .start();
+              .redirectErrorStream(true) // redirects stderr to stdout
+              .start();
       result.stderr = readLines(process.getInputStream());
       result.exitValue = process.exitValue();
     } catch (IOException e) {

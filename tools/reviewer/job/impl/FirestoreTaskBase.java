@@ -38,8 +38,7 @@ public abstract class FirestoreTaskBase {
     if (this.firestoreClient == null) {
       FileInputStream serviceAccount = null;
       try {
-        serviceAccount =
-            new FileInputStream(ReviewerJob.serviceAccountJson.get());
+        serviceAccount = new FileInputStream(ReviewerJob.serviceAccountJson.get());
         ServiceAccountCredentials cred =
             (ServiceAccountCredentials)
                 GoogleCredentials.fromStream(serviceAccount)
