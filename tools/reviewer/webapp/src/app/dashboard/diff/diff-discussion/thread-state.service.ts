@@ -12,6 +12,8 @@ interface FreezeMap {
   [id: string]: boolean;
 }
 
+// Service keeps state of threads: which comment expanded and which thread is frozen.
+// To read what is freeze mode, please open thread component.
 @Injectable()
 export class ThreadStateService {
   // Notifies that freeze mode is ended
