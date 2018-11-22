@@ -60,6 +60,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
 
   @Override
   public void run() {
+    CIResponse.Builder responseBuilder = CIResponse.newBuilder();
     if (lock.tryLock()) {
       try {
         initializeFirestoreClientIfNull();
@@ -78,7 +79,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
           fileUtils.mkdirs("ci");
         }
 
-        CIResponse.Builder responseBuilder = CIResponse.newBuilder().setRequest(request);
+        responseBuilder = CIResponse.newBuilder().setRequest(request);
 
         for (CIRequest.Target target : request.getTargetList()) {
           Repo repo = target.getRepo();
@@ -95,7 +96,15 @@ public class CiTask extends FirestoreTaskBase implements Task {
               gitRepo.pull();
             }
           } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            responseBuilder =
+                responseBuilder.addResults(
+                    CIResponse.TargetResult.newBuilder()
+                        .setTarget(target)
+                        .setSuccess(false)
+                        .setLog(e.toString())
+                        .build());
+            return;
           }
 
           gitRepo.switchBranch(target.getCommitId());
@@ -114,9 +123,8 @@ public class CiTask extends FirestoreTaskBase implements Task {
                   .setLog(result.stderr)
                   .build());
         }
-
-        firestoreClient.createDocument(CI_RESPONSES_PATH, responseBuilder.build());
       } finally {
+        firestoreClient.createDocument(CI_RESPONSES_PATH, responseBuilder.build());
         lock.unlock();
       }
     }

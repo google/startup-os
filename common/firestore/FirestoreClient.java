@@ -155,6 +155,7 @@ public class FirestoreClient {
    * @return proto message
    */
   public Message popDocument(String path, Message.Builder proto) {
+    // TODO: pop a document without fetching all documents in the list
     try {
       // this is *document* list, containing 'Firestore-flavored' JSON documents
       String documentList = this.httpGet(getGetUrl(path));
