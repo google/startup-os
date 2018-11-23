@@ -14,7 +14,7 @@ export class DiffUpdateService {
     private notificationService: NotificationService,
   ) { }
 
-  addComment(diff: Diff): void {
+  saveComment(diff: Diff): void {
     this.customUpdate(diff, 'Comment is saved in firebase');
   }
 

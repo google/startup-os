@@ -5,12 +5,12 @@ import { Subscription } from 'rxjs';
 
 import { Diff, File } from '@/core/proto';
 import {
-  AuthService,
   DiffUpdateService,
   ExceptionService,
   FirebaseStateService,
   LocalserverService,
   NotificationService,
+  UserService,
 } from '@/core/services';
 import { DeleteDiffDialogComponent, DeleteDiffReturn } from './delete-diff-dialog';
 import { DiffService } from './diff.service';
@@ -21,7 +21,6 @@ import { DiffService } from './diff.service';
   selector: 'cr-diff',
   templateUrl: './diff.component.html',
   providers: [DiffService],
-  styleUrls: ['./diff.scss'],
 })
 export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
@@ -37,7 +36,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     private localserverService: LocalserverService,
     private exceptionService: ExceptionService,
     private notificationService: NotificationService,
-    private authService: AuthService,
+    private userService: UserService,
     private diffUpdateService: DiffUpdateService,
   ) { }
 
@@ -111,7 +110,7 @@ export class DiffComponent implements OnInit, OnDestroy {
   }
 
   isUserAuthorOfTheDiff(): boolean {
-    return this.authService.userEmail === this.diff.getAuthor().getEmail();
+    return this.userService.email === this.diff.getAuthor().getEmail();
   }
 
   isForbiddenStatus(): boolean {

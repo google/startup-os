@@ -75,7 +75,7 @@ export class ThreadService {
       this.stateService.diff.addCodeThread(newThread);
     }
 
-    this.diffUpdateService.addComment(this.stateService.diff);
+    this.diffUpdateService.saveComment(this.stateService.diff);
   }
 
   private createNewThread(
@@ -94,13 +94,5 @@ export class ThreadService {
     newThread.setId(randstr64(6));
 
     return newThread;
-  }
-
-  deleteComment(isDeleteThread: boolean): void {
-    this.diffUpdateService.deleteComment(this.stateService.diff, isDeleteThread);
-  }
-
-  resolveThread(isDone: boolean): void {
-    this.diffUpdateService.resolveThread(this.stateService.diff, isDone);
   }
 }

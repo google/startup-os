@@ -12,17 +12,19 @@
     >{{ isExpanded ? 'Collapse' : 'Expand' }}</button>
   </div>
 </div>
-<div class="cr-header" *ngIf="isThreadExist()">
+<div *ngIf="isThreadExist()">
   <!-- Diff threads -->
   <diff-threads
     [threads]="diff.getDiffThreadList()"
     [diff]="diff"
+    (expandEmitter)="commentExpanded()"
   ></diff-threads>
   
   <!-- Code threads -->
   <code-threads
     [threads]="diff.getCodeThreadList()"
     [diff]="diff"
+    (expandEmitter)="commentExpanded()"
   ></code-threads>
 </div>
 <div class="cr-table-placeholder" *ngIf="!isThreadExist()">

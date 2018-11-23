@@ -1,14 +1,27 @@
-mat-table {
-  .mat-cell {
-    >.file-group {
-      margin-top: 15px;
-      >.filename {
-        margin-bottom: 10px;
-        a {
-          font-weight: bold;
-          cursor: pointer;
-        }
+.cr-header {
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.file-groups {
+  padding: 14px 0;
+  >.file-group {
+    >.filename {
+      margin-bottom: 10px;
+      margin-left: 22px;
+      a {
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
       }
+    }
+    >.thread {
+      margin-bottom: 14px;
+    }
+    >.hr {
+      margin: 14px 0;
+      height: 1px;
+      background: #d8d8d8;
     }
   }
 }

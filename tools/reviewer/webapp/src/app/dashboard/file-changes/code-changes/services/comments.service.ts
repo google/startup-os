@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 
+import { Thread } from '@/core/proto';
 import {
   BlockIndex,
   BlockLine,
   ChangesLine,
-  ThreadFrame,
 } from '../code-changes.interface';
 import { LineService } from './line.service';
 
@@ -18,31 +18,37 @@ export class CommentsService {
     this.openThreadsMap = this.lineService.createSplitDictionary();
   }
 
+  // Add a thread to the line
+  addThread(changesLine: ChangesLine, blockIndex: BlockIndex, thread: Thread): void {
+    changesLine.commentsLine.blocks[blockIndex].threads.push(thread);
+  }
+
   // Add empty thread to the line
-  addEmptyThread(changesLine: ChangesLine, blockIndex: BlockIndex): ThreadFrame {
-    const threadFrame: ThreadFrame = this.lineService.createThreadFrame();
-    changesLine.commentsLine.blocks[blockIndex].threadFrames.push(threadFrame);
-    return threadFrame;
+  addEmptyThread(changesLine: ChangesLine, blockIndex: BlockIndex): Thread {
+    const thread: Thread = new Thread();
+    thread.setLineNumber(changesLine.blocks[blockIndex].lineNumber);
+    this.addThread(changesLine, blockIndex, thread);
+    return thread;
   }
 
   // Remove all threads with comments from the line
   closeThreads(changesLine: ChangesLine, blockIndex: BlockIndex): void {
     const blockLine: BlockLine = changesLine.blocks[blockIndex];
-    const threads: ThreadFrame[] = blockLine.threadFrames;
-    blockLine.threadFrames = threads.filter(threadFrame => {
-      return threadFrame.thread.getCommentList().length === 0;
+    const threads: Thread[] = blockLine.threads;
+    blockLine.threads = threads.filter(thread => {
+      return thread.getCommentList().length === 0;
     });
 
-    if (blockLine.threadFrames.length === 0) {
+    if (blockLine.threads.length === 0) {
       this.saveAsClosed(blockLine.lineNumber, blockIndex);
     }
   }
 
   // Remove thread by thread index
   closeThread(blockLine: BlockLine, threadIndex: number, blockIndex: BlockIndex): void {
-    blockLine.threadFrames.splice(threadIndex, 1);
+    blockLine.threads.splice(threadIndex, 1);
 
-    if (blockLine.threadFrames.length === 0) {
+    if (blockLine.threads.length === 0) {
       this.saveAsClosed(blockLine.lineNumber, blockIndex);
     }
   }

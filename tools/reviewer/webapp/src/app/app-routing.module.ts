@@ -5,18 +5,22 @@ import { AuthGuard } from '@/core';
 import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
 
+import { DiffModule } from './dashboard/diff/diff.module';
+import { DiffsModule } from './dashboard/diffs/diffs.module';
+import { FileChangesModule } from './dashboard/file-changes/file-changes.module';
+
 const routes: Routes = [
   { path: '', redirectTo: 'diffs', pathMatch: 'full' },
   {
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: 'diffs', loadChildren: './dashboard/diffs/diffs.module#DiffsModule' },
-      { path: 'diff/:id', loadChildren: './dashboard/diff/diff.module#DiffModule' },
+      { path: 'diffs', loadChildren: () => DiffsModule },
+      { path: 'diff/:id', loadChildren: () => DiffModule },
       {
         path: 'diff', children: [{
           path: '**',
-          loadChildren: './dashboard/file-changes/file-changes.module#FileChangesModule',
+          loadChildren: () => FileChangesModule,
         }],
       },
     ],

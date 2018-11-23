@@ -34,21 +34,13 @@ public class TextDifferencerTest {
   private TextDifferencer differencer;
 
   private TextChange textChange(
-      String text,
-      ChangeType type,
-      int lineNumber,
-      int startIndex,
-      int endIndex,
-      int globalStartIndex,
-      int globalEndIndex) {
+      String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
     return TextChange.newBuilder()
         .setText(text)
         .setType(type)
         .setLineNumber(lineNumber)
         .setStartIndex(startIndex)
         .setEndIndex(endIndex)
-        .setGlobalStartIndex(globalStartIndex)
-        .setGlobalEndIndex(globalEndIndex)
         .build();
   }
 
@@ -69,14 +61,11 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder().setText("").setType(ChangeType.LINE_PLACEHOLDER).build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText(rightContents)
                     .setType(ChangeType.ADD)
                     .setEndIndex(9)
-                    .setGlobalEndIndex(9)
                     .build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
@@ -96,10 +85,7 @@ public class TextDifferencerTest {
                     .setText(leftContents)
                     .setType(ChangeType.DELETE)
                     .setEndIndex(9)
-                    .setGlobalEndIndex(9)
                     .build())
-            .addRightChange(
-                TextChange.newBuilder().setText("").setType(ChangeType.LINE_PLACEHOLDER).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
@@ -117,14 +103,12 @@ public class TextDifferencerTest {
                     .setText(contents)
                     .setType(ChangeType.NO_CHANGE)
                     .setEndIndex(10)
-                    .setGlobalEndIndex(10)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText(contents)
                     .setType(ChangeType.NO_CHANGE)
                     .setEndIndex(10)
-                    .setGlobalEndIndex(10)
                     .build())
             .setLeftFileContents(contents)
             .setRightFileContents(contents)
@@ -144,7 +128,6 @@ public class TextDifferencerTest {
                     .setText("No")
                     .setType(ChangeType.DELETE)
                     .setEndIndex(2)
-                    .setGlobalEndIndex(2)
                     .build())
             .addLeftChange(
                 TextChange.newBuilder()
@@ -152,15 +135,12 @@ public class TextDifferencerTest {
                     .setType(ChangeType.NO_CHANGE)
                     .setStartIndex(2)
                     .setEndIndex(10)
-                    .setGlobalStartIndex(2)
-                    .setGlobalEndIndex(10)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText("With")
                     .setType(ChangeType.ADD)
                     .setEndIndex(4)
-                    .setGlobalEndIndex(4)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
@@ -168,8 +148,6 @@ public class TextDifferencerTest {
                     .setType(ChangeType.NO_CHANGE)
                     .setStartIndex(4)
                     .setEndIndex(12)
-                    .setGlobalStartIndex(4)
-                    .setGlobalEndIndex(12)
                     .build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
@@ -186,26 +164,15 @@ public class TextDifferencerTest {
         TextDiff.newBuilder()
             .addLeftChange(
                 TextChange.newBuilder()
-                    .setText("With ")
+                    .setText("With Change.")
                     .setType(ChangeType.NO_CHANGE)
-                    .setEndIndex(5)
-                    .setGlobalEndIndex(5)
-                    .build())
-            .addLeftChange(
-                TextChange.newBuilder()
-                    .setText("Change.")
-                    .setType(ChangeType.NO_CHANGE)
-                    .setStartIndex(5)
                     .setEndIndex(12)
-                    .setGlobalStartIndex(5)
-                    .setGlobalEndIndex(12)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText("With ")
                     .setType(ChangeType.NO_CHANGE)
                     .setEndIndex(5)
-                    .setGlobalEndIndex(5)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
@@ -213,8 +180,6 @@ public class TextDifferencerTest {
                     .setType(ChangeType.ADD)
                     .setStartIndex(5)
                     .setEndIndex(7)
-                    .setGlobalStartIndex(5)
-                    .setGlobalEndIndex(7)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
@@ -222,8 +187,6 @@ public class TextDifferencerTest {
                     .setType(ChangeType.NO_CHANGE)
                     .setStartIndex(7)
                     .setEndIndex(14)
-                    .setGlobalStartIndex(7)
-                    .setGlobalEndIndex(14)
                     .build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
@@ -244,7 +207,6 @@ public class TextDifferencerTest {
                     .setText("Change at end")
                     .setType(ChangeType.NO_CHANGE)
                     .setEndIndex(13)
-                    .setGlobalEndIndex(13)
                     .build())
             .addLeftChange(
                 TextChange.newBuilder()
@@ -252,15 +214,12 @@ public class TextDifferencerTest {
                     .setType(ChangeType.DELETE)
                     .setStartIndex(13)
                     .setEndIndex(14)
-                    .setGlobalStartIndex(13)
-                    .setGlobalEndIndex(14)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
                     .setText("Change at end")
                     .setType(ChangeType.NO_CHANGE)
                     .setEndIndex(13)
-                    .setGlobalEndIndex(13)
                     .build())
             .addRightChange(
                 TextChange.newBuilder()
@@ -268,8 +227,6 @@ public class TextDifferencerTest {
                     .setType(ChangeType.ADD)
                     .setStartIndex(13)
                     .setEndIndex(14)
-                    .setGlobalStartIndex(13)
-                    .setGlobalEndIndex(14)
                     .build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)

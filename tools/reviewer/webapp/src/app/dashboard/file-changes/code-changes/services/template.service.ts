@@ -31,7 +31,7 @@ export class TemplateService {
           throw new Error('Invalid block index');
       }
     } else {
-      return 'code-line';
+      return 'common-line';
     }
   }
 
@@ -98,6 +98,6 @@ export class TemplateService {
 
   // Does the block line contain no comments?
   isEmpty(blockLine: BlockLine): boolean {
-    return blockLine.threadFrames.length === 0;
+    return blockLine.threads.length === 0;
   }
 }

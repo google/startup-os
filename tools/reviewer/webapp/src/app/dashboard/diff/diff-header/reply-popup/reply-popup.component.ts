@@ -7,7 +7,7 @@ import {
   Reviewer,
   Thread,
 } from '@/core/proto';
-import { AuthService, DiffUpdateService } from '@/core/services';
+import { DiffUpdateService, UserService } from '@/core/services';
 import { DiffHeaderService } from '../diff-header.service';
 
 // The popup appears when "Reply" button is pushed.
@@ -28,7 +28,7 @@ export class ReplyPopupComponent implements OnInit {
   @Output() toggleReplyPopup = new EventEmitter<boolean>();
 
   constructor(
-    private authService: AuthService,
+    private userService: UserService,
     private diffUpdateService: DiffUpdateService,
     private diffHeaderService: DiffHeaderService,
   ) { }
@@ -37,7 +37,7 @@ export class ReplyPopupComponent implements OnInit {
     // Set "Approved" checkbox to current approve value
     this.reviewer = this.diffHeaderService.getReviewer(
       this.diff,
-      this.authService.userEmail,
+      this.userService.email,
     );
     if (this.reviewer) {
       // Only if current user is present in reviewer list
@@ -49,7 +49,7 @@ export class ReplyPopupComponent implements OnInit {
     this.isLoading = true;
     this.diff.getAuthor().setNeedsAttention(true);
 
-    if (this.authService.userEmail === this.diff.getAuthor().getEmail()) {
+    if (this.userService.email === this.diff.getAuthor().getEmail()) {
       // Current user is an author
 
       // Set attention of all reviewers
@@ -63,7 +63,7 @@ export class ReplyPopupComponent implements OnInit {
         // If current user isn't present in reviewer list,
         // then create new reviewer
         this.reviewer = new Reviewer();
-        this.reviewer.setEmail(this.authService.userEmail);
+        this.reviewer.setEmail(this.userService.email);
         this.diff.addReviewer(this.reviewer);
       }
 
@@ -77,7 +77,7 @@ export class ReplyPopupComponent implements OnInit {
       const diffThread: Thread = new Thread();
       const comment: Comment = new Comment();
       comment.setContent(this.message);
-      comment.setCreatedBy(this.authService.userEmail);
+      comment.setCreatedBy(this.userService.email);
       comment.setTimestamp(Date.now());
       // Set isDone of Thread based on Action Required Checkbox
       diffThread.setIsDone(!this.actionRequired);

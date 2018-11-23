@@ -24,7 +24,7 @@ body {
   .cr-titlebar {
     height: 40px;
     background: $palette-1;
-    border-bottom: solid 1px $palette-2;
+    border: none;
     padding: 0 23px;
     display: flex;
     align-items: center;
@@ -57,6 +57,7 @@ body {
   }
   
   .mat-checkbox {
+    font-family: $default-font;
     .mat-checkbox-frame,
     .mat-checkbox-background {
       transform: scale(.9);
@@ -73,36 +74,8 @@ body {
     font-size: 14px;
   }
 
-  .mat-button {
-    font-family: $default-font;
-  }
-
-  @mixin cr-button() {
-    line-height: 0;
-    border-radius: 8px;
-    border: solid 1px #8d8d8d;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-  }
-
-  .cr-button {
-    @include cr-button();
-  }
-
-  .cr-light-button {
-    @include cr-button();
-    width: 120px;
-    height: 28px;
-    font-size: 16px;
-    color: black;
-  }
-
-  .cr-thread-button {
-    @include cr-button();
-    width: 97px;
-    height: 26px;
-    font-size: 14px;
+  .cr-header {
+    border: 1px solid $palette-2;
   }
 
   .ellipsis {
