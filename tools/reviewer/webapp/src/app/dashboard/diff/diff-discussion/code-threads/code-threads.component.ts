@@ -1,8 +1,10 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import { Diff, File, Thread } from '@/core/proto';
+import { CommentExpandedMap } from '@/shared/thread';
 import { DiffService } from '../../diff.service';
 import { DiscussionService } from '../discussion.service';
+import { ThreadStateService } from '../thread-state.service';
 
 // The component implements code threads on diff page.
 // How it looks: https://i.imgur.com/MobdMJl.jpg
@@ -12,20 +14,32 @@ import { DiscussionService } from '../discussion.service';
   styleUrls: ['./code-threads.component.scss'],
   providers: [DiscussionService],
 })
-export class CodeThreadsComponent implements OnInit, OnChanges {
+export class CodeThreadsComponent implements OnChanges, OnInit {
   // Threads are divided into groups by filenames
   fileGroupList: Thread[][] = [];
+  // Did firebase send any update, when freeze mode was active?
+  isQueue: boolean = false;
 
   @Input() threads: Thread[];
   @Input() diff: Diff;
+  @Output() expandEmitter = new EventEmitter<void>();
 
   constructor(
     private diffService: DiffService,
     public discussionService: DiscussionService,
-  ) { }
+    public threadStateService: ThreadStateService,
+  ) {
+    // Update thread, when freeze mode is ended
+    this.threadStateService.unfreezeChanges.subscribe(() => {
+      if (this.isQueue) {
+        this.initThreads();
+      }
+    });
+  }
 
   ngOnInit() {
     this.initThreads();
+
   }
 
   ngOnChanges() {
@@ -34,17 +48,24 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
     }
   }
 
+  saveStave(thread: Thread, commentExpandedMap: CommentExpandedMap): void {
+    this.threadStateService.saveState(thread, commentExpandedMap);
+    this.expandEmitter.emit();
+  }
+
   private initThreads(): void {
+    this.isQueue = false;
     this.fileGroupList = this.getSortedGroups(this.threads.slice());
+    this.threads.forEach(thread => {
+      this.threadStateService.createLink(thread);
+    });
   }
 
   private refreshThreads(): void {
-    if (this.getThreadsAmount(this.fileGroupList) === this.threads.length) {
-      // Links update
-      this.discussionService.refreshThreads(this.threads);
-    } else {
-      // Re-build template. Each thread component will be recreated.
+    if (!this.threadStateService.getFreezeMode()) {
       this.initThreads();
+    } else {
+      this.isQueue = true;
     }
   }
 
@@ -74,15 +95,6 @@ export class CodeThreadsComponent implements OnInit, OnChanges {
     }
 
     fileGroups.sort((a, b) => this.discussionService.compareLastTimestamps(a[0], b[0]));
-  }
-
-  // Get total number of threads in file groups
-  private getThreadsAmount(fileGroups: Thread[][]): number {
-    let threadsAmount: number = 0;
-    fileGroups.forEach(threads => {
-      threadsAmount += threads.length;
-    });
-    return threadsAmount;
   }
 
   openFile(fileGroup: Thread[]): void {

@@ -1,0 +1,11 @@
+@import '../index';
+
+.new-thread {
+  flex-direction: column;
+  border-radius: $border-radius;
+  border: none;
+  >.comment-buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

@@ -1,11 +1,11 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Subscription } from 'rxjs';
 
 import { Comment, Diff, Thread } from '@/core/proto';
 import { DiffUpdateService, UserService } from '@/core/services';
-import { DeleteCommentDialogComponent } from '../../delete-comment-dialog';
-import { ThreadState, ThreadStateService } from '../thread-state.service';
+import { DeleteCommentDialogComponent } from '../delete-comment-dialog';
+import { CommentExpandedMap } from './thread-comments.interface';
 
 @Component({
   selector: 'thread-comments',
@@ -13,78 +13,37 @@ import { ThreadState, ThreadStateService } from '../thread-state.service';
   styleUrls: ['./thread-comments.component.scss'],
 })
 export class ThreadCommentsComponent implements OnDestroy {
-  isCommentOpenMap: boolean[] = [];
   isCommentEditingMap: boolean[] = [];
-  isMenuVisibleMap: boolean[] = [];
-  state: ThreadState;
+  isMenuVisible: boolean = false;
   subscription = new Subscription();
 
   @Input() diff: Diff;
   @Input() thread: Thread;
+  @Input() commentExpandedMap: CommentExpandedMap;
+  @Output() saveStateEmitter = new EventEmitter<CommentExpandedMap>();
+  @Output() isFreezeModeEmitter = new EventEmitter<boolean>();
+  @Output() closeEmitter = new EventEmitter<void>();
 
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
-    private threadStateService: ThreadStateService,
     private diffUpdateService: DiffUpdateService,
-  ) {
-    // When thread state is changed from outside
-    this.subscription = this.threadStateService.stateChanges.subscribe(() => {
-      this.getState();
-    });
-  }
+  ) { }
 
   ngOnInit() {
-    this.getState();
-  }
-
-  // Updates state after rebuilding template or when state is changed from outside
-  getState(): void {
-    this.state = this.threadStateService.threadStateMap[this.thread.getId()];
-    if (
-      this.state &&
-      this.state.isCommentOpenMap &&
-      this.state.isCommentEditingMap &&
-      this.state.isMenuVisibleMap
-    ) {
-      this.isCommentOpenMap = this.state.isCommentOpenMap;
-      this.isCommentEditingMap = this.state.isCommentEditingMap;
-      this.isMenuVisibleMap = this.state.isMenuVisibleMap;
-    } else {
-      // Default values:
-      this.initStateMap();
-      this.saveState();
-    }
-  }
-
-  saveState(): void {
-    if (!this.state) {
-      this.state = this.threadStateService.initThreadState();
-    }
-    this.state.isCommentOpenMap = this.isCommentOpenMap;
-    this.state.isCommentEditingMap = this.isCommentEditingMap;
-    this.state.isMenuVisibleMap = this.isMenuVisibleMap;
-    this.threadStateService.threadStateMap[this.thread.getId()] = this.state;
+    this.initStateMap();
   }
 
   initStateMap(): void {
     this.thread.getCommentList().forEach(() => {
-      this.isCommentOpenMap.push(false);
       this.isCommentEditingMap.push(false);
-      this.isMenuVisibleMap.push(false);
     });
   }
 
   // Makes a comment maximized by clicking on it. Full text and date.
-  openComment(commentIndex: number): void {
-    this.isCommentOpenMap[commentIndex] = true;
-    this.saveState();
-    this.threadStateService.openComment();
-  }
-
-  // Shows/Closes menu to to edit/delete a comment
-  toggleMenu(commentIndex: number): void {
-    this.isMenuVisibleMap[commentIndex] = !this.isMenuVisibleMap[commentIndex];
+  expandComment(comment: Comment): void {
+    this.commentExpandedMap[comment.getId()] = true;
+    this.saveStateEmitter.emit(this.commentExpandedMap);
   }
 
   deleteComment(commentIndex: number): void {
@@ -98,6 +57,9 @@ export class ThreadCommentsComponent implements OnDestroy {
           this.thread.setCommentList(comments);
 
           const isDeleteThread: boolean = this.thread.getCommentList().length === 0;
+          if (isDeleteThread) {
+            this.closeEmitter.emit();
+          }
 
           // Delete the comment from firebase
           this.diffUpdateService.deleteComment(this.diff, isDeleteThread);
@@ -105,23 +67,45 @@ export class ThreadCommentsComponent implements OnDestroy {
       });
   }
 
+  // Starts editing of a comment
   editComment(commentIndex: number): void {
     this.isCommentEditingMap[commentIndex] = true;
+    this.checkFreeze();
   }
 
+  // Ends editing of a comment
   closeEditing(commentIndex: number): void {
     this.isCommentEditingMap[commentIndex] = false;
+    this.checkFreeze();
   }
 
-  saveMenuState(commentIndex: number, isMenuVisible: boolean): void {
-    this.state.isMenuVisibleMap[commentIndex] = isMenuVisible;
-    this.saveState();
+  // When menu is opened/closed
+  saveMenuState(isMenuVisible: boolean): void {
+    this.isMenuVisible = isMenuVisible;
+    // We need it, because updating of thread can close menu, which we just opened
+    this.checkFreeze();
+  }
+
+  // Tells parent freeze status of the comments
+  checkFreeze(): void {
+    if (this.isMenuVisible) {
+      this.isFreezeModeEmitter.emit(true);
+      return;
+    }
+    for (const isCommentEditing of this.isCommentEditingMap) {
+      if (isCommentEditing) {
+        this.isFreezeModeEmitter.emit(true);
+        return;
+      }
+    }
+    this.isFreezeModeEmitter.emit(false);
   }
 
   getUsername(comment: Comment): string {
     return this.userService.getUsername(comment.getCreatedBy());
   }
 
+  // Is comment with the index modified?
   isModified(commentIndex: number): boolean {
     const comment: Comment = this.thread.getCommentList()[commentIndex];
     if (comment) {
