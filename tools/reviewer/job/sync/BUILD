@@ -28,7 +28,7 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
-        "DiffReader.java",
+        "ReviewerClient.java",
         "GithubClient.java",
         "GithubPatch.java",
         "GithubReader.java",

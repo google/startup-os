@@ -22,10 +22,10 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffReques
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-public class DiffReader {
+public class ReviewerClient {
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub blockingStub;
 
-  public DiffReader() {
+  public ReviewerClient() {
     ManagedChannel channel =
         ManagedChannelBuilder.forAddress("localhost", 8001).usePlaintext(true).build();
     blockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
