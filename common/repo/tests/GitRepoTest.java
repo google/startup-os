@@ -462,5 +462,20 @@ public class GitRepoTest {
 
     assertFalse(repo.isMerged(TEST_BRANCH));
   }
+
+  @Test
+  public void testHasChangesWhenChangesAreExist() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
+    gitRepo.addFile("added_file.txt");
+    assertTrue(gitRepo.hasChanges());
+  }
+
+  @Test
+  public void testHasChangesWhenChangesAreNotExist() {
+    repo.switchBranch(TEST_BRANCH);
+    assertFalse(gitRepo.hasChanges());
+  }
 }
 

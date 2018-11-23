@@ -386,6 +386,10 @@ public class GitRepo implements Repo {
     return runCommand("remote get-url origin").stdout;
   }
 
+  public boolean hasChanges() {
+    return !getUncommittedFiles().isEmpty();
+  }
+
   private void switchToMasterBranch() {
     if (!currentBranch().equals("master")) {
       switchBranch("master");

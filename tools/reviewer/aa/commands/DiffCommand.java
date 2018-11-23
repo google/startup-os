@@ -131,7 +131,7 @@ public class DiffCommand implements AaCommand {
                     String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
                 repo.switchBranch(branchName);
               });
-      addGithubRepo(diffBuilder);
+      addGithubRepos(diffBuilder);
     } catch (Exception e) {
       repoToInitialBranch.forEach(
           (repo, initialBranch) -> {
@@ -167,7 +167,7 @@ public class DiffCommand implements AaCommand {
       diffBuilder.addAllIssue(getIssues(buglink.get()));
     }
 
-    addGithubRepo(diffBuilder);
+    addGithubRepos(diffBuilder);
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 
     return diffBuilder.build();
@@ -185,7 +185,7 @@ public class DiffCommand implements AaCommand {
     return true;
   }
 
-  private void addGithubRepo(Diff.Builder diffBuilder) {
+  private void addGithubRepos(Diff.Builder diffBuilder) {
     List<String> alreadySettingGithubRepoNames =
         diffBuilder
             .getGithubPrList()
@@ -200,17 +200,30 @@ public class DiffCommand implements AaCommand {
           .filter(fileUtils::folderExists)
           .forEach(
               path -> {
-                String repoName = Paths.get(path).getFileName().toString();
                 GitRepo repo = this.gitRepoFactory.create(path);
-                String repoURL = repo.getRemoteURL();
-                String repoOwner = repoURL.split("/")[3];
+                if (repo.hasChanges()) {
+                  String repoURL = repo.getRemoteURL();
+                  String repoOwner = repoURL.split("/")[3];
+                  String repoName = repoURL.split("/")[4].replace(".git", "");
 
-                if (!alreadySettingGithubRepoNames.contains(repoName)) {
-                  diffBuilder.addGithubPr(
-                      GithubPr.newBuilder()
-                          .setRepo(
-                              GithubRepo.newBuilder().setRepo(repoName).setOwner(repoOwner).build())
-                          .build());
+                  String folderName = Paths.get(path).getFileName().toString();
+                  if (!repoName.equals(folderName)) {
+                    System.out.println(
+                        String.format(
+                            "Repository name from the URL(%s) and folder name from workspace(%s) aren't the same.",
+                            repoName, folderName));
+                  }
+
+                  if (!alreadySettingGithubRepoNames.contains(repoName)) {
+                    diffBuilder.addGithubPr(
+                        GithubPr.newBuilder()
+                            .setRepo(
+                                GithubRepo.newBuilder()
+                                    .setRepo(repoName)
+                                    .setOwner(repoOwner)
+                                    .build())
+                            .build());
+                  }
                 }
               });
     } catch (Exception e) {
