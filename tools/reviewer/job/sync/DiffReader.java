@@ -17,8 +17,8 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
