@@ -34,6 +34,7 @@ java_library(
         "GithubReader.java",
         "GithubWriter.java",
         "LineNumberConverter.java",
+        "ReviewerClient.java",
     ],
     deps = [
         ":full_github_pr_java_proto",
@@ -44,8 +45,13 @@ java_library(
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
+        "//third_party/maven/io/grpc:grpc_core",
+        "//third_party/maven/io/grpc:grpc_netty",
+        "//third_party/maven/org/slf4j:slf4j_simple",
+        "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
         "//tools/reviewer/local_server/service:code_review_proto",
+        "//tools/reviewer/local_server/service:code_review_service",
     ],
 )
 
