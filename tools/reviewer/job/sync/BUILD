@@ -28,12 +28,12 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
-        "ReviewerClient.java",
         "GithubClient.java",
         "GithubPatch.java",
         "GithubReader.java",
         "GithubWriter.java",
         "LineNumberConverter.java",
+        "ReviewerClient.java",
     ],
     deps = [
         ":full_github_pr_java_proto",
