@@ -20,10 +20,6 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
-
-import java.io.IOException;
-
 /*
 * To read GitHub PullRequest:
 *  bazel run //tools/reviewer/job/sync:github_sync_tool -- read --repo_owner=<repo_owner> --repo_name=<repo name> --diff_number=<diff_number> --login=<GitHub login> --password=<GitHub password>
@@ -56,53 +52,9 @@ public class GithubSync {
   private static Flag<String> reviewerDiffLink =
       Flag.create("https://startupos-5f279.firebaseapp.com/diff/");
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) {
     Flags.parseCurrentPackage(args);
-    GithubSync githubSync = new GithubSync();
-    GithubClient githubClient = new GithubClient(login.get(), password.get());
-
-    if (args.length != 0) {
-      switch (args[0]) {
-        case "read":
-          {
-            githubSync.readPullRequest(githubClient);
-            break;
-          }
-        case "create":
-          {
-            // Use real PullRequest message instead default instance
-            PullRequest pullRequest = PullRequest.getDefaultInstance();
-            githubSync.createPullRequest(githubClient, pullRequest);
-            break;
-          }
-        case "update":
-          {
-            // Use real PullRequest message instead default instance
-            PullRequest pullRequest = PullRequest.getDefaultInstance();
-            githubSync.updatePullRequest(githubClient, pullRequest);
-            break;
-          }
-      }
-    }
-  }
-
-  private PullRequest readPullRequest(GithubClient githubClient) throws IOException {
-    GithubReader reader = new GithubReader(githubClient);
-    GithubPullRequestProtos.PullRequest diff =
-        reader.getPullRequest(repoOwner.get(), repoName.get(), diffNumber.get());
-    System.out.println(diff);
-    return diff;
-  }
-
-  private void createPullRequest(GithubClient githubClient, PullRequest pullRequest) {
-    GithubWriter writer = new GithubWriter(githubClient);
-    writer.createPullRequest(pullRequest, repoOwner.get(), repoName.get());
-  }
-
-  private void updatePullRequest(GithubClient githubClient, PullRequest pullRequest)
-      throws IOException {
-    GithubWriter writer = new GithubWriter(githubClient);
-    writer.updatePullRequest(pullRequest, repoOwner.get(), repoName.get());
+    // The sync logic will be added in next PRs
   }
 }
 

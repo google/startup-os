@@ -16,12 +16,14 @@ message PullRequest {
   string body = 6;
   string created_at = 7;
   string updated_at = 8;
-  repeated Review reviews = 9;
-  repeated IssueComment issueComment = 10;
+  repeated ReviewComment review_comment = 9;
+  repeated IssueComment issue_comment = 10;
   CommitPointer base = 11;
   CommitPointer head = 12;
   string repo = 13;
   repeated CommitInfo commits_info = 14;
+  string owner = 15;
+  int64 associated_reviewer_diff = 16;
 }
 
 message CommitPointer {
@@ -30,30 +32,12 @@ message CommitPointer {
   User user = 3;
 }
 
-message Review {
-  enum State {
-    UNKNOWN = 0;
-    APPROVED = 1;
-    CHANGES_REQUESTED = 2;
-    COMMENTED = 3;
-    PENDING = 4;
+message ReviewComment {
+  message Links {
+    message PullRequestLink { string href = 1; }
+    PullRequestLink pull_request = 1;
   }
 
-  int64 id = 1;
-  // Review author
-  User user = 2;
-  // Required when using REQUEST_CHANGES or COMMENT for the event parameter. The
-  // body text of the pull request review.
-  string body = 3;
-  string commit_id = 4;
-  // APPROVE, REQUEST_CHANGES, or COMMENT. By leaving this blank, you set the
-  // review action state to PENDING, which means you will need to submit the
-  // pull request review when you are ready
-  State state = 5;
-  repeated ReviewComment review_comment = 6;
-}
-
-message ReviewComment {
   int64 id = 1;
   int64 pull_request_review_id = 2;
   string diff_hunk = 3;
@@ -68,6 +52,9 @@ message ReviewComment {
   string body = 11;
   string created_at = 12;
   string updated_at = 13;
+  Links _links = 14;
+  // bool created_in_reviewer = 15;
+  string reviewer_thread_id = 15;
 }
 
 message IssueComment {
@@ -77,6 +64,8 @@ message IssueComment {
   User user = 3;
   string created_at = 4;
   string updated_at = 5;
+  // bool created_in_reviewer = 6;
+  string reviewer_thread_id = 6;
 }
 
 message User {
@@ -95,7 +84,7 @@ message CommitInfo {
 
   message Commit {
     User author = 1;
-    User commiter = 2;
+    User committer = 2;
     string message = 3;
     Tree tree = 4;
     int32 comment_count = 5;
