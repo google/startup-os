@@ -5,14 +5,6 @@ export enum BlockIndex {
   rightFile,
 }
 
-export interface ThreadFrame {
-  thread: Thread;
-  // For future improvement.
-  // Is "add new comment" interface focused by user cursor?
-  // TODO: make it work
-  isFocus: boolean;
-}
-
 // Code line of a block of code
 export interface BlockLine {
   clearCode: string;
@@ -21,7 +13,7 @@ export interface BlockLine {
   lineNumber: number;
   // Is the line a placeholder?
   isPlaceholder: boolean;
-  threadFrames: ThreadFrame[];
+  threads: Thread[];
   isChanged: boolean;
   textChange?: TextChange;
 }

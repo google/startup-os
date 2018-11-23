@@ -1,0 +1,24 @@
+<div class="comment new-thread edit-comment">
+  <!-- Textarea for new comment -->
+  <textarea
+    matInput
+    matTextareaAutosize
+    matAutosizeMinRows="2"
+    [formControl]="textarea"
+    placeholder="Leave a comment"
+  ></textarea>
+  <div class="comment-buttons">
+    <!-- Button to close ui to add new thread -->
+    <button
+      mat-button
+      class="cr-thread-button grey-button"
+      (click)="closeThread()"
+    >Cancel</button>
+    <!-- Button to add a comment -->
+    <button
+      mat-button
+      class="cr-thread-button sea-button"
+      (click)="addComment()"
+    >Reply</button>
+  </div>
+</div>

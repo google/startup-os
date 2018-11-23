@@ -65,6 +65,8 @@ public interface Repo {
 
   boolean branchExists(String name);
 
+  boolean fileExists(String commitId, String path);
+
   String getFileContents(String commitId, String path);
   /* Get current branch name */
   String currentBranch();

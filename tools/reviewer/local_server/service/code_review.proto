@@ -87,6 +87,7 @@ message Diff {
   repeated string cc = 14;
   // Threads on the whole diff, not on a particular file or line
   repeated Thread diff_thread = 15;
+  string modified_by = 16;
 }
 
 message Reviewer {
@@ -127,4 +128,6 @@ message Comment {
   string content = 1;
   int64 timestamp = 2;
   string created_by = 3;
+  bool is_modified = 4;
+  string id = 5;
 }

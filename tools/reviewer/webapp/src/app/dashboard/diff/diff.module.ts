@@ -3,10 +3,7 @@ import { NgModule } from '@angular/core';
 import { SharedModule } from '@/shared';
 
 import { DeleteDiffDialogComponent } from './delete-diff-dialog';
-import {
-  DeleteCommentDialogComponent,
-  DiffDiscussionComponentList,
-} from './diff-discussion';
+import { DiffDiscussionComponentList } from './diff-discussion';
 import { DiffDiscussionServiceList } from './diff-discussion';
 import { DiffFilesComponent } from './diff-files';
 import {
@@ -34,7 +31,6 @@ import { DiffComponent } from './diff.component';
   ],
   entryComponents: [
     DeleteDiffDialogComponent,
-    DeleteCommentDialogComponent,
     UserPopupComponent,
     AddUserPopupComponent,
   ],

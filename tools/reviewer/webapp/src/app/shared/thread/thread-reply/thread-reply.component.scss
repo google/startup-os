@@ -1,0 +1,39 @@
+@import '../index';
+
+.reply {
+  min-height: 52px;
+  border-radius: $bottom-radius;
+  border: none;
+  >.header {
+    display: flex;
+    align-items: flex-end;
+    >.line-number {
+      span {
+        color: #232323;
+        font-size: 12px;
+      }
+    }
+  }
+  >.message {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    >.action-panel {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      >.resolve-checkbox {
+        user-select: none;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      >.comment-buttons {
+        >.resolve-status {
+          font-size: 14px;
+          font-weight: 600;
+          color: #24678f;
+        }
+      }
+    }
+  }
+}

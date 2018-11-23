@@ -1,8 +1,9 @@
 <!-- Loading -->
 <page-loading [isLoading]="isLoading"></page-loading>
 
-<!-- Diff groups -->
-<div class="diff-groups" *ngIf="!isLoading">
+<!-- Dashboard -->
+<div class="dashboard" *ngIf="!isLoading">
+  <!-- Diff groups -->
   <div
     class="diff-group"
     *ngFor="let diffGroup of diffGroups; let i = index;"
@@ -28,7 +29,7 @@
       <ng-container matColumnDef="author">
         <mat-header-cell *matHeaderCellDef> Author </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          {{ authService.getUsername(diff.getAuthor().getEmail()) }}
+          {{ userService.getUsername(diff.getAuthor().getEmail()) }}
         </mat-cell>
       </ng-container>
 
@@ -43,6 +44,7 @@
         <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
         <mat-cell *matCellDef="let diff">
           {{ diff.getModifiedTimestamp() | time }}
+          {{ getModifiedBy(diff) }}
         </mat-cell>
       </ng-container>
 
