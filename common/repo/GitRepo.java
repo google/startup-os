@@ -386,15 +386,16 @@ public class GitRepo implements Repo {
     return runCommand("remote get-url origin").stdout;
   }
 
-  // Returns true if there are commits done since master exist or uncommitted files exist
+  // Checks if there are commits added since master, or any uncommitted files
   public boolean hasChanges(String branch) {
-    // TODO: Check the behavior of this method
-    /* `gitRepo.hasChanges(TEST_BRANCH)` always returns true because
-    gitRepo.getCommits(TEST_BRANCH) returns commitId which was created
-    in line#153(commandResult = runCommand("merge-base refs/heads/master " + branch)).
-    List<Commit> always is not empty.
-    */
-    return !getCommits(branch).isEmpty() || !getUncommittedFiles().isEmpty();
+    // `getCommits(String branch)` method gets list of commits where on the position 0 keeps the
+    // last master commit. We remove this element to get only <branch> commits
+    List<Commit> commits = new ArrayList<>(getCommits(branch));
+    if (!commits.isEmpty()) {
+      commits.remove(0);
+    }
+
+    return !commits.isEmpty() || !getUncommittedFiles().isEmpty();
   }
 
   private void switchToMasterBranch() {

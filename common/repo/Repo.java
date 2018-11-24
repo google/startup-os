@@ -34,7 +34,10 @@ public interface Repo {
   void switchBranch(String branch);
   /** Tags the commit at head. */
   void tagHead(String name);
-  /** Gets commits on branch since it diverged from master. */
+  /**
+   * Gets commits on branch since it diverged from master, including the last master commit, at
+   * position 0.
+   */
   ImmutableList<Commit> getCommits(String branch);
   /** Gets all uncommited files. This includes new, modified and deleted files. */
   ImmutableList<File> getUncommittedFiles();

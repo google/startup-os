@@ -464,11 +464,27 @@ public class GitRepoTest {
   }
 
   @Test
-  public void testHasChangesWhenChangesAreExist() {
+  public void testHasChangesWhenUncommittedFileIsExist() {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
     gitRepo.addFile("added_file.txt");
+    assertTrue(gitRepo.hasChanges(TEST_BRANCH));
+  }
+
+  @Test
+  public void testHasChangesWhenUncommittedFileIsNotExist() {
+    repo.switchBranch(TEST_BRANCH);
+    assertFalse(gitRepo.hasChanges(TEST_BRANCH));
+  }
+
+  @Test
+  public void testHasChangesWhenNewCommitIsExist() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
+    gitRepo.addFile("added_file.txt");
+    gitRepo.commit(gitRepo.getUncommittedFiles(), COMMIT_MESSAGE);
     assertTrue(gitRepo.hasChanges(TEST_BRANCH));
   }
 }
