@@ -137,8 +137,10 @@ public class GithubClient {
     RepositoryCommentsResponse.Builder builder = RepositoryCommentsResponse.newBuilder();
     String response =
         doRequest(
-            RequestMethod.GET,
-            String.format(GET_REPOSITORY_COMMENTS, request.getOwner(), request.getRepo()));
+                RequestMethod.GET,
+                String.format(GET_REPOSITORY_COMMENTS, request.getOwner(), request.getRepo()))
+            .replace("_links", "link")
+            .replace("href", "url");
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"review_comment\":%s}", response), builder);

@@ -33,8 +33,8 @@ message CommitPointer {
 }
 
 message ReviewComment {
-  message Links {
-    message PullRequestLink { string href = 1; }
+  message Link {
+    message PullRequestLink { string url = 1; }
     PullRequestLink pull_request = 1;
   }
 
@@ -52,8 +52,7 @@ message ReviewComment {
   string body = 11;
   string created_at = 12;
   string updated_at = 13;
-  Links _links = 14;
-  // bool created_in_reviewer = 15;
+  Link link = 14;
   string reviewer_thread_id = 15;
 }
 
@@ -64,7 +63,6 @@ message IssueComment {
   User user = 3;
   string created_at = 4;
   string updated_at = 5;
-  // bool created_in_reviewer = 6;
   string reviewer_thread_id = 6;
 }
 

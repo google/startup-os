@@ -114,11 +114,11 @@ public class GithubReader {
             reviewComment ->
                 Long.parseLong(
                         reviewComment
-                            .getLinks()
+                            .getLink()
                             .getPullRequest()
-                            .getHref()
+                            .getUrl()
                             .substring(
-                                reviewComment.getLinks().getPullRequest().getHref().lastIndexOf('/')
+                                reviewComment.getLink().getPullRequest().getUrl().lastIndexOf('/')
                                     + 1))
                     == number)
         .collect(Collectors.toList());
