@@ -17,7 +17,6 @@ package com.google.startupos.tools.reviewer.aa.commands;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubRepo;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
@@ -186,12 +185,8 @@ public class DiffCommand implements AaCommand {
   }
 
   private void addGithubRepos(Diff.Builder diffBuilder) {
-    List<String> alreadySettingGithubRepoNames =
-        diffBuilder
-            .getGithubPrList()
-            .stream()
-            .map(githubPr -> githubPr.getRepo().getRepo())
-            .collect(Collectors.toList());
+    List<String> existingGithubRepoNames =
+        diffBuilder.getGithubPrList().stream().map(GithubPr::getRepo).collect(Collectors.toList());
     try {
       fileUtils
           .listContents(workspacePath)
@@ -201,7 +196,8 @@ public class DiffCommand implements AaCommand {
           .forEach(
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
-                if (repo.hasChanges()) {
+                if (repo.hasChanges(repo.currentBranch())) {
+                  // Example of repoURL: https://github.com/google/startup-os.git
                   String repoURL = repo.getRemoteURL();
                   String repoOwner = repoURL.split("/")[3];
                   String repoName = repoURL.split("/")[4].replace(".git", "");
@@ -214,15 +210,9 @@ public class DiffCommand implements AaCommand {
                             repoName, folderName));
                   }
 
-                  if (!alreadySettingGithubRepoNames.contains(repoName)) {
+                  if (!existingGithubRepoNames.contains(repoName)) {
                     diffBuilder.addGithubPr(
-                        GithubPr.newBuilder()
-                            .setRepo(
-                                GithubRepo.newBuilder()
-                                    .setRepo(repoName)
-                                    .setOwner(repoOwner)
-                                    .build())
-                            .build());
+                        GithubPr.newBuilder().setRepo(repoName).setOwner(repoOwner).build());
                   }
                 }
               });

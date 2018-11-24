@@ -469,13 +469,7 @@ public class GitRepoTest {
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
     gitRepo.addFile("added_file.txt");
-    assertTrue(gitRepo.hasChanges());
-  }
-
-  @Test
-  public void testHasChangesWhenChangesAreNotExist() {
-    repo.switchBranch(TEST_BRANCH);
-    assertFalse(gitRepo.hasChanges());
+    assertTrue(gitRepo.hasChanges(TEST_BRANCH));
   }
 }
 

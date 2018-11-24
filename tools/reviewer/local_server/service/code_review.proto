@@ -53,15 +53,11 @@ message PongResponse { string message = 1; }
 
 message RemoveWorkspaceRequest { string workspace_name = 1; }
 
-message GithubRepo {
+message GithubPr {
   string owner = 1;
   string repo = 2;
-}
-
-message GithubPr {
-  GithubRepo repo = 1;
-  // PR number - essentially an ID
-  int64 number = 2;
+  // GitHub Pull Request number (essentially an ID). It is set by GitHub.
+  int64 number = 3;
 }
 
 // TODO: Separate non-request/response messages into a separate file. This
