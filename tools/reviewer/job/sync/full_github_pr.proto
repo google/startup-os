@@ -5,15 +5,19 @@ package com.google.startupos.tools.reviewer.job.sync;
 option java_package = "com.google.startupos.tools.reviewer.job.sync";
 option java_outer_classname = "GithubPullRequestProtos";
 
+// TODO: Remove unused fields
 message PullRequest {
 
   int64 id = 1;
   int64 number = 2;
+  // valid values: `open`, `closed`
   string state = 3;
   string title = 4;
   // Pull Request author
   User user = 5;
   string body = 6;
+  // expected format for created_at and updated_at fields:
+  // `yyyy-MM-ddTHH:mm:ssZ`
   string created_at = 7;
   string updated_at = 8;
   repeated ReviewComment review_comment = 9;

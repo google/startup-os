@@ -34,8 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/* Converts `tools.reviewer.localserver.service.Protos.Diff`
-to List<tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest> */
+// Converts a Diff proto to a list of GithubPullRequestProtos.PullRequest protos
 public class DiffConverter {
 
   private GithubClient githubClient;
@@ -49,7 +48,7 @@ public class DiffConverter {
     HEAD
   }
 
-  public List<PullRequest> convertDiffToPullRequests(Diff diff) throws IOException {
+  public List<PullRequest> toPullRequests(Diff diff) throws IOException {
     List<PullRequest> pullRequests = new ArrayList<>();
 
     for (GithubPr githubPr : diff.getGithubPrList()) {
