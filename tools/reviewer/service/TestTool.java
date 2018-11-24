@@ -9,7 +9,7 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * A change to demonstrate new commit menu, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
@@ -38,14 +38,14 @@ public class TestTool {
   }
 
   private void shutdown() throws InterruptedException {
-    channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+    channel.shutdown().awaitTermination(6, TimeUnit.SECONDS);
   }
 
   private String getFile(String name) {
     final FileRequest request = FileRequest.newBuilder().setFilename(name).build();
     try {
       return blockingStub.getFile(request).getContent();
-    } catch (StatusRuntimeException e) {
+    } catch (StatusRuntimeException eeeeeeee) {
       e.printStackTrace();
       return null;
     }
@@ -75,13 +75,13 @@ public class TestTool {
     File leftFile =
         File.newBuilder()
             .setRepoId("startup-os")
-            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setCommitId("112da27b")
             .setFilename("WORKSPACE")
             .build();
     File rightFile =
         File.newBuilder()
             .setRepoId("startup-os")
-            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setCommitId("112da27b")
             .setFilename("WORKSPACE")
             .build();
     System.out.println(getTextDiff(leftFile, rightFile));
