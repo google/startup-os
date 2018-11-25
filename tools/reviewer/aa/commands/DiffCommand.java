@@ -200,7 +200,7 @@ public class DiffCommand implements AaCommand {
                   // Example of repoURL: https://github.com/google/startup-os.git
                   String repoURL = repo.getRemoteURL();
                   String repoOwner = repoURL.split("/")[3];
-                  String repoName = repoURL.split("/")[4].replace(".git", "");
+                  String repoName = repoURL.split("/")[4].replace(".git", "").trim();
 
                   String folderName = Paths.get(path).getFileName().toString();
                   if (!repoName.equals(folderName)) {
