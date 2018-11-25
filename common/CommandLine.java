@@ -63,7 +63,8 @@ public class CommandLine {
           new ProcessBuilder(Arrays.asList(command.split(" ")))
               .redirectErrorStream(true) // redirects stderr to stdout
               .start();
-      result.stderr = readLines(process.getInputStream());
+      // stdout and stderr are merged together
+      result.stderr = result.stdout = readLines(process.getInputStream());
       result.exitValue = process.exitValue();
     } catch (IOException e) {
       e.printStackTrace();
