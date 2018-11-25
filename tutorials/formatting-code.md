@@ -4,6 +4,22 @@ To keep code in `startup-os` consistently formatted,
 we've developed a tool called `FormatterTool`.
 It works for Java, C++, Python and BUILD files.
 
+
+## Preliminary setup
+As _most_ of our code, as well as `bazel` itself is written in Java, `bazel` needs
+to know where to find JDK. Unfortunately, it seems that first-in-mind Google Cloud Build is configured to
+*run* Java programs, not to _build_ them - this is why `JAVA_HOME` is pointing to **JRE**
+which confuses `bazel`. To fix it, before running rest of the tutorial, run either of:
+```bash
+# use system JDK
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+```
+or
+```bash
+# use JDK embedded in bazel
+unset $JAVA_HOME
+```
+
 ## Listing available targets
 
 To list all build targets available, execute 
