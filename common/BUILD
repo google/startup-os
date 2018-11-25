@@ -3,6 +3,7 @@ package(default_visibility = ["//visibility:public"])
 java_library(
     name = "common",
     srcs = [
+        "CommandLine.java",
         "CommonComponent.java",
         "CommonModule.java",
         "FileUtils.java",

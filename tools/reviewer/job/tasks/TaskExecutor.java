@@ -17,6 +17,7 @@
 package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.startupos.tools.reviewer.job.impl.ReviewerMetadataUpdaterTask;
+import com.google.startupos.tools.reviewer.job.impl.CiTask;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -31,9 +32,10 @@ public class TaskExecutor extends TimerTask {
   private ExecutorService threadPool;
 
   @Inject
-  public TaskExecutor(ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask) {
+  public TaskExecutor(ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask, CiTask ciTask) {
     tasks = new ArrayList<>();
     tasks.add(reviewerMetadataUpdaterTask);
+    tasks.add(ciTask);
     threadPool = Executors.newFixedThreadPool(4);
   }
 
