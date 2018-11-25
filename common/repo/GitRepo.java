@@ -389,13 +389,8 @@ public class GitRepo implements Repo {
   // Checks if there are commits added since master, or any uncommitted files
   public boolean hasChanges(String branch) {
     // `getCommits(String branch)` method gets list of commits where on the position 0 keeps the
-    // last master commit. We remove this element to get only <branch> commits
-    List<Commit> commits = new ArrayList<>(getCommits(branch));
-    if (!commits.isEmpty()) {
-      commits.remove(0);
-    }
-
-    return !commits.isEmpty() || !getUncommittedFiles().isEmpty();
+    // last master commit. We ignore the first element.
+    return (getCommits(branch).size() > 1) || (!getUncommittedFiles().isEmpty());
   }
 
   private void switchToMasterBranch() {
