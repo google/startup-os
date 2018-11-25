@@ -1,5 +1,5 @@
 <div class="cr-header">
-  General discussions {{ discussionService.getHeader(threads) }}
+  Code discussions {{ discussionService.getHeader(threads) }}
 </div>
 <div class="file-groups">
   <!-- List of groups -->
@@ -12,6 +12,9 @@
       <cr-thread
         [diff]="diff"
         [thread]="thread"
+        [commentExpandedMap]="threadStateService.getState(thread)"
+        (saveStateEmitter)="saveStave(thread, $event)"
+        (isFreezeModeEmitter)="threadStateService.saveFreezeMode(thread, $event)"
       ></cr-thread>
     </div>
     <div class="hr" *ngIf="fileGroupIndex !== fileGroupList.length - 1"></div>

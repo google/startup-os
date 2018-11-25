@@ -82,6 +82,7 @@ export class DiffsComponent implements OnInit, OnDestroy {
   // Each time when a diff is added/changed/deleted in firebase,
   // we receive new list here.
   subscribeOnChanges(userEmail: string): void {
+    this.changesSubscription.unsubscribe();
     this.changesSubscription = this.firebaseStateService.diffsChanges.subscribe(diffs => {
       this.categorizeDiffs(userEmail, diffs);
     });

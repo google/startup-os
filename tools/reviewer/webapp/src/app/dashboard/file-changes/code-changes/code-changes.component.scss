@@ -12,7 +12,7 @@ table {
   border-bottom: $border;
   tr {
     >.line-number {
-      background: #fafbfc;
+      background: #ebebeb;
       border-left: $border;
       border-right: $border;
       font-size: $font-size;
@@ -62,6 +62,10 @@ table {
       }
       >.threads {
         padding-top: $thread-padding;
+        >.thread {
+          max-width: 800px;
+          margin-bottom: $thread-padding;
+        }
       }
     }
   }
