@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UserService } from '@/core/services';
-import { CommitSelectService } from './commit-select';
 import {
   CommitService,
   ExtensionService,
@@ -22,7 +21,6 @@ import {
     ExtensionService,
     ThreadService,
     CommitService,
-    CommitSelectService,
   ],
 })
 export class FileChangesComponent implements OnInit, OnDestroy {
@@ -33,7 +31,6 @@ export class FileChangesComponent implements OnInit, OnDestroy {
     private loadService: LoadService,
     private extensionService: ExtensionService,
     public commitService: CommitService,
-    public commitSelectService: CommitSelectService,
     public userService: UserService,
   ) {
     this.stateService.isLoading = true;

@@ -1,0 +1,35 @@
+<div class="commit-menu">
+  <div class="dots">
+    <div
+      class="dot"
+      *ngFor="let commitId of stateService.commitIdList; let commitIndex = index"
+      (mouseenter)="showPopup(commitIndex)"
+      (mouseleave)="hidePopup()"
+    ></div>
+  </div>
+  <div
+    class="bridge"
+    [style.left.px]="bridge.x"
+    [style.width.px]="bridge.width"
+  ></div>
+  <drag-element
+    [isCircle]="true"
+    [style.left.px]="rightDrag.x"
+    (mousedown)="mousedown($event, rightDrag)"
+    (mouseenter)="showPopup(rightDrag.index)"
+    (mouseleave)="hidePopup()"
+  ></drag-element>
+  <drag-element
+    [isCircle]="leftDrag.index > 0 || leftDrag.isClicked"
+    [style.left.px]="leftDrag.x"
+    (mousedown)="mousedown($event, leftDrag)"
+    (mouseenter)="showPopup(leftDrag.index)"
+    (mouseleave)="hidePopup()"
+  ></drag-element>
+  <commit-popup
+    [style.left.px]="commitInfo.offset"
+    [commitInfo]="commitInfo"
+    *ngIf="commitInfo.isVisible && !leftDrag.isClicked && !rightDrag.isClicked"
+  ></commit-popup>
+</div>
+

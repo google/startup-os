@@ -100,4 +100,16 @@ export class TemplateService {
   isEmpty(blockLine: BlockLine): boolean {
     return blockLine.threads.length === 0;
   }
+
+  isLastLine(changesLines: ChangesLine[], lineIndex: number): boolean {
+    let isLastLine: boolean = lineIndex === changesLines.length - 2;
+    if (isLastLine) {
+      changesLines[lineIndex + 1].blocks.forEach(blockLine => {
+        if (!this.isEmpty(blockLine)) {
+          isLastLine = false;
+        }
+      });
+    }
+    return isLastLine;
+  }
 }

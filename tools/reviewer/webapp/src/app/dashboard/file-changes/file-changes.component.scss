@@ -14,15 +14,25 @@
       }
     }
   }
-  .file-header,
-  .code-changes {
+  .file-header {
     display: flex;
-    margin: 0 23px;
     padding: 10px 0;
     align-items: center;
     >.commit-menu {
       margin-left: 70px;
       display: flex;
     }
+    >.filename {
+      >span {
+        color: #5d5d5d;
+      }
+    }
+  }
+  .file-header,
+  .code-changes {
+    margin: 0 23px;
+  }
+  .code-changes {
+    padding-bottom: 10px;
   }
 }

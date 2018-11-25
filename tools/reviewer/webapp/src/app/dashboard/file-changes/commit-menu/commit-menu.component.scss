@@ -1,0 +1,36 @@
+$border: 2px;
+
+.commit-menu {
+  display: flex;
+  align-items: center;
+  position: relative;
+  user-select: none;
+  user-drag: none;
+  >.dots {
+    display: flex;
+    >.dot {
+      height: 20px;
+      width: 20px;
+      background: white;
+      margin-right: 16px;
+      border-radius: 50%;
+      border: $border solid #8d8d8d;
+    }
+    >.dot:first-child {
+      border-radius: 0;
+    }
+    >.dot:last-child {
+      margin: 0;
+    }
+  }
+  >.bridge {
+    position: absolute;
+    background: #ffc84b;
+    height: 6px;
+    pointer-events: none;
+  }
+  >drag-element {
+    position: absolute;
+    margin-left: $border;
+  }
+}

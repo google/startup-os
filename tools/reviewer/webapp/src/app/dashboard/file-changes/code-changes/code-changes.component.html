@@ -1,6 +1,9 @@
 <table cellpadding="0" cellspacing="0" border="0">
   <!-- Code lines -->
-  <tr *ngFor="let changesLine of changesLines; let lineIndex = index">
+  <tr
+    [ngClass]="{ 'last-line': templateService.isLastLine(changesLines, lineIndex) }"
+    *ngFor="let changesLine of changesLines; let lineIndex = index"
+  >
     <!-- left and right block lines -->
     <ng-container
       *ngFor="let blockLine of changesLine.blocks; let blockIndex = index"
@@ -13,13 +16,12 @@
       </td>
 
       <td
-        [ngClass]="[
-          'content',
-          templateService.getLineBackground(
-            changesLine,
-            blockIndex,
-            blockLine)
-        ]"
+        class="content"
+        [ngClass]="[templateService.getLineBackground(
+          changesLine,
+          blockIndex,
+          blockLine
+        )]"
         valign="top"
         (mouseover)="hoverService.mouseOver(blockLine, blockIndex)"
         (mouseleave)="hoverService.mouseLeave()"
@@ -34,7 +36,7 @@
             *ngIf="hoverService.isHovered(blockLine, blockIndex)"
             (click)="commentsService.addEmptyThread(changesLine, blockIndex)"
           >
-            <mat-icon>add_box</mat-icon>
+            <img src="/assets/ic-add-comment.svg">
           </div>
         </div>
 

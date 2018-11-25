@@ -29,16 +29,7 @@
 
     <!-- Commit Menu -->
     <div class="commit-menu">
-      <commit-select
-        title="Left commit id"
-        [commitId]="stateService.leftCommitId"
-        (selectChanges)="commitSelectService.leftSelectChanged($event)"
-      ></commit-select>
-      <commit-select
-        title="Right commit id"
-        [commitId]="stateService.rightCommitId"
-        (selectChanges)="commitSelectService.rightSelectChanged($event)"
-      ></commit-select>
+      <commit-menu></commit-menu>
     </div>
   </div>
 

@@ -1,12 +1,13 @@
 @import 'basic-styles.scss';
 
-// TODO: synchronize local scss variables
-
 $font-size: 15px;
-$border: #CCC solid 1px;
+$border-width: 2px;
+$border: $border-width solid #979797;
 $thread-padding: 20px;
+$border-radius: 8px;
 
 table {
+  border-radius: $border-radius + $border-width;
   border-top: $border;
   border-right: $border;
   border-bottom: $border;
@@ -15,7 +16,7 @@ table {
       background: #ebebeb;
       border-left: $border;
       border-right: $border;
-      font-size: $font-size;
+      font-size: 12px;
       user-select: none;
       padding: 0 3px;
       >span {
@@ -31,17 +32,12 @@ table {
       >.add-comment-button {
         position: absolute;
         user-select: none;
-        >.icon-button {
-          margin-top: 2px;
+        top: -2px;
+        left: 2px;
+        cursor: pointer;
+        >img {
           width: $font-size;
           height: $font-size;
-          cursor: pointer;
-          >.mat-icon {
-            color: #036fe8;
-            width: $font-size;
-            height: $font-size;
-            line-height: $font-size;
-          }
         }
       }
       >.chars-highlighting {
@@ -63,10 +59,32 @@ table {
       >.threads {
         padding-top: $thread-padding;
         >.thread {
-          max-width: 800px;
+          width: 762px;
           margin-bottom: $thread-padding;
         }
       }
     }
+  }
+  tr:first-child {
+    td:first-child {
+      border-top-left-radius: $border-radius;
+    }
+    td:last-child {
+      border-top-right-radius: $border-radius;
+    }
+  }
+  @mixin last-line() {
+    td:first-child {
+      border-bottom-left-radius: $border-radius;
+    }
+    td:last-child {
+      border-bottom-right-radius: $border-radius;
+    }
+  }
+  tr:last-child {
+    @include last-line();
+  }
+  .last-line {
+    @include last-line();
   }
 }
