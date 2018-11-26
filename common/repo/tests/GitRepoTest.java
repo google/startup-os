@@ -464,7 +464,7 @@ public class GitRepoTest {
   }
 
   @Test
-  public void testHasChangesWhenUncommittedFileIsExist() {
+  public void testHasChangesWithUncommittedFile() {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
@@ -473,13 +473,13 @@ public class GitRepoTest {
   }
 
   @Test
-  public void testHasChangesWhenUncommittedFileIsNotExist() {
+  public void testHasChangesIsFalseWithNoChanges() {
     repo.switchBranch(TEST_BRANCH);
     assertFalse(gitRepo.hasChanges(TEST_BRANCH));
   }
 
   @Test
-  public void testHasChangesWhenNewCommitIsExist() {
+  public void testHasChangesWhenNewCommitExists() {
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));

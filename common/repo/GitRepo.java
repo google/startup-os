@@ -381,12 +381,12 @@ public class GitRepo implements Repo {
     return commandResult.stdout.trim().replace("\n", "");
   }
 
-  // Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git)
+  @Override
   public String getRemoteURL() {
     return runCommand("remote get-url origin").stdout;
   }
 
-  // Checks if there are commits added since master, or any uncommitted files
+  @Override
   public boolean hasChanges(String branch) {
     // `getCommits(String branch)` method gets list of commits where on the position 0 keeps the
     // last master commit. We ignore the first element.

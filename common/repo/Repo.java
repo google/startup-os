@@ -55,10 +55,9 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
-  /*
-   * Reset current branch.
-   * All changes introduced after it would be marked as unstaged
-   * but saved in working tree
+  /**
+   * Reset current branch. All changes introduced after it would be marked as unstaged but saved in
+   * working tree
    */
   void reset(String ref);
   /** Remove branch */
@@ -71,7 +70,11 @@ public interface Repo {
   boolean fileExists(String commitId, String path);
 
   String getFileContents(String commitId, String path);
-  /* Get current branch name */
+  /** Get current branch name */
   String currentBranch();
+  /** Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git) */
+  String getRemoteURL();
+  /** Checks if there are commits added since master, or any uncommitted files */
+  boolean hasChanges(String branch);
 }
 
