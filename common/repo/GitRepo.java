@@ -123,7 +123,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void switchBranch(String branch) {
-    if (branchExists(branch)) {
+    if (branchExists(branch) || commitExists(branch)) {
       runCommand("checkout --quiet " + branch);
     } else {
       runCommand("checkout --quiet -b " + branch);

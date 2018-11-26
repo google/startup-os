@@ -20,3 +20,9 @@ separate thread from thread pool.
 Pulls the git repo from remote specified in `--repo_url` cmdline arg.
 Computes checksum of `.reviewer/global_registry.prototxt`. If it has been changed
 from previous version, push it to Firestore.
+
+
+### CITask
+Pulls `CIRequest` from `/reviewer/ci/requests`, clones all the `Repo`s it
+contains, checks out relevant commits for each of them, runs `reviewer-ci.sh`
+and stores `CIResponse` in `/reviewer/ci/responses/`
