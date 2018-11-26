@@ -31,9 +31,9 @@ java_library(
     deps = [
         ":diff_match_patch",
         ":text_difference_java_proto",
+        "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
-        "//common/repo:repo_java_proto",
     ],
 )
 

@@ -33,9 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
-
 
 @AutoFactory
 public class GitRepo implements Repo {
@@ -49,9 +46,11 @@ public class GitRepo implements Repo {
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
   private final FileUtils fileUtils;
+  private final String repoPath;
 
   GitRepo(@Provided FileUtils fileUtils, String repoPath) {
     this.fileUtils = fileUtils;
+    this.repoPath = repoPath;
     gitCommandBase =
         Arrays.asList(
             "git",
@@ -65,7 +64,7 @@ public class GitRepo implements Repo {
     private String stderr;
   }
 
-  private String readLines(InputStream inputStream) throws IOException {
+  private static String readLines(InputStream inputStream) throws IOException {
     StringBuffer output = new StringBuffer();
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
       String line;
@@ -101,28 +100,12 @@ public class GitRepo implements Repo {
     } catch (Exception e) {
       e.printStackTrace();
     }
+
     if (!result.stderr.replaceAll(AMBIGUOUS_REFNAME, "").replaceAll(GITHUB_PR_MESSAGE, "").isEmpty()
         && throwException) {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
-    return result;
-  }
-
-  private CommandResult runCommand2(String command) {
-    CommandResult result = new CommandResult();
-    try {
-      List<String> fullCommand = new ArrayList<>(gitCommandBase);
-      fullCommand.addAll(Arrays.asList(command.split(" ")));
-      String[] fullCommandArray = fullCommand.toArray(new String[0]);
-      result.command = String.join(" ", fullCommand);    
-      ProcessBuilder builder = new ProcessBuilder(fullCommandArray);
-      builder.redirectErrorStream(true);
-      Process process = builder.start();
-      result.stdout = readLines(process.getInputStream());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }    
     return result;
   }
 
@@ -375,38 +358,77 @@ public class GitRepo implements Repo {
 
   @Override
   public boolean fileExists(String commitId, String path) {
-    return runCommand("--no-pager show " + commitId + ":" + path, false).stderr.isEmpty();
+    if (!commitId.isEmpty()) {
+      return runCommand("--no-pager show " + commitId + ":" + path, false).stderr.isEmpty();
+    } else {
+      return fileUtils.fileExists(fileUtils.joinToAbsolutePath(repoPath, path));
+    }
   }
 
   @Override
   public String getFileContents(String commitId, String path) {
-    return runCommand("--no-pager show " + commitId + ":" + path).stdout;
+    if (!commitId.isEmpty()) {
+      return runCommand("--no-pager show " + commitId + ":" + path).stdout;
+    } else {
+      return fileUtils.readFileUnchecked(fileUtils.joinToAbsolutePath(repoPath, path));
+    }
+  }
+
+  private static String removeDiffHeader(String diff) {
+    // Remove first 4 header lines, but leave the hunk header (e.g @@ -5,83 +5,83 @@)
+    return diff.substring(Strings.ordinalIndexOf(diff, "\n", 4) + 1);
   }
 
   @Override
-  public String getTextDiff(File file1, File file2, boolean wordDiff) {
-    if (!file1.getFilename().equals(file2.getFilename()) || !file1.getRepoId().equals(file2.getRepoId())
+  public String getTextDiff(File file1, File file2) throws IOException {
+    if (!file1.getFilename().equals(file2.getFilename())
+        || !file1.getRepoId().equals(file2.getRepoId())
         || !file1.getWorkspace().equals(file2.getWorkspace())) {
       throw new IllegalArgumentException(
           "Files should have the same repo and filename:\n" + file1 + file2);
     }
-    String wordDiffString = wordDiff ? "--word-diff=plain --word-diff-regex=\".\" " : "";
+    if (!fileExists(file1.getCommitId(), file1.getFilename())) {
+      throw new IOException("File1 should exist:\n" + file1);
+    }
+    if (!fileExists(file2.getCommitId(), file2.getFilename())) {
+      throw new IOException("File2 should exist:\n" + file2);
+    }
+    if (file1.getCommitId().isEmpty() && !file2.getCommitId().isEmpty()) {
+      throw new UnsupportedOperationException("If file1 has no commit, file 2 should also not have a commit");
+    }
     try {
-      System.setOut(new PrintStream(new FileOutputStream("/tmp/test.txt")));
-      CommandResult commandResult = runCommand2("diff --no-color --inter-hunk-context=1000000 " + wordDiffString + file1.getCommitId() + " " + file2.getCommitId() + " -- " + file1.getFilename());
-      String result = commandResult.stdout;
-
-      System.out.println("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-      System.out.println(commandResult.command);
-      System.out.println(result);
-      System.out.println(commandResult.stderr);
-      System.out.println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
-      // Remove first 5 lines, which are just header lines
-      return result.substring(Strings.ordinalIndexOf(result, "\n", 5) + 1);
+      if (file1.getCommitId().isEmpty() && file2.getCommitId().isEmpty()) {
+        // Use the --no-index flag
+        CommandResult commandResult =
+            runCommand(
+                "diff --no-index --inter-hunk-context=1000000 " + fileUtils.joinToAbsolutePath(repoPath, file1.getFilename()) + " " + fileUtils.joinToAbsolutePath(repoPath, file2.getFilename()));
+        return removeDiffHeader(commandResult.stdout);
+      } else {
+        String file1CommitIdWithSpace =
+            file1.getCommitId().isEmpty() ? "" : " " + file1.getCommitId();
+        String file2CommitIdWithSpace =
+            file2.getCommitId().isEmpty() ? "" : " " + file2.getCommitId();
+        CommandResult commandResult =
+            runCommand(
+                "diff --inter-hunk-context=1000000"
+                    + file1CommitIdWithSpace
+                    + file2CommitIdWithSpace
+                    + " -- "
+                    + file1.getFilename());
+        return removeDiffHeader(commandResult.stdout);
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }
     return null;
+  }
+
+  public static String getTextDiff(String file1, String file2) throws IOException {
+    String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
+    Process process = Runtime.getRuntime().exec(command.split(" "));
+    String stdout = readLines(process.getInputStream());
+    String stderr = readLines(process.getErrorStream());
+    return removeDiffHeader(stdout);
   }
 
   @Override

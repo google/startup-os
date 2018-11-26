@@ -24,6 +24,7 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.TextDifferencer;
 import java.io.IOException;
 import com.google.common.base.Strings;
@@ -97,7 +98,9 @@ public class TextDifferencerTool {
   void run() throws IOException {
     String leftFileContents = fileUtils.readFile(leftFile.get());
     String rightFileContents = fileUtils.readFile(rightFile.get());
-    TextDiff textDiff = textDifferencer.getTextDiff(leftFileContents, rightFileContents);
+    String diffString = GitRepo.getTextDiff(leftFile.get(), rightFile.get());
+    TextDiff textDiff =
+        textDifferencer.getTextDiff(leftFileContents, rightFileContents, diffString);
     int iLeft = 0;
     int iRight = 0;
     String leftLine = "";

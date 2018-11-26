@@ -16,31 +16,36 @@
 
 package com.google.startupos.tools.reviewer.localserver.service;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.TextDifferencer;
 import com.google.startupos.common.firestore.FirestoreClient;
+import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.BranchInfo;
+import com.google.startupos.common.repo.Protos.Commit;
+import com.google.startupos.common.repo.Protos.File.Action;
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
-import com.google.startupos.common.repo.Protos.File.Action;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.FileResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.PongResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.RemoveWorkspaceRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
@@ -50,10 +55,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.common.repo.Protos.BranchInfo;
-import com.google.common.collect.ImmutableList;
-import com.google.startupos.common.repo.Protos.File;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -95,78 +96,77 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     return repoFactory.create(repoPath);
   }
 
-  // Returns null when file does not exist in head repo
-  private String readTextFile(File file) throws IOException {
+  private void validateFile(File file) {
     if (file.getFilename().isEmpty()) {
       throw new IllegalArgumentException("File does not have a filename:\n" + file);
     }
+    if (!file.getWorkspace().isEmpty()) {
+      if (!file.getUser().isEmpty()) {
+        // It's another user
+        throw new UnsupportedOperationException("Other users are currently not supported");
+      }
+      if (!file.getCommitId().isEmpty()) {
+        if (!workspaceExists(file.getWorkspace())) {
+          if (!getHeadRepo(file.getRepoId()).commitExists(file.getCommitId())) {
+            logger
+                .atInfo()
+                .log(
+                    "Workspace %s doesn't exist, and commit %s doesn't exist in head repo",
+                    file.getWorkspace(), file.getCommitId());
+            file = file.toBuilder().clearWorkspace().build();
+          }
+        }
+      }
+    }
+  }
+
+  // Fallback to head repo if workspace does not exist
+  private File getHeadFallackIfNeeded(File file) {
+    if (!file.getWorkspace().isEmpty()
+        && !file.getCommitId().isEmpty()
+        && !workspaceExists(file.getWorkspace())) {
+      return file.toBuilder().clearWorkspace().build();
+    }
+    return file;
+  }
+
+  // Returns null when file does not exist
+  private String readHeadFile(File file) throws IOException {
+    Repo headRepo = getHeadRepo(file.getRepoId());
+    if (headRepo.fileExists(file.getCommitId(), file.getFilename())) {
+      return headRepo.getFileContents(file.getCommitId(), file.getFilename());
+    } else {
+      return null;
+    }
+  }
+
+  // Returns null when file does not exist
+  private String readWorkspaceFile(File file) throws IOException {
+    if (file.getCommitId().isEmpty()) {
+      // It's a file in the local filesystem (not in a repo)
+      String filePath =
+          fileUtils.joinToAbsolutePath(
+              basePath, "ws", file.getWorkspace(), file.getRepoId(), file.getFilename());
+      return fileUtils.readFile(filePath);
+    } else {
+      // It's a file in a repo
+      String repoPath =
+          fileUtils.joinToAbsolutePath(basePath, "ws", file.getWorkspace(), file.getRepoId());
+      Repo repo = repoFactory.create(repoPath);
+      return repo.getFileContents(file.getCommitId(), file.getFilename());
+    }
+  }
+
+  // Returns null when file does not exist in head repo
+  private String readTextFile(File file) throws IOException {
     if (file.getAction() == Action.DELETE) {
       return "";
     }
     try {
       if (file.getWorkspace().isEmpty()) {
-        // It's a file in head
-        Repo headRepo = getHeadRepo(file.getRepoId());
-        if (headRepo.fileExists(file.getCommitId(), file.getFilename())) {
-          return headRepo.getFileContents(file.getCommitId(), file.getFilename());
-        } else {
-          return null;
-        }
+        return readHeadFile(file);
       } else {
-        // It's a file in a workspace
-        if (file.getUser().isEmpty()) {
-          // It's the current user
-          if (file.getCommitId().isEmpty()) {
-            // It's a file in the local filesystem (not in a repo)
-            String filePath =
-                fileUtils.joinToAbsolutePath(
-                    basePath, "ws", file.getWorkspace(), file.getRepoId(), file.getFilename());
-            return fileUtils.readFile(filePath);
-          } else {
-            // It's a file in a repo
-            if (workspaceExists(file.getWorkspace())) {
-              String repoPath =
-                  fileUtils.joinToAbsolutePath(
-                      basePath, "ws", file.getWorkspace(), file.getRepoId());
-              Repo repo = repoFactory.create(repoPath);
-              return repo.getFileContents(file.getCommitId(), file.getFilename());
-            } else {
-              // Workspace doesn't exist, try to read from head repo
-              if (!getHeadRepo(file.getRepoId()).commitExists(file.getCommitId())) {
-                logger
-                    .atInfo()
-                    .log(
-                        "Workspace %s doesn't exist, and commit %s doesn't exist in head repo",
-                        file.getWorkspace(), file.getCommitId());
-                return "";
-              }
-              file = file.toBuilder().clearWorkspace().build();
-              return readTextFile(file);
-            }
-          }
-        } else {
-          // It's another user
-          if (file.getCommitId().isEmpty()) {
-            // It's a file in the local filesystem (not in a repo)
-            String filePath =
-                fileUtils.joinToAbsolutePath(
-                    basePath,
-                    "users",
-                    file.getUser(),
-                    "ws",
-                    file.getWorkspace(),
-                    file.getRepoId(),
-                    file.getFilename());
-            return fileUtils.readFile(filePath);
-          } else {
-            // It's a file in a repo
-            String repoPath =
-                fileUtils.joinToAbsolutePath(
-                    basePath, "users", file.getUser(), "ws", file.getWorkspace(), file.getRepoId());
-            Repo repo = repoFactory.create(repoPath);
-            return repo.getFileContents(file.getCommitId(), file.getFilename());
-          }
-        }
+        return readWorkspaceFile(file);
       }
     } catch (RuntimeException e) {
       logger.atSevere().withCause(e).log("readTextFile failed for:\n" + file);
@@ -206,59 +206,49 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     responseObserver.onCompleted();
   }
 
+  // Return null if repo doesn't exist.
+  private Repo getRepo(File file) {
+    if (file.getWorkspace().isEmpty()) {
+      return getHeadRepo(file.getRepoId());
+    } else {
+      return repoFactory.create(
+          fileUtils.joinToAbsolutePath(basePath, "ws", file.getWorkspace(), file.getRepoId()));
+    }
+  }
+
   @Override
   public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
     File file1 = req.getLeftFile();
     File file2 = req.getRightFile();
-    if (!file1.getFilename().equals(file2.getFilename()) || !file1.getRepoId().equals(file2.getRepoId())
+    validateFile(file1);
+    validateFile(file2);
+    if (!file1.getFilename().equals(file2.getFilename())
+        || !file1.getRepoId().equals(file2.getRepoId())
         || !file1.getWorkspace().equals(file2.getWorkspace())) {
       String message = "Files should have the same workspace, repo and filename:\n" + file1 + file2;
-      responseObserver.onError(
-          Status.NOT_FOUND
-              .withDescription(message)
-              .asException());
+      responseObserver.onError(Status.NOT_FOUND.withDescription(message).asException());
       throw new IllegalArgumentException(message);
     }
-    Repo repo = null;
-    if (file1.getWorkspace().isEmpty() || !workspaceExists(file1.getWorkspace())) {
-      // It's files in head
-      repo = getHeadRepo(file1.getRepoId());
-    } else {
-      // It's files in a workspace
-      if (file1.getUser().isEmpty()) {
-        // It's the current user
-        repo = repoFactory.create(fileUtils.joinToAbsolutePath(
-          basePath, "ws", file1.getWorkspace(), file1.getRepoId()));
-      } else {
-        // It's a different user. Currently not supported.
-        throw new UnsupportedOperationException("Not supporting different users");
-      }
-    }
-    if (repo == null) {
-      responseObserver.onError(
-          Status.NOT_FOUND
-              .withDescription(String.format("TextDiffRequest: %s", req))
-              .asException());
-      throw new IllegalStateException("Repo not found");
-    }
-    String wordDiffString = repo.getTextDiff(file1, file2, true);
-    System.out.println("YYYYYYYYYYYYYYYYYYYYYYYYYY");
-    System.out.println(wordDiffString);
-    System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-    // System.out.println(wordDiffString);
     try {
-      String leftText = readTextFile(req.getLeftFile());
-      String rightText = readTextFile(req.getRightFile());
+      file1 = getHeadFallackIfNeeded(file1);
+      file2 = getHeadFallackIfNeeded(file2);
+      Repo repo = getRepo(file1);
+      String leftText = readTextFile(file1);
+      String rightText = readTextFile(file2);
+      String diffString = repo.getTextDiff(file1, file2);
       responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .setTextDiff(textDifferencer.getTextDiff2(leftText, rightText, wordDiffString))
+              .setTextDiff(textDifferencer.getTextDiff(leftText, rightText, diffString))
               .build());
     } catch (IOException e) {
+      e.printStackTrace();
+      responseObserver.onNext(
+          TextDiffResponse.newBuilder().setTextDiff(TextDiff.getDefaultInstance()).build());
       responseObserver.onError(
           Status.NOT_FOUND
               .withDescription(String.format("TextDiffRequest: %s", req))
               .asException());
-    }  
+    }
     responseObserver.onCompleted();
   }
 
@@ -312,7 +302,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
                         .setRepoId(repoId)
                         .setFilenameWithRepo(fileUtils.joinPaths(repoId, file.getFilename()))
                         .build())
-            .peek(System.out::println)
             .collect(Collectors.toList()));
   }
 

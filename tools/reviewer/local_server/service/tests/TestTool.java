@@ -129,7 +129,7 @@ public class TestTool {
 
   public static void main(String[] args) {
     TestTool tool = new TestTool();
-    tool.runGetTextDiff();
+    tool.runGetDiffFiles("fix_diff6", 329);
   }
 }
 

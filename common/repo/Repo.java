@@ -19,6 +19,7 @@ package com.google.startupos.common.repo;
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
+import java.io.IOException;
 
 /**
  * An interface for a code repository that uses Trunk-based development. In particular, this means
@@ -67,7 +68,7 @@ public interface Repo {
 
   boolean fileExists(String commitId, String path);
 
-  String getTextDiff(File file1, File file2, boolean wordDiff);
+  String getTextDiff(File file1, File file2) throws IOException;
 
   String getFileContents(String commitId, String path);
   /* Get current branch name */

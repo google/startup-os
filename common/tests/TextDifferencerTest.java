@@ -19,9 +19,12 @@ package com.google.startupos.common;
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.TextChange;
 import com.google.startupos.common.Protos.TextDiff;
+import dagger.Component;
+import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +35,7 @@ import org.junit.runners.JUnit4;
 public class TextDifferencerTest {
 
   private TextDifferencer differencer;
+  private FileUtils fileUtils;
 
   private TextChange textChange(
       String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
@@ -47,11 +51,16 @@ public class TextDifferencerTest {
   @Before
   public void setUp() {
     differencer = new TextDifferencer();
+    fileUtils = DaggerTextDifferencerTest_TestComponent.create().getFileUtils();
+  }
+
+  protected String getGoldenFile(String filename) {
+    return fileUtils.readFileFromResourcesUnchecked("common/tests/resources/" + filename);
   }
 
   @Test
-  public void testEmptyDiff2() {
-    assertEquals(TextDiff.getDefaultInstance(), differencer.getTextDiff2("", "", ""));
+  public void testEmptyDiff() {
+    assertEquals(TextDiff.getDefaultInstance(), differencer.getTextDiff("", "", ""));
   }
 
   @Test
@@ -63,131 +72,168 @@ public class TextDifferencerTest {
             .setLeftFileContents(text)
             .setRightFileContents(text)
             .build();
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(text, text, text));
+    assertEquals(expectedTextDiff, differencer.getTextDiff(text, text, ""));
   }
 
   @Test
-  public void testOnlyAdditions2() {
+  public void testOnlyAdditions() {
     String leftContents = "";
     String rightContents = "Addition.";
+    String diff = "@@ -0,0 +1 @@\n+Addition.";
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
             .addRightChange(
-                TextChange.newBuilder()
-                    .setText(rightContents)
-                    .setType(ChangeType.ADD)
-                    .setEndIndex(9)
-                    .build())
+                TextChange.newBuilder().setText(rightContents).setType(ChangeType.ADD).build())
+            .addLeftChange(TextChange.newBuilder().setType(ChangeType.LINE_PLACEHOLDER).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(leftContents, rightContents, "{+Addition.+}"));
+    assertEquals(
+        expectedTextDiff,
+        differencer.getTextDiff(leftContents, rightContents, diff));
   }
 
-  @Test
-  public void testOnlyDeletions2() {
-    String leftContents = "Deletion.";
-    String rightContents = "";
+      @Test
+      public void testOnlyDeletions() {
+        String leftContents = "Deletion.";
+        String rightContents = "";
+        String diff = "@@ -1 +0,0 @@\n-Deletion.";
 
-    TextDiff expectedTextDiff =
-        TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder()
-                    .setText(leftContents)
-                    .setType(ChangeType.DELETE)
-                    .setEndIndex(9)
-                    .build())
-            .setLeftFileContents(leftContents)
-            .setRightFileContents(rightContents)
-            .build();
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(leftContents, rightContents, "[-Deletion.-]"));
-  }
+        TextDiff expectedTextDiff =
+            TextDiff.newBuilder()
+                .addLeftChange(
+                    TextChange.newBuilder()
+                        .setText(leftContents)
+                        .setType(ChangeType.DELETE)
+                        .build())
+                .addRightChange(
+                    TextChange.newBuilder()
+                        .setText(rightContents)
+                        .setType(ChangeType.LINE_PLACEHOLDER)
+                        .build())
+                .setLeftFileContents(leftContents)
+                .setRightFileContents(rightContents)
+                .build();
+        assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diff));
+      }
 
-  @Test
-  public void testOnlyNoChanges2() {
-    String contents = "No Change.";
+      @Test
+      public void testOnlyNoChanges() {
+        String contents = "No Change.";
 
-    TextDiff expectedTextDiff =
-        TextDiff.newBuilder()
-            .setLeftFileContents(contents)
-            .setRightFileContents(contents)
-            .build();
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(contents, contents, ""));
-  }
+        TextDiff expectedTextDiff =
+            TextDiff.newBuilder()
+                .setLeftFileContents(contents)
+                .setRightFileContents(contents)
+                .build();
+        assertEquals(expectedTextDiff, differencer.getTextDiff(contents, contents, ""));
+      }
 
-  @Test
-  public void testMixedChangesAtTheBeginning() {
-    String leftContents = "No Change.";
-    String rightContents = "With Change.";
+      @Test
+      public void testMixedChangesAtTheBeginning() {
+        String leftContents = "No Change.";
+        String rightContents = "With Change.";
+        String diff = "@@ -1 +1 @@\n-No Change.\n+With Change.";
 
-    TextDiff expectedTextDiff =
-        TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder()
-                    .setText("No")
-                    .setType(ChangeType.DELETE)
-                    .setEndIndex(2)
-                    .build())
-            .addRightChange(
-                TextChange.newBuilder()
-                    .setText("With")
-                    .setType(ChangeType.ADD)
-                    .setEndIndex(4)
-                    .build())
-            .setLeftFileContents(leftContents)
-            .setRightFileContents(rightContents)
-            .build();
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(leftContents, rightContents, "[-No-]{+With+} Change."));
-  }
+        TextDiff expectedTextDiff =
+            TextDiff.newBuilder()
+                .addLeftChange(
+                    TextChange.newBuilder()
+                        .setText("No Change.")
+                        .setType(ChangeType.DELETE)
+                        .build())
+                .addRightChange(
+                    TextChange.newBuilder()
+                        .setText("With Change.")
+                        .setType(ChangeType.ADD)
+                        .build())
+                .setLeftFileContents(leftContents)
+                .setRightFileContents(rightContents)
+                .build();
+        assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diff));
+      }
 
-  @Test
-  public void testMixedChangesAtTheMiddle() {
-    String leftContents = "With Change.";
-    String rightContents = "With a Change.";
+      @Test
+      public void testMixedChangesAtTheMiddle() {
+        String leftContents = "With Change.";
+        String rightContents = "With a Change.";
+        String diff = "@@ -1 +1 @@\n-With Change.\n+With a Change.";
 
-    TextDiff expectedTextDiff =
-        TextDiff.newBuilder()
-            .addRightChange(
-                TextChange.newBuilder()
-                    .setText("a ")
-                    .setType(ChangeType.ADD)
-                    .setStartIndex(5)
-                    .setEndIndex(7)
-                    .build())
-            .setLeftFileContents(leftContents)
-            .setRightFileContents(rightContents)
-            .build();
+        TextDiff expectedTextDiff =
+            TextDiff.newBuilder()
+                .addLeftChange(
+                    TextChange.newBuilder()
+                        .setText("With Change.")
+                        .setType(ChangeType.DELETE)
+                        .build())
+                .addRightChange(
+                    TextChange.newBuilder()
+                        .setText("With a Change.")
+                        .setType(ChangeType.ADD)
+                        .build())
+                .setLeftFileContents(leftContents)
+                .setRightFileContents(rightContents)
+                .build();
+        assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diff));
+      }
 
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(leftContents, rightContents, "With {+a +}Change."));
-  }
+      @Test
+      public void testMixedChangesAtTheEnd() {
+        String leftContents = "Change at end.";
+        String rightContents = "Change at end!";
+        String diff = "@@ -1 +1 @@\n-Change at end.\n+Change at end!";
 
-  @Test
-  public void testMixedChangesAtTheEnd() {
-    String leftContents = "Change at end.";
-    String rightContents = "Change at end!";
+        TextDiff expectedTextDiff =
+            TextDiff.newBuilder()
+                .addLeftChange(
+                    TextChange.newBuilder()
+                        .setText("Change at end.")
+                        .setType(ChangeType.DELETE)
+                        .build())
+                .addRightChange(
+                    TextChange.newBuilder()
+                        .setText("Change at end!")
+                        .setType(ChangeType.ADD)
+                        .build())
+                .setLeftFileContents(leftContents)
+                .setRightFileContents(rightContents)
+                .build();
 
-    TextDiff expectedTextDiff =
-        TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder()
-                    .setText(".")
-                    .setType(ChangeType.DELETE)
-                    .setStartIndex(13)
-                    .setEndIndex(14)
-                    .build())
-            .addRightChange(
-                TextChange.newBuilder()
-                    .setText("!")
-                    .setType(ChangeType.ADD)
-                    .setStartIndex(13)
-                    .setEndIndex(14)
-                    .build())
-            .setLeftFileContents(leftContents)
-            .setRightFileContents(rightContents)
-            .build();
+        assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diff));
+      }
 
-    assertEquals(expectedTextDiff, differencer.getTextDiff2(leftContents, rightContents, "Change at end[-.-]{+!+}"));
+    @Test
+    public void testBuildFileChange() {
+      String leftContents = getGoldenFile("BUILD_before.txt");
+      String rightContents = getGoldenFile("BUILD_after.txt");
+      String diffString = getGoldenFile("BUILD_diff.txt");
+
+      TextDiff expectedTextDiff =
+          TextDiff.newBuilder()
+              .addLeftChange(
+                  TextChange.newBuilder()
+                      .setType(ChangeType.LINE_PLACEHOLDER)
+                      .setLineNumber(12)
+                      .build())
+              .addRightChange(
+                  TextChange.newBuilder()
+                      .setText("        \"//common/repo:repo_java_proto\",")
+                      .setType(ChangeType.ADD)
+                      .setLineNumber(12)
+                      .build())
+              .setLeftFileContents(leftContents)
+              .setRightFileContents(rightContents)
+              .build();
+
+      assertEquals(
+          expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diffString));
+    }
+
+  @Singleton
+  @Component(modules = CommonModule.class)
+  interface TestComponent {
+    FileUtils getFileUtils();
   }
 }
 

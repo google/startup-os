@@ -219,8 +219,9 @@ public class CodeReviewServiceTextDiffTest {
   }
 
   private TextDiffResponse getExpectedResponse(String contents) {
+    // No change means a space at the beginning of every line:
     return TextDiffResponse.newBuilder()
-        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents))
+        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents, ""))
         .build();
   }
 
@@ -255,7 +256,7 @@ public class CodeReviewServiceTextDiffTest {
   }
 
   // Committed, workspace doesn't exist
-  @Test
+  @Test(expected = StatusRuntimeException.class)
   public void testTextDiff_committedAndWorkspaceNotExists() {
     File file =
         File.newBuilder()
@@ -266,7 +267,6 @@ public class CodeReviewServiceTextDiffTest {
             .build();
 
     TextDiffResponse response = getResponse(file);
-    assertEquals(getExpectedResponse(""), response);
   }
 
   // Committed, workspace doesn't exist (pushed)
