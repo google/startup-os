@@ -462,5 +462,30 @@ public class GitRepoTest {
 
     assertFalse(repo.isMerged(TEST_BRANCH));
   }
+
+  @Test
+  public void testHasChangesWithUncommittedFile() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
+    gitRepo.addFile("added_file.txt");
+    assertTrue(gitRepo.hasChanges(TEST_BRANCH));
+  }
+
+  @Test
+  public void testHasChangesIsFalseWithNoChanges() {
+    repo.switchBranch(TEST_BRANCH);
+    assertFalse(gitRepo.hasChanges(TEST_BRANCH));
+  }
+
+  @Test
+  public void testHasChangesWhenNewCommitExists() {
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, "added_file.txt"));
+    gitRepo.addFile("added_file.txt");
+    gitRepo.commit(gitRepo.getUncommittedFiles(), COMMIT_MESSAGE);
+    assertTrue(gitRepo.hasChanges(TEST_BRANCH));
+  }
 }
 

@@ -34,7 +34,10 @@ public interface Repo {
   void switchBranch(String branch);
   /** Tags the commit at head. */
   void tagHead(String name);
-  /** Gets commits on branch since it diverged from master. */
+  /**
+   * Gets commits on branch since it diverged from master, including the last master commit, at
+   * position 0.
+   */
   ImmutableList<Commit> getCommits(String branch);
   /** Gets all uncommited files. This includes new, modified and deleted files. */
   ImmutableList<File> getUncommittedFiles();
@@ -52,10 +55,9 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
-  /*
-   * Reset current branch.
-   * All changes introduced after it would be marked as unstaged
-   * but saved in working tree
+  /**
+   * Reset current branch. All changes introduced after it would be marked as unstaged but saved in
+   * working tree
    */
   void reset(String ref);
   /** Remove branch */
@@ -68,7 +70,11 @@ public interface Repo {
   boolean fileExists(String commitId, String path);
 
   String getFileContents(String commitId, String path);
-  /* Get current branch name */
+  /** Get current branch name */
   String currentBranch();
+  /** Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git) */
+  String getRemoteURL();
+  /** Checks if there are commits added since master, or any uncommitted files */
+  boolean hasChanges(String branch);
 }
 

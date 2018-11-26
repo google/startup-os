@@ -381,6 +381,18 @@ public class GitRepo implements Repo {
     return commandResult.stdout.trim().replace("\n", "");
   }
 
+  @Override
+  public String getRemoteURL() {
+    return runCommand("remote get-url origin").stdout;
+  }
+
+  @Override
+  public boolean hasChanges(String branch) {
+    // `getCommits(String branch)` method gets list of commits where on the position 0 keeps the
+    // last master commit. We ignore the first element.
+    return (getCommits(branch).size() > 1) || (!getUncommittedFiles().isEmpty());
+  }
+
   private void switchToMasterBranch() {
     if (!currentBranch().equals("master")) {
       switchBranch("master");
