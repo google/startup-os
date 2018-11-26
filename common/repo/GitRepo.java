@@ -394,14 +394,18 @@ public class GitRepo implements Repo {
       throw new IOException("File2 should exist:\n" + file2);
     }
     if (file1.getCommitId().isEmpty() && !file2.getCommitId().isEmpty()) {
-      throw new UnsupportedOperationException("If file1 has no commit, file 2 should also not have a commit");
+      throw new UnsupportedOperationException(
+          "If file1 has no commit, file 2 should also not have a commit");
     }
     try {
       if (file1.getCommitId().isEmpty() && file2.getCommitId().isEmpty()) {
         // Use the --no-index flag
         CommandResult commandResult =
             runCommand(
-                "diff --no-index --inter-hunk-context=1000000 " + fileUtils.joinToAbsolutePath(repoPath, file1.getFilename()) + " " + fileUtils.joinToAbsolutePath(repoPath, file2.getFilename()));
+                "diff --no-index --inter-hunk-context=1000000 "
+                    + fileUtils.joinToAbsolutePath(repoPath, file1.getFilename())
+                    + " "
+                    + fileUtils.joinToAbsolutePath(repoPath, file2.getFilename()));
         return removeDiffHeader(commandResult.stdout);
       } else {
         String file1CommitIdWithSpace =

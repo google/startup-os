@@ -23,8 +23,8 @@ java_test(
     srcs = [
         "CodeReviewServiceTextDiffTest.java",
     ],
-    test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceTextDiffTest",
     local = 1,
+    test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceTextDiffTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
