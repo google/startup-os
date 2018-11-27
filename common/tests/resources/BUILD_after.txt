@@ -1,0 +1,15 @@
+package(default_visibility = ["//visibility:public"])
+
+java_library(
+    name = "text_differencer",
+    srcs = [
+        "TextDifferencer.java",
+    ],
+    deps = [
+        ":diff_match_patch",
+        ":text_difference_java_proto",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//common/repo:repo_java_proto",
+    ],
+)

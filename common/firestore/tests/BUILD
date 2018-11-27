@@ -21,7 +21,6 @@ java_test(
     srcs = [
         "FirestoreJsonFormatPrinterTest.java",
     ],
-    data = glob(["*.json"]),
     resources = glob(["resources/*.json"]),
     test_class = "com.google.startupos.common.firestore.test.FirestoreJsonFormatPrinterTest",
     deps = [
@@ -41,7 +40,6 @@ java_test(
     srcs = [
         "FirestoreJsonFormatParserTest.java",
     ],
-    data = glob(["*.json"]),
     resources = glob(["resources/*.json"]),
     test_class = "com.google.startupos.common.firestore.test.FirestoreJsonFormatParserTest",
     deps = [

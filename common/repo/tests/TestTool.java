@@ -35,7 +35,7 @@ public class TestTool {
     this.repoFactory = repoFactory;
   }
 
-  void run(String[] args) {
+  void run(String[] args) throws Exception {
     if (args.length > 0) {
       String command = args[0];
       Repo repo = repoFactory.create(System.getenv("BUILD_WORKSPACE_DIRECTORY"));
@@ -90,6 +90,16 @@ public class TestTool {
             System.out.println(branch);
           }
           break;
+        case "getTextDiff":
+          File file1 =
+              File.newBuilder().setCommitId(args[1]).setFilename("tools/aa/AaModule.java").build();
+          File file2 =
+              File.newBuilder().setCommitId(args[2]).setFilename("tools/aa/AaModule.java").build();
+          System.out.println(repo.getTextDiff(file1, file2));
+          break;
+        case "getFileContents":
+          System.out.println(repo.getFileContents(args[1], args[2]));
+          break;
         default:
           System.out.println("Unknown command");
           break;
@@ -105,7 +115,7 @@ public class TestTool {
     TestTool getTestTool();
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     DaggerTestTool_TestToolComponent.create().getTestTool().run(args);
   }
 }

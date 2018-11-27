@@ -7,9 +7,10 @@ bazel run //tools:buildifier -- -mode=fix `pwd`/…
 # (https://github.com/bazelbuild/buildtools/blob/master/unused_deps/)
 bazel run //tools:unused_deps -- <BUILD target, e.g //folder:target>
 
-
 # Bash completion
 # This assumes you've installed `bazel` via APT or Homebrew
 # To enable bundled-in autocomplete for `bazel`, run completion.sh
 # completion.sh present at https://github.com/google/startup-os/tree/master/tools
 sh tools/completion.sh
+
+# To show logs for passing tests, add this to `bazel test`: --test_output=all
