@@ -30,5 +30,9 @@ public class Strings {
   public static String capitalize(String string) {
     return StringUtils.capitalize(string);
   }
+
+  public static int ordinalIndexOf(String string, String searchString, int n) {
+    return StringUtils.ordinalIndexOf(string, searchString, n);
+  }
 }
 
