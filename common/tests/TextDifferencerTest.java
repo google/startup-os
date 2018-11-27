@@ -18,10 +18,12 @@ package com.google.startupos.common;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.ImmutableList;
+import com.google.protobuf.TextFormat;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.TextChange;
 import com.google.startupos.common.Protos.TextDiff;
+import dagger.Component;
+import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,26 +34,56 @@ import org.junit.runners.JUnit4;
 public class TextDifferencerTest {
 
   private TextDifferencer differencer;
-
-  private TextChange textChange(
-      String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
-    return TextChange.newBuilder()
-        .setText(text)
-        .setType(type)
-        .setLineNumber(lineNumber)
-        .setStartIndex(startIndex)
-        .setEndIndex(endIndex)
-        .build();
-  }
+  private FileUtils fileUtils;
 
   @Before
   public void setUp() {
     differencer = new TextDifferencer();
+    fileUtils = DaggerTextDifferencerTest_TestComponent.create().getFileUtils();
+  }
+
+  protected String readFile(String filename) {
+    return fileUtils.readFileFromResourcesUnchecked("common/tests/resources/" + filename);
+  }
+
+  protected TextDiff readTextDiff(String filename) {
+    String protoText = readFile(filename);
+    TextDiff.Builder result = TextDiff.newBuilder();
+    try {
+      TextFormat.merge(protoText, result);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+    return result.build();
   }
 
   @Test
   public void testEmptyDiff() {
     assertEquals(TextDiff.getDefaultInstance(), differencer.getTextDiff("", ""));
+  }
+
+  @Test
+  public void testLeftAndRightAreEqual() {
+    String text = "aaa";
+
+    TextDiff expectedTextDiff =
+        TextDiff.newBuilder()
+            .addLeftChange(
+                TextChange.newBuilder()
+                    .setText(text)
+                    .setType(ChangeType.NO_CHANGE)
+                    .setEndIndex(3)
+                    .build())
+            .addRightChange(
+                TextChange.newBuilder()
+                    .setText(text)
+                    .setType(ChangeType.NO_CHANGE)
+                    .setEndIndex(3)
+                    .build())
+            .setLeftFileContents(text)
+            .setRightFileContents(text)
+            .build();
+    assertEquals(expectedTextDiff, differencer.getTextDiff(text, text));
   }
 
   @Test
@@ -233,6 +265,20 @@ public class TextDifferencerTest {
             .build();
 
     assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents));
+  }
+
+  @Test
+  public void testBuildFileChange() {
+    String leftContents = readFile("BUILD_before.txt");
+    String rightContents = readFile("BUILD_after.txt");
+    TextDiff expectedTextDiff = readTextDiff("BUILD_diff_prototxt.txt");
+    assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents));
+  }
+
+  @Singleton
+  @Component(modules = CommonModule.class)
+  interface TestComponent {
+    FileUtils getFileUtils();
   }
 }
 
