@@ -53,4 +53,7 @@ message WordChange {
   int32 start_index = 4;
   int32 end_index = 5;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> "D329:

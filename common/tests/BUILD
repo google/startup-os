@@ -47,6 +47,8 @@ java_test(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/junit",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/com/google/protobuf:protobuf_java_util",
     ],
 )
 

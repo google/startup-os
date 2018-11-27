@@ -35,7 +35,11 @@ public interface Repo {
   void switchBranch(String branch);
   /** Tags the commit at head. */
   void tagHead(String name);
+<<<<<<< HEAD
   /**
+=======
+  /** 
+>>>>>>> "D329:
    * Gets commits on branch since it diverged from master, including the last master commit, at
    * position 0.
    */
@@ -56,7 +60,11 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
+<<<<<<< HEAD
   /**
+=======
+  /*
+>>>>>>> "D329:
    * Reset current branch. All changes introduced after it would be marked as unstaged but saved in
    * working tree
    */
@@ -82,4 +90,3 @@ public interface Repo {
   /** Checks if there are commits added since master, or any uncommitted files */
   boolean hasChanges(String branch);
 }
-

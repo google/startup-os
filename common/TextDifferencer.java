@@ -169,6 +169,9 @@ public class TextDifferencer {
     System.out.println("AAAAAAAAAAAAA");
     TextDiff.Builder result = textDiff.toBuilder();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> "D329:
     result.clearLeftDiffLine();
     result.clearRightDiffLine();
     int segmentStart = 0;
@@ -185,12 +188,15 @@ public class TextDifferencer {
         }
         segmentStart = diffIndex;
       }
+<<<<<<< HEAD
 =======
     // result.clearLeftDiffLine();
     // result.clearRightDiffLine();
     for (DiffLine diffLine : textDiff.getLeftDiffLineList()) {
       result.addLeftChange(convertToTextChange(diffLine));
 >>>>>>> webapp DiffLine
+=======
+>>>>>>> "D329:
     }
     // Take care of last segment
     if (segmentStart < textDiff.getLeftDiffLineList().size() - 1) {
@@ -231,6 +237,7 @@ public class TextDifferencer {
     result.append(diffLines.get(endIndex - 1).getText());
     return result.toString();
   }
+<<<<<<< HEAD
 
   private ChangeType getChangeType(Operation operation) {
     if (operation == Operation.EQUAL) {
@@ -244,4 +251,18 @@ public class TextDifferencer {
     }
   }
 }
+=======
+>>>>>>> "D329:
 
+  private ChangeType getChangeType(Operation operation) {
+    if (operation == Operation.EQUAL) {
+      return ChangeType.NO_CHANGE;
+    } else if (operation == Operation.INSERT) {
+      return ChangeType.ADD;
+    } else if (operation == Operation.DELETE) {
+      return ChangeType.DELETE;
+    } else {
+      throw new IllegalArgumentException("Unknown Operation enum: " + operation);
+    }
+  }
+}
