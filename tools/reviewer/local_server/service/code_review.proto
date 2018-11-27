@@ -58,6 +58,7 @@ message GithubPr {
   string repo = 2;
   // GitHub Pull Request number (essentially an ID). It is set by GitHub.
   int64 number = 3;
+}
 
 // TODO: Separate non-request/response messages into a separate file. This
 // resulted in issues
@@ -130,6 +131,7 @@ message Thread {
   repeated Comment comment = 6;
   Type type = 7;
   string id = 8;
+  int32 github_comment_position = 9;
 }
 
 message Comment {

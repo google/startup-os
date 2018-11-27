@@ -60,9 +60,15 @@ public class GithubWriter {
                     .setRequestData(
                         CreatePullRequestRequest.CreatePullRequestRequestData.newBuilder()
                             .setTitle(pullRequest.getTitle())
-                            .setHead(pullRequest.getHead().getRef())
-                            .setBase(pullRequest.getBase().getRef())
-                            .setBody(pullRequest.getBody())
+                            .setHead(pullRequest.getHeadBranchName())
+                            .setBase(pullRequest.getBaseBranchName())
+                            // TODO: Set more informative message for default description
+                            // An attempt to create new Pull Request without specifying `body`
+                            // causes an error. We set the default value to avoid the error.
+                            .setBody(
+                                pullRequest.getBody().isEmpty()
+                                    ? "Default description"
+                                    : pullRequest.getBody())
                             .build())
                     .build())
             .getPullRequest()

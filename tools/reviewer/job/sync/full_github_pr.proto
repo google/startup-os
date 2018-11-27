@@ -22,18 +22,12 @@ message PullRequest {
   string updated_at = 8;
   repeated ReviewComment review_comment = 9;
   repeated IssueComment issue_comment = 10;
-  CommitPointer base = 11;
-  CommitPointer head = 12;
+  string base_branch_name = 11;
+  string head_branch_name = 12;
   string repo = 13;
   repeated CommitInfo commits_info = 14;
   string owner = 15;
   int64 associated_reviewer_diff = 16;
-}
-
-message CommitPointer {
-  string sha = 1;
-  string ref = 2;
-  User user = 3;
 }
 
 message ReviewComment {

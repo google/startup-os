@@ -17,7 +17,6 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitPointer;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
@@ -43,12 +42,7 @@ public class DiffConverter {
     this.githubClient = githubClient;
   }
 
-  private enum CommitPointerType {
-    BASE,
-    HEAD
-  }
-
-  public List<PullRequest> toPullRequests(Diff diff) throws IOException {
+  public List<PullRequest> toPullRequests(Diff diff) {
     List<PullRequest> pullRequests = new ArrayList<>();
 
     for (GithubPr githubPr : diff.getGithubPrList()) {
@@ -61,16 +55,15 @@ public class DiffConverter {
           .setState(getPullRequestState(diff.getStatus()))
           .setTitle("D" + diff.getId())
           .setUser(User.newBuilder().setEmail(diff.getAuthor().getEmail()).build())
-          // TODO: Set more informative message for default description
-          .setBody(diff.getDescription().isEmpty() ? "Default description" : diff.getDescription())
+          .setBody(diff.getDescription())
           .setCreatedAt(Instant.ofEpochMilli(diff.getCreatedTimestamp()).toString())
           .setUpdatedAt(Instant.ofEpochMilli(diff.getModifiedTimestamp()).toString())
-          .setBase(getCommitPointer(githubPr, CommitPointerType.BASE, "D" + diff.getId()))
-          .setHead(getCommitPointer(githubPr, CommitPointerType.HEAD, "D" + diff.getId()))
-          .setRepo(githubPr.getRepo().getRepo())
+          .setBaseBranchName("master")
+          .setHeadBranchName("D" + diff.getId())
+          .setRepo(githubPr.getRepo())
           .addAllReviewComment(getReviewCommentsByRepoName(diff, githubPr))
           .addAllIssueComment(getIssueComments(diff, githubPr))
-          .setOwner(githubPr.getRepo().getOwner())
+          .setOwner(githubPr.getOwner())
           .setAssociatedReviewerDiff(diff.getId());
       pullRequests.add(pullRequest.build());
     }
@@ -82,7 +75,7 @@ public class DiffConverter {
     List<Thread> codeThreads =
         diff.getCodeThreadList()
             .stream()
-            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo().getRepo()))
+            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo()))
             .collect(Collectors.toList());
 
     for (Thread thread : codeThreads) {
@@ -91,7 +84,10 @@ public class DiffConverter {
         githubComment
             .setPath(thread.getFile().getFilename())
             .setId(comment.getGithubCommentId())
-            .setPosition(getReviewCommentPosition(thread, githubPr))
+            .setPosition(
+                thread.getGithubCommentPosition() == 0
+                    ? getReviewCommentPosition(thread, githubPr)
+                    : thread.getGithubCommentPosition())
             .setCommitId(thread.getFile().getCommitId())
             .setUser(User.newBuilder().setEmail(comment.getCreatedBy()).build())
             .setBody(comment.getContent())
@@ -113,34 +109,6 @@ public class DiffConverter {
     }
   }
 
-  private CommitPointer getCommitPointer(
-      GithubPr githubPr, CommitPointerType commitPointerType, String headBranch)
-      throws IOException {
-
-    if (githubPr.getNumber() == 0) {
-      CommitPointer.Builder commitPointer = CommitPointer.newBuilder();
-      commitPointer.setRef(
-          commitPointerType.equals(CommitPointerType.BASE) ? "master" : headBranch);
-      return commitPointer.build();
-    } else {
-      PullRequest existingPullRequest =
-          githubClient
-              .getPullRequest(
-                  GithubProtos.PullRequestRequest.newBuilder()
-                      .setOwner(githubPr.getRepo().getOwner())
-                      .setRepo(githubPr.getRepo().getRepo())
-                      .setNumber(githubPr.getNumber())
-                      .build())
-              .getPullRequest();
-
-      if (commitPointerType.equals(CommitPointerType.BASE)) {
-        return existingPullRequest.getBase();
-      } else {
-        return existingPullRequest.getHead();
-      }
-    }
-  }
-
   private int getReviewCommentPosition(Thread thread, GithubPr githubPr) {
     LineNumberConverter.Side commentSide =
         thread.getFile().getCommitId().equals(thread.getCommitId())
@@ -152,8 +120,8 @@ public class DiffConverter {
           githubClient
               .getCommit(
                   CommitRequest.newBuilder()
-                      .setOwner(githubPr.getRepo().getOwner())
-                      .setRepo(githubPr.getRepo().getRepo())
+                      .setOwner(githubPr.getOwner())
+                      .setRepo(githubPr.getRepo())
                       .setSha(thread.getFile().getCommitId())
                       .build())
               .getCommit()
@@ -181,7 +149,7 @@ public class DiffConverter {
     List<Thread> diffThreads =
         diff.getDiffThreadList()
             .stream()
-            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo().getRepo()))
+            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo()))
             .collect(Collectors.toList());
     for (Protos.Thread thread : diffThreads) {
       thread
