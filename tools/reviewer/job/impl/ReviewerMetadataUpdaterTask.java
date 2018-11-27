@@ -27,6 +27,7 @@ import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
+import com.google.startupos.tools.reviewer.job.impl.FirestoreTaskBase;
 
 import javax.inject.Inject;
 import java.io.FileInputStream;
@@ -47,7 +48,7 @@ import java.util.stream.Stream;
  * `REVIEWER_REGISTRY_DOCUMENT_NAME` and `REVIEWER_REGISTRY_DOCUMENT_NAME_BIN` documents in
  * `REVIEWER_REGISTRY_COLLECTION` collection
  */
-public class ReviewerMetadataUpdaterTask implements Task {
+public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
   private static final String REVIEWER_REGISTRY_COLLECTION = "/reviewer";
@@ -60,11 +61,8 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private final ReentrantLock lock = new ReentrantLock();
 
   private String storedChecksum;
-  private FirestoreClient firestoreClient;
-
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
-  private FirestoreClientFactory firestoreClientFactory;
 
   @Inject
   public ReviewerMetadataUpdaterTask(
@@ -81,27 +79,6 @@ public class ReviewerMetadataUpdaterTask implements Task {
         REVIEWER_REGISTRY_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME, registry);
     firestoreClient.createProtoDocument(
         REVIEWER_REGISTRY_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
-  }
-
-  private void initializeFirestoreClientIfNull() {
-    if (this.firestoreClient == null) {
-      FileInputStream serviceAccount = null;
-      try {
-        serviceAccount = new FileInputStream(ReviewerJob.serviceAccountJson.get());
-        ServiceAccountCredentials cred =
-            (ServiceAccountCredentials)
-                GoogleCredentials.fromStream(serviceAccount)
-                    .createScoped(
-                        Arrays.asList(
-                            "https://www.googleapis.com/auth/cloud-platform",
-                            "https://www.googleapis.com/auth/datastore"));
-        this.firestoreClient =
-            this.firestoreClientFactory.create(
-                cred.getProjectId(), cred.refreshAccessToken().getTokenValue());
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
   }
 
   private static Stream<Integer> intStream(byte[] array) {

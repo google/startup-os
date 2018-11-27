@@ -123,7 +123,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void switchBranch(String branch) {
-    if (branchExists(branch)) {
+    if (branchExists(branch) || commitExists(branch)) {
       runCommand("checkout --quiet " + branch);
     } else {
       runCommand("checkout --quiet -b " + branch);
@@ -379,6 +379,18 @@ public class GitRepo implements Repo {
   public String getHeadCommitId() {
     CommandResult commandResult = runCommand("rev-parse HEAD");
     return commandResult.stdout.trim().replace("\n", "");
+  }
+
+  @Override
+  public String getRemoteURL() {
+    return runCommand("remote get-url origin").stdout;
+  }
+
+  @Override
+  public boolean hasChanges(String branch) {
+    // `getCommits(String branch)` method gets list of commits where on the position 0 keeps the
+    // last master commit. We ignore the first element.
+    return (getCommits(branch).size() > 1) || (!getUncommittedFiles().isEmpty());
   }
 
   private void switchToMasterBranch() {
