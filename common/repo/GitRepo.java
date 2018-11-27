@@ -26,7 +26,6 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.Strings;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -425,7 +424,6 @@ public class GitRepo implements Repo {
     String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
     Process process = Runtime.getRuntime().exec(command.split(" "));
     String stdout = streamToString(process.getInputStream());
-    String stderr = streamToString(process.getErrorStream());
     return removeDiffHeader(stdout);
   }
 
