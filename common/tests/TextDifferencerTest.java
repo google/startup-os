@@ -18,7 +18,6 @@ package com.google.startupos.common;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.ImmutableList;
 import com.google.protobuf.TextFormat;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.TextChange;
@@ -36,17 +35,6 @@ public class TextDifferencerTest {
 
   private TextDifferencer differencer;
   private FileUtils fileUtils;
-
-  private TextChange textChange(
-      String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
-    return TextChange.newBuilder()
-        .setText(text)
-        .setType(type)
-        .setLineNumber(lineNumber)
-        .setStartIndex(startIndex)
-        .setEndIndex(endIndex)
-        .build();
-  }
 
   @Before
   public void setUp() {
