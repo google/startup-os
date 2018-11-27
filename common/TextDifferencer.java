@@ -168,6 +168,7 @@ public class TextDifferencer {
     }
     System.out.println("AAAAAAAAAAAAA");
     TextDiff.Builder result = textDiff.toBuilder();
+<<<<<<< HEAD
     result.clearLeftDiffLine();
     result.clearRightDiffLine();
     int segmentStart = 0;
@@ -184,6 +185,12 @@ public class TextDifferencer {
         }
         segmentStart = diffIndex;
       }
+=======
+    // result.clearLeftDiffLine();
+    // result.clearRightDiffLine();
+    for (DiffLine diffLine : textDiff.getLeftDiffLineList()) {
+      result.addLeftChange(convertToTextChange(diffLine));
+>>>>>>> webapp DiffLine
     }
     // Take care of last segment
     if (segmentStart < textDiff.getLeftDiffLineList().size() - 1) {
