@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.stream.Stream;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -218,6 +219,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
+    System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+    logger.atInfo().log("TextDiff request\n%s", req);
     File file1 = req.getLeftFile();
     File file2 = req.getRightFile();
     validateFile(file1);
@@ -233,13 +236,38 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       file1 = getHeadFallackIfNeeded(file1);
       file2 = getHeadFallackIfNeeded(file2);
       Repo repo = getRepo(file1);
-      String leftText = readTextFile(file1);
-      String rightText = readTextFile(file2);
-      String diffString = repo.getTextDiff(file1, file2);
-      responseObserver.onNext(
+      if (!repo.fileExists(file1.getCommitId(), file1.getFilename()) && !repo.fileExists(file2.getCommitId(), file2.getFilename())) {
+        responseObserver.onNext(
           TextDiffResponse.newBuilder()
-              .setTextDiff(textDifferencer.getTextDiff(leftText, rightText, diffString))
+              .setTextDiff(TextDiff.getDefaultInstance())
               .build());
+        responseObserver.onError(
+          Status.NOT_FOUND
+              .withDescription(String.format("TextDiffRequest: %s", req))
+              .asException());
+      } else if (!repo.fileExists(file1.getCommitId(), file1.getFilename())) {
+        String rightText = readTextFile(file2);
+        String diffString = "@@ -1 +1 @@\n" + addCharToEveryLine(rightText, '+');
+        responseObserver.onNext(
+          TextDiffResponse.newBuilder()
+              .setTextDiff(textDifferencer.getTextDiff("", rightText, diffString))
+              .build());
+      } else if (!repo.fileExists(file2.getCommitId(), file2.getFilename())) {
+        String leftText = readTextFile(file1);
+        String diffString = "@@ -1 +1 @@'n'" + addCharToEveryLine(leftText, '-');
+        responseObserver.onNext(
+          TextDiffResponse.newBuilder()
+              .setTextDiff(textDifferencer.getTextDiff(leftText, "", diffString))
+              .build());
+      } else {
+        String leftText = readTextFile(file1);
+        String rightText = readTextFile(file2);
+        String diffString = repo.getTextDiff(file1, file2);
+        responseObserver.onNext(
+            TextDiffResponse.newBuilder()
+                .setTextDiff(textDifferencer.getTextDiff(leftText, rightText, diffString))
+                .build());
+      }
     } catch (IOException e) {
       e.printStackTrace();
       responseObserver.onNext(
@@ -250,6 +278,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               .asException());
     }
     responseObserver.onCompleted();
+  }
+
+  private String addCharToEveryLine(String text, char c) {
+    return String.join("\n", Stream.of(text.split("\n"))
+        .map(line -> c + line)
+        .collect(Collectors.toList()));
   }
 
   // TODO: fix concurrency issues (if two different call method at same time)
@@ -336,6 +370,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
               .asRuntimeException());
       return;
     }
+    logger.atInfo().log("DiffFiles request\n%s", request);
     String workspacePath;
     String workspace;
     String branch;
@@ -398,7 +433,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       e.printStackTrace();
     }
 
-    logger.atInfo().log("DiffFiles request\n%s", request);
     responseObserver.onNext(response.build());
     responseObserver.onCompleted();
   }

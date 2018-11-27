@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.Protos.ChangeType;
-import com.google.startupos.common.Protos.TextChange;
+import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.TextDiff;
 import dagger.Component;
 import javax.inject.Singleton;
@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import com.google.protobuf.TextFormat;
 
 /** Tests for {@link com.google.startupos.common.TextDifferencer}. */
 @RunWith(JUnit4.class)
@@ -37,16 +38,16 @@ public class TextDifferencerTest {
   private TextDifferencer differencer;
   private FileUtils fileUtils;
 
-  private TextChange textChange(
-      String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
-    return TextChange.newBuilder()
-        .setText(text)
-        .setType(type)
-        .setLineNumber(lineNumber)
-        .setStartIndex(startIndex)
-        .setEndIndex(endIndex)
-        .build();
-  }
+//   private DiffLine DiffLine(
+//       String text, ChangeType type, int lineNumber, int startIndex, int endIndex) {
+//     return DiffLine.newBuilder()
+//         .setText(text)
+//         .setType(type)
+//         .setLineNumber(lineNumber)
+//         .setStartIndex(startIndex)
+//         .setEndIndex(endIndex)
+//         .build();
+//   }
 
   @Before
   public void setUp() {
@@ -54,8 +55,19 @@ public class TextDifferencerTest {
     fileUtils = DaggerTextDifferencerTest_TestComponent.create().getFileUtils();
   }
 
-  protected String getGoldenFile(String filename) {
+  protected String readFile(String filename) {
     return fileUtils.readFileFromResourcesUnchecked("common/tests/resources/" + filename);
+  }
+
+  protected TextDiff readTextDiff(String filename) {
+    String protoText = readFile(filename);
+    TextDiff.Builder result = TextDiff.newBuilder();
+    try {
+      TextFormat.merge(protoText, result);
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+    return result.build();
   }
 
   @Test
@@ -80,9 +92,9 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addRightChange(
-                TextChange.newBuilder().setText(rightContents).setType(ChangeType.ADD).build())
-            .addLeftChange(TextChange.newBuilder().setType(ChangeType.LINE_PLACEHOLDER).build())
+            .addRightDiffLine(
+                DiffLine.newBuilder().setText(rightContents).setType(ChangeType.ADD).build())
+            .addLeftDiffLine(DiffLine.newBuilder().setType(ChangeType.LINE_PLACEHOLDER).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
@@ -97,10 +109,10 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder().setText(leftContents).setType(ChangeType.DELETE).build())
-            .addRightChange(
-                TextChange.newBuilder()
+            .addLeftDiffLine(
+                DiffLine.newBuilder().setText(leftContents).setType(ChangeType.DELETE).build())
+            .addRightDiffLine(
+                DiffLine.newBuilder()
                     .setText(rightContents)
                     .setType(ChangeType.LINE_PLACEHOLDER)
                     .build())
@@ -127,10 +139,10 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder().setText("No Change.").setType(ChangeType.DELETE).build())
-            .addRightChange(
-                TextChange.newBuilder().setText("With Change.").setType(ChangeType.ADD).build())
+            .addLeftDiffLine(
+                DiffLine.newBuilder().setText("No Change.").setType(ChangeType.DELETE).build())
+            .addRightDiffLine(
+                DiffLine.newBuilder().setText("With Change.").setType(ChangeType.ADD).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
@@ -145,10 +157,10 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder().setText("With Change.").setType(ChangeType.DELETE).build())
-            .addRightChange(
-                TextChange.newBuilder().setText("With a Change.").setType(ChangeType.ADD).build())
+            .addLeftDiffLine(
+                DiffLine.newBuilder().setText("With Change.").setType(ChangeType.DELETE).build())
+            .addRightDiffLine(
+                DiffLine.newBuilder().setText("With a Change.").setType(ChangeType.ADD).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
@@ -163,13 +175,13 @@ public class TextDifferencerTest {
 
     TextDiff expectedTextDiff =
         TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder()
+            .addLeftDiffLine(
+                DiffLine.newBuilder()
                     .setText("Change at end.")
                     .setType(ChangeType.DELETE)
                     .build())
-            .addRightChange(
-                TextChange.newBuilder().setText("Change at end!").setType(ChangeType.ADD).build())
+            .addRightDiffLine(
+                DiffLine.newBuilder().setText("Change at end!").setType(ChangeType.ADD).build())
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
@@ -179,27 +191,12 @@ public class TextDifferencerTest {
 
   @Test
   public void testBuildFileChange() {
-    String leftContents = getGoldenFile("BUILD_before.txt");
-    String rightContents = getGoldenFile("BUILD_after.txt");
-    String diffString = getGoldenFile("BUILD_diff.txt");
-
-    TextDiff expectedTextDiff =
-        TextDiff.newBuilder()
-            .addLeftChange(
-                TextChange.newBuilder()
-                    .setType(ChangeType.LINE_PLACEHOLDER)
-                    .setLineNumber(12)
-                    .build())
-            .addRightChange(
-                TextChange.newBuilder()
-                    .setText("        \"//common/repo:repo_java_proto\",")
-                    .setType(ChangeType.ADD)
-                    .setLineNumber(12)
-                    .build())
-            .setLeftFileContents(leftContents)
-            .setRightFileContents(rightContents)
-            .build();
-
+    String leftContents = readFile("BUILD_before.txt");
+    String rightContents = readFile("BUILD_after.txt");
+    // To regenerate BUILD_diff.txt, run:
+    // git diff --no-index common/tests/resources/BUILD_before.txt common/tests/resources/BUILD_after.txt | tail -n +5
+    String diffString = readFile("BUILD_diff.txt");
+    TextDiff expectedTextDiff = readTextDiff("BUILD_diff_prototxt.txt");
     assertEquals(
         expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diffString));
   }

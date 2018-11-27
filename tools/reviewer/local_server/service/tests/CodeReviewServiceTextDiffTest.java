@@ -219,7 +219,6 @@ public class CodeReviewServiceTextDiffTest {
   }
 
   private TextDiffResponse getExpectedResponse(String contents) {
-    // No change means a space at the beginning of every line:
     return TextDiffResponse.newBuilder()
         .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents, ""))
         .build();

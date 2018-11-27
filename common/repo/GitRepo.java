@@ -21,6 +21,7 @@ import com.google.auto.factory.Provided;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
@@ -29,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,15 +66,8 @@ public class GitRepo implements Repo {
     private String stderr;
   }
 
-  private static String readLines(InputStream inputStream) throws IOException {
-    StringBuffer output = new StringBuffer();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        output.append(line).append('\n');
-      }
-    }
-    return output.toString();
+  private static String streamToString(InputStream inputStream) throws IOException {
+    return CharStreams.toString(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
   }
 
   private CommandResult runCommand(String command) {
@@ -95,8 +90,8 @@ public class GitRepo implements Repo {
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
-      result.stdout = readLines(process.getInputStream());
-      result.stderr = readLines(process.getErrorStream());
+      result.stdout = streamToString(process.getInputStream());
+      result.stderr = streamToString(process.getErrorStream());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -430,8 +425,8 @@ public class GitRepo implements Repo {
   public static String getTextDiff(String file1, String file2) throws IOException {
     String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
     Process process = Runtime.getRuntime().exec(command.split(" "));
-    String stdout = readLines(process.getInputStream());
-    String stderr = readLines(process.getErrorStream());
+    String stdout = streamToString(process.getInputStream());
+    String stderr = streamToString(process.getErrorStream());
     return removeDiffHeader(stdout);
   }
 
@@ -476,4 +471,3 @@ public class GitRepo implements Repo {
     return commandResult.stderr.isEmpty();
   }
 }
-

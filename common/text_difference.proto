@@ -23,8 +23,6 @@ enum ChangeType {
 }
 
 message TextDiff {
-  repeated TextChange left_change = 1;
-  repeated TextChange right_change = 2;
   repeated DiffLine left_diff_line = 5;
   repeated DiffLine right_diff_line = 6;
   string left_file_contents = 3;
@@ -42,7 +40,7 @@ message DiffLine {
   // empty, the line is visually empty and is a placeholder for an
   // addition/deletion on the other side.
   int32 code_line_number = 4;
-  // List of word changes, that should be highlighted more prominently then the
+  // List of word changes, that should be highlighted more prominently than the
   // rest of the line, usually in a darker color.
   repeated WordChange word_change = 5;
 }
@@ -52,22 +50,6 @@ message WordChange {
   string text = 1;
   ChangeType type = 2;
   // Indices of a change in the line.
-  int32 start_index = 4;
-  int32 end_index = 5;
-}
-
-// TODO: Remove TextChange once we switch to DiffLine
-message TextChange {
-  reserved 6, 7, 8;
-  // The string being changed. Used for debugging purposes.
-  string text = 1;
-
-  // The {@link Type} of the difference.
-  ChangeType type = 2;
-
-  int32 line_number = 3;
-
-  // Indices of a change in the line. Leave it empty if whole line was changed.
   int32 start_index = 4;
   int32 end_index = 5;
 }

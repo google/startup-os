@@ -97,6 +97,9 @@ public class TestTool {
               File.newBuilder().setCommitId(args[2]).setFilename("tools/aa/AaModule.java").build();
           System.out.println(repo.getTextDiff(file1, file2));
           break;
+        case "getFileContents":
+          System.out.println(repo.getFileContents(args[1], args[2]));
+          break;
         default:
           System.out.println("Unknown command");
           break;

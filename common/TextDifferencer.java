@@ -23,7 +23,6 @@ import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import com.google.startupos.common.Protos.TextDiff;
-import com.google.startupos.common.Protos.TextChange;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.WordChange;
 import com.google.startupos.common.repo.Protos.File;
@@ -85,8 +84,8 @@ public class TextDifferencer {
   }
 
   public TextDiff getTextDiff(String leftText, String rightText, String diffString) {
-    System.out.println("********* diffString *************");
-    System.out.println(diffString);
+    // System.out.println("********* diffString *************");
+    // System.out.println(diffString);
     TextDiff.Builder result =
         TextDiff.newBuilder().setLeftFileContents(leftText).setRightFileContents(rightText);
     if (diffString.isEmpty()) {
@@ -148,45 +147,93 @@ public class TextDifferencer {
     }
     // Fill any last section:
     fillPlaceholderGap(result, leftDiffLineNumber, rightDiffLineNumber);
-    TextDiff textDiff = tempUseTextChanges(result.build());
+    TextDiff textDiff = result.build();
+    //addWordChanges(textDiff);
     System.out.println("*************** TEXT DIFF **************");
     System.out.println(textDiff);
     return textDiff;
   }
 
+  private List<DiffMatchPatch.Diff> getDiffPatchMatchDiff(String leftText, String rightText) {
+    DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
+    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(leftText, rightText);
+    diffMatchPatch.diff_cleanupSemantic(diffs);
+    return diffs;
+  }
+
   // TODO: remove this and use only DiffLines once front-end is changed.
-  private TextDiff tempUseTextChanges(TextDiff textDiff) {
+  private TextDiff addWordChanges(TextDiff textDiff) {
+    if (textDiff.getLeftDiffLineList().isEmpty()) {
+      return textDiff;
+    }
+    System.out.println("AAAAAAAAAAAAA");
     TextDiff.Builder result = textDiff.toBuilder();
-    // result.clearLeftDiffLine();
-    // result.clearRightDiffLine();
-    for (DiffLine diffLine : textDiff.getLeftDiffLineList()) {
-      result.addLeftChange(convertToTextChange(diffLine));
+    result.clearLeftDiffLine();
+    result.clearRightDiffLine();
+    int segmentStart = 0;
+    for (int diffIndex = 1; diffIndex < textDiff.getLeftDiffLineList().size(); diffIndex++) {
+      DiffLine leftDiffLine = textDiff.getLeftDiffLineList().get(diffIndex);
+      DiffLine prevLeftDiffLine = textDiff.getLeftDiffLineList().get(diffIndex);
+      if (leftDiffLine.getDiffLineNumber() - prevLeftDiffLine.getDiffLineNumber() > 1) {
+        String leftText = getMultilineText(textDiff.getLeftDiffLineList(), segmentStart, diffIndex);
+        String rightText = getMultilineText(textDiff.getRightDiffLineList(), segmentStart, diffIndex);
+        List<DiffMatchPatch.Diff> diffs = getDiffPatchMatchDiff(leftText, rightText);
+        for (DiffMatchPatch.Diff diff : diffs) {
+          System.out.println("WWWWWWWWWWW 1:" + diff.text);
+          System.out.println("WWWWWWWWWWWW 1:" + getChangeType(diff.operation));
+        }
+        segmentStart = diffIndex;
+      }
     }
-    for (DiffLine diffLine : textDiff.getRightDiffLineList()) {
-      result.addRightChange(convertToTextChange(diffLine));
+    // Take care of last segment
+    if (segmentStart < textDiff.getLeftDiffLineList().size() - 1) {
+      ImmutableList<DiffMatchPatch.Diff> diffs = splitMultiLines(getDiffPatchMatchDiff(
+          getMultilineText(textDiff.getLeftDiffLineList(), segmentStart, textDiff.getLeftDiffLineList().size()),
+          getMultilineText(textDiff.getRightDiffLineList(), segmentStart, textDiff.getRightDiffLineList().size())));
+      for (int i = 0; i < diffs.size(); i++) {
+        DiffMatchPatch.Diff diff = diffs.get(i);
+        System.out.println("WWWWWWWWWWWW 2.1:\n" + diff.text);
+        System.out.println("WWWWWWWWWWWW 2.2:" + getChangeType(diff.operation));
+      }
+    }
+     
+      //result.addLeftChange(convertToTextChange(diffLine));
+    
+    return result.build();
+  }
+
+  private ImmutableList<DiffMatchPatch.Diff> splitMultiLines(List<DiffMatchPatch.Diff> diffs) {
+    ImmutableList.Builder<DiffMatchPatch.Diff> result = ImmutableList.builder();
+    for (DiffMatchPatch.Diff diff : diffs) {
+      for (String line : diff.text.split("\n")) {
+        if (!line.isEmpty()) {
+          result.add(new DiffMatchPatch.Diff(diff.operation, line));
+        }
+      }
     }
     return result.build();
   }
 
-  private TextChange convertToTextChange(DiffLine diffLine) {
-    TextChange.Builder result = TextChange.newBuilder();
-    result.setText(diffLine.getText());
-    result.setType(diffLine.getType());
-    result.setLineNumber(diffLine.getDiffLineNumber());
-    return result.build();
+  // endIndex is not inclusive - i.e, diffLines at endIndex is not used.
+  private String getMultilineText(List<DiffLine> diffLines, int startIndex, int endIndex) {
+    StringBuilder result = new StringBuilder();
+    for (int i = startIndex; i < endIndex - 1; i++) {
+      result.append(diffLines.get(i).getText() + "\n");
+    }
+    // Last one without newline
+    result.append(diffLines.get(endIndex - 1).getText());
+    return result.toString();
   }
 
-  // TODO: Use this when using DiffPatchMatch
-  // private ChangeType getChangeType(Operation operation) {
-  //   if (operation == Operation.EQUAL) {
-  //     return ChangeType.NO_CHANGE;
-  //   } else if (operation == Operation.INSERT) {
-  //     return ChangeType.ADD;
-  //   } else if (operation == Operation.DELETE) {
-  //     return ChangeType.DELETE;
-  //   } else {
-  //     throw new IllegalArgumentException("Unknown Operation enum: " + operation);
-  //   }
-  // }
+  private ChangeType getChangeType(Operation operation) {
+    if (operation == Operation.EQUAL) {
+      return ChangeType.NO_CHANGE;
+    } else if (operation == Operation.INSERT) {
+      return ChangeType.ADD;
+    } else if (operation == Operation.DELETE) {
+      return ChangeType.DELETE;
+    } else {
+      throw new IllegalArgumentException("Unknown Operation enum: " + operation);
+    }
+  }
 }
-
