@@ -23,7 +23,7 @@ Contains main method and methods to write and read a proto file in binary format
 
 ## Preliminary setup
 As _most_ of our code, as well as `bazel` itself is written in Java, `bazel` needs
-to know where to find JDK. Unfortunately, it seems that first-in-mind Google Cloud Build is configured to
+to know where to find JDK. Unfortunately, it seems that Google Cloud Shell is configured to
 *run* Java programs, not to _build_ them - this is why `JAVA_HOME` is pointing to **JRE**
 which confuses `bazel`. To fix it, before running rest of the tutorial, run either of:
 ```bash
