@@ -157,8 +157,8 @@ public class TextDifferencer {
   // TODO: remove this and use only DiffLines once front-end is changed.
   private TextDiff tempUseTextChanges(TextDiff textDiff) {
     TextDiff.Builder result = textDiff.toBuilder();
-    result.clearLeftDiffLine();
-    result.clearRightDiffLine();
+    // result.clearLeftDiffLine();
+    // result.clearRightDiffLine();
     for (DiffLine diffLine : textDiff.getLeftDiffLineList()) {
       result.addLeftChange(convertToTextChange(diffLine));
     }
