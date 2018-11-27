@@ -35,12 +35,17 @@ java_test(
 java_test(
     name = "TextDifferencerTest",
     srcs = ["TextDifferencerTest.java"],
+    resources = glob(["resources/*.txt"]),
     test_class = "com.google.startupos.common.TextDifferencerTest",
     deps = [
+        "//common",
+        "//common:dagger_with_annotation_processor",
         "//common:text_difference_java_proto",
         "//common:text_differencer",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/junit",
     ],
 )
