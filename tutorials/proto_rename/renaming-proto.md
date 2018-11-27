@@ -27,14 +27,13 @@ to know where to find JDK. Unfortunately, it seems that first-in-mind Google Clo
 *run* Java programs, not to _build_ them - this is why `JAVA_HOME` is pointing to **JRE**
 which confuses `bazel`. To fix it, before running rest of the tutorial, run either of:
 ```bash
-# use system JDK
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 ```
-or
+to use system JDK or
 ```bash
-# use JDK embedded in bazel
-unset $JAVA_HOME
+unset JAVA_HOME
 ```
+to use JDK embedded in bazel
 
 ## First launch
 - Run the command to build targets:
