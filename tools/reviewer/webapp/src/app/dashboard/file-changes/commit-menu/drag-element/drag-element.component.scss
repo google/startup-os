@@ -1,6 +1,7 @@
 .drag-element {
-  height: 20px;
-  width: 20px;
+  $size: 14px;
+  height: $size;
+  width: $size;
   background: #ffc84b;
 }
 .circle {

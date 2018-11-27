@@ -9,10 +9,11 @@ $border: 2px;
   >.dots {
     display: flex;
     >.dot {
-      height: 20px;
-      width: 20px;
+      $size: 14px;
+      height: $size;
+      width: $size;
       background: white;
-      margin-right: 16px;
+      margin-right: 13px;
       border-radius: 50%;
       border: $border solid #8d8d8d;
     }
@@ -22,15 +23,24 @@ $border: 2px;
     >.dot:last-child {
       margin: 0;
     }
+    >.uncommited {
+      opacity: 0.3;
+    }
+    >.selected {
+      background: #ffc84b;
+    }
   }
   >.bridge {
     position: absolute;
     background: #ffc84b;
-    height: 6px;
+    height: 5px;
     pointer-events: none;
   }
   >drag-element {
     position: absolute;
     margin-left: $border;
+  }
+  >.selected {
+    opacity: 0;
   }
 }

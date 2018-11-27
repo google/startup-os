@@ -125,8 +125,9 @@ export class ChangesService {
     this.addPlaceholders(textDiff.getRightChangeList(), rightBlockLines);
 
     if (leftBlockLines.length !== rightBlockLines.length) {
-      // After adding all placeholders
-      throw new Error('Blocks should have the same amount of lines');
+      throw new Error(
+        'After adding all placeholders, blocks should have the same amount of lines',
+      );
     }
     const amountOfLines: number = leftBlockLines.length;
 

@@ -14,4 +14,8 @@ export interface CommitInfo {
 })
 export class CommitPopupComponent {
   @Input() commitInfo: CommitInfo;
+
+  getId(id: string): string {
+    return id || 'Uncommited';
+  }
 }

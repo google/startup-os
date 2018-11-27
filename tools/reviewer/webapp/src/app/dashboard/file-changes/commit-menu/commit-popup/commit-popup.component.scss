@@ -1,11 +1,12 @@
 :host {
   position: absolute;
-  top: 25px;
+  top: 20px;
   >.commit-popup {
     $left: 22px;
     $speech-arrow: 15px;
     margin-top: $speech-arrow;
-    margin-left: -$left;
+    margin-left: -$left - 2px;
+    min-width: 170px;
     position: relative;
     z-index: 2;
     background: white;

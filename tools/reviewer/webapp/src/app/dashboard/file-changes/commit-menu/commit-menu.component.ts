@@ -2,17 +2,19 @@ import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MouseService } from '@/core/services';
-import { LoadService, StateService } from '../services';
+import { CommitService, LoadService, StateService } from '../services';
 import { CommitInfo } from './commit-popup';
 
-// Drag element is an orange circle (or square), which can be drag and droped by user
+// DragElement is an orange circle (or square), which can be dragged and dropped by user
 // to pick another commit.
-// Point is an white circle (or square), where can be dropped drag element.
+// Point is a white circle (or square), where dragElement can be dropped.
 interface DragElement {
   x: number;
   offset: number;
   isClicked: boolean;
   index: number;
+  isExist: boolean;
+  isSelected: boolean;
 }
 
 // Orange line, which connects two drag elements
@@ -21,9 +23,9 @@ interface Bridge {
   width: number;
 }
 
-const dragWidth: number = 20;
-const distanceBetweenPoints: number = 40;
-const magnetField: number = 20;
+const dragWidth: number = 14;
+const distanceBetweenPoints: number = 31;
+const magnetField: number = 12;
 
 // Menu to pick commits
 // How it looks: https://i.imgur.com/Svk6ok7.png
@@ -49,6 +51,7 @@ export class CommitMenuComponent implements OnDestroy {
   constructor(
     private mouseService: MouseService,
     private stateService: StateService,
+    private commitService: CommitService,
     private loadService: LoadService,
   ) {
     this.initDragElements();
@@ -64,7 +67,7 @@ export class CommitMenuComponent implements OnDestroy {
       this.moveBridge();
     });
 
-    // When user clicks up (drops) left mouse button
+    // When user releases left mouse button
     this.mouseupSubscription = this.mouseService.mouseup.subscribe(() => {
       // If drag element changed its point, then change commit id of page
       if (this.leftDrag.isClicked) {
@@ -88,27 +91,23 @@ export class CommitMenuComponent implements OnDestroy {
 
   // Creates drag elements and bridge on the stage
   initDragElements(): void {
-    let leftIndex: number = this.getCommitIndex(this.stateService.leftCommitId);
-    let rightIndex: number = this.getCommitIndex(this.stateService.rightCommitId);
-    if (leftIndex === -1 || rightIndex === -1 || leftIndex >= rightIndex) {
-      // If commits not found, pick first and last commits
-      leftIndex = 0;
-      rightIndex = this.stateService.commitIdList.length - 1;
-      this.stateService.leftCommitId = this.stateService.commitIdList[leftIndex];
-      this.stateService.rightCommitId = this.stateService.commitIdList[rightIndex];
-      this.loadService.changeCommitId();
-    }
+    const leftIndex: number = this.commitService.getCommitIndex(this.stateService.leftCommitId);
+    const rightIndex: number = this.commitService.getCommitIndex(this.stateService.rightCommitId);
     this.leftDrag = {
       x: leftIndex * distanceBetweenPoints,
       offset: 0,
       isClicked: false,
       index: leftIndex,
+      isExist: !!this.stateService.leftCommitId,
+      isSelected: true,
     };
     this.rightDrag = {
       x: rightIndex * distanceBetweenPoints,
       offset: 0,
       isClicked: false,
       index: rightIndex,
+      isExist: rightIndex !== -1,
+      isSelected: true,
     };
     this.moveBridge();
   }
@@ -132,7 +131,7 @@ export class CommitMenuComponent implements OnDestroy {
     step: number,
   ): string {
     let index: number = this.getNearestX(dragElement.x);
-    if (index === dragElement2.index) {
+    if (index === dragElement2.index && dragElement2.isExist) {
       // If nearest point is already occupied
       index += step;
     }
@@ -151,14 +150,17 @@ export class CommitMenuComponent implements OnDestroy {
   }
 
   // Pulls drag element to nearest point
-  getMagnetX(x: number): number {
+  magnet(x: number, dragElement: DragElement): void {
     const centerX: number = x + dragWidth / 2;
     const n: number = this.getNearestX(x);
     const pointX: number = dragWidth / 2 + distanceBetweenPoints * n;
     if (centerX > pointX - magnetField / 2 && centerX < pointX + magnetField / 2) {
-      return pointX - dragWidth / 2;
+      dragElement.x = pointX - dragWidth / 2;
+      dragElement.isSelected = true;
+    } else {
+      dragElement.isSelected = false;
+      dragElement.x = x;
     }
-    return x;
   }
 
   // Gets X of nearest point to the x
@@ -175,21 +177,19 @@ export class CommitMenuComponent implements OnDestroy {
     let x: number = this.getX(mouseX, dragElement);
 
     // Stop drag element by second drag element
-    const secondDragFrameX: number = dragElement2.x + dragWidth * step;
-    if (x * step < secondDragFrameX * step) {
-      x = secondDragFrameX;
+    if (dragElement2.isExist) {
+      const secondDragFrameX: number = dragElement2.x + dragWidth * step;
+      if (x * step < secondDragFrameX * step) {
+        x = secondDragFrameX;
+      }
     }
 
-    dragElement.x = this.getMagnetX(x);
+    this.magnet(x, dragElement);
   }
 
   moveBridge(): void {
     this.bridge.x = this.leftDrag.x + dragWidth / 2;
     this.bridge.width = this.rightDrag.x - this.leftDrag.x;
-  }
-
-  getCommitIndex(commitId: string): number {
-    return this.stateService.commitIdList.indexOf(commitId);
   }
 
   showPopup(commitIndex: number): void {
@@ -202,6 +202,12 @@ export class CommitMenuComponent implements OnDestroy {
 
   hidePopup(): void {
     this.commitInfo.isVisible = false;
+  }
+
+  isDotSelected(index: number): boolean {
+    const isLeft: boolean = this.leftDrag.x === index * distanceBetweenPoints;
+    const isRight: boolean = this.rightDrag.x === index * distanceBetweenPoints;
+    return isLeft || isRight;
   }
 
   ngOnDestroy() {

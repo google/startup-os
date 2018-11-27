@@ -53,6 +53,7 @@
         <!-- Code -->
         <div
           class="code-line code"
+          [ngClass]="{ unselected: hoverService.hoveredBlockIndex !== blockIndex }"
           *ngIf="!changesLine.isCommentsLine && !blockLine.isPlaceholder"
           (dblclick)="commentsService.addEmptyThread(changesLine, blockIndex)"
         >

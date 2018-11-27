@@ -193,6 +193,13 @@ export class LocalserverService {
       }
     }
 
+    // Add uncommited point too
+    for (const commit of branchInfo.getUncommittedFileList()) {
+      if (commit.getFilenameWithRepo() === filenameWithRepo) {
+        commitIdList.push('');
+      }
+    }
+
     return commitIdList;
   }
 }

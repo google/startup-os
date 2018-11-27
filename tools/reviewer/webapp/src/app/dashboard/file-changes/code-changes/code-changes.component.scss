@@ -3,7 +3,6 @@
 $font-size: 15px;
 $border-width: 2px;
 $border: $border-width solid #979797;
-$thread-padding: 20px;
 $border-radius: 8px;
 
 table {
@@ -43,6 +42,7 @@ table {
       >.chars-highlighting {
         position: absolute;
         left: $add-comment-button-width;
+        user-select: none;
         pre {
           color: rgba(0,0,0,0);
         }
@@ -56,11 +56,14 @@ table {
       .code-line {
         padding-top: 1px;
       }
+      >.unselected {
+        user-select: none;
+      }
       >.threads {
-        padding-top: $thread-padding;
+        padding-top: 13px;
         >.thread {
           width: 762px;
-          margin-bottom: $thread-padding;
+          margin-bottom: 17px;
         }
       }
     }

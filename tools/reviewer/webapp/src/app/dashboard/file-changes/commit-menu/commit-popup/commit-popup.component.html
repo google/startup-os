@@ -7,6 +7,6 @@
     [shadow]=[2,2,2,0.8]
   ></speech-arrow>
   
-  <div class="commit-id">{{ commitInfo.id }}</div>
+  <div class="commit-id">{{ getId(commitInfo.id) }}</div>
   <div class="time">{{ commitInfo.timestamp | date:'h:mm a, MMM d' }}</div>
 </div>

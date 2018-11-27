@@ -2,6 +2,10 @@
   <div class="dots">
     <div
       class="dot"
+      [ngClass]="{
+        uncommited: !commitId,
+        selected: isDotSelected(commitIndex)
+      }"
       *ngFor="let commitId of stateService.commitIdList; let commitIndex = index"
       (mouseenter)="showPopup(commitIndex)"
       (mouseleave)="hidePopup()"
@@ -11,6 +15,7 @@
     class="bridge"
     [style.left.px]="bridge.x"
     [style.width.px]="bridge.width"
+    *ngIf="leftDrag.isExist && rightDrag.isExist"
   ></div>
   <drag-element
     [isCircle]="true"
@@ -18,6 +23,8 @@
     (mousedown)="mousedown($event, rightDrag)"
     (mouseenter)="showPopup(rightDrag.index)"
     (mouseleave)="hidePopup()"
+    *ngIf="rightDrag.isExist"
+    [ngClass]="{ selected: rightDrag.isSelected }"
   ></drag-element>
   <drag-element
     [isCircle]="leftDrag.index > 0 || leftDrag.isClicked"
@@ -25,6 +32,8 @@
     (mousedown)="mousedown($event, leftDrag)"
     (mouseenter)="showPopup(leftDrag.index)"
     (mouseleave)="hidePopup()"
+    *ngIf="leftDrag.isExist"
+    [ngClass]="{ selected: leftDrag.isSelected }"
   ></drag-element>
   <commit-popup
     [style.left.px]="commitInfo.offset"
