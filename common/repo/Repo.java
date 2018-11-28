@@ -35,15 +35,7 @@ public interface Repo {
   void switchBranch(String branch);
   /** Tags the commit at head. */
   void tagHead(String name);
-<<<<<<< HEAD
-<<<<<<< HEAD
   /**
-=======
-  /** 
->>>>>>> "D329:
-=======
-  /** 
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
    * Gets commits on branch since it diverged from master, including the last master commit, at
    * position 0.
    */
@@ -64,14 +56,7 @@ public interface Repo {
   boolean merge(String branch);
   /** Is branch merged to master */
   boolean isMerged(String branch);
-<<<<<<< HEAD
   /**
-=======
-  /*
-<<<<<<< HEAD
->>>>>>> "D329:
-=======
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
    * Reset current branch. All changes introduced after it would be marked as unstaged but saved in
    * working tree
    */
@@ -85,11 +70,8 @@ public interface Repo {
 
   boolean fileExists(String commitId, String path);
 
-<<<<<<< HEAD
   boolean fileExists(File file);
 
-=======
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
   String getTextDiff(File file1, File file2) throws IOException;
 
   String getFileContents(String commitId, String path);
@@ -100,3 +82,4 @@ public interface Repo {
   /** Checks if there are commits added since master, or any uncommitted files */
   boolean hasChanges(String branch);
 }
+

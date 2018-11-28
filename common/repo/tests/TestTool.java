@@ -37,7 +37,6 @@ public class TestTool {
 
   void run(String[] args) throws Exception {
     if (args.length > 0) {
-      System.out.println("XXXXXXXXXXXXXX args[0]: " + args[0]);
       String command = args[0];
       Repo repo = repoFactory.create(System.getenv("BUILD_WORKSPACE_DIRECTORY"));
       switch (command) {

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 
-import { DiffLine, Thread } from '@/core/proto';
 import {
   BlockIndex,
   BlockLine,
@@ -17,8 +16,7 @@ export class LineService {
       lineNumber: 0,
       isChanged: false,
       isPlaceholder: false,
-      threadFrames: [],
-      diffLine: new DiffLine(),
+      threads: [],
     };
   }
 

@@ -26,10 +26,6 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.Strings;
-<<<<<<< HEAD
-=======
-import java.io.BufferedReader;
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,9 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
-
 
 @AutoFactory
 public class GitRepo implements Repo {
@@ -101,7 +94,6 @@ public class GitRepo implements Repo {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
     if (!result.stderr.replaceAll(AMBIGUOUS_REFNAME, "").replaceAll(GITHUB_PR_MESSAGE, "").isEmpty()
         && throwException) {
       throw new RuntimeException(formatError(result));
@@ -215,7 +207,6 @@ public class GitRepo implements Repo {
   }
 
   private File.Action getAction(String changeType) {
-    // TODO: Add UU
     switch (changeType) {
       case "A":
         return File.Action.ADD;
@@ -227,8 +218,6 @@ public class GitRepo implements Repo {
         return File.Action.RENAME;
       case "M":
         return File.Action.MODIFY;
-      case "U":
-        return File.Action.MODIFY;
       case "AM":
         return File.Action.COPY;
       case "C":
@@ -236,11 +225,7 @@ public class GitRepo implements Repo {
       case "??":
         return File.Action.ADD;
       default:
-        if (changeType.length() > 1) {
-          return getAction(changeType.substring(0, 1));
-        } else {
-          throw new IllegalStateException("Unknown change type " + changeType);
-        }
+        throw new IllegalStateException("Unknown change type " + changeType);
     }
   }
 
@@ -371,14 +356,11 @@ public class GitRepo implements Repo {
     } else {
       return fileUtils.fileExists(fileUtils.joinToAbsolutePath(repoPath, path));
     }
-<<<<<<< HEAD
   }
 
   @Override
   public boolean fileExists(File file) {
     return fileExists(file.getCommitId(), file.getFilename());
-=======
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
   }
 
   @Override
@@ -403,24 +385,16 @@ public class GitRepo implements Repo {
       throw new IllegalArgumentException(
           "Files should have the same repo and filename:\n" + file1 + file2);
     }
-<<<<<<< HEAD
     if (!fileExists(file1)) {
       throw new IOException("File1 should exist:\n" + file1);
     }
     if (!fileExists(file2)) {
-=======
-    if (!fileExists(file1.getCommitId(), file1.getFilename())) {
-      throw new IOException("File1 should exist:\n" + file1);
-    }
-    if (!fileExists(file2.getCommitId(), file2.getFilename())) {
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
       throw new IOException("File2 should exist:\n" + file2);
     }
     if (file1.getCommitId().isEmpty() && !file2.getCommitId().isEmpty()) {
       throw new UnsupportedOperationException(
           "If file1 has no commit, file 2 should also not have a commit");
     }
-<<<<<<< HEAD
     if (file1.getCommitId().isEmpty() && file2.getCommitId().isEmpty()) {
       // Use the --no-index flag
       CommandResult commandResult =
@@ -444,50 +418,12 @@ public class GitRepo implements Repo {
                   + file1.getFilename());
       return removeDiffHeader(commandResult.stdout);
     }
-=======
-    try {
-      if (file1.getCommitId().isEmpty() && file2.getCommitId().isEmpty()) {
-        // Use the --no-index flag
-        CommandResult commandResult =
-            runCommand(
-                "diff --no-index --inter-hunk-context=1000000 "
-                    + fileUtils.joinToAbsolutePath(repoPath, file1.getFilename())
-                    + " "
-                    + fileUtils.joinToAbsolutePath(repoPath, file2.getFilename()));
-        return removeDiffHeader(commandResult.stdout);
-      } else {
-        String file1CommitIdWithSpace =
-            file1.getCommitId().isEmpty() ? "" : " " + file1.getCommitId();
-        String file2CommitIdWithSpace =
-            file2.getCommitId().isEmpty() ? "" : " " + file2.getCommitId();
-        CommandResult commandResult =
-            runCommand(
-                "diff --inter-hunk-context=1000000"
-                    + file1CommitIdWithSpace
-                    + file2CommitIdWithSpace
-                    + " -- "
-                    + file1.getFilename());
-        return removeDiffHeader(commandResult.stdout);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return null;
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
   }
 
   public static String getTextDiff(String file1, String file2) throws IOException {
     String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
     Process process = Runtime.getRuntime().exec(command.split(" "));
     String stdout = streamToString(process.getInputStream());
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    String stderr = streamToString(process.getErrorStream());
->>>>>>> "D329:
-=======
-    String stderr = streamToString(process.getErrorStream());
->>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
     return removeDiffHeader(stdout);
   }
 
@@ -544,3 +480,4 @@ public class GitRepo implements Repo {
     return commandResult.stderr.isEmpty();
   }
 }
+

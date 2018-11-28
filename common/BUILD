@@ -35,7 +35,6 @@ java_library(
         "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
-        "//common/repo:repo_java_proto",
     ],
 )
 

@@ -219,7 +219,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
   @Override
   public void getTextDiff(TextDiffRequest req, StreamObserver<TextDiffResponse> responseObserver) {
-    System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
     logger.atInfo().log("TextDiff request\n%s", req);
     File file1 = req.getLeftFile();
     File file2 = req.getRightFile();
@@ -236,29 +235,28 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       file1 = getHeadFallackIfNeeded(file1);
       file2 = getHeadFallackIfNeeded(file2);
       Repo repo = getRepo(file1);
-      if (!repo.fileExists(file1.getCommitId(), file1.getFilename()) && !repo.fileExists(file2.getCommitId(), file2.getFilename())) {
+      if (!repo.fileExists(file1.getCommitId(), file1.getFilename())
+          && !repo.fileExists(file2.getCommitId(), file2.getFilename())) {
         responseObserver.onNext(
-          TextDiffResponse.newBuilder()
-              .setTextDiff(TextDiff.getDefaultInstance())
-              .build());
+            TextDiffResponse.newBuilder().setTextDiff(TextDiff.getDefaultInstance()).build());
         responseObserver.onError(
-          Status.NOT_FOUND
-              .withDescription(String.format("TextDiffRequest: %s", req))
-              .asException());
+            Status.NOT_FOUND
+                .withDescription(String.format("TextDiffRequest: %s", req))
+                .asException());
       } else if (!repo.fileExists(file1.getCommitId(), file1.getFilename())) {
         String rightText = readTextFile(file2);
         String diffString = "@@ -1 +1 @@\n" + addCharToEveryLine(rightText, '+');
         responseObserver.onNext(
-          TextDiffResponse.newBuilder()
-              .setTextDiff(textDifferencer.getTextDiff("", rightText, diffString))
-              .build());
+            TextDiffResponse.newBuilder()
+                .setTextDiff(textDifferencer.getTextDiff("", rightText, diffString))
+                .build());
       } else if (!repo.fileExists(file2.getCommitId(), file2.getFilename())) {
         String leftText = readTextFile(file1);
         String diffString = "@@ -1 +1 @@'n'" + addCharToEveryLine(leftText, '-');
         responseObserver.onNext(
-          TextDiffResponse.newBuilder()
-              .setTextDiff(textDifferencer.getTextDiff(leftText, "", diffString))
-              .build());
+            TextDiffResponse.newBuilder()
+                .setTextDiff(textDifferencer.getTextDiff(leftText, "", diffString))
+                .build());
       } else {
         String leftText = readTextFile(file1);
         String rightText = readTextFile(file2);
@@ -281,9 +279,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   private String addCharToEveryLine(String text, char c) {
-    return String.join("\n", Stream.of(text.split("\n"))
-        .map(line -> c + line)
-        .collect(Collectors.toList()));
+    return String.join(
+        "\n", Stream.of(text.split("\n")).map(line -> c + line).collect(Collectors.toList()));
   }
 
   // TODO: fix concurrency issues (if two different call method at same time)
