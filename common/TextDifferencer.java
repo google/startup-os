@@ -177,7 +177,8 @@ public class TextDifferencer {
         String leftText = getMultilineText(textDiff.getLeftDiffLineList(), segmentStart, diffIndex);
         String rightText =
             getMultilineText(textDiff.getRightDiffLineList(), segmentStart, diffIndex);
-        ImmutableList<DiffMatchPatch.Diff> diffs = splitMultiLines(getDiffPatchMatchDiff(leftText, rightText));
+        ImmutableList<DiffMatchPatch.Diff> diffs =
+            splitMultiLines(getDiffPatchMatchDiff(leftText, rightText));
         for (DiffMatchPatch.Diff diff : diffs) {
           // TODO: Implement
         }
