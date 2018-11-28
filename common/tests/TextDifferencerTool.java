@@ -24,11 +24,12 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.TextDifferencer;
 import java.io.IOException;
 import com.google.common.base.Strings;
 import com.google.startupos.common.Protos.TextDiff;
-import com.google.startupos.common.Protos.TextChange;
+import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.ChangeType;
 import java.util.List;
 import java.util.ArrayList;
@@ -74,21 +75,21 @@ public class TextDifferencerTool {
     this.textDifferencer = textDifferencer;
   }
 
-  private String getLeftText(TextChange change) {
-    if (change.getType() == ChangeType.NO_CHANGE) {
-      return ANSI_WHITE + change.getText() + ANSI_RESET;
-    } else if (change.getType() == ChangeType.DELETE) {
-      return ANSI_WHITE + ANSI_RED_BACKGROUND + change.getText() + ANSI_RESET;
+  private String getLeftText(DiffLine line) {
+    if (line.getType() == ChangeType.NO_CHANGE) {
+      return ANSI_WHITE + line.getText() + ANSI_RESET;
+    } else if (line.getType() == ChangeType.DELETE) {
+      return ANSI_WHITE + ANSI_RED_BACKGROUND + line.getText() + ANSI_RESET;
     }
     // LINE_PLACEHOLDER
     return "";
   }
 
-  private String getRightText(TextChange change) {
-    if (change.getType() == ChangeType.NO_CHANGE) {
-      return ANSI_WHITE + change.getText() + ANSI_RESET;
-    } else if (change.getType() == ChangeType.ADD) {
-      return ANSI_WHITE + ANSI_GREEN_BACKGROUND + change.getText() + ANSI_RESET;
+  private String getRightText(DiffLine line) {
+    if (line.getType() == ChangeType.NO_CHANGE) {
+      return ANSI_WHITE + line.getText() + ANSI_RESET;
+    } else if (line.getType() == ChangeType.ADD) {
+      return ANSI_WHITE + ANSI_GREEN_BACKGROUND + line.getText() + ANSI_RESET;
     }
     // LINE_PLACEHOLDER
     return "";
@@ -97,7 +98,9 @@ public class TextDifferencerTool {
   void run() throws IOException {
     String leftFileContents = fileUtils.readFile(leftFile.get());
     String rightFileContents = fileUtils.readFile(rightFile.get());
-    TextDiff textDiff = textDifferencer.getTextDiff(leftFileContents, rightFileContents);
+    String diffString = GitRepo.getTextDiff(leftFile.get(), rightFile.get());
+    TextDiff textDiff =
+        textDifferencer.getTextDiff(leftFileContents, rightFileContents, diffString);
     int iLeft = 0;
     int iRight = 0;
     String leftLine = "";
@@ -108,17 +111,17 @@ public class TextDifferencerTool {
     List<String> rightOutput = new ArrayList<>();
     boolean done = false;
     while (!done) {
-      while (iLeft < textDiff.getLeftChangeList().size()
-          && textDiff.getLeftChangeList().get(iLeft).getLineNumber() == lineNumber) {
-        TextChange change = textDiff.getLeftChangeList().get(iLeft);
-        leftLine += getLeftText(change);
-        leftStringLength += change.getText().length();
+      while (iLeft < textDiff.getLeftDiffLineList().size()
+          && textDiff.getLeftDiffLineList().get(iLeft).getCodeLineNumber() == lineNumber) {
+        DiffLine diffLine = textDiff.getLeftDiffLineList().get(iLeft);
+        leftLine += getLeftText(diffLine);
+        leftStringLength += diffLine.getText().length();
         iLeft++;
       }
-      while (iRight < textDiff.getRightChangeList().size()
-          && textDiff.getRightChangeList().get(iRight).getLineNumber() == lineNumber) {
-        TextChange change = textDiff.getRightChangeList().get(iRight);
-        rightLine += getRightText(change);
+      while (iRight < textDiff.getRightDiffLineList().size()
+          && textDiff.getRightDiffLineList().get(iRight).getCodeLineNumber() == lineNumber) {
+        DiffLine diffLine = textDiff.getRightDiffLineList().get(iRight);
+        rightLine += getRightText(diffLine);
         iRight++;
       }
       String padding = Strings.repeat(" ", PADDING - leftStringLength);
@@ -129,8 +132,8 @@ public class TextDifferencerTool {
 
       lineNumber++;
       done =
-          iLeft == textDiff.getLeftChangeList().size()
-              && iRight == textDiff.getRightChangeList().size();
+          iLeft == textDiff.getLeftDiffLineList().size()
+              && iRight == textDiff.getRightDiffLineList().size();
     }
   }
 
