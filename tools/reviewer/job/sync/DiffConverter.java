@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
@@ -70,7 +71,7 @@ public class DiffConverter {
     return pullRequests;
   }
 
-  private List<ReviewComment> getReviewCommentsByRepoName(Diff diff, GithubPr githubPr) {
+  private ImmutableList<ReviewComment> getReviewCommentsByRepoName(Diff diff, GithubPr githubPr) {
     List<ReviewComment> result = new ArrayList<>();
     List<Thread> codeThreads =
         diff.getCodeThreadList()
@@ -80,14 +81,20 @@ public class DiffConverter {
 
     for (Thread thread : codeThreads) {
       for (Comment comment : thread.getCommentList()) {
+        // TODO: Store `githubCommentPosition` in the Diff.Thread in Firestore
+        int githubCommentPosition;
+        // `0` value means the comment isn't synced with GitHub
+        if (thread.getGithubCommentPosition() == 0) {
+          githubCommentPosition = getReviewCommentPositionFromGitHub(thread, githubPr);
+        } else {
+          githubCommentPosition = thread.getGithubCommentPosition();
+        }
+
         ReviewComment.Builder githubComment = ReviewComment.newBuilder();
         githubComment
             .setPath(thread.getFile().getFilename())
             .setId(comment.getGithubCommentId())
-            .setPosition(
-                thread.getGithubCommentPosition() == 0
-                    ? getReviewCommentPosition(thread, githubPr)
-                    : thread.getGithubCommentPosition())
+            .setPosition(githubCommentPosition)
             .setCommitId(thread.getFile().getCommitId())
             .setUser(User.newBuilder().setEmail(comment.getCreatedBy()).build())
             .setBody(comment.getContent())
@@ -97,19 +104,18 @@ public class DiffConverter {
         result.add(githubComment.build());
       }
     }
-    return result;
+    return ImmutableList.copyOf(result);
   }
 
-  // TODO: Check if the state is correct
   private String getPullRequestState(Diff.Status status) {
-    if (status.equals(Diff.Status.ACCEPTED)) {
+    if (status.equals(Diff.Status.SUBMITTED) || status.equals(Diff.Status.REVERTED)) {
       return "close";
     } else {
       return "open";
     }
   }
 
-  private int getReviewCommentPosition(Thread thread, GithubPr githubPr) {
+  private int getReviewCommentPositionFromGitHub(Thread thread, GithubPr githubPr) {
     LineNumberConverter.Side commentSide =
         thread.getFile().getCommitId().equals(thread.getCommitId())
             ? LineNumberConverter.Side.RIGHT
@@ -137,14 +143,13 @@ public class DiffConverter {
 
     if (patch.equals("")) {
       throw new RuntimeException(
-          "Can not find the `patch` for file: " + thread.getFile().getFilename());
+          "Can't find the `patch` for file: " + thread.getFile().getFilename());
     }
 
-    LineNumberConverter converter = new LineNumberConverter(patch);
-    return converter.getPosition(thread.getLineNumber(), commentSide);
+    return LineNumberConverter.getPosition(patch, thread.getLineNumber(), commentSide);
   }
 
-  private List<IssueComment> getIssueComments(Diff diff, GithubPr githubPr) {
+  private ImmutableList<IssueComment> getIssueComments(Diff diff, GithubPr githubPr) {
     List<IssueComment> result = new ArrayList<>();
     List<Thread> diffThreads =
         diff.getDiffThreadList()
@@ -167,7 +172,7 @@ public class DiffConverter {
                                   .build())
                           .build()));
     }
-    return result;
+    return ImmutableList.copyOf(result);
   }
 }
 

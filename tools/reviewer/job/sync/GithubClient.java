@@ -137,10 +137,8 @@ public class GithubClient {
     RepositoryCommentsResponse.Builder builder = RepositoryCommentsResponse.newBuilder();
     String response =
         doRequest(
-                RequestMethod.GET,
-                String.format(GET_REPOSITORY_COMMENTS, request.getOwner(), request.getRepo()))
-            .replace("_links", "link")
-            .replace("href", "url");
+            RequestMethod.GET,
+            String.format(GET_REPOSITORY_COMMENTS, request.getOwner(), request.getRepo()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"review_comment\":%s}", response), builder);
@@ -264,7 +262,8 @@ public class GithubClient {
     if (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.DELETE)) {
       return doRequest(requestMethod, request, "");
     } else {
-      throw new RuntimeException(requestMethod.name() + " method requires the request data.");
+      throw new IllegalArgumentException(
+          requestMethod.name() + " method requires the request data.");
     }
   }
 

@@ -54,7 +54,7 @@ public class GithubSync {
 
   public static void main(String[] args) {
     Flags.parseCurrentPackage(args);
-    // The sync logic will be added in next PRs
+    // TODO: Implement sync logic
   }
 }
 
