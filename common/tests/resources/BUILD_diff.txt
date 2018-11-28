@@ -6,4 +6,3 @@
 +        "//common/repo:repo_java_proto",
      ],
  )
- 

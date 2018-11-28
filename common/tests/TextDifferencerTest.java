@@ -96,11 +96,17 @@ public class TextDifferencerTest {
                 DiffLine.newBuilder().setText(rightContents).setType(ChangeType.ADD).build())
             .addLeftDiffLine(DiffLine.newBuilder().setType(ChangeType.LINE_PLACEHOLDER).build())
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
     assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diff));
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
   }
 
   @Test
@@ -131,6 +137,7 @@ public class TextDifferencerTest {
     TextDiff expectedTextDiff =
         TextDiff.newBuilder().setLeftFileContents(contents).setRightFileContents(contents).build();
     assertEquals(expectedTextDiff, differencer.getTextDiff(contents, contents, ""));
+<<<<<<< HEAD
   }
 
   @Test
@@ -217,6 +224,8 @@ public class TextDifferencerTest {
     TextDiff expectedTextDiff =
         TextDiff.newBuilder().setLeftFileContents(contents).setRightFileContents(contents).build();
     assertEquals(expectedTextDiff, differencer.getTextDiff(contents, contents, ""));
+=======
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
   }
 
   @Test
@@ -267,6 +276,7 @@ public class TextDifferencerTest {
                 DiffLine.newBuilder()
                     .setText("Change at end.")
                     .setType(ChangeType.DELETE)
+<<<<<<< HEAD
                     .build())
             .addRightDiffLine(
                 DiffLine.newBuilder().setText("Change at end!").setType(ChangeType.ADD).build())
@@ -298,18 +308,29 @@ public class TextDifferencerTest {
                     .setLineNumber(12)
                     .build())
 >>>>>>> "D329:
+=======
+                    .build())
+            .addRightDiffLine(
+                DiffLine.newBuilder().setText("Change at end!").setType(ChangeType.ADD).build())
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
             .setLeftFileContents(leftContents)
             .setRightFileContents(rightContents)
             .build();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
     assertEquals(expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diff));
   }
 
   @Test
   public void testBuildFileChange() {
+<<<<<<< HEAD
 =======
 >>>>>>> "D329:
+=======
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
     String leftContents = readFile("BUILD_before.txt");
     String rightContents = readFile("BUILD_after.txt");
     // To regenerate BUILD_diff.txt, run:
@@ -317,10 +338,13 @@ public class TextDifferencerTest {
     String diffString = readFile("BUILD_diff.txt");
     TextDiff expectedTextDiff = readTextDiff("BUILD_diff_prototxt.txt");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> "D329:
 =======
 >>>>>>> "D329:
+=======
+>>>>>>> 0bc695c82573fbc87cabb8d8ec81f78cc580452c
     assertEquals(
         expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diffString));
   }
