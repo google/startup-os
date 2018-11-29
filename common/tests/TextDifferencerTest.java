@@ -18,8 +18,6 @@ package com.google.startupos.common;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.ImmutableList;
-import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.TextDiff;

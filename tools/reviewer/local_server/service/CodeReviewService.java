@@ -122,7 +122,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   // Fallback to head repo if workspace does not exist
-  private File getHeadFallackIfNeeded(File file) {
+  private File getHeadFallbackIfNeeded(File file) {
     if (!file.getWorkspace().isEmpty()
         && !file.getCommitId().isEmpty()
         && !workspaceExists(file.getWorkspace())) {
@@ -131,8 +131,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     return file;
   }
 
-  // Returns null when file does not exist
-  private String readHeadFile(File file) throws IOException {
+  private String readHeadFile(File file) {
     Repo headRepo = getHeadRepo(file.getRepoId());
     if (headRepo.fileExists(file.getCommitId(), file.getFilename())) {
       return headRepo.getFileContents(file.getCommitId(), file.getFilename());
@@ -141,7 +140,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     }
   }
 
-  // Returns null when file does not exist
   private String readWorkspaceFile(File file) throws IOException {
     if (file.getCommitId().isEmpty()) {
       // It's a file in the local filesystem (not in a repo)
@@ -158,7 +156,6 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     }
   }
 
-  // Returns null when file does not exist in head repo
   private String readTextFile(File file) throws IOException {
     if (file.getAction() == Action.DELETE) {
       return "";
@@ -232,8 +229,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       throw new IllegalArgumentException(message);
     }
     try {
-      file1 = getHeadFallackIfNeeded(file1);
-      file2 = getHeadFallackIfNeeded(file2);
+      file1 = getHeadFallbackIfNeeded(file1);
+      file2 = getHeadFallbackIfNeeded(file2);
       Repo repo = getRepo(file1);
       if (!repo.fileExists(file1.getCommitId(), file1.getFilename())
           && !repo.fileExists(file2.getCommitId(), file2.getFilename())) {

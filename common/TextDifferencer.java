@@ -16,7 +16,6 @@
 
 package com.google.startupos.common;
 
-import com.google.common.base.CharMatcher;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.Protos.ChangeType;
@@ -24,18 +23,12 @@ import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.Protos.DiffLine;
-import com.google.startupos.common.Protos.WordChange;
-import com.google.startupos.common.repo.Protos.File;
 import javax.inject.Inject;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.lang.Math;
 import java.lang.StringBuilder;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /** Text differencer for finding the diff between 2 text documents. */
 public class TextDifferencer {
@@ -74,6 +67,7 @@ public class TextDifferencer {
     // Examples of diff hunk headers:
     // @@ -1 +1 @@
     // @@ -5,83 +5,83 @@
+    // @@ -0,0 +1,10 @@ (for new file)
     // Remove 1 to be 0-based, so we subtract 1
     // It shouldn't be negative, although for some reason it is, so we truncate at 0.
     return Math.max(Integer.parseInt(hunkHeader.split(" ")[1].substring(1).split(",")[0]) - 1, 0);
@@ -84,8 +78,8 @@ public class TextDifferencer {
   }
 
   public TextDiff getTextDiff(String leftText, String rightText, String diffString) {
-    // System.out.println("********* diffString *************");
-    // System.out.println(diffString);
+    System.out.println("********* diffString *************");
+    System.out.println(diffString);
     TextDiff.Builder result =
         TextDiff.newBuilder().setLeftFileContents(leftText).setRightFileContents(rightText);
     if (diffString.isEmpty()) {

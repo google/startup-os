@@ -264,8 +264,7 @@ public class CodeReviewServiceTextDiffTest {
             .setCommitId(testFileCommitId)
             .setFilename(TEST_FILE)
             .build();
-
-    TextDiffResponse response = getResponse(file);
+    getResponse(file);
   }
 
   // Committed, workspace doesn't exist (pushed)
