@@ -37,8 +37,14 @@ export class TemplateService {
 
   // Make line highlighted with separate chars
   highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): string {
-    const startIndex: number = blockLine.textChange.getStartIndex();
-    const endIndex: number = blockLine.textChange.getEndIndex();
+    // TODO: use word changes, when it's done on server side
+    const startIndex: number = 0;
+    const endIndex: number = 0;
+
+    // TODO: hightlight all word changes (not only first one)
+    // const startIndex: number = blockLine.diffLine.getWordChangeList()[0].getStartIndex();
+    // const endIndex: number = blockLine.diffLine.getWordChangeList()[0].getEndIndex();
+
     const className = (blockIndex === BlockIndex.rightFile) ?
       'hl-right' :
       'hl-left';
