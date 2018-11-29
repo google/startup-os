@@ -220,7 +220,7 @@ public class CodeReviewServiceTextDiffTest {
 
   private TextDiffResponse getExpectedResponse(String contents) {
     return TextDiffResponse.newBuilder()
-        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents))
+        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents, ""))
         .build();
   }
 
@@ -255,7 +255,7 @@ public class CodeReviewServiceTextDiffTest {
   }
 
   // Committed, workspace doesn't exist
-  @Test
+  @Test(expected = StatusRuntimeException.class)
   public void testTextDiff_committedAndWorkspaceNotExists() {
     File file =
         File.newBuilder()
@@ -264,9 +264,7 @@ public class CodeReviewServiceTextDiffTest {
             .setCommitId(testFileCommitId)
             .setFilename(TEST_FILE)
             .build();
-
-    TextDiffResponse response = getResponse(file);
-    assertEquals(getExpectedResponse(""), response);
+    getResponse(file);
   }
 
   // Committed, workspace doesn't exist (pushed)

@@ -70,6 +70,7 @@ java_library(
         ":code_review_java_proto",
         "//common",
         "//common:auto_factory",
+        "//common:text_difference_java_proto",
         "//common:text_differencer",
         "//common/firestore",
         "//common/flags",

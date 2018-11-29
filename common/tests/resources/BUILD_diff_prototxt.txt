@@ -1,172 +1,22 @@
-left_change {
-  text: "package(default_visibility = [\"//visibility:public\"])"
-  type: NO_CHANGE
-  end_index: 53
-}
-left_change {
-  type: NO_CHANGE
-  line_number: 1
-}
-left_change {
-  text: "java_library("
-  type: NO_CHANGE
-  line_number: 2
-  end_index: 13
-}
-left_change {
-  text: "    name = \"text_differencer\","
-  type: NO_CHANGE
-  line_number: 3
-  end_index: 30
-}
-left_change {
-  text: "    srcs = ["
-  type: NO_CHANGE
-  line_number: 4
-  end_index: 12
-}
-left_change {
-  text: "        \"TextDifferencer.java\","
-  type: NO_CHANGE
-  line_number: 5
-  end_index: 31
-}
-left_change {
-  text: "    ],"
-  type: NO_CHANGE
-  line_number: 6
-  end_index: 6
-}
-left_change {
-  text: "    deps = ["
-  type: NO_CHANGE
-  line_number: 7
-  end_index: 12
-}
-left_change {
-  text: "        \":diff_match_patch\","
-  type: NO_CHANGE
-  line_number: 8
-  end_index: 28
-}
-left_change {
-  text: "        \":text_difference_java_proto\","
-  type: NO_CHANGE
-  line_number: 9
-  end_index: 38
-}
-left_change {
-  text: "        \"//third_party/maven/com/google/guava\","
-  type: NO_CHANGE
-  line_number: 10
-  end_index: 47
-}
-left_change {
+left_diff_line {
   type: LINE_PLACEHOLDER
-  line_number: 11
+  diff_line_number: 11
 }
-left_change {
+left_diff_line {
   type: LINE_PLACEHOLDER
-  line_number: 12
+  diff_line_number: 12
 }
-left_change {
-  text: "    ],"
-  type: NO_CHANGE
-  line_number: 13
-  end_index: 6
-}
-left_change {
-  text: ")"
-  type: NO_CHANGE
-  line_number: 14
-  end_index: 1
-}
-right_change {
-  text: "package(default_visibility = [\"//visibility:public\"])"
-  type: NO_CHANGE
-  end_index: 53
-}
-right_change {
-  type: NO_CHANGE
-  line_number: 1
-}
-right_change {
-  text: "java_library("
-  type: NO_CHANGE
-  line_number: 2
-  end_index: 13
-}
-right_change {
-  text: "    name = \"text_differencer\","
-  type: NO_CHANGE
-  line_number: 3
-  end_index: 30
-}
-right_change {
-  text: "    srcs = ["
-  type: NO_CHANGE
-  line_number: 4
-  end_index: 12
-}
-right_change {
-  text: "        \"TextDifferencer.java\","
-  type: NO_CHANGE
-  line_number: 5
-  end_index: 31
-}
-right_change {
-  text: "    ],"
-  type: NO_CHANGE
-  line_number: 6
-  end_index: 6
-}
-right_change {
-  text: "    deps = ["
-  type: NO_CHANGE
-  line_number: 7
-  end_index: 12
-}
-right_change {
-  text: "        \":diff_match_patch\","
-  type: NO_CHANGE
-  line_number: 8
-  end_index: 28
-}
-right_change {
-  text: "        \":text_difference_java_proto\","
-  type: NO_CHANGE
-  line_number: 9
-  end_index: 38
-}
-right_change {
-  text: "        \"//third_party/maven/com/google/guava\","
-  type: NO_CHANGE
-  line_number: 10
-  end_index: 47
-}
-right_change {
+right_diff_line {
   text: "        \"//third_party/maven/javax/inject:javax_inject\","
   type: ADD
-  line_number: 11
-  end_index: 56
+  diff_line_number: 11
+  code_line_number: 11
 }
-right_change {
+right_diff_line {
   text: "        \"//common/repo:repo_java_proto\","
   type: ADD
-  line_number: 12
-  end_index: 40
-}
-right_change {
-  text: "    ],"
-  type: NO_CHANGE
-  line_number: 13
-  end_index: 6
-}
-right_change {
-  text: ")"
-  type: NO_CHANGE
-  line_number: 14
-  end_index: 1
+  diff_line_number: 12
+  code_line_number: 12
 }
 left_file_contents: "package(default_visibility = [\"//visibility:public\"])\n\njava_library(\n    name = \"text_differencer\",\n    srcs = [\n        \"TextDifferencer.java\",\n    ],\n    deps = [\n        \":diff_match_patch\",\n        \":text_difference_java_proto\",\n        \"//third_party/maven/com/google/guava\",\n    ],\n)\n"
 right_file_contents: "package(default_visibility = [\"//visibility:public\"])\n\njava_library(\n    name = \"text_differencer\",\n    srcs = [\n        \"TextDifferencer.java\",\n    ],\n    deps = [\n        \":diff_match_patch\",\n        \":text_difference_java_proto\",\n        \"//third_party/maven/com/google/guava\",\n        \"//third_party/maven/javax/inject:javax_inject\",\n        \"//common/repo:repo_java_proto\",\n    ],\n)\n"
