@@ -1,4 +1,4 @@
-import { TextChange, Thread } from '@/core/proto';
+import { DiffLine, Thread } from '@/core/proto';
 
 export enum BlockIndex {
   leftFile,
@@ -15,7 +15,7 @@ export interface BlockLine {
   isPlaceholder: boolean;
   threads: Thread[];
   isChanged: boolean;
-  textChange?: TextChange;
+  diffLine: DiffLine;
 }
 
 // Line of code changes (left and right blocks)
