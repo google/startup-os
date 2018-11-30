@@ -2,11 +2,13 @@ java_binary(
     name = "job",
     srcs = [
         "ReviewerJob.java",
+        "impl/CiTask.java",
+        "impl/FirestoreTaskBase.java",
         "impl/ReviewerMetadataUpdaterTask.java",
         "tasks/Task.java",
         "tasks/TaskExecutor.java",
     ],
-    main_class = "com.google.startupos.tools.reviewer.job.Job",
+    main_class = "com.google.startupos.tools.reviewer.job.ReviewerJob",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

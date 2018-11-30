@@ -1,0 +1,22 @@
+left_diff_line {
+  type: LINE_PLACEHOLDER
+  diff_line_number: 11
+}
+left_diff_line {
+  type: LINE_PLACEHOLDER
+  diff_line_number: 12
+}
+right_diff_line {
+  text: "        \"//third_party/maven/javax/inject:javax_inject\","
+  type: ADD
+  diff_line_number: 11
+  code_line_number: 11
+}
+right_diff_line {
+  text: "        \"//common/repo:repo_java_proto\","
+  type: ADD
+  diff_line_number: 12
+  code_line_number: 12
+}
+left_file_contents: "package(default_visibility = [\"//visibility:public\"])\n\njava_library(\n    name = \"text_differencer\",\n    srcs = [\n        \"TextDifferencer.java\",\n    ],\n    deps = [\n        \":diff_match_patch\",\n        \":text_difference_java_proto\",\n        \"//third_party/maven/com/google/guava\",\n    ],\n)\n"
+right_file_contents: "package(default_visibility = [\"//visibility:public\"])\n\njava_library(\n    name = \"text_differencer\",\n    srcs = [\n        \"TextDifferencer.java\",\n    ],\n    deps = [\n        \":diff_match_patch\",\n        \":text_difference_java_proto\",\n        \"//third_party/maven/com/google/guava\",\n        \"//third_party/maven/javax/inject:javax_inject\",\n        \"//common/repo:repo_java_proto\",\n    ],\n)\n"

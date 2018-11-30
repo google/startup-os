@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import {
   ChangeType,
-  TextChange,
+  DiffLine,
   TextDiff,
 } from '@/core/proto';
 import { HighlightService } from '@/core/services';
@@ -91,13 +91,13 @@ export class ChangesService {
   }
 
   // TODO: remove the method, when the issue will be fix
-  tempFixChangesLineNumber(textChanges: TextChange[]): void {
+  tempFixChangesLineNumber(diffLines: DiffLine[]): void {
     let delimiter: number = 0;
-    textChanges.forEach(textChange => {
-      switch (textChange.getType()) {
+    diffLines.forEach(diffLine => {
+      switch (diffLine.getType()) {
         case ChangeType.DELETE:
         case ChangeType.ADD:
-          textChange.setLineNumber(textChange.getLineNumber() - delimiter);
+          diffLine.setDiffLineNumber(diffLine.getDiffLineNumber() - delimiter);
           break;
         case ChangeType.LINE_PLACEHOLDER:
           delimiter++;
@@ -115,14 +115,14 @@ export class ChangesService {
       changesLines: ChangesLine[];
       changesLinesMap: { [id: number]: number }[];
     } {
-    this.tempFixChangesLineNumber(textDiff.getLeftChangeList());
-    this.tempFixChangesLineNumber(textDiff.getRightChangeList());
+    this.tempFixChangesLineNumber(textDiff.getLeftDiffLineList());
+    this.tempFixChangesLineNumber(textDiff.getRightDiffLineList());
 
-    this.applyChanges(textDiff.getLeftChangeList(), leftBlockLines);
-    this.applyChanges(textDiff.getRightChangeList(), rightBlockLines);
+    this.applyChanges(textDiff.getLeftDiffLineList(), leftBlockLines);
+    this.applyChanges(textDiff.getRightDiffLineList(), rightBlockLines);
 
-    this.addPlaceholders(textDiff.getLeftChangeList(), leftBlockLines);
-    this.addPlaceholders(textDiff.getRightChangeList(), rightBlockLines);
+    this.addPlaceholders(textDiff.getLeftDiffLineList(), leftBlockLines);
+    this.addPlaceholders(textDiff.getRightDiffLineList(), rightBlockLines);
 
     if (leftBlockLines.length !== rightBlockLines.length) {
       throw new Error(
@@ -144,9 +144,9 @@ export class ChangesService {
       // Add map marker to be able for fast access
       const codeIndex: number = changesLines.length;
       changesLinesMap[BlockIndex.leftFile]
-        [leftBlockLines[i].lineNumber] = codeIndex;
+      [leftBlockLines[i].lineNumber] = codeIndex;
       changesLinesMap[BlockIndex.rightFile]
-        [rightBlockLines[i].lineNumber] = codeIndex;
+      [rightBlockLines[i].lineNumber] = codeIndex;
 
       // Create line for comments
       const commentsLine: ChangesLine = this.lineService.createCommentsLine(
@@ -165,32 +165,27 @@ export class ChangesService {
     };
   }
 
-  applyChanges(textChanges: TextChange[], blockLines: BlockLine[]): void {
-    textChanges.forEach(textChange => {
-      switch (textChange.getType()) {
+  applyChanges(diffLines: DiffLine[], blockLines: BlockLine[]): void {
+    diffLines.forEach(diffLine => {
+      switch (diffLine.getType()) {
         case ChangeType.DELETE:
         case ChangeType.ADD:
           // Highlight changes
-          blockLines[textChange.getLineNumber()].isChanged = true;
-          blockLines[textChange.getLineNumber()].textChange = textChange;
+          blockLines[diffLine.getDiffLineNumber()].isChanged = true;
+          blockLines[diffLine.getDiffLineNumber()].diffLine = diffLine;
       }
     });
   }
 
-  addPlaceholders(textChanges: TextChange[], blockLines: BlockLine[]): void {
-    let previousLineNumber: number = 0;
-    textChanges.forEach(textChange => {
-      if (textChange.getType() === ChangeType.LINE_PLACEHOLDER) {
+  addPlaceholders(diffLines: DiffLine[], blockLines: BlockLine[]): void {
+    diffLines.forEach(diffLine => {
+      if (diffLine.getType() === ChangeType.LINE_PLACEHOLDER) {
         // Add placeholder
         blockLines.splice(
-          // LineNumber + 1 because we want to add placeholder after the line
-          previousLineNumber + 1,
+          diffLine.getDiffLineNumber(),
           0,
           this.lineService.createPlaceholder(),
         );
-      } else {
-        // Remember number of the line to know where to put next placeholder
-        previousLineNumber = textChange.getLineNumber();
       }
     });
   }

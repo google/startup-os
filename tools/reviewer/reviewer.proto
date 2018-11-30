@@ -13,6 +13,24 @@ message Repo {
   string url = 2;
 }
 
+message CIRequest {
+  message Target {
+    Repo repo = 1;
+    string commitId = 2;
+  }
+  repeated Target target = 1;
+}
+
+message CIResponse {
+  CIRequest request = 1;
+  message TargetResult {
+    CIRequest.Target target = 1;
+    bool success = 2;
+    string log = 3;
+  }
+  repeated TargetResult results = 2;
+}
+
 /* Firebase config. The only field we probably need is project_id, but we're not
  * sure of that. */
 message FirebaseConfig {
