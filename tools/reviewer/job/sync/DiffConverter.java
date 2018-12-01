@@ -22,6 +22,7 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Issu
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitInfo;
 import com.google.startupos.tools.reviewer.localserver.service.Protos;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
@@ -62,7 +63,8 @@ public class DiffConverter {
           .setBaseBranchName("master")
           .setHeadBranchName("D" + diff.getId())
           .setRepo(githubPr.getRepo())
-          .addAllReviewComment(getReviewCommentsByRepoName(diff, githubPr))
+          .addAllReviewComment(
+              getReviewCommentsByRepoName(diff, githubPr.getOwner(), githubPr.getRepo()))
           .addAllIssueComment(getIssueComments(diff, githubPr))
           .setOwner(githubPr.getOwner())
           .setAssociatedReviewerDiff(diff.getId());
@@ -71,21 +73,21 @@ public class DiffConverter {
     return pullRequests;
   }
 
-  private ImmutableList<ReviewComment> getReviewCommentsByRepoName(Diff diff, GithubPr githubPr) {
+  private ImmutableList<ReviewComment> getReviewCommentsByRepoName(
+      Diff diff, String repoOwner, String repoName) {
     List<ReviewComment> result = new ArrayList<>();
     List<Thread> codeThreads =
         diff.getCodeThreadList()
             .stream()
-            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo()))
+            .filter(thread -> thread.getRepoId().equals(repoName))
             .collect(Collectors.toList());
 
     for (Thread thread : codeThreads) {
       for (Comment comment : thread.getCommentList()) {
-        // TODO: Store `githubCommentPosition` in the Diff.Thread in Firestore
         int githubCommentPosition;
         // `0` value means the comment isn't synced with GitHub
         if (thread.getGithubCommentPosition() == 0) {
-          githubCommentPosition = getReviewCommentPositionFromGitHub(thread, githubPr);
+          githubCommentPosition = getReviewCommentPositionFromGitHub(thread, repoOwner, repoName);
         } else {
           githubCommentPosition = thread.getGithubCommentPosition();
         }
@@ -115,37 +117,44 @@ public class DiffConverter {
     }
   }
 
-  private int getReviewCommentPositionFromGitHub(Thread thread, GithubPr githubPr) {
+  private int getReviewCommentPositionFromGitHub(Thread thread, String repoOwner, String repoName) {
     LineNumberConverter.Side commentSide =
         thread.getFile().getCommitId().equals(thread.getCommitId())
             ? LineNumberConverter.Side.RIGHT
             : LineNumberConverter.Side.LEFT;
-    String patch = "";
+
+    List<String> githubFilePatches = new ArrayList<>();
     try {
-      patch =
+      githubFilePatches =
           githubClient
               .getCommit(
                   CommitRequest.newBuilder()
-                      .setOwner(githubPr.getOwner())
-                      .setRepo(githubPr.getRepo())
+                      .setOwner(repoOwner)
+                      .setRepo(repoName)
                       .setSha(thread.getFile().getCommitId())
                       .build())
               .getCommit()
               .getFilesList()
               .stream()
-              .filter(file -> thread.getFile().getFilename().equals(file.getFilename()))
-              .collect(Collectors.toList())
-              .get(0)
-              .getPatch();
+              .filter(githubFile -> thread.getFile().getFilename().equals(githubFile.getFilename()))
+              .map(CommitInfo.File::getPatch)
+              .collect(Collectors.toList());
     } catch (IOException e) {
       e.printStackTrace();
     }
 
+    if (githubFilePatches.size() != 1) {
+      throw new RuntimeException(
+          "Can't find the commit in GitHub for the file: " + thread.getFile().getFilename());
+    }
+    String patch = githubFilePatches.get(0);
+
     if (patch.equals("")) {
       throw new RuntimeException(
-          "Can't find the `patch` for file: " + thread.getFile().getFilename());
+          "Can't find the `patch` in GitHub for the file: " + thread.getFile().getFilename());
     }
 
+    // TODO: Store the result in the Diff.Thread in Firestore
     return LineNumberConverter.getPosition(patch, thread.getLineNumber(), commentSide);
   }
 

@@ -68,6 +68,7 @@ public class GithubClient {
   // https://developer.github.com/v3/repos/commits/#get-a-single-commit
   private static final String GET_COMMIT = "repos/%s/%s/commits/%s";
   // https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
+  // Lists a maximum of 250 commits for a pull request
   private static final String GET_COMMITS_ON_PULL_REQUEST = "repos/%s/%s/pulls/%s/commits";
   // https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
   private static final String GET_REPOSITORY_COMMENTS = "repos/%s/%s/pulls/comments";
