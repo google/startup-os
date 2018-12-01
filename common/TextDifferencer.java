@@ -23,11 +23,14 @@ import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.WordChange;
+import com.google.startupos.common.Lists;
+import com.google.startupos.common.Lists.Segment;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Text differencer for finding the diff between 2 text documents. */
 public class TextDifferencer {
@@ -156,37 +159,21 @@ public class TextDifferencer {
   }
 
   private void addWordChanges(List<DiffLine> leftLines, List<DiffLine> rightLines) {
-    if (leftLines.isEmpty()) {
-      return;
-    }
-    int segmentStart = 0;
-    for (int diffIndex = 1; diffIndex < leftLines.size(); diffIndex++) {
-      DiffLine leftDiffLine = leftLines.get(diffIndex);
-      DiffLine prevLeftDiffLine = leftLines.get(diffIndex);
-      if (leftDiffLine.getDiffLineNumber() - prevLeftDiffLine.getDiffLineNumber() > 1) {
-        addWordChanges(leftLines, rightLines, segmentStart, diffIndex, diffIndex);
-        segmentStart = diffIndex;
-      }
-    }
-    // Take care of last segment
-    if (segmentStart == 0 || segmentStart < leftLines.size() - 1) {
-
-      addWordChanges(leftLines, rightLines, segmentStart, leftLines.size(), rightLines.size());
+    List<Integer> diffLineNumbers =
+        leftLines.stream().map(line -> line.getDiffLineNumber()).collect(Collectors.toList());
+    for (Segment segment : Lists.splitToSegments(diffLineNumbers)) {
+      addWordChanges(leftLines, rightLines, segment.startIndex(), segment.endIndex());
     }
   }
 
-  // Returns a list of Diffs per line, from segmentStart until leftSegmentEnd (not inclusive).
+  // Adds WordChanges, from segmentStart until segmentEnd (inclusive).
   private void addWordChanges(
-      List<DiffLine> leftLines,
-      List<DiffLine> rightLines,
-      int segmentStart,
-      int leftSegmentEnd,
-      int rightSegmentEnd) {
+      List<DiffLine> leftLines, List<DiffLine> rightLines, int segmentStart, int segmentEnd) {
     DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
     LinkedList<DiffMatchPatch.Diff> diffs =
         diffMatchPatch.diff_main(
-            getMultilineText(leftLines, segmentStart, leftSegmentEnd),
-            getMultilineText(rightLines, segmentStart, rightSegmentEnd));
+            getMultilineText(leftLines, segmentStart, segmentEnd),
+            getMultilineText(rightLines, segmentStart, segmentEnd));
     diffMatchPatch.diff_cleanupSemantic(diffs);
 
     // Split multi-lines
@@ -244,14 +231,14 @@ public class TextDifferencer {
     return line.getText().equals(word.getText());
   }
 
-  // endIndex is not inclusive - i.e, diffLines at endIndex is not used.
+  // endIndex is inclusive - i.e, diffLines at endIndex are used.
   private String getMultilineText(List<DiffLine> diffLines, int startIndex, int endIndex) {
     StringBuilder result = new StringBuilder();
-    for (int i = startIndex; i < endIndex - 1; i++) {
+    for (int i = startIndex; i < endIndex; i++) {
       result.append(diffLines.get(i).getText() + "\n");
     }
     // Last one without newline
-    result.append(diffLines.get(endIndex - 1).getText());
+    result.append(diffLines.get(endIndex).getText());
     return result.toString();
   }
 
