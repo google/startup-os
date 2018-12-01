@@ -35,8 +35,8 @@ import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRe
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsResponse;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.RepositoryCommentsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.RepositoryCommentsResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,8 +70,6 @@ public class GithubClient {
   // https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
   // Lists a maximum of 250 commits for a pull request
   private static final String GET_COMMITS_ON_PULL_REQUEST = "repos/%s/%s/pulls/%s/commits";
-  // https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
-  private static final String GET_REPOSITORY_COMMENTS = "repos/%s/%s/pulls/comments";
   // https://developer.github.com/v3/pulls/comments/#edit-a-comment
   private static final String EDIT_REVIEW_COMMENT = "repos/%s/%s/pulls/comments/%s";
   // https://developer.github.com/v3/pulls/comments/#delete-a-comment
@@ -80,6 +78,8 @@ public class GithubClient {
   private static final String EDIT_ISSUE_COMMENT = "repos/%s/%s/issues/comments/%s";
   // https://developer.github.com/v3/issues/comments/#delete-a-comment
   private static final String DELETE_ISSUE_COMMENT = "repos/%s/%s/issues/comments/%s";
+  // https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
+  private static final String GET_COMMENTS_ON_PULL_REQUEST = "repos/%s/%s/pulls/%d/comments";
 
   private final String login;
   private final String password;
@@ -133,13 +133,17 @@ public class GithubClient {
     return builder.build();
   }
 
-  public RepositoryCommentsResponse getRepositoryComments(RepositoryCommentsRequest request)
+  public PullRequestCommentsResponse getPullRequestComments(PullRequestCommentsRequest request)
       throws IOException {
-    RepositoryCommentsResponse.Builder builder = RepositoryCommentsResponse.newBuilder();
+    PullRequestCommentsResponse.Builder builder = PullRequestCommentsResponse.newBuilder();
     String response =
         doRequest(
             RequestMethod.GET,
-            String.format(GET_REPOSITORY_COMMENTS, request.getOwner(), request.getRepo()));
+            String.format(
+                GET_COMMENTS_ON_PULL_REQUEST,
+                request.getOwner(),
+                request.getRepo(),
+                request.getNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
         .merge(String.format("{\"review_comment\":%s}", response), builder);

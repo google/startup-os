@@ -20,7 +20,7 @@ import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequ
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.RepositoryCommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
@@ -29,7 +29,6 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Comm
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Reads GitHub Pull Request using GitHub API and creates
@@ -106,22 +105,13 @@ public class GithubReader {
   private List<ReviewComment> getPullRequestReviewComments(
       String repoOwner, String repoName, long number) throws IOException {
     return githubClient
-        .getRepositoryComments(
-            RepositoryCommentsRequest.newBuilder().setOwner(repoOwner).setRepo(repoName).build())
-        .getReviewCommentList()
-        .stream()
-        .filter(
-            reviewComment ->
-                Long.parseLong(
-                        reviewComment
-                            .getLinks()
-                            .getPullRequest()
-                            .getHref()
-                            .substring(
-                                reviewComment.getLinks().getPullRequest().getHref().lastIndexOf('/')
-                                    + 1))
-                    == number)
-        .collect(Collectors.toList());
+        .getPullRequestComments(
+            PullRequestCommentsRequest.newBuilder()
+                .setOwner(repoOwner)
+                .setRepo(repoName)
+                .setNumber(number)
+                .build())
+        .getReviewCommentList();
   }
 }
 

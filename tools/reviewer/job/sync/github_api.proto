@@ -104,13 +104,14 @@ message DeleteReviewCommentRequest {
   int64 comment_id = 3;
 }
 
-// https://developer.github.com/v3/pulls/comments/#list-comments-in-a-repository
-message RepositoryCommentsRequest {
+// https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
+message PullRequestCommentsRequest {
   string owner = 1;
   string repo = 2;
+  int64 number = 3;
 }
 
-message RepositoryCommentsResponse {
+message PullRequestCommentsResponse {
   repeated ReviewComment review_comment = 1;
 }
 
