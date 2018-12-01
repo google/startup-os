@@ -27,22 +27,11 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.TextDifferencer;
 import java.io.IOException;
-import com.google.common.base.Strings;
 import com.google.startupos.common.Protos.TextDiff;
-import com.google.startupos.common.Protos.DiffLine;
-import com.google.startupos.common.Protos.ChangeType;
-import java.util.List;
-import java.util.ArrayList;
 
 /** A tool for testing TextDifferencer. */
 @Singleton
 public class TextDifferencerTool {
-  static final String ANSI_RESET = "\u001B[0m";
-  static final String ANSI_WHITE = "\u001B[37m";
-  static final String ANSI_RED_BACKGROUND = "\u001B[41m";
-  static final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
-  static final int PADDING = 100;
-
   @FlagDesc(name = "left_file", description = "Left file", required = true)
   public static Flag<String> leftFile = Flag.create("");
 

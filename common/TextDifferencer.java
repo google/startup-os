@@ -16,7 +16,6 @@
 
 package com.google.startupos.common;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
@@ -25,12 +24,10 @@ import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.WordChange;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.lang.Math;
-import java.lang.StringBuilder;
-import java.util.ArrayList;
 
 /** Text differencer for finding the diff between 2 text documents. */
 public class TextDifferencer {

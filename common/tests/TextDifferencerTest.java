@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.TextDiff;
-import com.google.startupos.common.Protos.WordChange;
 import dagger.Component;
 import javax.inject.Singleton;
 import org.junit.Before;
