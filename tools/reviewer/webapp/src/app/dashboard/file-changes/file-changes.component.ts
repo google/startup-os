@@ -35,9 +35,6 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   ) {
     this.stateService.isLoading = true;
     this.stateService.isCommitFound = true;
-
-    document.body.style.width = 'auto';
-    document.body.style.minWidth = '100%';
   }
 
   ngOnInit() {
@@ -71,8 +68,6 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     delete this.stateService.rightCommitId;
     delete this.stateService.leftCommitId;
-    document.body.style.width = '100%';
-    document.body.style.minWidth = 'auto';
     this.loadService.destroy();
   }
 }

@@ -5,6 +5,7 @@ export interface CommitInfo {
   timestamp: number;
   offset: number;
   isVisible: boolean;
+  isInit: boolean;
 }
 
 @Component({

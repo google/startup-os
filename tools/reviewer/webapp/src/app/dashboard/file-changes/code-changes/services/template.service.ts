@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+import { WordChange } from '@/core/proto';
 import { HighlightService } from '@/core/services';
 import {
   BlockIndex,
@@ -37,13 +38,15 @@ export class TemplateService {
 
   // Make line highlighted with separate chars
   highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): string {
-    // TODO: use word changes, when it's done on server side
-    const startIndex: number = 0;
-    const endIndex: number = 0;
-
     // TODO: hightlight all word changes (not only first one)
-    // const startIndex: number = blockLine.diffLine.getWordChangeList()[0].getStartIndex();
-    // const endIndex: number = blockLine.diffLine.getWordChangeList()[0].getEndIndex();
+    let startIndex: number = 0;
+    let endIndex: number = 0;
+
+    const wordChanges: WordChange[] = blockLine.diffLine.getWordChangeList();
+    if (wordChanges.length > 0) {
+      startIndex = wordChanges[0].getStartIndex();
+      endIndex = wordChanges[0].getEndIndex();
+    }
 
     const className = (blockIndex === BlockIndex.rightFile) ?
       'hl-right' :
@@ -105,17 +108,5 @@ export class TemplateService {
   // Does the block line contain no comments?
   isEmpty(blockLine: BlockLine): boolean {
     return blockLine.threads.length === 0;
-  }
-
-  isLastLine(changesLines: ChangesLine[], lineIndex: number): boolean {
-    let isLastLine: boolean = lineIndex === changesLines.length - 2;
-    if (isLastLine) {
-      changesLines[lineIndex + 1].blocks.forEach(blockLine => {
-        if (!this.isEmpty(blockLine)) {
-          isLastLine = false;
-        }
-      });
-    }
-    return isLastLine;
   }
 }

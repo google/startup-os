@@ -44,6 +44,7 @@ export class CommitMenuComponent implements OnDestroy {
     timestamp: 0,
     offset: 0,
     isVisible: false,
+    isInit: false,
   };
   mousemoveSubscription = new Subscription();
   mouseupSubscription = new Subscription();
@@ -192,16 +193,19 @@ export class CommitMenuComponent implements OnDestroy {
     this.bridge.width = this.rightDrag.x - this.leftDrag.x;
   }
 
-  showPopup(commitIndex: number): void {
+  setPopupData(commitIndex: number): void {
     this.commitInfo.id = this.stateService.commitIdList[commitIndex];
     // TODO: Display real time of a commit
     this.commitInfo.timestamp = 1543122301000;
     this.commitInfo.offset = commitIndex * distanceBetweenPoints;
+    this.commitInfo.isInit = true;
     this.commitInfo.isVisible = true;
   }
 
-  hidePopup(): void {
-    this.commitInfo.isVisible = false;
+  showPopup() {
+    if (this.commitInfo.isInit) {
+      this.commitInfo.isVisible = true;
+    }
   }
 
   isDotSelected(index: number): boolean {

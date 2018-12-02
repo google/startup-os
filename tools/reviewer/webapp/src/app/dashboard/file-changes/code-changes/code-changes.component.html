@@ -1,9 +1,6 @@
 <table cellpadding="0" cellspacing="0" border="0">
   <!-- Code lines -->
-  <tr
-    [ngClass]="{ 'last-line': templateService.isLastLine(changesLines, lineIndex) }"
-    *ngFor="let changesLine of changesLines; let lineIndex = index"
-  >
+  <tr *ngFor="let changesLine of changesLines; let lineIndex = index">
     <!-- left and right block lines -->
     <ng-container
       *ngFor="let blockLine of changesLine.blocks; let blockIndex = index"

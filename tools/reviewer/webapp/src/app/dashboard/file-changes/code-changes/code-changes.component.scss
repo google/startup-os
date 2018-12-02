@@ -3,10 +3,8 @@
 $font-size: 15px;
 $border-width: 2px;
 $border: $border-width solid #979797;
-$border-radius: 8px;
 
 table {
-  border-radius: $border-radius + $border-width;
   border-top: $border;
   border-right: $border;
   border-bottom: $border;
@@ -67,27 +65,5 @@ table {
         }
       }
     }
-  }
-  tr:first-child {
-    td:first-child {
-      border-top-left-radius: $border-radius;
-    }
-    td:last-child {
-      border-top-right-radius: $border-radius;
-    }
-  }
-  @mixin last-line() {
-    td:first-child {
-      border-bottom-left-radius: $border-radius;
-    }
-    td:last-child {
-      border-bottom-right-radius: $border-radius;
-    }
-  }
-  tr:last-child {
-    @include last-line();
-  }
-  .last-line {
-    @include last-line();
   }
 }
