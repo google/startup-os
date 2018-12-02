@@ -1,6 +1,10 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
@@ -163,8 +167,8 @@ ts_setup_workspace()
 
 http_archive(
     name = "io_bazel_rules_docker",
-    strip_prefix = "rules_docker-0.4.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.4.0.tar.gz"],
+    strip_prefix = "rules_docker-0.5.1",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.5.1.tar.gz"],
 )
 
 load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
