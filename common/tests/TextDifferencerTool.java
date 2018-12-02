@@ -38,6 +38,9 @@ public class TextDifferencerTool {
   @FlagDesc(name = "right_file", description = "Right file", required = true)
   public static Flag<String> rightFile = Flag.create("");
 
+  @FlagDesc(name = "print_output", description = "Print TextDiff output", required = false)
+  public static Flag<Boolean> printOutput = Flag.create(false);
+
   private FileUtils fileUtils;
   private TextDifferencer textDifferencer;
 
@@ -53,7 +56,9 @@ public class TextDifferencerTool {
     String diffString = GitRepo.getTextDiff(leftFile.get(), rightFile.get());
     TextDiff textDiff =
         textDifferencer.getTextDiff(leftFileContents, rightFileContents, diffString);
-    System.out.println(textDiff);
+    if (printOutput.get()) {
+      System.out.println(textDiff);
+    }
   }
 
   @Singleton
