@@ -23,7 +23,6 @@ import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.WordChange;
-import com.google.startupos.common.Lists;
 import com.google.startupos.common.Lists.Segment;
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -160,7 +159,7 @@ public class TextDifferencer {
 
   private void addWordChanges(List<DiffLine> leftLines, List<DiffLine> rightLines) {
     List<Integer> diffLineNumbers =
-        leftLines.stream().map(line -> line.getDiffLineNumber()).collect(Collectors.toList());
+        leftLines.stream().map(DiffLine::getDiffLineNumber).collect(Collectors.toList());
     for (Segment segment : Lists.splitToSegments(diffLineNumbers)) {
       addWordChanges(leftLines, rightLines, segment.startIndex(), segment.endIndex());
     }

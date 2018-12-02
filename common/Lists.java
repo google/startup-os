@@ -25,7 +25,7 @@ public class Lists {
 
   /**
    * Splits list into consecutive segments of numbers. Assumed all numbers are unique and
-   * monotoniously increasing.
+   * monotonously increasing.
    */
   public static ImmutableList<Segment> splitToSegments(List<Integer> list) {
     ImmutableList.Builder<Segment> result = ImmutableList.builder();
