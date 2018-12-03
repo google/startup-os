@@ -37,50 +37,47 @@ public class LineNumberConverter {
     RIGHT
   }
 
-  // The relationship between position in the diff and line number in file for the left side
-  private Map<Integer, Integer> positionToLineNumberLeftSide = new HashMap<>();
-  // The relationship between position in the diff and line number in file for the right side
-  private Map<Integer, Integer> positionToLineNumberRightSide = new HashMap<>();
-  // The relationship between line number in file and position in the diff for the left side
-  private Map<Integer, Integer> lineNumberToPositionLeftSide = new HashMap<>();
-  // The relationship between line number in file and position in the diff for the right side
-  private Map<Integer, Integer> lineNumberToPositionRightSide = new HashMap<>();
-
-  /**
-   * LineNumberConverter class constructor.
-   *
-   * @param diffPatchStr `patch`(diff) of GitHub Pull Request file in string format
-   */
-  public LineNumberConverter(String diffPatchStr) {
-    processDiffPatch(diffPatchStr);
-  }
-
   /**
    * Returns the absolute line number in the file
    *
+   * @param patch is `patch`(diff) of GitHub Pull Request file in string format
    * @param position is line number in the diff(patch)
    * @param side the side(LEFT or RIGHT) where the comment is added
    */
-  public int getLineNumber(int position, Side side) {
-    return side.equals(Side.LEFT)
-        ? positionToLineNumberLeftSide.get(position)
-        : positionToLineNumberRightSide.get(position);
+  public static int getLineNumber(String patch, int position, Side side) {
+    return processDiffPatch(patch, position, side, ReturnValueFor.REVIEWER);
   }
 
   /**
    * Returns the position in the diff(patch)
    *
+   * @param patch is `patch`(diff) of GitHub Pull Request file in string format
    * @param lineNumber is the absolute line number in the file
    * @param side the side(LEFT or RIGHT) where the comment is added
    */
-  public int getPosition(int lineNumber, Side side) {
-    return side.equals(Side.LEFT)
-        ? lineNumberToPositionLeftSide.get(lineNumber)
-        : lineNumberToPositionRightSide.get(lineNumber);
+  public static int getPosition(String patch, int lineNumber, Side side) {
+    return processDiffPatch(patch, lineNumber, side, ReturnValueFor.GITHUB);
   }
 
-  private void processDiffPatch(String diffPatchStr) {
-    GithubPatch githubPatch = new GithubPatch(diffPatchStr);
+  // XXX: Need to come up with a more appropriate name
+  private enum ReturnValueFor {
+    GITHUB,
+    REVIEWER
+  }
+
+  // XXX: Need to come up with a more appropriate name
+  private static int processDiffPatch(
+      String patch, int number, Side side, ReturnValueFor valueFor) {
+    // The relationship between position in the diff and line number in file for the left side
+    Map<Integer, Integer> positionToLineNumberLeftSide = new HashMap<>();
+    // The relationship between position in the diff and line number in file for the right side
+    Map<Integer, Integer> positionToLineNumberRightSide = new HashMap<>();
+    // The relationship between line number in file and position in the diff for the left side
+    Map<Integer, Integer> lineNumberToPositionLeftSide = new HashMap<>();
+    // The relationship between line number in file and position in the diff for the right side
+    Map<Integer, Integer> lineNumberToPositionRightSide = new HashMap<>();
+
+    GithubPatch githubPatch = new GithubPatch(patch);
     List<String> newLineSymbols = githubPatch.getNewlineSymbols();
     // The diff patch can contain one of several parts. We name this part diff hunk.
     List<GithubPatch.DiffHunkHeader> diffHunkHeaders = githubPatch.getDiffHunkHeaders();
@@ -157,6 +154,19 @@ public class LineNumberConverter {
             positionIndex++;
             break;
           }
+      }
+    }
+    if (valueFor.equals(ReturnValueFor.REVIEWER)) {
+      if (side.equals(Side.LEFT)) {
+        return positionToLineNumberLeftSide.get(number);
+      } else {
+        return positionToLineNumberRightSide.get(number);
+      }
+    } else {
+      if (side.equals(Side.LEFT)) {
+        return lineNumberToPositionLeftSide.get(number);
+      } else {
+        return lineNumberToPositionRightSide.get(number);
       }
     }
   }

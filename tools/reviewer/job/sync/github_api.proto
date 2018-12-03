@@ -51,45 +51,68 @@ message CreateIssueCommentRequest {
   message CreateIssueCommentRequestData { string body = 1; }
 }
 
-// https://developer.github.com/v3/pulls/reviews/#list-reviews-on-a-pull-request
-message ReviewsRequest {
+message CreateIssueCommentResponse { IssueComment issue_comment = 1; }
+
+// https://developer.github.com/v3/issues/comments/#edit-a-comment
+message EditIssueCommentRequest {
   string owner = 1;
   string repo = 2;
-  int64 number = 3;
+  int64 comment_id = 3;
+  EditIssueCommentRequestData request_data = 4;
+
+  message EditIssueCommentRequestData { string body = 1; }
 }
 
-message ReviewsResponse { repeated Review reviews = 1; }
-
-// https://developer.github.com/v3/pulls/reviews/#get-comments-for-a-single-review
-message ReviewCommentsRequest {
+// https://developer.github.com/v3/issues/comments/#delete-a-comment
+message DeleteIssueCommentRequest {
   string owner = 1;
   string repo = 2;
-  int64 number = 3;
-  int64 review_id = 4;
+  int64 comment_id = 3;
 }
 
-message ReviewCommentsResponse { repeated ReviewComment review_comments = 1; }
-
-// https://developer.github.com/v3/pulls/reviews/#create-a-pull-request-review
-message CreatePullRequestReviewRequest {
+// https://developer.github.com/v3/pulls/comments/#create-a-comment
+message CreateReviewCommentRequest {
   string owner = 1;
   string repo = 2;
   int64 number = 3;
-  CreatePullRequestReviewRequestData request_data = 4;
+  CreateReviewCommentRequestData request_data = 4;
 
-  message CreatePullRequestReviewRequestData {
-    string commit_id = 1;
-    //  required field
-    string body = 2;
-    string event = 3;
-    repeated ReviewCommentRequestData comments = 4;
-
-    message ReviewCommentRequestData {
-      string path = 1;
-      int64 position = 2;
-      string body = 3;
-    }
+  message CreateReviewCommentRequestData {
+    string body = 1;
+    string commit_id = 2;
+    string path = 3;
+    int32 position = 4;
   }
+}
+
+message CreateReviewCommentResponse { ReviewComment review_comment = 1; }
+
+// https://developer.github.com/v3/pulls/comments/#edit-a-comment
+message EditReviewCommentRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 comment_id = 3;
+  EditReviewCommentRequestData request_data = 4;
+
+  message EditReviewCommentRequestData { string body = 1; }
+}
+
+// https://developer.github.com/v3/pulls/comments/#delete-a-comment
+message DeleteReviewCommentRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 comment_id = 3;
+}
+
+// https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
+message PullRequestCommentsRequest {
+  string owner = 1;
+  string repo = 2;
+  int64 number = 3;
+}
+
+message PullRequestCommentsResponse {
+  repeated ReviewComment review_comment = 1;
 }
 
 // https://developer.github.com/v3/repos/commits/#get-a-single-commit
@@ -109,8 +132,3 @@ message CommitsRequest {
 }
 
 message CommitsResponse { repeated CommitInfo commits = 1; }
-
-// https://developer.github.com/v3/users/#get-a-single-user
-message UserRequest { string login = 1; }
-
-message UserResponse { User user = 1; }
