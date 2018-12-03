@@ -29,7 +29,6 @@ $border: 1px solid #c1c1c1;
       padding: 10px 23px;
       align-items: center;
       background: $background;
-      border-bottom: $border;
       >.commit-menu {
         margin-left: 70px;
         display: flex;
@@ -42,10 +41,9 @@ $border: 1px solid #c1c1c1;
     }
   }
   >.header-cover {
-    height: 95px;
+    height: 83px;
   }
   >.code-changes {
-    margin: 0 23px;
     padding-bottom: 10px;
   }
 }

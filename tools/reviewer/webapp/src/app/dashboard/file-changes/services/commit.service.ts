@@ -55,7 +55,8 @@ export class CommitService {
     this.addCommitId(this.stateService.leftCommitId);
     this.addCommitId(this.stateService.rightCommitId);
 
-    // Switch left and right commits, if left commit id newer than right one
+    // Switch left and right commits, if left commit id is newer than right one.
+    // This cannot happen using the UI, but can by editing the url.
     const leftIndex: number = this.getCommitIndex(this.stateService.leftCommitId);
     const rightIndex: number = this.getCommitIndex(this.stateService.rightCommitId);
     if (leftIndex >= rightIndex && leftIndex !== -1 && rightIndex !== -1) {
