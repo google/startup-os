@@ -9,50 +9,47 @@ option java_outer_classname = "Protos";
 enum ChangeType {
   // Unused.
   TYPE_UNUSED = 0;
-
   // No change has occurred. The source is equal to the destination.
   NO_CHANGE = 1;
-
   // New text was added to the source. Only for right-side change.
   ADD = 2;
-
   // Text deleted from the source. Only for left-side change.
   DELETE = 3;
-
   // Text from source was replaced on both sides.
   REPLACE = 5;
-
   // An empty line for an addition/deletion on the other side. Note that
   // this is not a newline in the original file.
   LINE_PLACEHOLDER = 4;
 }
 
 message TextDiff {
-  repeated com.google.startupos.common.TextChange left_change = 1;
-  repeated com.google.startupos.common.TextChange right_change = 2;
+  repeated DiffLine left_diff_line = 5;
+  repeated DiffLine right_diff_line = 6;
   string left_file_contents = 3;
   string right_file_contents = 4;
 }
 
-message TextChange {
-  reserved 6, 7, 8;
+message DiffLine {
   // The string being changed. Used for debugging purposes.
   string text = 1;
-
-  // The {@link Type} of the difference.
   ChangeType type = 2;
-
-  int32 line_number = 3;
-
-  // Indices of a change in the line. Leave it empty if whole line was changed.
-  int32 start_index = 4;
-  int32 end_index = 5;
+  // Line number in the diff. Visually, left and right lines with the same diff
+  // line number will be on the same line.
+  int32 diff_line_number = 3;
+  // Line number in the code. This is the number that's visually shown. If
+  // empty, the line is visually empty and is a placeholder for an
+  // addition/deletion on the other side.
+  int32 code_line_number = 4;
+  // List of word changes, that should be highlighted more prominently than the
+  // rest of the line, usually in a darker color.
+  repeated WordChange word_change = 5;
 }
 
-// Intermediate proto for DiffPatchMatch change.
-message DiffPatchMatchChange {
+message WordChange {
+  // The string being changed. Used for debugging purposes.
   string text = 1;
-  // For REPLACE, this is the replacing text, on the right.
-  string replacing_text = 3;
   ChangeType type = 2;
+  // Indices of a change in the line.
+  int32 start_index = 4;
+  int32 end_index = 5;
 }

@@ -424,6 +424,10 @@ public class GitRepo implements Repo {
     String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
     Process process = Runtime.getRuntime().exec(command.split(" "));
     String stdout = streamToString(process.getInputStream());
+    String stderr = streamToString(process.getErrorStream());
+    if (!stderr.isEmpty()) {
+      System.out.println(stderr);
+    }
     return removeDiffHeader(stdout);
   }
 
