@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Diff } from '@/shared/proto';
+import { Diff } from '@/core/proto';
 
 // The component implements header of the diff
 // How it looks: https://i.imgur.com/m6lZUjR.jpg

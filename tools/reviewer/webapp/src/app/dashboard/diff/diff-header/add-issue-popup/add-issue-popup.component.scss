@@ -1,0 +1,62 @@
+:host {
+  position: relative;
+  >.frame {
+    position: absolute;
+    $left: 22px;
+    left: -$left;
+    >.user-popup {
+      $speech-arrow: 15px;
+      margin-top: 15px;
+      position: relative;
+      z-index: 2;
+      background: white;
+      padding: 20px;
+      border: solid 2px #8c8c8c;
+      box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      >.email-input {
+        margin-bottom: 18px;
+        input {
+          height: 30px;
+          padding: 0 8px;
+          border-radius: 8px;
+          outline: none;
+          border: 1px solid #8d8d8d;
+          &::placeholder {
+            color: #b5b5b5;
+            font-size: 14px;
+          }
+        }
+      }
+      >.buttons {
+        display: flex;
+        >.blue-button {
+          margin-left: 10px;
+        }
+        .mat-button {
+          width: 150px;
+        }
+      }
+      >.error-message {
+        margin-top: 12px;
+        color: red;
+        font-size: 15px;
+        opacity: 0.85;
+      }
+      >speech-arrow {
+        line-height: $speech-arrow;
+        top: -$speech-arrow;
+        left: $left;
+        position: absolute;
+      }
+    }
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+    }
+  }
+}

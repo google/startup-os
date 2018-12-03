@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
+import { UserService } from '@/core/services';
 import { CommitSelectService } from './commit-select';
 import {
   CommitService,
@@ -27,11 +28,13 @@ import {
 export class FileChangesComponent implements OnInit, OnDestroy {
   constructor(
     private activatedRoute: ActivatedRoute,
+    private router: Router,
     public stateService: StateService,
     private loadService: LoadService,
     private extensionService: ExtensionService,
     public commitService: CommitService,
     public commitSelectService: CommitSelectService,
+    public userService: UserService,
   ) {
     this.stateService.isLoading = true;
     this.stateService.isCommitFound = true;
@@ -43,13 +46,12 @@ export class FileChangesComponent implements OnInit, OnDestroy {
 
   // Get parameters from url
   parseUrlParam(): void {
-    this.stateService.diffId = this.activatedRoute.snapshot.url[0].path;
-    const filename: string = this.activatedRoute.snapshot.url
-      .splice(1)
-      .map(v => v.path)
-      .join('/');
-    this.stateService.file.setFilenameWithRepo(filename);
+    // '/diff/33/path/to/file.java?left=abc' -> [url, 33, 'path/to/file.java', param]
+    const url: RegExpMatchArray = this.router.url.match(/\/diff\/([\d]+)\/([\w\d\.\/-]+)(\?.+?)?/);
+    this.stateService.diffId = url[1];
+    const filename: string = url[2];
 
+    this.stateService.file.setFilenameWithRepo(filename);
     this.stateService.language = this.extensionService.getLanguage(filename);
 
     // Get left and right commit ids from url if they present
@@ -60,6 +62,10 @@ export class FileChangesComponent implements OnInit, OnDestroy {
       // Load changes from local server
       this.loadService.loadDiff(this.stateService.diffId);
     });
+  }
+
+  getAuthor(): string {
+    return this.userService.getUsername(this.stateService.diff.getAuthor().getEmail());
   }
 
   ngOnDestroy() {

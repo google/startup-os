@@ -17,11 +17,14 @@ body {
   .bold {
     font-weight: 600;
   }
+  .approved {
+    color: #0d912c;
+  }
 
   .cr-titlebar {
     height: 40px;
     background: $palette-1;
-    border-bottom: solid 1px $palette-2;
+    border: none;
     padding: 0 23px;
     display: flex;
     align-items: center;
@@ -40,11 +43,21 @@ body {
     }
   }
 
+  .cr-table-placeholder {
+    height: 42px;
+    padding: 0 23px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #5d5d5d;
+  }
+
   .mat-header-row {
     min-height: 32px;
   }
   
   .mat-checkbox {
+    font-family: $default-font;
     .mat-checkbox-frame,
     .mat-checkbox-background {
       transform: scale(.9);
@@ -61,33 +74,8 @@ body {
     font-size: 14px;
   }
 
-  @mixin cr-button() {
-    line-height: 0;
-    border-radius: 8px;
-    border: solid 1px #8d8d8d;
-    font-weight: 600;
-    outline: none;
-    cursor: pointer;
-    font-family: $default-font;
-  }
-
-  .cr-button {
-    @include cr-button();
-  }
-
-  .cr-light-button {
-    @include cr-button();
-    width: 120px;
-    height: 28px;
-    font-size: 16px;
-    color: black;
-  }
-
-  .cr-thread-button {
-    @include cr-button();
-    width: 97px;
-    height: 26px;
-    font-size: 14px;
+  .cr-header {
+    border: 1px solid $palette-2;
   }
 
   .ellipsis {

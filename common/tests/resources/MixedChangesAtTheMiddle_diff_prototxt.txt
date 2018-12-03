@@ -1,0 +1,16 @@
+left_file_contents: "With Change."
+right_file_contents: "With a Change."
+left_diff_line {
+  text: "With Change."
+  type: DELETE
+}
+right_diff_line {
+  text: "With a Change."
+  type: ADD
+  word_change {
+    text: "a "
+    type: ADD
+    start_index: 5
+    end_index: 7
+  }
+}

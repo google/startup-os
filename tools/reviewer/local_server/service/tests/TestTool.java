@@ -20,6 +20,7 @@ import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
@@ -93,7 +94,7 @@ public class TestTool {
     File rightFile =
         File.newBuilder()
             .setRepoId("startup-os")
-            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setCommitId("dbee600438f322e2db4085b4cd7a27212fe1ef40")
             .setFilename("WORKSPACE")
             .build();
     System.out.println(getTextDiff(leftFile, rightFile));
@@ -129,7 +130,7 @@ public class TestTool {
 
   public static void main(String[] args) {
     TestTool tool = new TestTool();
-    tool.runGetTextDiff();
+    tool.runGetDiffFiles("fix_diff6", 329);
   }
 }
 

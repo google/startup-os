@@ -1,62 +1,52 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import {
-  MatButtonModule,
-  MatCardModule,
-  MatCheckboxModule,
-  MatDialogModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatProgressSpinnerModule,
-  MatSelectModule,
-  MatSnackBarModule,
-  MatTableModule,
-  MatToolbarModule,
-} from '@angular/material';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 
-import { PageLoadingComponent } from '@/page-loading';
-import { DirectiveList } from './directives';
-import { PipeList } from './pipes';
+import { MaterialModule } from '@/import';
 
-const SharedModules = [
-  FlexLayoutModule,
-  MatButtonModule,
-  MatCardModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatProgressSpinnerModule,
-  MatSnackBarModule,
-  MatToolbarModule,
-  MatTableModule,
-  MatDialogModule,
-  MatCheckboxModule,
-  MatSelectModule,
-];
+import { DiffStatusComponent } from './diff-status';
+import { DirectiveList } from './directives';
+import { PageLoadingComponent } from './page-loading';
+import { PipeList } from './pipes';
+import { SelectDashboardComponent } from './select-dashboard';
+import { SpeechArrowComponent } from './speech-arrow';
+import { DeleteCommentDialogComponent, ThreadComponentComponentList } from './thread';
+import { ToolbarComponent } from './toolbar';
 
 const Declarations = [
-  ...DirectiveList,
-  ...PipeList,
+  DiffStatusComponent,
   PageLoadingComponent,
+  ToolbarComponent,
+  SpeechArrowComponent,
+  SelectDashboardComponent,
+  ...ThreadComponentComponentList,
+  ...PipeList,
+  ...DirectiveList,
+];
+
+const Modules = [
+  FormsModule,
+  ReactiveFormsModule,
+  HttpModule,
+  CommonModule,
+  MaterialModule,
+  FlexLayoutModule,
 ];
 
 @NgModule({
   imports: [
-    CommonModule,
     RouterModule,
-    ...SharedModules,
+    ...Modules,
   ],
+  declarations: Declarations,
+  providers: [],
   exports: [
-    SharedModules,
     ...Declarations,
+    ...Modules,
   ],
-  declarations: [
-    ...Declarations,
-  ],
+  entryComponents: [DeleteCommentDialogComponent],
 })
 export class SharedModule { }

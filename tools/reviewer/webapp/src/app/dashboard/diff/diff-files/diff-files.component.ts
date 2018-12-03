@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { File } from '@/shared/proto';
+import { Diff, File } from '@/core/proto';
 import { DiffService } from '../diff.service';
 
 // The component implements UI of file list of the diff
@@ -13,6 +13,7 @@ import { DiffService } from '../diff.service';
 })
 export class DiffFilesComponent {
   displayedColumns = ['filename', 'comments', 'modified', 'delta'];
+  @Input() diff: Diff;
   @Input() files: File[];
   @Input() diffId: number;
 

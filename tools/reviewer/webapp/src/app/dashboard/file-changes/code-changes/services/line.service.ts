@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 
-import { Thread } from '@/shared/proto';
+import { DiffLine } from '@/core/proto';
 import {
   BlockIndex,
   BlockLine,
   ChangesLine,
-  ThreadFrame,
 } from '../code-changes.interface';
 
 // Constructors of line interfaces
@@ -18,7 +17,8 @@ export class LineService {
       lineNumber: 0,
       isChanged: false,
       isPlaceholder: false,
-      threadFrames: [],
+      threads: [],
+      diffLine: new DiffLine(),
     };
   }
 
@@ -69,13 +69,6 @@ export class LineService {
     commentsLine.blocks[BlockIndex.rightFile].lineNumber = rightBlockLine
       .lineNumber;
     return commentsLine;
-  }
-
-  createThreadFrame(): ThreadFrame {
-    return {
-      isFocus: true,
-      thread: new Thread(),
-    };
   }
 
   // Split dictionary is a matrix, where

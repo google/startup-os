@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 
-import { Diff } from '@/shared/proto';
-import { NotificationService } from '@/shared/services';
+import { Diff } from '@/core/proto';
+import { NotificationService } from '@/core/services';
 
 export interface DeleteDiffReturn {
   isDeleteDiff: boolean;

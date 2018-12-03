@@ -62,14 +62,23 @@
           class="threads"
           *ngIf="changesLine.isCommentsLine && !templateService.isEmpty(blockLine)"
         >
-          <line-comments
-            [changesLine]="changesLine"
-            [blockLine]="blockLine"
-            [blockIndex]="blockIndex"
-            [lineIndex]="lineIndex"
-            [threadIndex]="threadIndex"
-            *ngFor="let threadFrame of blockLine.threadFrames; let threadIndex = index"
-          ></line-comments>
+          <div
+            class="thread"
+            *ngFor="let thread of blockLine.threads; let threadIndex = index"
+          >
+            <cr-thread
+              [diff]="stateService.diff"
+              [thread]="thread"
+              (closeEmitter)="commentsService.closeThread(blockLine, threadIndex, blockIndex)"
+              (addEmitter)="addThread(
+                $event,
+                blockLine,
+                blockIndex,
+                lineIndex,
+                thread
+              )"
+            ></cr-thread>
+          </div>
         </div>
       </td>
     </ng-container>

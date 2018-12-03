@@ -1,16 +1,8 @@
-import { TextChange, Thread } from '@/shared/proto';
+import { DiffLine, Thread } from '@/core/proto';
 
 export enum BlockIndex {
   leftFile,
   rightFile,
-}
-
-export interface ThreadFrame {
-  thread: Thread;
-  // For future improvement.
-  // Is "add new comment" interface focused by user cursor?
-  // TODO: make it work
-  isFocus: boolean;
 }
 
 // Code line of a block of code
@@ -21,9 +13,9 @@ export interface BlockLine {
   lineNumber: number;
   // Is the line a placeholder?
   isPlaceholder: boolean;
-  threadFrames: ThreadFrame[];
+  threads: Thread[];
   isChanged: boolean;
-  textChange?: TextChange;
+  diffLine: DiffLine;
 }
 
 // Line of code changes (left and right blocks)

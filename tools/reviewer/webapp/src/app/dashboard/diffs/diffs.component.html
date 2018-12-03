@@ -1,8 +1,9 @@
 <!-- Loading -->
 <page-loading [isLoading]="isLoading"></page-loading>
 
-<!-- Diff groups -->
-<div class="diff-groups" *ngIf="!isLoading">
+<!-- Dashboard -->
+<div class="dashboard" *ngIf="!isLoading">
+  <!-- Diff groups -->
   <div
     class="diff-group"
     *ngFor="let diffGroup of diffGroups; let i = index;"
@@ -28,7 +29,7 @@
       <ng-container matColumnDef="author">
         <mat-header-cell *matHeaderCellDef> Author </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          {{ authService.getUsername(diff.getAuthor().getEmail()) }}
+          {{ userService.getUsername(diff.getAuthor().getEmail()) }}
         </mat-cell>
       </ng-container>
 
@@ -43,13 +44,20 @@
         <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
         <mat-cell *matCellDef="let diff">
           {{ diff.getModifiedTimestamp() | time }}
+          {{ getModifiedBy(diff) }}
         </mat-cell>
       </ng-container>
 
       <ng-container matColumnDef="reviewers">
         <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
         <mat-cell *matCellDef="let diff">
-          {{ getUsernames(diff.getReviewerList()) }}
+          <span
+            [ngClass]="{
+              'bold': reviewer.getNeedsAttention(),
+              'approved': reviewer.getApproved()
+            }"
+            *ngFor="let reviewer of diff.getReviewerList(); let i = index;"
+          >{{ getUsername(reviewer, i, diff) }}</span>
         </mat-cell>
       </ng-container>
 
@@ -77,7 +85,7 @@
       ></mat-row>
     </mat-table>
     <!-- Show the placeholder, if group contains no diffs -->
-    <div class="placeholder" *ngIf="diffGroup.length === 0">
+    <div class="cr-table-placeholder" *ngIf="diffGroup.length === 0">
       No Diffs
     </div>
   </div>

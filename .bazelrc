@@ -1,0 +1,7 @@
+# TODO: Remove incompatability flags
+build --proto_compiler //external:proto_compiler \
+      --proto_toolchain_for_java //external:proto_java_toolchain \
+      --incompatible_remove_native_http_archive=false \
+      --incompatible_remove_native_git_repository=false
+run --direct_run
+test --test_output=errors

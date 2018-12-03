@@ -1,10 +1,28 @@
-.file-header,
-.code-changes {
-  padding: 10px 30px 0 30px;
-}
-
-.commit-menu {
-  margin-top: 20px;
-  margin-left: 30px;
-  display: flex;
+.file-changes {
+  background: #f3f3f3;
+  .titlebar {
+    border-bottom: 1px solid #c1c1c1;
+    >.title {
+      margin-right: 30px;
+      >.diff {
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  .file-header,
+  .code-changes {
+    display: flex;
+    margin: 0 23px;
+    padding: 10px 0;
+    align-items: center;
+    >.commit-menu {
+      margin-left: 70px;
+      display: flex;
+    }
+  }
 }

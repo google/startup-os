@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
 
-import { Thread } from '@/shared/proto';
-import { ThreadStateService } from './thread';
+import { Thread } from '@/core/proto';
 
 // Methods, which can be reused in code and diff thread components
 @Injectable()
 export class DiscussionService {
-  constructor(private threadStateService: ThreadStateService) { }
-
   compareLastTimestamps(a: Thread, b: Thread): number {
     const aLastIndex: number = a.getCommentList().length - 1;
     const bLastIndex: number = b.getCommentList().length - 1;
@@ -23,10 +20,16 @@ export class DiscussionService {
     threads.sort((a, b) => this.compareLastTimestamps(a, b));
   }
 
+  getConversationLabel(length: number): string {
+    // Example: 6 conversations
+    const conversations: string = (length > 1) ? 'conversations' : 'conversation';
+    return length + ' ' + conversations;
+  }
+
   // Get text of header of threads
   getHeader(threads: Thread[]): string {
-    const conversations: string = (threads.length > 1) ? 'conversations' : 'conversation';
-    return `(${threads.length} ${conversations}, ` +
+    // Example: (6 conversations, 3 unresolved)
+    return `(${this.getConversationLabel(threads.length)}, ` +
       `${this.getUnresolvedThreads(threads)} unresolved)`;
   }
 
@@ -34,15 +37,5 @@ export class DiscussionService {
     return threads
       .filter(thread => !thread.getIsDone())
       .length;
-  }
-
-  // If new thread wasn't added or a thread wasn't deleted make links update.
-  // Link update means content of each thread will be refreshed, but general threads
-  // structure will remain the same.
-  refreshThreads(threads: Thread[], type: Thread.Type): void {
-    threads.forEach(thread => {
-      this.threadStateService.updateThreadLink(thread);
-    });
-    this.threadStateService.updateState(type);
   }
 }

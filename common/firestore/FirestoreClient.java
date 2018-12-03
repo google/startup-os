@@ -19,6 +19,10 @@ package com.google.startupos.common.firestore;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 import com.google.auto.factory.AutoFactory;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.startupos.common.firestore.Protos.ProtoDocument;
@@ -35,8 +39,8 @@ import java.util.Base64;
 @AutoFactory(allowSubclasses = true)
 public class FirestoreClient {
   // Base path formatted by project name and path, that starts with a /.
-  private static final String BASE_PATH =
-      "https://firestore.googleapis.com/v1beta1" + "/projects/%s/databases/(default)/documents%s";
+  private static final String API_ROOT = "https://firestore.googleapis.com/v1beta1/";
+  private static final String BASE_PATH = API_ROOT + "projects/%s/databases/(default)/documents%s";
 
   private final String project;
   private final String token;
@@ -62,11 +66,11 @@ public class FirestoreClient {
     return getCreateDocumentUrl(user, null);
   }
 
-  private String getDocumentResponse(String path) throws IOException {
+  private String httpMethod(String urlString, String method) throws IOException {
     StringBuilder response = new StringBuilder();
-    URL url = new URL(getGetUrl(path));
+    URL url = new URL(urlString);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-    connection.setRequestMethod("GET");
+    connection.setRequestMethod(method);
     connection.setRequestProperty("Authorization", "Bearer " + token);
     try (BufferedReader reader =
         new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
@@ -76,9 +80,21 @@ public class FirestoreClient {
       }
     }
     if (connection.getResponseCode() != HTTP_OK) {
-      throw new IllegalStateException("getDocument failed: " + connection.getResponseMessage());
+      throw new IllegalStateException("httpGet failed: " + connection.getResponseMessage());
     }
     return response.toString();
+  }
+
+  private String httpGet(String urlString) throws IOException {
+    return this.httpMethod(urlString, "GET");
+  }
+
+  private void httpDelete(String urlString) throws IOException {
+    this.httpMethod(urlString, "DELETE");
+  }
+
+  private String getDocumentResponse(String path) throws IOException {
+    return this.httpGet(getGetUrl(path));
   }
 
   public Message getDocument(String path, Message.Builder proto) {
@@ -129,6 +145,35 @@ public class FirestoreClient {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Pops (FIFO) document from collection
+   *
+   * @param path document path
+   * @param proto builder for proto message
+   * @return proto message
+   */
+  public Message popDocument(String path, Message.Builder proto) {
+    // TODO: pop a document without fetching all documents in the list
+    try {
+      // this is *document* list, containing 'Firestore-flavored' JSON documents
+      String documentList = this.httpGet(getGetUrl(path));
+      JsonElement element = new JsonParser().parse(documentList);
+      JsonArray documents = element.getAsJsonObject().getAsJsonArray("documents");
+      if (documents != null && documents.size() > 0) {
+        JsonObject document = documents.get(documents.size() - 1).getAsJsonObject();
+        FirestoreJsonFormat.parser().merge(document.toString(), proto);
+        String keyName = document.get("name").getAsJsonPrimitive().getAsString();
+        // TODO: refactor to have separate .deleteDocument() method
+        // keyName starts with 'projects/' so it's full path rather than only document id
+        this.httpDelete(API_ROOT + keyName);
+        return proto.build();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   private void createDocument(String path, String documentId, String json) {
