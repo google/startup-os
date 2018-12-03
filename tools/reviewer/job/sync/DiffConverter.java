@@ -146,13 +146,12 @@ public class DiffConverter {
 
     if (githubFilePatches.size() != 1) {
       throw new RuntimeException(
-          "Can't find the commit in GitHub for the file: " + thread.getFile().getFilename());
+          "Expecting only 1 patch in response for file: " + thread.getFile().getFilename());
     }
     String patch = githubFilePatches.get(0);
 
     if (patch.equals("")) {
-      throw new RuntimeException(
-          "Can't find the `patch` in GitHub for the file: " + thread.getFile().getFilename());
+      throw new RuntimeException("Patch is empty for file: " + thread.getFile().getFilename());
     }
 
     // TODO: Store the result in the Diff.Thread in Firestore
