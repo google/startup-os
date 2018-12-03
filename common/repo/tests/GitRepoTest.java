@@ -487,5 +487,47 @@ public class GitRepoTest {
     gitRepo.commit(gitRepo.getUncommittedFiles(), COMMIT_MESSAGE);
     assertTrue(gitRepo.hasChanges(TEST_BRANCH));
   }
+
+  @Test
+  public void testGetPatchWhenOneDiffHunk() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    repo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(
+        "New file content\n", fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
+    String expectedPatch = "@@ -1 +1 @@\n" + "-Some test file contents\n" + "+New file content\n";
+    assertEquals(expectedPatch, gitRepo.getPatch(TEST_FILE));
+  }
+
+  @Test
+  public void testGetPatchWhenTwoDiffHunks() {
+    String fileContentInMaster =
+        "line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n";
+    fileUtils.writeStringUnchecked(fileContentInMaster, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+
+    repo.switchBranch(TEST_BRANCH);
+    String fileContentInTestBranch =
+        "line1\n(CHANGED)line2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n(ADDED)line11\n";
+    fileUtils.writeStringUnchecked(
+        fileContentInTestBranch, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
+
+    String expectedPatch =
+        "@@ -1,5 +1,5 @@\n"
+            + " line1\n"
+            + "-line2\n"
+            + "+(CHANGED)line2\n"
+            + " line3\n"
+            + " line4\n"
+            + " line5\n"
+            + "@@ -8,3 +8,4 @@ line7\n"
+            + " line8\n"
+            + " line9\n"
+            + " line10\n"
+            + "+(ADDED)line11\n";
+    assertEquals(expectedPatch, gitRepo.getPatch(TEST_FILE));
+  }
 }
 

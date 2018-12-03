@@ -90,6 +90,7 @@ public class SnapshotCommand implements AaCommand {
                     branchName
                         + ":\n"
                         + files.stream().map(File::getFilename).collect(Collectors.joining("\n"));
+                files.forEach(file -> file.toBuilder().setPatch(repo.getPatch(path)));
                 repo.commit(files, String.format(message, branchName));
                 System.out.println(String.format("[%s]: Committed changes", repoName));
               });

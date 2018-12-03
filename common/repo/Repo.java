@@ -81,5 +81,11 @@ public interface Repo {
   String getRemoteURL();
   /** Checks if there are commits added since master, or any uncommitted files */
   boolean hasChanges(String branch);
+
+  /**
+   * Gets patch(diff) between current file and the file of the master branch. The response can have
+   * one and more diff hunks
+   */
+  String getPatch(String filename);
 }
 

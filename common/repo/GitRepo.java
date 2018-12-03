@@ -461,6 +461,11 @@ public class GitRepo implements Repo {
     return (getCommits(branch).size() > 1) || (!getUncommittedFiles().isEmpty());
   }
 
+  @Override
+  public String getPatch(String filename) {
+    return removeDiffHeader(runCommand("diff master -- " + filename).stdout);
+  }
+
   private void switchToMasterBranch() {
     if (!currentBranch().equals("master")) {
       switchBranch("master");
