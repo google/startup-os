@@ -28,7 +28,6 @@ import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.Strings;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,10 +64,6 @@ public class GitRepo implements Repo {
     private String stderr;
   }
 
-  private static String streamToString(InputStream inputStream) throws IOException {
-    return CharStreams.toString(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-  }
-
   private CommandResult runCommand(String command) {
     return runCommand(Arrays.asList(command.split(" ")));
   }
@@ -89,8 +84,8 @@ public class GitRepo implements Repo {
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
-      result.stdout = streamToString(process.getInputStream());
-      result.stderr = streamToString(process.getErrorStream());
+      result.stdout = fileUtils.streamToString(process.getInputStream());
+      result.stderr = fileUtils.streamToString(process.getErrorStream());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -423,8 +418,8 @@ public class GitRepo implements Repo {
   public static String getTextDiff(String file1, String file2) throws IOException {
     String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
     Process process = Runtime.getRuntime().exec(command.split(" "));
-    String stdout = streamToString(process.getInputStream());
-    String stderr = streamToString(process.getErrorStream());
+    String stdout = FileUtils.streamToString(process.getInputStream());
+    String stderr = FileUtils.streamToString(process.getErrorStream());
     if (!stderr.isEmpty()) {
       System.out.println(stderr);
     }
@@ -482,6 +477,14 @@ public class GitRepo implements Repo {
     CommandResult commandResult =
         runCommand("clone -q " + url + " " + fileUtils.joinToAbsolutePath(path, ".git"));
     return commandResult.stderr.isEmpty();
+  }
+
+  public static String getOrgName(String githubUrl) {
+    return githubUrl.split("/")[3];
+  }
+
+  public static String getProjectName(String githubUrl) {
+    return githubUrl.split("/")[4];
   }
 }
 

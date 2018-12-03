@@ -27,7 +27,12 @@ import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
+import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistryConfig;
+import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 import com.google.startupos.tools.reviewer.job.impl.FirestoreTaskBase;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
 
 import javax.inject.Inject;
 import java.io.FileInputStream;
@@ -40,29 +45,40 @@ import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * This task clones (or pulls) the repo, specified in `repo_url` command line argument Then it
- * checks whether `GLOBAL_REGISTRY_FILE` was changed as compared to previous version If it did,
- * newly updated version is posted to Firestore in proto and binary formats to
- * `REVIEWER_REGISTRY_DOCUMENT_NAME` and `REVIEWER_REGISTRY_DOCUMENT_NAME_BIN` documents in
- * `REVIEWER_REGISTRY_COLLECTION` collection
+/*
+ * This task periodically updates the reviewer configs in Firestore.
+ *
+ * It does it by:
+ * 1. Cloning (and then pulling) the repo, specified by the `repo_url` flag.
+ * 2. Checking whether `GLOBAL_REGISTRY_FILE` was changed as compared to previous version.
+ * 3. If it did, a newly updated version is posted to Firestore in proto and binary formats.
+ * 4. Doing the same for the config of every Reviewer in the registry.
  */
 public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
-  private static final String REVIEWER_REGISTRY_COLLECTION = "/reviewer";
+  private static final String REVIEWER_COLLECTION = "/reviewer";
   private static final String REVIEWER_REGISTRY_DOCUMENT_NAME = "registry";
   private static final String REVIEWER_REGISTRY_DOCUMENT_NAME_BIN = "registry_binary";
+  private static final String REVIEWER_CONFIG_DOCUMENT_NAME = "config";
+  private static final String REVIEWER_CONFIG_DOCUMENT_NAME_BIN = "config_binary";
 
   private static final String REPO_DIRECTORY = "repo";
   private static final String GLOBAL_REGISTRY_FILE = "tools/reviewer/global_registry.prototxt";
+  private static final String REPO_REGISTRY_FILE = "reviewer_config.prototxt";
+  private static final String REPO_REGISTRY_URL =
+      "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
 
   private final ReentrantLock lock = new ReentrantLock();
 
-  private String storedChecksum;
+  private String registryChecksum;
+  private Map<String, Integer> reviewerConfigHashes = new HashMap();
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
+  private boolean firstRun;
 
   @Inject
   public ReviewerMetadataUpdaterTask(
@@ -72,13 +88,20 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
     this.firestoreClientFactory = firestoreClientFactory;
+    this.firstRun = true;
   }
 
-  private void uploadProtoToFirestore(ReviewerRegistry registry) {
-    firestoreClient.createDocument(
-        REVIEWER_REGISTRY_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME, registry);
+  private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
+    firestoreClient.createDocument(REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME, registry);
     firestoreClient.createProtoDocument(
-        REVIEWER_REGISTRY_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
+        REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
+  }
+
+  private void uploadReviewerConfigToFirestore(ReviewerConfig reviewerConfig) {
+    firestoreClient.createDocument(
+        REVIEWER_COLLECTION, REVIEWER_CONFIG_DOCUMENT_NAME, reviewerConfig);
+    firestoreClient.createProtoDocument(
+        REVIEWER_COLLECTION, REVIEWER_CONFIG_DOCUMENT_NAME_BIN, reviewerConfig);
   }
 
   private static Stream<Integer> intStream(byte[] array) {
@@ -120,26 +143,57 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
         String globalRegistryFilePath =
             fileUtils.joinToAbsolutePath(REPO_DIRECTORY, GLOBAL_REGISTRY_FILE);
         String newChecksum = md5ForFile(globalRegistryFilePath);
+        ReviewerRegistry registry =
+            (ReviewerRegistry)
+                fileUtils.readPrototxtUnchecked(
+                    globalRegistryFilePath, ReviewerRegistry.newBuilder());
 
-        if (!newChecksum.equals(storedChecksum)) {
-          log.atInfo()
-              .log(
-                  "New checksum not equal to stored one: new %s, stored %s",
-                  newChecksum, storedChecksum);
-
-          ReviewerRegistry reg =
-              (ReviewerRegistry)
-                  fileUtils.readPrototxtUnchecked(
-                      globalRegistryFilePath, ReviewerRegistry.newBuilder());
-
-          uploadProtoToFirestore(reg);
-
-          storedChecksum = newChecksum;
-
+        if (!newChecksum.equals(registryChecksum)) {
+          if (firstRun) {
+            log.atInfo().log("Storing on first run, checksum: %s", newChecksum);
+          } else {
+            log.atInfo()
+                .log(
+                    "New checksum not equal to stored one: new %s, stored %s",
+                    newChecksum, registryChecksum);
+          }
+          uploadReviewerRegistryToFirestore(registry);
+          registryChecksum = newChecksum;
         } else {
-          log.atInfo().log("Checksum equals to stored: found %s,", storedChecksum);
+          log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
         }
 
+        for (ReviewerRegistryConfig registryConfig : registry.getReviewerConfigList()) {
+          String url =
+              String.format(
+                  REPO_REGISTRY_URL,
+                  GitRepo.getOrgName(registryConfig.getConfigRepo()),
+                  GitRepo.getProjectName(registryConfig.getConfigRepo()));
+          try {
+            String content = fileUtils.downloadUrl(url);
+            ReviewerConfig reviewerConfig =
+                (ReviewerConfig)
+                    fileUtils.readPrototxtFromString(content, ReviewerConfig.newBuilder());
+            int reviewerConfigHash = reviewerConfig.hashCode();
+            if (!reviewerConfigHashes.containsKey(registryConfig.toString())
+                || (reviewerConfigHashes.get(registryConfig.toString()) == reviewerConfigHash)) {
+              uploadReviewerConfigToFirestore(reviewerConfig);
+              reviewerConfigHashes.put(registryConfig.toString(), reviewerConfigHash);
+              log.atInfo()
+                  .log("Updated ReviewerConfig for repo %s,", registryConfig.getConfigRepo());
+            } else {
+              log.atInfo()
+                  .log(
+                      "ReviewerConfig already up-to-date for repo %s,",
+                      registryConfig.getConfigRepo());
+            }
+          } catch (Exception e) {
+            log.atWarning()
+                .withCause(e)
+                .log("Cannot update config in registry entry:\n%s", registryConfig);
+          }
+        }
+        firstRun = false;
       } catch (IOException exception) {
         exception.printStackTrace();
       } finally {
