@@ -123,6 +123,7 @@ public class DiffConverter {
             ? LineNumberConverter.Side.RIGHT
             : LineNumberConverter.Side.LEFT;
 
+    // TODO: Implement getting `patches` using local Git
     List<String> githubFilePatches = new ArrayList<>();
     try {
       githubFilePatches =
