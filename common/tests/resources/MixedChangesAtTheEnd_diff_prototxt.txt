@@ -1,0 +1,22 @@
+left_file_contents: "Change at end."
+right_file_contents: "Change at end!"
+left_diff_line {
+  text: "Change at end."
+  type: DELETE
+  word_change {
+    text: "."
+    type: DELETE
+    start_index: 13
+    end_index: 14
+  }
+}
+right_diff_line {
+  text: "Change at end!"
+  type: ADD
+  word_change {
+    text: "!"
+    type: ADD
+    start_index: 13
+    end_index: 14
+  }
+}

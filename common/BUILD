@@ -7,6 +7,7 @@ java_library(
         "CommonComponent.java",
         "CommonModule.java",
         "FileUtils.java",
+        "Lists.java",
         "MessageDifferencer.java",
         "StringBuilder.java",
         "Strings.java",
@@ -25,12 +26,23 @@ java_library(
 )
 
 java_library(
+    name = "lists",
+    srcs = ["Lists.java"],
+    deps = [
+        "//third_party/maven/com/google/auto/value:auto_value",
+        "//third_party/maven/com/google/code/findbugs:jsr305",
+        "//third_party/maven/com/google/guava",
+    ],
+)
+
+java_library(
     name = "text_differencer",
     srcs = [
         "TextDifferencer.java",
     ],
     deps = [
         ":diff_match_patch",
+        ":lists",
         ":text_difference_java_proto",
         "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/guava",

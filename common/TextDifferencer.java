@@ -16,19 +16,20 @@
 
 package com.google.startupos.common;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch;
 import com.google.startupos.name.fraser.neil.plaintext.DiffMatchPatch.Operation;
 import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.Protos.DiffLine;
+import com.google.startupos.common.Protos.WordChange;
+import com.google.startupos.common.Lists.Segment;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.lang.Math;
-import java.lang.StringBuilder;
+import java.util.stream.Collectors;
 
 /** Text differencer for finding the diff between 2 text documents. */
 public class TextDifferencer {
@@ -42,10 +43,13 @@ public class TextDifferencer {
   public TextDifferencer() {}
 
   private void fillPlaceholderGap(
-      TextDiff.Builder builder, int leftDiffLineNumber, int rightDiffLineNumber) {
+      List<DiffLine> leftLines,
+      List<DiffLine> rightLines,
+      int leftDiffLineNumber,
+      int rightDiffLineNumber) {
     // Add left placeholders:
     while (rightDiffLineNumber - leftDiffLineNumber > 0) {
-      builder.addLeftDiffLine(
+      leftLines.add(
           DiffLine.newBuilder()
               .setType(ChangeType.LINE_PLACEHOLDER)
               .setDiffLineNumber(leftDiffLineNumber)
@@ -54,7 +58,7 @@ public class TextDifferencer {
     }
     // Add right placeholders:
     while (leftDiffLineNumber - rightDiffLineNumber > 0) {
-      builder.addRightDiffLine(
+      rightLines.add(
           DiffLine.newBuilder()
               .setType(ChangeType.LINE_PLACEHOLDER)
               .setDiffLineNumber(rightDiffLineNumber)
@@ -86,6 +90,8 @@ public class TextDifferencer {
       return result.build();
     }
     String[] diffLines = diffString.split("\n");
+    List<DiffLine> leftLines = new ArrayList();
+    List<DiffLine> rightLines = new ArrayList();
     int leftCodeLineNumber = getLeftStartLine(diffLines[0]);
     int leftDiffLineNumber = leftCodeLineNumber;
     int rightCodeLineNumber = getRightStartLine(diffLines[0]);
@@ -108,7 +114,7 @@ public class TextDifferencer {
       if (type == ChangeType.NO_CHANGE) {
         // On NO_CHANGE lines, we know that both diff line indices should be the same. We add
         // placeholder DiffLines to fill in the gaps:
-        fillPlaceholderGap(result, leftDiffLineNumber, rightDiffLineNumber);
+        fillPlaceholderGap(leftLines, rightLines, leftDiffLineNumber, rightDiffLineNumber);
         // Now gap is filled, so set both line numbers to the maximum:
         leftDiffLineNumber = Math.max(leftDiffLineNumber, rightDiffLineNumber);
         rightDiffLineNumber = leftDiffLineNumber;
@@ -120,8 +126,8 @@ public class TextDifferencer {
         continue;
       }
       String text = diffLines[diffIndex].substring(1);
-      int codeLineNumber = type == ChangeType.ADD ? rightCodeLineNumber : leftCodeLineNumber;
-      int diffLineNumber = type == ChangeType.ADD ? rightDiffLineNumber : leftDiffLineNumber;
+      int codeLineNumber = type == ChangeType.DELETE ? leftCodeLineNumber : rightCodeLineNumber;
+      int diffLineNumber = type == ChangeType.DELETE ? leftDiffLineNumber : rightDiffLineNumber;
       DiffLine diffLine =
           DiffLine.newBuilder()
               .setText(text)
@@ -129,97 +135,109 @@ public class TextDifferencer {
               .setCodeLineNumber(codeLineNumber)
               .setDiffLineNumber(diffLineNumber)
               .build();
-      if (type == ChangeType.ADD) {
-        result.addRightDiffLine(diffLine);
-        rightCodeLineNumber++;
-        rightDiffLineNumber++;
-      } else {
-        result.addLeftDiffLine(diffLine);
+      if (type == ChangeType.DELETE) {
+        leftLines.add(diffLine);
         leftCodeLineNumber++;
         leftDiffLineNumber++;
+      } else {
+        rightLines.add(diffLine);
+        rightCodeLineNumber++;
+        rightDiffLineNumber++;
       }
     }
     // Fill any last section:
-    fillPlaceholderGap(result, leftDiffLineNumber, rightDiffLineNumber);
+    fillPlaceholderGap(leftLines, rightLines, leftDiffLineNumber, rightDiffLineNumber);
+    addWordChanges(leftLines, rightLines);
+    result.addAllLeftDiffLine(leftLines);
+    result.addAllRightDiffLine(rightLines);
     TextDiff textDiff = result.build();
-    // TODO: Uncomment once addWordChanges() is complete.
-    // addWordChanges(textDiff);
     System.out.println("*************** TEXT DIFF **************");
-    System.out.println(textDiff);
+    System.out.println(
+        textDiff.toBuilder().clearLeftFileContents().clearRightFileContents().build());
     return textDiff;
   }
 
-  private List<DiffMatchPatch.Diff> getDiffPatchMatchDiff(String leftText, String rightText) {
+  private void addWordChanges(List<DiffLine> leftLines, List<DiffLine> rightLines) {
+    List<Integer> diffLineNumbers =
+        leftLines.stream().map(DiffLine::getDiffLineNumber).collect(Collectors.toList());
+    for (Segment segment : Lists.splitToSegments(diffLineNumbers)) {
+      addWordChanges(leftLines, rightLines, segment.startIndex(), segment.endIndex());
+    }
+  }
+
+  // Adds WordChanges, from segmentStart until segmentEnd (inclusive).
+  private void addWordChanges(
+      List<DiffLine> leftLines, List<DiffLine> rightLines, int segmentStart, int segmentEnd) {
     DiffMatchPatch diffMatchPatch = new DiffMatchPatch();
-    LinkedList<DiffMatchPatch.Diff> diffs = diffMatchPatch.diff_main(leftText, rightText);
+    LinkedList<DiffMatchPatch.Diff> diffs =
+        diffMatchPatch.diff_main(
+            getMultilineText(leftLines, segmentStart, segmentEnd),
+            getMultilineText(rightLines, segmentStart, segmentEnd));
     diffMatchPatch.diff_cleanupSemantic(diffs);
-    return diffs;
-  }
 
-  private TextDiff addWordChanges(TextDiff textDiff) {
-    if (textDiff.getLeftDiffLineList().isEmpty()) {
-      return textDiff;
-    }
-    TextDiff.Builder result = textDiff.toBuilder();
-    result.clearLeftDiffLine();
-    result.clearRightDiffLine();
-    int segmentStart = 0;
-    for (int diffIndex = 1; diffIndex < textDiff.getLeftDiffLineList().size(); diffIndex++) {
-      DiffLine leftDiffLine = textDiff.getLeftDiffLineList().get(diffIndex);
-      DiffLine prevLeftDiffLine = textDiff.getLeftDiffLineList().get(diffIndex);
-      if (leftDiffLine.getDiffLineNumber() - prevLeftDiffLine.getDiffLineNumber() > 1) {
-        String leftText = getMultilineText(textDiff.getLeftDiffLineList(), segmentStart, diffIndex);
-        String rightText =
-            getMultilineText(textDiff.getRightDiffLineList(), segmentStart, diffIndex);
-        ImmutableList<DiffMatchPatch.Diff> diffs =
-            splitMultiLines(getDiffPatchMatchDiff(leftText, rightText));
-        for (DiffMatchPatch.Diff diff : diffs) {
-          // TODO: Implement
-        }
-        segmentStart = diffIndex;
-      }
-    }
-    // Take care of last segment
-    if (segmentStart < textDiff.getLeftDiffLineList().size() - 1) {
-      ImmutableList<DiffMatchPatch.Diff> diffs =
-          splitMultiLines(
-              getDiffPatchMatchDiff(
-                  getMultilineText(
-                      textDiff.getLeftDiffLineList(),
-                      segmentStart,
-                      textDiff.getLeftDiffLineList().size()),
-                  getMultilineText(
-                      textDiff.getRightDiffLineList(),
-                      segmentStart,
-                      textDiff.getRightDiffLineList().size())));
-      for (int i = 0; i < diffs.size(); i++) {
-        DiffMatchPatch.Diff diff = diffs.get(i);
-        // TODO: Implement
-      }
-    }
-    return result.build();
-  }
-
-  private ImmutableList<DiffMatchPatch.Diff> splitMultiLines(List<DiffMatchPatch.Diff> diffs) {
-    ImmutableList.Builder<DiffMatchPatch.Diff> result = ImmutableList.builder();
+    // Split multi-lines
+    int leftLineCounter = 0;
+    int rightLineCounter = 0;
+    int leftCharCounter = 0;
+    int rightCharCounter = 0;
     for (DiffMatchPatch.Diff diff : diffs) {
-      for (String line : diff.text.split("\n")) {
-        if (!line.isEmpty()) {
-          result.add(new DiffMatchPatch.Diff(diff.operation, line));
+      String[] diffLines = diff.text.split("\n");
+      ChangeType type = getChangeType(diff.operation);
+      for (int i = 0; i < diffLines.length; i++) {
+        if (i > 0) { // This means we had a newline
+          leftCharCounter = 0;
+          rightCharCounter = 0;
+          if (type == ChangeType.DELETE || type == ChangeType.NO_CHANGE) {
+            leftLineCounter++;
+          }
+          if (type == ChangeType.ADD || type == ChangeType.NO_CHANGE) {
+            rightLineCounter++;
+          }
+        }
+        String line = diffLines[i];
+        int charCounter = type == ChangeType.DELETE ? leftCharCounter : rightCharCounter;
+        WordChange wordChange =
+            WordChange.newBuilder()
+                .setText(line)
+                .setStartIndex(charCounter)
+                .setEndIndex(charCounter + line.length())
+                .setType(type)
+                .build();
+        if (type == ChangeType.DELETE) {
+          int index = segmentStart + leftLineCounter;
+          if (!wordChangeIsWholeLine(leftLines.get(index), wordChange)) {
+            leftLines.set(
+                index, leftLines.get(index).toBuilder().addWordChange(wordChange).build());
+          }
+        } else if (type == ChangeType.ADD) {
+          int index = segmentStart + rightLineCounter;
+          if (!wordChangeIsWholeLine(rightLines.get(index), wordChange)) {
+            rightLines.set(
+                index, rightLines.get(index).toBuilder().addWordChange(wordChange).build());
+          }
+        }
+        if (type == ChangeType.DELETE || type == ChangeType.NO_CHANGE) {
+          leftCharCounter += line.length();
+        }
+        if (type == ChangeType.ADD || type == ChangeType.NO_CHANGE) {
+          rightCharCounter += line.length();
         }
       }
     }
-    return result.build();
   }
 
-  // endIndex is not inclusive - i.e, diffLines at endIndex is not used.
+  private boolean wordChangeIsWholeLine(DiffLine line, WordChange word) {
+    return line.getText().equals(word.getText());
+  }
+
+  // endIndex is inclusive - i.e, diffLines at endIndex are used.
   private String getMultilineText(List<DiffLine> diffLines, int startIndex, int endIndex) {
     StringBuilder result = new StringBuilder();
-    for (int i = startIndex; i < endIndex - 1; i++) {
+    for (int i = startIndex; i < endIndex; i++) {
       result.append(diffLines.get(i).getText() + "\n");
     }
     // Last one without newline
-    result.append(diffLines.get(endIndex - 1).getText());
+    result.append(diffLines.get(endIndex).getText());
     return result.toString();
   }
 

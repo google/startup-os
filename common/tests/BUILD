@@ -33,6 +33,20 @@ java_test(
 )
 
 java_test(
+    name = "ListsTest",
+    srcs = ["ListsTest.java"],
+    test_class = "com.google.startupos.common.ListsTest",
+    deps = [
+        "//common:lists",
+        "//third_party/maven/com/google/dagger",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/junit",
+        "//third_party/maven/org/mockito:mockito_core",
+        "//third_party/maven/org/objenesis",
+    ],
+)
+
+java_test(
     name = "TextDifferencerTest",
     srcs = ["TextDifferencerTest.java"],
     resources = glob(["resources/*.txt"]),
