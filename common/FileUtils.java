@@ -20,13 +20,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import com.google.common.io.CharStreams;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -36,11 +38,9 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import com.google.common.io.Resources;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.net.URL;
-import java.net.MalformedURLException;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
