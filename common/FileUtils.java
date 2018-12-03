@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import com.google.common.io.CharStreams;
 import java.nio.file.FileSystem;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -36,6 +37,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import com.google.common.io.Resources;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -64,6 +69,13 @@ public class FileUtils {
   public Message readPrototxt(String path, Message.Builder builder) throws IOException {
     String protoText = readFile(path);
     TextFormat.merge(protoText, builder);
+    return builder.build();
+  }
+
+  /** Reads a prototxt from a string into a proto. */
+  public Message readPrototxtFromString(String prototxt, Message.Builder builder)
+      throws IOException {
+    TextFormat.merge(prototxt, builder);
     return builder.build();
   }
 
@@ -378,6 +390,18 @@ public class FileUtils {
             }
           }
         });
+  }
+
+  public static String streamToString(InputStream inputStream) throws IOException {
+    return CharStreams.toString(new InputStreamReader(inputStream, UTF_8));
+  }
+
+  public String downloadUrl(String url) throws IOException {
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(new URL(url).openStream()))) {
+      return CharStreams.toString(in);
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }
 
