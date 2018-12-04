@@ -29,7 +29,8 @@ import java.util.Timer;
 
 // To run on server:
 // bazel run //tools/reviewer/job -- \
-// --service_account_json /home/startup_os_project/base/local/startupos-5f279-firebase-adminsdk-v8n9e-2418a5ae73.json \
+// --service_account_json
+// /home/startup_os_project/base/local/startupos-5f279-firebase-adminsdk-v8n9e-2418a5ae73.json \
 // --repo_url https://github.com/google/startup-os &
 // disown -a
 @Singleton
