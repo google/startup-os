@@ -29,7 +29,7 @@ import java.util.Timer;
 
 @Singleton
 public class ReviewerJob {
-  private static final Long TASK_EXECUTION_PERIOD_MS = 15000L;
+  private static final Long TASK_EXECUTION_PERIOD_MS = 5 * 60 * 1000L;
   private TaskExecutor taskExecutor;
 
   @FlagDesc(name = "service_account_json", description = "", required = true)
