@@ -27,6 +27,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Timer;
 
+// To run on server:
+// bazel run //tools/reviewer/job -- \
+// --service_account_json /home/startup_os_project/base/local/startupos-5f279-firebase-adminsdk-v8n9e-2418a5ae73.json \
+// --repo_url https://github.com/google/startup-os &
+// disown -a
 @Singleton
 public class ReviewerJob {
   private static final Long TASK_EXECUTION_PERIOD_MS = 5 * 60 * 1000L;
