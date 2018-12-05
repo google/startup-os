@@ -81,7 +81,7 @@ user {
     description: "Team member for StartupOS project (Google OSS examples, Reviewer)"
     url: "https://github.com/google/startup-os"
   }
-    top_contribution {
+  top_contribution {
     description: "Sync between Reviewer and GitHub (using GitHub API)"
     url: "https://github.com/google/startup-os/tree/master/tools/reviewer/job/sync"
   }
