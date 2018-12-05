@@ -462,8 +462,8 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public String getPatch(String filename) {
-    return removeDiffHeader(runCommand("diff master -- " + filename).stdout);
+  public String getPatch(String commitOrBranch, String filename) {
+    return removeDiffHeader(runCommand("diff " + commitOrBranch + " -- " + filename).stdout);
   }
 
   private void switchToMasterBranch() {

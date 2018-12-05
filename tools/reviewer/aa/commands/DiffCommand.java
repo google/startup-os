@@ -128,6 +128,7 @@ public class DiffCommand implements AaCommand {
                 repoToInitialBranch.put(repo, repo.currentBranch());
                 System.out.println(
                     String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
+                diffBuilder.setBaseBranchCommitId(repo.getHeadCommitId());
                 repo.switchBranch(branchName);
               });
       addGithubRepos(diffBuilder);
@@ -193,7 +194,7 @@ public class DiffCommand implements AaCommand {
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
                 repo.getUncommittedFiles()
-                    .forEach(file -> file.toBuilder().setPatch(repo.getPatch(path)));
+                    .forEach(file -> file.toBuilder().setPatch(repo.getPatch("master", path)));
               });
     } catch (Exception e) {
       throw new RuntimeException("Can not set `patch(diff)` for file. " + e.getCause());
