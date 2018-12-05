@@ -65,6 +65,22 @@ user {
   }
 }
 user {
+  id: "webdevelopland"
+  first_name: "Vadim"
+  email: "webdevelopland@gmail.com"
+  image_url: "https://i.imgur.com/5padPgx.png"
+  skill: "Angular"
+  project_id: "reviewer"
+  social_network {
+    type: GITHUB
+    url: "https://github.com/webdevelopland"
+  }
+  top_contribution {
+    description: "Developer of Reviewer web app"
+    url: "https://github.com/google/startup-os/tree/master/tools/reviewer/webapp"
+  }
+}
+user {
   id: "val-fed"
   first_name: "Valerii"
   last_name: "Fedorenko"
@@ -85,4 +101,4 @@ user {
     description: "Sync between Reviewer and GitHub (using GitHub API)"
     url: "https://github.com/google/startup-os/tree/master/tools/reviewer/job/sync"
   }
-}
+ }
