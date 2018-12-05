@@ -30,6 +30,8 @@ import org.junit.Test;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.FirebaseConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
+import com.google.startupos.tools.reviewer.ReviewerProtos.User;
+
 
 /* A test to check reviewer_config.prototxt is valid proto format */
 public class ReviewerConfigTest {
@@ -52,6 +54,13 @@ public class ReviewerConfigTest {
   @Test
   public void protoFileTest() throws Exception {
     fileUtils.readPrototxt("reviewer_config.prototxt", ReviewerConfig.newBuilder());
+  }
+
+  @Test
+  public void TotalCrystalCorrectTest() {
+    User user =
+            User.newBuilder().setId("123").setFirstName("gal").setLastName("golan").setCrystals(3).build();
+
   }
 }
 
