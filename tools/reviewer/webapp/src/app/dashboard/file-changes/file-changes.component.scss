@@ -1,47 +1,44 @@
-$toolbar-height: 57px;
 $background: #f3f3f3;
 $border: 1px solid #c1c1c1;
 
 .file-changes {
   background: $background;
-  >.file-header {
-    position: fixed;
-    top: $toolbar-height;
-    left: 0;
-    z-index: 1;
-    width: 100%;
-    >.titlebar {
-      border-bottom: $border;
-      >.title {
-        margin-right: 30px;
-        >.diff {
-          outline: none;
-          cursor: pointer;
-          user-select: none;
-          &:hover {
-            text-decoration: underline;
-          }
-        }
-      }
-    }
-    >.header-menu {
-      display: flex;
-      padding: 10px 23px;
-      align-items: center;
-      background: $background;
-      >.commit-menu {
-        margin-left: 70px;
-        display: flex;
-      }
-      >.filename {
-        >span {
-          color: #5d5d5d;
+  >.titlebar {
+    border-bottom: $border;
+    >.title {
+      margin-right: 30px;
+      >.diff {
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        &:hover {
+          text-decoration: underline;
         }
       }
     }
   }
+  >.header-menu {
+    position: fixed;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    padding: 10px 23px;
+    align-items: center;
+    background: $background;
+    border-bottom: 1px solid #979797;
+    >.commit-menu {
+      margin-left: 70px;
+      display: flex;
+    }
+    >.filename {
+      >span {
+        color: #5d5d5d;
+      }
+    }
+  }
   >.header-cover {
-    height: 83px;
+    height: 42px;
   }
   >.code-changes {
     padding-bottom: 10px;

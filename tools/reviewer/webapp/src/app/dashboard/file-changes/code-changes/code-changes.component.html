@@ -19,9 +19,8 @@
           blockIndex,
           blockLine
         )]"
+        (mousedown)="clickIndex = blockIndex"
         valign="top"
-        (mouseover)="hoverService.mouseOver(blockLine, blockIndex)"
-        (mouseleave)="hoverService.mouseLeave()"
       >
         <!-- "Add comment" button -->
         <div
@@ -30,7 +29,6 @@
         >
           <div
             class="icon-button"
-            *ngIf="hoverService.isHovered(blockLine, blockIndex)"
             (click)="commentsService.addEmptyThread(changesLine, blockIndex)"
           >
             <img src="/assets/ic-add-comment.svg">
@@ -43,15 +41,15 @@
           *ngIf="blockLine.isChanged"
         >
           <pre
-            [HTML]="templateService.highlightChanges(blockLine, blockIndex)"
+            [HTML]="blockLine.wordChanges"
           ></pre>
         </div>
 
         <!-- Code -->
         <div
           class="code-line code"
-          [ngClass]="{ unselected: hoverService.hoveredBlockIndex !== blockIndex }"
           *ngIf="!changesLine.isCommentsLine && !blockLine.isPlaceholder"
+          [ngClass]="{ selectable: clickIndex === blockIndex }"
           (dblclick)="commentsService.addEmptyThread(changesLine, blockIndex)"
         >
           <pre [HTML]="blockLine.code"></pre>

@@ -2,36 +2,31 @@
 <page-loading [isLoading]="stateService.isLoading"></page-loading>
 
 <div class="file-changes" *ngIf="!stateService.isLoading">
-  <!-- Header -->
-  <div class="file-header">
-    <!-- Titlebar -->
-    <div class="cr-titlebar titlebar">
-      <div class="title">
-        <span
-          class="diff bold"
-          routerLink="/diff/{{ stateService.diffId }}"
-        >Diff {{ stateService.diff.getId() }}</span>
-        <span>by</span>
-        <span
-          [ngClass]="{
-            'username': true,
-            'bold': stateService.diff.getAuthor().getNeedsAttention()
-          }"
-        >{{ getAuthor() }}</span>
-      </div>
-      <diff-status [diff]="stateService.diff"></diff-status>
+  <!-- Titlebar -->
+  <div class="cr-titlebar titlebar">
+    <div class="title">
+      <span
+        class="diff bold"
+        routerLink="/diff/{{ stateService.diffId }}"
+      >Diff {{ stateService.diff.getId() }}</span>
+      <span>by</span>
+      <span
+        class="username"
+        [ngClass]="{ 'bold': stateService.diff.getAuthor().getNeedsAttention() }"
+      >{{ getAuthor() }}</span>
+    </div>
+    <diff-status [diff]="stateService.diff"></diff-status>
+  </div>
+
+  <div class="header-menu" [style.top.px]="headerTop">
+    <!-- Path -->
+    <div class="filename">
+      <span>{{ stateService.file.getFilenameWithRepo() }}</span>
     </div>
 
-    <div class="header-menu">
-      <!-- Path -->
-      <div class="filename">
-        <span>{{ stateService.file.getFilenameWithRepo() }}</span>
-      </div>
-
-      <!-- Commit Menu -->
-      <div class="commit-menu">
-        <commit-menu></commit-menu>
-      </div>
+    <!-- Commit Menu -->
+    <div class="commit-menu">
+      <commit-menu></commit-menu>
     </div>
   </div>
   <div class="header-cover"></div>

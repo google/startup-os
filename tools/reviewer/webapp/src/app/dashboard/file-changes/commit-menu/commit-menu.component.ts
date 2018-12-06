@@ -57,19 +57,10 @@ export class CommitMenuComponent implements OnDestroy {
   ) {
     this.initDragElements();
 
-    // When mouse cursor is moved
-    this.mousemoveSubscription = this.mouseService.mousemove.subscribe(event => {
-      if (this.leftDrag.isClicked) {
-        this.moveDragElement(event.pageX, this.leftDrag, this.rightDrag, -1);
-      }
-      if (this.rightDrag.isClicked) {
-        this.moveDragElement(event.pageX, this.rightDrag, this.leftDrag, 1);
-      }
-      this.moveBridge();
-    });
-
     // When user releases left mouse button
     this.mouseupSubscription = this.mouseService.mouseup.subscribe(() => {
+      this.destroyMouseMoveEventHandler();
+
       // If drag element changed its point, then change commit id of page
       if (this.leftDrag.isClicked) {
         const commitId: string = this.getCommitId(this.leftDrag, this.rightDrag, -1);
@@ -88,6 +79,24 @@ export class CommitMenuComponent implements OnDestroy {
       this.leftDrag.isClicked = false;
       this.rightDrag.isClicked = false;
     });
+  }
+
+  // Starts listening mouse moving
+  createMouseMoveEventHandler(): void {
+    document.onmousemove = (event: MouseEvent) => {
+      if (this.leftDrag.isClicked) {
+        this.moveDragElement(event.pageX, this.leftDrag, this.rightDrag, -1);
+      }
+      if (this.rightDrag.isClicked) {
+        this.moveDragElement(event.pageX, this.rightDrag, this.leftDrag, 1);
+      }
+      this.moveBridge();
+    };
+  }
+
+  // Stops listening mouse moving
+  destroyMouseMoveEventHandler(): void {
+    document.onmousemove = null;
   }
 
   // Creates drag elements and bridge on the stage
@@ -122,6 +131,7 @@ export class CommitMenuComponent implements OnDestroy {
       }
       dragElement.offset = event.offsetX;
       dragElement.isClicked = true;
+      this.createMouseMoveEventHandler();
     }
   }
 
@@ -202,7 +212,7 @@ export class CommitMenuComponent implements OnDestroy {
     this.commitInfo.isVisible = true;
   }
 
-  showPopup() {
+  showPopup(): void {
     if (this.commitInfo.isInit) {
       this.commitInfo.isVisible = true;
     }
@@ -215,7 +225,7 @@ export class CommitMenuComponent implements OnDestroy {
   }
 
   ngOnDestroy() {
-    this.mousemoveSubscription.unsubscribe();
+    this.destroyMouseMoveEventHandler();
     this.mouseupSubscription.unsubscribe();
   }
 }

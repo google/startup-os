@@ -37,7 +37,7 @@ export class TemplateService {
   }
 
   // Make line highlighted with separate chars
-  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): string {
+  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): void {
     // TODO: hightlight all word changes (not only first one)
     let startIndex: number = 0;
     let endIndex: number = 0;
@@ -53,13 +53,11 @@ export class TemplateService {
       'hl-left';
 
     if (
-      startIndex === endIndex ||
-      (startIndex === 0 && endIndex === blockLine.clearCode.length)
+      startIndex !== endIndex &&
+      startIndex !== 0 ||
+      endIndex !== blockLine.clearCode.length
     ) {
-      // No need to highlight chars, if whole line was changed.
-      return blockLine.clearCode;
-    } else {
-      return this.makeHighlighting(
+      blockLine.wordChanges = this.makeHighlighting(
         startIndex,
         endIndex,
         blockLine.clearCode,
