@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 // Converts a Diff proto to a list of GithubPullRequestProtos.PullRequest protos
 public class DiffConverter {
 
-  public ImmutableList<PullRequest> toPullRequests(Diff diff) {
+  public ImmutableList<PullRequest> toPullRequests(Diff diff, String patch) {
     ImmutableList.Builder<PullRequest> pullRequests = ImmutableList.builder();
 
     for (GithubPr githubPr : diff.getGithubPrList()) {
@@ -55,7 +55,10 @@ public class DiffConverter {
           .setRepo(githubPr.getRepo())
           .addAllReviewComment(
               getReviewCommentsByRepoName(
-                  diff.getCodeThreadList(), githubPr.getRepo(), diff.getBaseBranchCommitId()))
+                  diff.getCodeThreadList(),
+                  githubPr.getRepo(),
+                  diff.getBaseBranchCommitId(),
+                  patch))
           .addAllIssueComment(getIssueComments(diff.getDiffThreadList(), githubPr.getRepo()))
           .setOwner(githubPr.getOwner())
           .setAssociatedReviewerDiff(diff.getId());
@@ -65,7 +68,7 @@ public class DiffConverter {
   }
 
   private ImmutableList<ReviewComment> getReviewCommentsByRepoName(
-      List<Thread> codeThreads, String repoName, String baseBranchCommitId) {
+      List<Thread> codeThreads, String repoName, String baseBranchCommitId, String patch) {
     ImmutableList.Builder<ReviewComment> result = ImmutableList.builder();
     ImmutableList<Thread> codeThreadsByRepo =
         ImmutableList.copyOf(
@@ -79,7 +82,8 @@ public class DiffConverter {
         int githubCommentPosition;
         // `0` value means the comment isn't synced with GitHub
         if (thread.getGithubCommentPosition() == 0) {
-          githubCommentPosition = getReviewCommentPositionFromGitHub(baseBranchCommitId, thread);
+          githubCommentPosition =
+              getReviewCommentPositionFromGitHub(baseBranchCommitId, thread, patch);
         } else {
           githubCommentPosition = thread.getGithubCommentPosition();
         }
@@ -109,13 +113,13 @@ public class DiffConverter {
     }
   }
 
-  private int getReviewCommentPositionFromGitHub(String baseBranchCommitId, Thread thread) {
+  private int getReviewCommentPositionFromGitHub(
+      String baseBranchCommitId, Thread thread, String patch) {
     LineNumberConverter.Side commentSide =
         baseBranchCommitId.equals(thread.getCommitId())
             ? LineNumberConverter.Side.LEFT
             : LineNumberConverter.Side.RIGHT;
 
-    final String patch = thread.getFile().getPatch();
     if (patch.equals("")) {
       throw new RuntimeException("Patch is empty for file: " + thread.getFile().getFilename());
     }

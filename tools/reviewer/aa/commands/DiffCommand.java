@@ -166,8 +166,6 @@ public class DiffCommand implements AaCommand {
       // replace buglink if specified
       diffBuilder.addAllIssue(getIssues(buglink.get()));
     }
-
-    addGitPatch();
     addGithubRepos(diffBuilder);
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 
@@ -184,21 +182,6 @@ public class DiffCommand implements AaCommand {
     // TODO: Rename createDiff to createOrUpdateDiff
     codeReviewBlockingStub.createDiff(request);
     return true;
-  }
-
-  private void addGitPatch() {
-    try {
-      fileUtils
-          .listContents(workspacePath)
-          .forEach(
-              path -> {
-                GitRepo repo = this.gitRepoFactory.create(path);
-                repo.getUncommittedFiles()
-                    .forEach(file -> file.toBuilder().setPatch(repo.getPatch("master", path)));
-              });
-    } catch (Exception e) {
-      throw new RuntimeException("Can not set `patch(diff)` for file. " + e.getCause());
-    }
   }
 
   private void addGithubRepos(Diff.Builder diffBuilder) {

@@ -44,9 +44,6 @@ message File {
   // Empty if referring to a local file
   string commit_id = 5;
   Action action = 6;
-  // Git patch(diff) between current file and the file of the base
-  // branch(usually "master")
-  string patch = 9;
 }
 
 message Commit {

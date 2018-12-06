@@ -71,7 +71,6 @@ public class DiffConverterTest {
                             .setRepoId("test-repo")
                             .setCommitId("feature_branch_commit_id")
                             .setFilenameWithRepo("test-repo/test_file.txt")
-                            .setPatch(TEST_FILE_PATCH)
                             .build())
                     .setLineNumber(5)
                     .addComment(
@@ -90,7 +89,7 @@ public class DiffConverterTest {
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
-        diffConverter.toPullRequests(diff);
+        diffConverter.toPullRequests(diff, TEST_FILE_PATCH);
 
     GithubPullRequestProtos.PullRequest expectedPullRequest =
         GithubPullRequestProtos.PullRequest.newBuilder()
@@ -142,7 +141,6 @@ public class DiffConverterTest {
                             .setRepoId("test-repo")
                             .setCommitId("base_branch_commit_id")
                             .setFilenameWithRepo("test-repo/test_file.txt")
-                            .setPatch(TEST_FILE_PATCH)
                             .build())
                     .setLineNumber(14)
                     .addComment(
@@ -161,7 +159,7 @@ public class DiffConverterTest {
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
-        diffConverter.toPullRequests(diff);
+        diffConverter.toPullRequests(diff, TEST_FILE_PATCH);
 
     GithubPullRequestProtos.PullRequest expectedPullRequest =
         GithubPullRequestProtos.PullRequest.newBuilder()
@@ -213,7 +211,6 @@ public class DiffConverterTest {
                             .setRepoId("test-repo")
                             .setCommitId("base_branch_commit_id")
                             .setFilenameWithRepo("test-repo/test_file.txt")
-                            .setPatch(TEST_FILE_PATCH)
                             .build())
                     .setLineNumber(1)
                     .addComment(
@@ -231,7 +228,7 @@ public class DiffConverterTest {
             .setBaseBranchCommitId("base_branch_commit_id")
             .build();
 
-    diffConverter.toPullRequests(diff);
+    diffConverter.toPullRequests(diff, TEST_FILE_PATCH);
   }
 }
 

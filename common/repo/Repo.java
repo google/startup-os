@@ -82,9 +82,9 @@ public interface Repo {
   /** Checks if there are commits added since master, or any uncommitted files */
   boolean hasChanges(String branch);
   /**
-   * Gets patch(diff) between current file and the file of the base branch(usually "master"). It's
-   * possible to use branch name or commit ID. The response can have one and more diff hunks
+   * Gets patch(diff) between current file and the file in the passed `referenceCommitOrBranch`.
+   * It's possible to use branch name or commit ID. The response can have one and more diff hunks
    */
-  String getPatch(String commitOrBranch, String filename);
+  String getPatch(String referenceCommitOrBranch, String filename);
 }
 
