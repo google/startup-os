@@ -63,6 +63,7 @@ user {
     description: "Various common infra libraries for StartupOS"
     url: "https://github.com/google/startup-os/tree/master/common"
   }
+  crystals:100
 }
 user {
   id: "webdevelopland"
@@ -79,6 +80,7 @@ user {
     description: "Developer of Reviewer web app"
     url: "https://github.com/google/startup-os/tree/master/tools/reviewer/webapp"
   }
+  crystals:100
 }
 user {
   id: "val-fed"
@@ -101,4 +103,6 @@ user {
     description: "Sync between Reviewer and GitHub (using GitHub API)"
     url: "https://github.com/google/startup-os/tree/master/tools/reviewer/job/sync"
   }
+  crystals:100
  }
+ total_crystal: 300

@@ -78,7 +78,7 @@ message User {
   repeated Contribution top_contribution = 9;
   int32 crystals = 10;
   // List of things people think are worthy of crystals exchange
-  repeated string ishare = 11;
+  repeated string offer = 11;
 }
 
 message SocialNetwork {
