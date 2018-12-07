@@ -64,3 +64,41 @@ user {
     url: "https://github.com/google/startup-os/tree/master/common"
   }
 }
+user {
+  id: "webdevelopland"
+  first_name: "Vadim"
+  email: "webdevelopland@gmail.com"
+  image_url: "https://i.imgur.com/5padPgx.png"
+  skill: "Angular"
+  project_id: "reviewer"
+  social_network {
+    type: GITHUB
+    url: "https://github.com/webdevelopland"
+  }
+  top_contribution {
+    description: "Developer of Reviewer web app"
+    url: "https://github.com/google/startup-os/tree/master/tools/reviewer/webapp"
+  }
+}
+user {
+  id: "val-fed"
+  first_name: "Valerii"
+  last_name: "Fedorenko"
+  email: "valerii.fedorenko.ua@gmail.com"
+  image_url: "https://ibb.co/LCNRWTK"
+  social_network {
+    type: LINKEDIN
+    url: "https://www.linkedin.com/in/valerii-fedorenko-616541146/"
+  }
+  skill: "Java"
+  project_id: "google_oss_examples"
+  project_id: "reviewer"
+  top_contribution {
+    description: "Team member for StartupOS project (Google OSS examples, Reviewer)"
+    url: "https://github.com/google/startup-os"
+  }
+  top_contribution {
+    description: "Sync between Reviewer and GitHub (using GitHub API)"
+    url: "https://github.com/google/startup-os/tree/master/tools/reviewer/job/sync"
+  }
+ }

@@ -87,6 +87,7 @@ message SocialNetwork {
     FACEBOOK = 1;
     TWITTER = 2;
     LINKEDIN = 3;
+    GITHUB = 4;
   }
   Type type = 1;
   string url = 2;
