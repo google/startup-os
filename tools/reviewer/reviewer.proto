@@ -77,7 +77,7 @@ message User {
   repeated string project_id = 8;
   repeated Contribution top_contribution = 9;
   int32 crystals = 10;
-  // list of things people think are worthy of crystals exchange
+  // List of things people think are worthy of crystals exchange
   repeated string ishare = 11;
 }
 

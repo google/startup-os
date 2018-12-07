@@ -23,7 +23,10 @@ import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import dagger.Component;
 import dagger.Provides;
+
+import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.util.List;
 import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +34,6 @@ import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.FirebaseConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.tools.reviewer.ReviewerProtos.User;
-
 
 /* A test to check reviewer_config.prototxt is valid proto format */
 public class ReviewerConfigTest {
@@ -57,10 +59,18 @@ public class ReviewerConfigTest {
   }
 
   @Test
-  public void TotalCrystalCorrectTest() {
-    User user =
-            User.newBuilder().setId("123").setFirstName("gal").setLastName("golan").setCrystals(3).build();
+  public void TotalCrystalCorrectTest() throws IOException {
+    ReviewerConfig config =
+        (ReviewerConfig)
+            fileUtils.readPrototxt("reviewer_config.prototxt", ReviewerConfig.newBuilder());
 
+    int crystalSum = 0;
+    List<User> userList = config.getUserList();
+    for (User user : userList) {
+      crystalSum += user.getCrystals();
+    }
+
+    assertEquals(config.getTotalCrystal(), crystalSum);
   }
 }
 
