@@ -19,8 +19,10 @@ java_test(
     test_class = "com.google.startupos.tools.reviewer.job.sync.tests.DiffConverterTest",
     deps = [
         "//common",
+        "//common/repo",
         "//common/repo:repo_java_proto",
         "//third_party/maven/junit",
+        "//third_party/maven/org/mockito:mockito_core",
         "//tools/reviewer/job/sync:full_github_pr_java_proto",
         "//tools/reviewer/job/sync:github_sync",
         "//tools/reviewer/local_server/service:code_review_java_proto",

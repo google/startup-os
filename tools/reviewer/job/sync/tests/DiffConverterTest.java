@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.job.sync.tests;
 
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.sync.DiffConverter;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos;
 import com.google.startupos.tools.reviewer.localserver.service.Protos;
@@ -25,6 +26,9 @@ import org.junit.Test;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class DiffConverterTest {
   private static final String TEST_FILE_PATCH =
@@ -45,10 +49,12 @@ public class DiffConverterTest {
           + "+(CHANGED)line-15";
 
   private DiffConverter diffConverter;
+  private GitRepo gitRepo = mock(GitRepo.class);
 
   @Before
   public void setUp() {
     diffConverter = new DiffConverter();
+    when(gitRepo.getPatch(anyString(), anyString())).thenReturn(TEST_FILE_PATCH);
   }
 
   @Test
@@ -89,7 +95,7 @@ public class DiffConverterTest {
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
-        diffConverter.toPullRequests(diff, TEST_FILE_PATCH);
+        diffConverter.toPullRequests(diff, gitRepo);
 
     GithubPullRequestProtos.PullRequest expectedPullRequest =
         GithubPullRequestProtos.PullRequest.newBuilder()
@@ -159,7 +165,7 @@ public class DiffConverterTest {
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
-        diffConverter.toPullRequests(diff, TEST_FILE_PATCH);
+        diffConverter.toPullRequests(diff, gitRepo);
 
     GithubPullRequestProtos.PullRequest expectedPullRequest =
         GithubPullRequestProtos.PullRequest.newBuilder()
@@ -228,7 +234,7 @@ public class DiffConverterTest {
             .setBaseBranchCommitId("base_branch_commit_id")
             .build();
 
-    diffConverter.toPullRequests(diff, TEST_FILE_PATCH);
+    diffConverter.toPullRequests(diff, gitRepo);
   }
 }
 

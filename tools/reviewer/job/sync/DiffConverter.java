@@ -17,6 +17,7 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 // Converts a Diff proto to a list of GithubPullRequestProtos.PullRequest protos
 public class DiffConverter {
 
-  public ImmutableList<PullRequest> toPullRequests(Diff diff, String patch) {
+  public ImmutableList<PullRequest> toPullRequests(Diff diff, GitRepo gitRepo) {
     ImmutableList.Builder<PullRequest> pullRequests = ImmutableList.builder();
 
     for (GithubPr githubPr : diff.getGithubPrList()) {
@@ -58,7 +59,7 @@ public class DiffConverter {
                   diff.getCodeThreadList(),
                   githubPr.getRepo(),
                   diff.getBaseBranchCommitId(),
-                  patch))
+                  gitRepo))
           .addAllIssueComment(getIssueComments(diff.getDiffThreadList(), githubPr.getRepo()))
           .setOwner(githubPr.getOwner())
           .setAssociatedReviewerDiff(diff.getId());
@@ -68,7 +69,7 @@ public class DiffConverter {
   }
 
   private ImmutableList<ReviewComment> getReviewCommentsByRepoName(
-      List<Thread> codeThreads, String repoName, String baseBranchCommitId, String patch) {
+      List<Thread> codeThreads, String repoName, String baseBranchCommitId, GitRepo gitRepo) {
     ImmutableList.Builder<ReviewComment> result = ImmutableList.builder();
     ImmutableList<Thread> codeThreadsByRepo =
         ImmutableList.copyOf(
@@ -83,7 +84,10 @@ public class DiffConverter {
         // `0` value means the comment isn't synced with GitHub
         if (thread.getGithubCommentPosition() == 0) {
           githubCommentPosition =
-              getReviewCommentPositionFromGitHub(baseBranchCommitId, thread, patch);
+              getReviewCommentPositionFromGitHub(
+                  baseBranchCommitId,
+                  thread,
+                  gitRepo.getPatch(baseBranchCommitId, thread.getFile().getFilename()));
         } else {
           githubCommentPosition = thread.getGithubCommentPosition();
         }
