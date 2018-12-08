@@ -18,15 +18,12 @@ $border: 1px solid #c1c1c1;
     }
   }
   >.header-menu {
-    position: fixed;
-    left: 0;
-    z-index: 1;
-    width: 100%;
     display: flex;
     padding: 10px 23px;
     align-items: center;
     background: $background;
-    border-bottom: 1px solid #979797;
+    position: relative;
+    z-index: 5;
     >.commit-menu {
       margin-left: 70px;
       display: flex;
@@ -36,6 +33,13 @@ $border: 1px solid #c1c1c1;
         color: #5d5d5d;
       }
     }
+  }
+  >.header-fixed {
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-bottom: 1px solid #979797;
+    width: 100%;
   }
   >.header-cover {
     height: 42px;

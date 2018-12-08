@@ -26,7 +26,7 @@ const headerTopStart: number = 98;
   ],
 })
 export class FileChangesComponent implements OnInit, OnDestroy {
-  headerTop: number = headerTopStart;
+  isHeaderFixed: boolean = false;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -43,7 +43,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
 
     document.onscroll = () => {
       const scrollTop: number = document.documentElement.scrollTop || document.body.scrollTop;
-      this.headerTop = Math.max(0, headerTopStart - scrollTop);
+      this.isHeaderFixed = scrollTop >= headerTopStart;
     };
   }
 
