@@ -15,11 +15,26 @@ repo {
   id: "hasadna"
   url: "https://github.com/hasadna/hasadna"
 }
+project {
+  id: "google_oss_examples"
+  display_name: "Google Open Source examples"
+  project_url: "https://github.com/google/startup-os"
+  description: "Working examples of Google's open source stack: Bazel, Protocol Buffers, gRPC, Angular, Dagger, Docker, Kubernetes etc."
+  user_id: "oferb"
+}
+project {
+  id: "reviewer"
+  display_name: "Reviewer: Multi-repo Code Review"
+  project_url: "https://github.com/google/startup-os/tree/master/tools/reviewer"
+  description: "A multi-repo Code Review tool that is hosting-agnostic and supports atomic commits across repos."
+  user_id: "oferb"
+}
 user {
   id: "oferb"
   first_name: "Ofer"
   last_name: "Bartal"
   email: "oferb@google.com"
+  image_url: "https://i.ibb.co/VJY1Prm/0.jpg"
   social_network {
     type: LINKEDIN
     url: "https://www.linkedin.com/in/ofer-bartal-58a50811/"
@@ -30,4 +45,60 @@ user {
   }
   skill: "Java"
   skill: "Linux"
+  project_id: "google_oss_examples"
+  project_id: "reviewer"
+  top_contribution {
+    description: "Team leader for StartupOS project (Google OSS examples, Reviewer)"
+    url: "https://github.com/google/startup-os"
+  }
+  top_contribution {
+    description: "Java port of C++ gflags"
+    url: "https://github.com/google/startup-os/tree/master/common/flags"
+  }
+  top_contribution {
+    description: "Text diff implementation for Reviewer (using git and DiffPatchMatch)"
+    url: "https://github.com/google/startup-os/blob/master/common/TextDifferencer.java"
+  }
+  top_contribution {
+    description: "Various common infra libraries for StartupOS"
+    url: "https://github.com/google/startup-os/tree/master/common"
+  }
 }
+user {
+  id: "webdevelopland"
+  first_name: "Vadim"
+  email: "webdevelopland@gmail.com"
+  image_url: "https://i.imgur.com/5padPgx.png"
+  skill: "Angular"
+  project_id: "reviewer"
+  social_network {
+    type: GITHUB
+    url: "https://github.com/webdevelopland"
+  }
+  top_contribution {
+    description: "Developer of Reviewer web app"
+    url: "https://github.com/google/startup-os/tree/master/tools/reviewer/webapp"
+  }
+}
+user {
+  id: "val-fed"
+  first_name: "Valerii"
+  last_name: "Fedorenko"
+  email: "valerii.fedorenko.ua@gmail.com"
+  image_url: "https://ibb.co/LCNRWTK"
+  social_network {
+    type: LINKEDIN
+    url: "https://www.linkedin.com/in/valerii-fedorenko-616541146/"
+  }
+  skill: "Java"
+  project_id: "google_oss_examples"
+  project_id: "reviewer"
+  top_contribution {
+    description: "Team member for StartupOS project (Google OSS examples, Reviewer)"
+    url: "https://github.com/google/startup-os"
+  }
+  top_contribution {
+    description: "Sync between Reviewer and GitHub (using GitHub API)"
+    url: "https://github.com/google/startup-os/tree/master/tools/reviewer/job/sync"
+  }
+ }

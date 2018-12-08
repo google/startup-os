@@ -2,7 +2,12 @@
 # Usage:
 # local_server.sh start --root_path <root_path>
 
-#
+# If running on "fallback server":
+# export STARTUP_OS=/home/startup_os_project/base/head/startup-os
+# cd $STARTUP_OS
+# tools/reviewer/local_server/local_server.sh start --root_path $STARTUP_OS &
+# disown -a
+
 # Debugging gRPC server:
 # kill $(lsof -tnP -i:8001 -sTCP:LISTEN)
 # bazel build //tools/reviewer/local_server:local_server; bazel-bin/tools/reviewer/local_server/local_server

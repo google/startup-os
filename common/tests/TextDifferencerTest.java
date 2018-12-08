@@ -161,6 +161,16 @@ public class TextDifferencerTest {
         expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diffString));
   }
 
+  @Test
+  public void testLicenseFileChange() {
+    String leftContents = readFile("License_before.txt");
+    String rightContents = readFile("License_after.txt");
+    String diffString = readFile("License_diff.txt");
+    TextDiff expectedTextDiff = readTextDiff("License_diff_prototxt.txt");
+    assertEquals(
+        expectedTextDiff, differencer.getTextDiff(leftContents, rightContents, diffString));
+  }
+
   @Singleton
   @Component(modules = CommonModule.class)
   interface TestComponent {

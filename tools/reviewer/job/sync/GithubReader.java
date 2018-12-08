@@ -18,13 +18,12 @@ package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewsResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Review;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitInfo;
 
 import java.io.IOException;
@@ -44,7 +43,7 @@ public class GithubReader {
 
   public PullRequest getPullRequest(String repoOwner, String repoName, long number)
       throws IOException {
-    PullRequest.Builder result =
+    PullRequest.Builder pullRequest =
         githubClient
             .getPullRequest(
                 PullRequestRequest.newBuilder()
@@ -55,12 +54,12 @@ public class GithubReader {
             .getPullRequest()
             .toBuilder();
 
-    result
-        .addAllReviews(getPullRequestReviews(repoOwner, repoName, number))
+    pullRequest
+        .addAllReviewComment(getPullRequestReviewComments(repoOwner, repoName, number))
         .addAllIssueComment(getIssueComments(repoOwner, repoName, number))
         .addAllCommitsInfo(getCommits(repoOwner, repoName, number))
         .setRepo(repoName);
-    return result.build();
+    return pullRequest.build();
   }
 
   private List<CommitInfo> getCommits(String repoOwner, String repoName, long number)
@@ -103,38 +102,16 @@ public class GithubReader {
         .getIssueCommentList();
   }
 
-  private List<Review> getPullRequestReviews(String repoOwner, String repoName, long number)
-      throws IOException {
-    List<Review> result = new ArrayList<>();
-    ReviewsResponse reviewsResponse =
-        githubClient.getReviews(
-            GithubProtos.ReviewsRequest.newBuilder()
+  private List<ReviewComment> getPullRequestReviewComments(
+      String repoOwner, String repoName, long number) throws IOException {
+    return githubClient
+        .getPullRequestComments(
+            PullRequestCommentsRequest.newBuilder()
                 .setOwner(repoOwner)
                 .setRepo(repoName)
                 .setNumber(number)
-                .build());
-
-    for (Review review : reviewsResponse.getReviewsList()) {
-      result.add(
-          Review.newBuilder()
-              .setId(review.getId())
-              .setUser(review.getUser())
-              .setBody(review.getBody())
-              .setCommitId(review.getCommitId())
-              .setState(review.getState())
-              .addAllReviewComment(
-                  githubClient
-                      .getReviewComments(
-                          ReviewCommentsRequest.newBuilder()
-                              .setOwner(repoOwner)
-                              .setRepo(repoName)
-                              .setNumber(number)
-                              .setReviewId(review.getId())
-                              .build())
-                      .getReviewCommentsList())
-              .build());
-    }
-    return result;
+                .build())
+        .getReviewCommentList();
   }
 }
 

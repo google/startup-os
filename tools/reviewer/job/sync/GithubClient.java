@@ -22,19 +22,21 @@ import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitResponse;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitsResponse;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateIssueCommentResponse;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreatePullRequestReviewRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CreateReviewCommentResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.DeleteIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.DeleteReviewCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.EditIssueCommentRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.EditReviewCommentRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsResponse;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewCommentsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewCommentsResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.ReviewsResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.UserRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.UserResponse;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,9 +44,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
 import static java.net.HttpURLConnection.HTTP_CREATED;
 import static java.net.HttpURLConnection.HTTP_OK;
 
@@ -62,18 +63,23 @@ public class GithubClient {
   private static final String GET_COMMENTS_ON_ISSUE = "repos/%s/%s/issues/%d/comments";
   // https://developer.github.com/v3/issues/comments/#create-a-comment
   private static final String CREATE_COMMENT_ON_ISSUE = "repos/%s/%s/issues/%d/comments";
-  // https://developer.github.com/v3/pulls/reviews/#list-reviews-on-a-pull-request
-  private static final String GET_PULL_REQUEST_REVIEWS = "repos/%s/%s/pulls/%d/reviews";
-  // https://developer.github.com/v3/pulls/reviews/#get-comments-for-a-single-review
-  private static final String GET_REVIEW_COMMENTS = "repos/%s/%s/pulls/%d/reviews/%d/comments";
-  // https://developer.github.com/v3/pulls/reviews/#create-a-pull-request-review
-  private static final String CREATE_PULL_REQUEST_REVIEW = "repos/%s/%s/pulls/%d/reviews";
+  // https://developer.github.com/v3/pulls/comments/#create-a-comment
+  private static final String CREATE_COMMENT_ON_REVIEW = "repos/%s/%s/pulls/%d/comments";
   // https://developer.github.com/v3/repos/commits/#get-a-single-commit
   private static final String GET_COMMIT = "repos/%s/%s/commits/%s";
   // https://developer.github.com/v3/pulls/#list-commits-on-a-pull-request
+  // Lists a maximum of 250 commits for a pull request
   private static final String GET_COMMITS_ON_PULL_REQUEST = "repos/%s/%s/pulls/%s/commits";
-  // https://developer.github.com/v3/users/#get-a-single-user
-  private static final String GET_USER = "users/%s";
+  // https://developer.github.com/v3/pulls/comments/#edit-a-comment
+  private static final String EDIT_REVIEW_COMMENT = "repos/%s/%s/pulls/comments/%s";
+  // https://developer.github.com/v3/pulls/comments/#delete-a-comment
+  private static final String DELETE_REVIEW_COMMENT = "repos/%s/%s/pulls/comments/%s";
+  // https://developer.github.com/v3/issues/comments/#edit-a-comment
+  private static final String EDIT_ISSUE_COMMENT = "repos/%s/%s/issues/comments/%s";
+  // https://developer.github.com/v3/issues/comments/#delete-a-comment
+  private static final String DELETE_ISSUE_COMMENT = "repos/%s/%s/issues/comments/%s";
+  // https://developer.github.com/v3/pulls/comments/#list-comments-on-a-pull-request
+  private static final String GET_COMMENTS_ON_PULL_REQUEST = "repos/%s/%s/pulls/%d/comments";
 
   private final String login;
   private final String password;
@@ -127,80 +133,106 @@ public class GithubClient {
     return builder.build();
   }
 
-  public void createIssueComment(CreateIssueCommentRequest request) {
-    try {
-      String requestData = JsonFormat.printer().print(request.getRequestData());
-      doRequest(
-          RequestMethod.POST,
-          String.format(
-              CREATE_COMMENT_ON_ISSUE, request.getOwner(), request.getRepo(), request.getNumber()),
-          requestData);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public ReviewsResponse getReviews(ReviewsRequest request) throws IOException {
-    ReviewsResponse.Builder builder = ReviewsResponse.newBuilder();
+  public PullRequestCommentsResponse getPullRequestComments(PullRequestCommentsRequest request)
+      throws IOException {
+    PullRequestCommentsResponse.Builder builder = PullRequestCommentsResponse.newBuilder();
     String response =
         doRequest(
             RequestMethod.GET,
             String.format(
-                GET_PULL_REQUEST_REVIEWS,
+                GET_COMMENTS_ON_PULL_REQUEST,
                 request.getOwner(),
                 request.getRepo(),
                 request.getNumber()));
     JsonFormat.parser()
         .ignoringUnknownFields()
-        .merge(String.format("{\"reviews\":%s}", response), builder);
+        .merge(String.format("{\"review_comment\":%s}", response), builder);
     return builder.build();
   }
 
-  public ReviewCommentsResponse getReviewComments(ReviewCommentsRequest request)
-      throws IOException {
-    ReviewCommentsResponse.Builder builder = ReviewCommentsResponse.newBuilder();
-    String response =
-        doRequest(
-            RequestMethod.GET,
-            String.format(
-                GET_REVIEW_COMMENTS,
-                request.getOwner(),
-                request.getRepo(),
-                request.getNumber(),
-                request.getReviewId()));
-    JsonFormat.parser()
-        .ignoringUnknownFields()
-        .merge(String.format("{\"review_comments\":%s}", response), builder);
-    return builder.build();
-  }
-
-  public void createPullRequestReview(CreatePullRequestReviewRequest request) {
+  public CreateIssueCommentResponse createIssueComment(CreateIssueCommentRequest request) {
     try {
-      String requestData =
-          JsonFormat.printer().print(request.getRequestData()).replace("commitId", "commit_id");
+      String requestData = JsonFormat.printer().print(request.getRequestData());
+      String response =
+          doRequest(
+              RequestMethod.POST,
+              String.format(
+                  CREATE_COMMENT_ON_ISSUE,
+                  request.getOwner(),
+                  request.getRepo(),
+                  request.getNumber()),
+              requestData);
+      CreateIssueCommentResponse.Builder builder = CreateIssueCommentResponse.newBuilder();
+      JsonFormat.parser()
+          .ignoringUnknownFields()
+          .merge(String.format("{\"issue_comment\":%s}", response), builder);
+      return builder.build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-      // GitHub API requires number format for number fields. E.g. we should change `position: "84"`
-      // to `position: 84`
-      Matcher matcher = Pattern.compile("\"\\d+\"").matcher(requestData);
-      while (matcher.find()) {
-        String numberWithDoubleQuotes = matcher.group();
-        requestData =
-            requestData.replaceFirst(
-                numberWithDoubleQuotes,
-                numberWithDoubleQuotes.substring(1, numberWithDoubleQuotes.length() - 1));
-      }
-
+  public void editIssueComment(EditIssueCommentRequest request) {
+    try {
+      String requestData = JsonFormat.printer().print(request.getRequestData());
       doRequest(
-          RequestMethod.POST,
+          RequestMethod.PATCH,
           String.format(
-              CREATE_PULL_REQUEST_REVIEW,
-              request.getOwner(),
-              request.getRepo(),
-              request.getNumber()),
+              EDIT_ISSUE_COMMENT, request.getOwner(), request.getRepo(), request.getCommentId()),
           requestData);
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public void deleteIssueComment(DeleteIssueCommentRequest request) {
+    doRequest(
+        RequestMethod.DELETE,
+        String.format(
+            DELETE_ISSUE_COMMENT, request.getOwner(), request.getRepo(), request.getCommentId()));
+  }
+
+  public CreateReviewCommentResponse createReviewComment(CreateReviewCommentRequest request) {
+    try {
+      String requestData =
+          JsonFormat.printer().print(request.getRequestData()).replace("commitId", "commit_id");
+      String response =
+          doRequest(
+              RequestMethod.POST,
+              String.format(
+                  CREATE_COMMENT_ON_REVIEW,
+                  request.getOwner(),
+                  request.getRepo(),
+                  request.getNumber()),
+              requestData);
+      CreateReviewCommentResponse.Builder builder = CreateReviewCommentResponse.newBuilder();
+      JsonFormat.parser()
+          .ignoringUnknownFields()
+          .merge(String.format("{\"review_comment\":%s}", response), builder);
+      return builder.build();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void editReviewComment(EditReviewCommentRequest request) {
+    try {
+      String requestData = JsonFormat.printer().print(request.getRequestData());
+      doRequest(
+          RequestMethod.PATCH,
+          String.format(
+              EDIT_REVIEW_COMMENT, request.getOwner(), request.getRepo(), request.getCommentId()),
+          requestData);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void deleteReviewComment(DeleteReviewCommentRequest request) {
+    doRequest(
+        RequestMethod.DELETE,
+        String.format(
+            DELETE_REVIEW_COMMENT, request.getOwner(), request.getRepo(), request.getCommentId()));
   }
 
   public CommitResponse getCommit(CommitRequest request) throws IOException {
@@ -231,24 +263,12 @@ public class GithubClient {
     return builder.build();
   }
 
-  public UserResponse getUser(UserRequest request) {
-    UserResponse.Builder builder = UserResponse.newBuilder();
-    String response = doRequest(RequestMethod.GET, String.format(GET_USER, request.getLogin()));
-    try {
-      JsonFormat.parser()
-          .ignoringUnknownFields()
-          .merge(String.format("{\"user\":%s}", response), builder);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return builder.build();
-  }
-
   private String doRequest(RequestMethod requestMethod, String request) {
-    if (requestMethod.equals(RequestMethod.GET)) {
+    if (requestMethod.equals(RequestMethod.GET) || requestMethod.equals(RequestMethod.DELETE)) {
       return doRequest(requestMethod, request, "");
     } else {
-      throw new RuntimeException(requestMethod.name() + " method requires the request data.");
+      throw new IllegalArgumentException(
+          requestMethod.name() + " method requires the request data.");
     }
   }
 
@@ -257,19 +277,25 @@ public class GithubClient {
       URL url = new URL(BASE_PATH + request);
       StringBuilder response = new StringBuilder();
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-      connection.setRequestMethod(requestMethod.name());
+      if (requestMethod.equals(RequestMethod.PATCH)) {
+        connection.setRequestProperty("X-HTTP-Method-Override", "PATCH");
+        connection.setRequestMethod("POST");
+      } else {
+        connection.setRequestMethod(requestMethod.name());
+      }
+      connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
       connection.setRequestProperty(
           "Authorization",
           "Basic " + Base64.getEncoder().encodeToString((login + ":" + password).getBytes()));
-      connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-      if (requestMethod.equals(RequestMethod.POST)) {
+      if (requestMethod.equals(RequestMethod.POST) || requestMethod.equals(RequestMethod.PATCH)) {
         connection.setDoOutput(true);
         connection.getOutputStream().write(requestData.getBytes("UTF-8"));
       }
 
       if ((connection.getResponseCode() != HTTP_OK)
-          && (connection.getResponseCode() != HTTP_CREATED)) {
+          && (connection.getResponseCode() != HTTP_CREATED)
+          && (connection.getResponseCode() != HTTP_NO_CONTENT)) {
         StringBuilder errorResponse = new StringBuilder();
         try (BufferedReader reader =
             new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
@@ -302,7 +328,9 @@ public class GithubClient {
 
   private enum RequestMethod {
     GET,
-    POST
+    POST,
+    PATCH,
+    DELETE
   }
 }
 
