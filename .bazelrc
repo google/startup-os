@@ -1,4 +1,3 @@
 build --proto_compiler //external:proto_compiler \
       --proto_toolchain_for_java //external:proto_java_toolchain
-run --direct_run
 test --test_output=errors
