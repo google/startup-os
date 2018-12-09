@@ -97,8 +97,6 @@ message Diff {
   string modified_by = 16;
   // GitHub PRs associated with this repo.
   repeated GithubPr github_pr = 17;
-  // Commit ID of base branch (usually "master")
-  string base_branch_commit_id = 18;
 }
 
 message Reviewer {

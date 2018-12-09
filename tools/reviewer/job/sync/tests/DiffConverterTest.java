@@ -91,7 +91,6 @@ public class DiffConverterTest {
             .setModifiedBy("author@test.com")
             .addGithubPr(
                 Protos.GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
-            .setBaseBranchCommitId("base_branch_commit_id")
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
@@ -161,7 +160,6 @@ public class DiffConverterTest {
             .setModifiedBy("author@test.com")
             .addGithubPr(
                 Protos.GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
-            .setBaseBranchCommitId("base_branch_commit_id")
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
@@ -231,7 +229,6 @@ public class DiffConverterTest {
             .setModifiedBy("author@test.com")
             .addGithubPr(
                 Protos.GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
-            .setBaseBranchCommitId("base_branch_commit_id")
             .build();
 
     diffConverter.toPullRequests(diff, gitRepo);

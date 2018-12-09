@@ -128,7 +128,6 @@ public class DiffCommand implements AaCommand {
                 repoToInitialBranch.put(repo, repo.currentBranch());
                 System.out.println(
                     String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
-                diffBuilder.setBaseBranchCommitId(repo.getHeadCommitId());
                 repo.switchBranch(branchName);
               });
       addGithubRepos(diffBuilder);

@@ -467,6 +467,11 @@ public class GitRepo implements Repo {
         runCommand("diff " + referenceCommitOrBranch + " -- " + filename).stdout);
   }
 
+  @Override
+  public String getTheLatestCommitIdOfBranch(String branch) {
+    return runCommand("rev-parse " + branch).stdout.trim();
+  }
+
   private void switchToMasterBranch() {
     if (!currentBranch().equals("master")) {
       switchBranch("master");

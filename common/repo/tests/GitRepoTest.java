@@ -533,5 +533,19 @@ public class GitRepoTest {
     assertEquals(expectedPatch, gitRepo.getPatch(masterCommitId, TEST_FILE));
     assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_FILE));
   }
+
+  @Test
+  public void testGetTheLatestCommitIdOfBranchWhenMasterBranch() {
+    String expectedCommitId = gitRepo.getHeadCommitId();
+    repo.switchBranch(TEST_BRANCH);
+    assertEquals(expectedCommitId, gitRepo.getTheLatestCommitIdOfBranch("master"));
+  }
+
+  @Test
+  public void testGetTheLatestCommitIdOfBranchWhenFeatureBranch() {
+    repo.switchBranch(TEST_BRANCH);
+    String expectedCommitId = gitRepo.getHeadCommitId();
+    assertEquals(expectedCommitId, gitRepo.getTheLatestCommitIdOfBranch(TEST_BRANCH));
+  }
 }
 
