@@ -31,6 +31,20 @@ message CIResponse {
   repeated TargetResult results = 2;
 }
 
+/* Config for a Reviewer instance, stored in config_repo in
+ * ReviewerRegistryConfig. */
+message ReviewerConfig {
+  // Display name for Reviewer instance. Should be same as
+  // ReviewerRegistryConfig.display_name
+  string display_name = 1;
+  FirebaseConfig firebase_config = 2;
+  // Repos in this Reviewer instance
+  repeated Repo repo = 3;
+  repeated User user = 4;
+  repeated Project project = 5;
+  int32 total_crystal = 6;
+}
+
 /* Firebase config. The only field we probably need is project_id, but we're not
  * sure of that. */
 message FirebaseConfig {
@@ -48,18 +62,6 @@ message FirebaseConfig {
   string messaging_sender_id = 6;
 }
 
-/* Config for a Reviewer instance, stored in config_repo. */
-message ReviewerConfig {
-  // Display name for Reviewer instance. Should be same as
-  // ReviewerRegistryConfig.display_name
-  string display_name = 1;
-  FirebaseConfig firebase_config = 2;
-  // Repos in this Reviewer instance
-  repeated Repo repo = 3;
-  repeated User user = 4;
-  repeated Project project = 5;
-}
-
 // A user, a contributor to the Reviewer repos.
 message User {
   // A unique identifier for a user, e.g GitHub user
@@ -74,6 +76,9 @@ message User {
   // Projects the user works on
   repeated string project_id = 8;
   repeated Contribution top_contribution = 9;
+  int32 crystals = 10;
+  // List of things people think are worthy of crystals exchange
+  repeated string offer = 11;
 }
 
 message SocialNetwork {
@@ -82,6 +87,7 @@ message SocialNetwork {
     FACEBOOK = 1;
     TWITTER = 2;
     LINKEDIN = 3;
+    GITHUB = 4;
   }
   Type type = 1;
   string url = 2;

@@ -28,6 +28,7 @@ java_proto_library(
 java_library(
     name = "github_sync",
     srcs = [
+        "DiffConverter.java",
         "GithubClient.java",
         "GithubPatch.java",
         "GithubReader.java",
@@ -41,6 +42,7 @@ java_library(
         "//common",
         "//common/repo:repo_java_proto",
         "//common/repo:repo_proto",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/io/grpc:grpc_core",

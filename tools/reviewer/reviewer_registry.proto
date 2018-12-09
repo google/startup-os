@@ -17,6 +17,8 @@ message ReviewerRegistryConfig {
   string config_repo = 3;
   // URL of webapp
   string webapp_url = 4;
+  // URL of ReviewerConfig json with a binary proto
+  string config_url = 6;
   // Default port for local server
   int32 default_port = 5;
 }
