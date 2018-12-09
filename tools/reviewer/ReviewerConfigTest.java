@@ -59,7 +59,7 @@ public class ReviewerConfigTest {
   }
 
   @Test
-  public void TotalCrystalCorrectTest() throws IOException {
+  public void totalCrystalCorrectTest() throws IOException {
     ReviewerConfig config =
         (ReviewerConfig)
             fileUtils.readPrototxt("reviewer_config.prototxt", ReviewerConfig.newBuilder());
