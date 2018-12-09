@@ -1,7 +1,6 @@
 html,
 body {
   color: #2a2a2a;
-  height: 100%;
   margin: 0px;
   font-family: $default-font;
 
@@ -75,7 +74,9 @@ body {
   }
 
   .cr-header {
-    border: 1px solid $palette-2;
+    $border: 1px solid $palette-2;
+    border-top: $border;
+    border-bottom: $border;
   }
 
   .ellipsis {
@@ -83,4 +84,11 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+body {
+  position: absolute;
+  width: 100%;
+}
+html {
+  overflow-y: scroll;
 }

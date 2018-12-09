@@ -2,12 +2,9 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from '@/core';
+import { DiffModule, DiffsModule, FileChangesModule } from '@/dashboard';
 import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
-
-import { DiffModule } from './dashboard/diff/diff.module';
-import { DiffsModule } from './dashboard/diffs/diffs.module';
-import { FileChangesModule } from './dashboard/file-changes/file-changes.module';
 
 const routes: Routes = [
   { path: '', redirectTo: 'diffs', pathMatch: 'full' },

@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { UserService } from '@/core/services';
-import { CommitSelectService } from './commit-select';
 import {
   CommitService,
   ExtensionService,
@@ -10,6 +9,8 @@ import {
   StateService,
   ThreadService,
 } from './services';
+
+const headerTopStart: number = 98;
 
 // The component implements file-changes page.
 // Frame for code-changes.
@@ -22,10 +23,10 @@ import {
     ExtensionService,
     ThreadService,
     CommitService,
-    CommitSelectService,
   ],
 })
 export class FileChangesComponent implements OnInit, OnDestroy {
+  isHeaderFixed: boolean = false;
   constructor(
     private activatedRoute: ActivatedRoute,
     private router: Router,
@@ -33,18 +34,24 @@ export class FileChangesComponent implements OnInit, OnDestroy {
     private loadService: LoadService,
     private extensionService: ExtensionService,
     public commitService: CommitService,
-    public commitSelectService: CommitSelectService,
     public userService: UserService,
   ) {
     this.stateService.isLoading = true;
     this.stateService.isCommitFound = true;
+    document.body.style.width = 'auto';
+    document.body.style.minWidth = '100%';
+
+    document.onscroll = () => {
+      const scrollTop: number = document.documentElement.scrollTop || document.body.scrollTop;
+      this.isHeaderFixed = scrollTop >= headerTopStart;
+    };
   }
 
   ngOnInit() {
     this.parseUrlParam();
   }
 
-  // Get parameters from url
+  // Gets parameters from url
   parseUrlParam(): void {
     // '/diff/33/path/to/file.java?left=abc' -> [url, 33, 'path/to/file.java', param]
     const url: RegExpMatchArray = this.router.url.match(/\/diff\/([\d]+)\/([\w\d\.\/-]+)(\?.+?)?/);
@@ -71,6 +78,9 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     delete this.stateService.rightCommitId;
     delete this.stateService.leftCommitId;
+    document.body.style.width = '100%';
+    document.body.style.minWidth = 'auto';
+    document.onscroll = null;
     this.loadService.destroy();
   }
 }

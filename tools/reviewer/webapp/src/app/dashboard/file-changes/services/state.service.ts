@@ -24,6 +24,7 @@ export class StateService {
   isCommitFound: boolean;
   leftCommitId: string;
   rightCommitId: string;
+  // TODO: replace commit list to file list to be able to get "action" and other file fields
   commitIdList: string[] = [];
   onloadSubscription = new Subscription();
   changesSubscription = new Subscription();

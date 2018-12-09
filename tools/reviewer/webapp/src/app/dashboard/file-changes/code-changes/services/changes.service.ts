@@ -10,6 +10,7 @@ import {
   BlockIndex, BlockLine, ChangesLine,
 } from '../code-changes.interface';
 import { LineService } from './line.service';
+import { TemplateService } from './template.service';
 
 // Main service of code-changes
 @Injectable()
@@ -17,6 +18,7 @@ export class ChangesService {
   constructor(
     private highlightService: HighlightService,
     private lineService: LineService,
+    private templateService: TemplateService,
   ) { }
 
   // Convert string file content to highlighted code lines
@@ -42,10 +44,12 @@ export class ChangesService {
         throw new Error("Highlighted and clear lines don't match");
       }
 
-      blockLines.push(
+      blockLines.push(this.lineService.createBlockLine(
+        lineCode,
+        clearLineCode,
         // index + 1 because we want 1,2,3,4,5... instead of 0,1,2,3,4...
-        this.lineService.createBlockLine(lineCode, clearLineCode, index + 1),
-      );
+        index + 1,
+      ));
     });
 
     return blockLines;
@@ -112,9 +116,9 @@ export class ChangesService {
     rightBlockLines: BlockLine[],
     textDiff: TextDiff,
   ): {
-      changesLines: ChangesLine[];
-      changesLinesMap: { [id: number]: number }[];
-    } {
+    changesLines: ChangesLine[];
+    changesLinesMap: { [id: number]: number }[];
+  } {
     this.tempFixChangesLineNumber(textDiff.getLeftDiffLineList());
     this.tempFixChangesLineNumber(textDiff.getRightDiffLineList());
 
@@ -125,8 +129,11 @@ export class ChangesService {
     this.addPlaceholders(textDiff.getRightDiffLineList(), rightBlockLines);
 
     if (leftBlockLines.length !== rightBlockLines.length) {
-      // After adding all placeholders
-      throw new Error('Blocks should have the same amount of lines');
+      throw new Error(
+        `After adding all placeholders, blocks should have the same amount of lines.
+Left lines: ${leftBlockLines.length}
+Right lines: ${leftBlockLines.length}`,
+      );
     }
     const amountOfLines: number = leftBlockLines.length;
 
@@ -139,6 +146,8 @@ export class ChangesService {
         leftBlockLines[i],
         rightBlockLines[i],
       );
+      this.templateService.highlightChanges(leftBlockLines[i], BlockIndex.leftFile);
+      this.templateService.highlightChanges(rightBlockLines[i], BlockIndex.rightFile);
 
       // Add map marker to be able for fast access
       const codeIndex: number = changesLines.length;
