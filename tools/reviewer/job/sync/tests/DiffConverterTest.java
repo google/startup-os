@@ -47,6 +47,8 @@ public class DiffConverterTest {
           + " line-14\n"
           + "-line-15\n"
           + "+(CHANGED)line-15";
+  private static final String BASE_BRANCH_COMMIT_ID = "base_branch_commit_id";
+  private static final String FEATURE_BRANCH_COMMIT_ID = "feature_branch_commit_id";
 
   private DiffConverter diffConverter;
   private GitRepo gitRepo = mock(GitRepo.class);
@@ -55,6 +57,7 @@ public class DiffConverterTest {
   public void setUp() {
     diffConverter = new DiffConverter();
     when(gitRepo.getPatch(anyString(), anyString())).thenReturn(TEST_FILE_PATCH);
+    when(gitRepo.getTheLatestCommitIdOfBranch(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
   }
 
   @Test
@@ -69,13 +72,13 @@ public class DiffConverterTest {
             .addCodeThread(
                 Protos.Thread.newBuilder()
                     .setRepoId("test-repo")
-                    .setCommitId("feature_branch_commit_id")
+                    .setCommitId(FEATURE_BRANCH_COMMIT_ID)
                     .setFile(
                         com.google.startupos.common.repo.Protos.File.newBuilder()
                             .setFilename("test_file.txt")
                             .setWorkspace("ws1")
                             .setRepoId("test-repo")
-                            .setCommitId("feature_branch_commit_id")
+                            .setCommitId(FEATURE_BRANCH_COMMIT_ID)
                             .setFilenameWithRepo("test-repo/test_file.txt")
                             .build())
                     .setLineNumber(5)
@@ -107,7 +110,7 @@ public class DiffConverterTest {
                 GithubPullRequestProtos.ReviewComment.newBuilder()
                     .setPath("test_file.txt")
                     .setPosition(5)
-                    .setCommitId("feature_branch_commit_id")
+                    .setCommitId(FEATURE_BRANCH_COMMIT_ID)
                     .setUser(
                         GithubPullRequestProtos.User.newBuilder()
                             .setEmail("reviewer@test.com")
@@ -138,13 +141,13 @@ public class DiffConverterTest {
             .addCodeThread(
                 Protos.Thread.newBuilder()
                     .setRepoId("test-repo")
-                    .setCommitId("base_branch_commit_id")
+                    .setCommitId(BASE_BRANCH_COMMIT_ID)
                     .setFile(
                         com.google.startupos.common.repo.Protos.File.newBuilder()
                             .setFilename("test_file.txt")
                             .setWorkspace("ws1")
                             .setRepoId("test-repo")
-                            .setCommitId("base_branch_commit_id")
+                            .setCommitId(BASE_BRANCH_COMMIT_ID)
                             .setFilenameWithRepo("test-repo/test_file.txt")
                             .build())
                     .setLineNumber(14)
@@ -176,7 +179,7 @@ public class DiffConverterTest {
                 GithubPullRequestProtos.ReviewComment.newBuilder()
                     .setPath("test_file.txt")
                     .setPosition(12)
-                    .setCommitId("base_branch_commit_id")
+                    .setCommitId(BASE_BRANCH_COMMIT_ID)
                     .setUser(
                         GithubPullRequestProtos.User.newBuilder()
                             .setEmail("reviewer@test.com")
@@ -207,13 +210,13 @@ public class DiffConverterTest {
             .addCodeThread(
                 Protos.Thread.newBuilder()
                     .setRepoId("test-repo")
-                    .setCommitId("base_branch_commit_id")
+                    .setCommitId(BASE_BRANCH_COMMIT_ID)
                     .setFile(
                         com.google.startupos.common.repo.Protos.File.newBuilder()
                             .setFilename("test_file.txt")
                             .setWorkspace("ws1")
                             .setRepoId("test-repo")
-                            .setCommitId("base_branch_commit_id")
+                            .setCommitId(BASE_BRANCH_COMMIT_ID)
                             .setFilenameWithRepo("test-repo/test_file.txt")
                             .build())
                     .setLineNumber(1)
