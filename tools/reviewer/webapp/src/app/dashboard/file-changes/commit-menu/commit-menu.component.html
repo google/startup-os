@@ -1,0 +1,49 @@
+<div class="commit-menu">
+  <div
+    class="bridge"
+    [style.left.px]="bridge.x"
+    [style.width.px]="bridge.width"
+    *ngIf="leftDrag.isExist && rightDrag.isExist"
+  ></div>
+  <div class="popup-hover-zone"
+    (mouseenter)="showPopup()"
+    (mouseleave)="commitInfo.isVisible = false"
+  >
+    <div class="dots">
+      <div
+        class="dot"
+        [ngClass]="{
+          uncommited: !commitId,
+          selected: isDotSelected(commitIndex)
+        }"
+        *ngFor="let commitId of stateService.commitIdList; let commitIndex = index"
+        (mouseenter)="setPopupData(commitIndex)"
+        (mouseleave)="commitInfo.isInit = false"
+      ></div>
+    </div>
+    <drag-element
+      [isCircle]="true"
+      [style.left.px]="rightDrag.x"
+      (mousedown)="mousedown($event, rightDrag)"
+      (mouseenter)="setPopupData(rightDrag.index)"
+      (mouseleave)="commitInfo.isInit = false"
+      *ngIf="rightDrag.isExist"
+      [ngClass]="{ selected: rightDrag.isSelected }"
+    ></drag-element>
+    <drag-element
+      [isCircle]="leftDrag.index > 0 || leftDrag.isClicked"
+      [style.left.px]="leftDrag.x"
+      (mousedown)="mousedown($event, leftDrag)"
+      (mouseenter)="setPopupData(leftDrag.index)"
+      (mouseleave)="commitInfo.isInit = false"
+      *ngIf="leftDrag.isExist"
+      [ngClass]="{ selected: leftDrag.isSelected }"
+    ></drag-element>
+    <commit-popup
+      [style.left.px]="commitInfo.offset - 24"
+      [commitInfo]="commitInfo"
+      *ngIf="commitInfo.isVisible && !leftDrag.isClicked && !rightDrag.isClicked"
+    ></commit-popup>
+  </div>
+</div>
+

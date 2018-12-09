@@ -36,16 +36,16 @@ export class UserPopupComponent {
     this.close();
   }
 
-  close() {
+  close(): void {
     this.isHovered = false;
   }
 
-  changeAttention() {
+  changeAttention(): void {
     this.changeAttentionEmitter.emit(this.email);
     this.close();
   }
 
-  removeFromList() {
+  removeFromList(): void {
     this.removeFromListEmitter.emit(this.email);
     this.close();
   }
