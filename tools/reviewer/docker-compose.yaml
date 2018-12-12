@@ -37,3 +37,13 @@ services:
       - "--local_server_host=local_server_local"
     volumes:
       - "/home/oferb/devel/base:/base"
+
+  local_reviewer_job:
+    image: bazel/tools/reviewer/job:job
+    environment:
+      - "BUILD_WORKSPACE_DIRECTORY=/base"
+    command:
+      - "--service_account_json=/base/local/startupos-5f279-firebase-adminsdk-v8n9e-2418a5ae73.json"
+      - "--repo_url=https://github.com/google/startup-os"
+    volumes:
+      - "/home/oferb/devel/base:/base"

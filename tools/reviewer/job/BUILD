@@ -1,4 +1,7 @@
-java_binary(
+load("@io_bazel_rules_docker//java:image.bzl", "java_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_push")
+
+java_image(
     name = "job",
     srcs = [
         "ReviewerJob.java",
@@ -8,6 +11,7 @@ java_binary(
         "tasks/Task.java",
         "tasks/TaskExecutor.java",
     ],
+    base = "@alpine_java_git//image",
     main_class = "com.google.startupos.tools.reviewer.job.ReviewerJob",
     deps = [
         "//common",
@@ -23,4 +27,13 @@ java_binary(
         "//tools/reviewer:reviewer_java_proto",
         "//tools/reviewer:reviewer_registry_java_proto",
     ],
+)
+
+container_push(
+    name = "push_job",
+    format = "Docker",
+    image = ":job",
+    registry = "gcr.io",
+    repository = "startup-os/reviewer",
+    tag = "latest",
 )
