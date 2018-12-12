@@ -57,7 +57,7 @@ public class DiffConverterTest {
   public void setUp() {
     diffConverter = new DiffConverter();
     when(gitRepo.getPatch(anyString(), anyString())).thenReturn(TEST_FILE_PATCH);
-    when(gitRepo.getTheLatestCommitIdOfBranch(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
+    when(gitRepo.getMostRecentCommit(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
   }
 
   @Test

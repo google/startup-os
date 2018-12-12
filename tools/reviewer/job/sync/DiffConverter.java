@@ -58,7 +58,7 @@ public class DiffConverter {
               getReviewCommentsByRepoName(
                   diff.getCodeThreadList(),
                   githubPr.getRepo(),
-                  gitRepo.getTheLatestCommitIdOfBranch("master"),
+                  gitRepo.getMostRecentCommit("master"),
                   gitRepo))
           .addAllIssueComment(getIssueComments(diff.getDiffThreadList(), githubPr.getRepo()))
           .setOwner(githubPr.getOwner())

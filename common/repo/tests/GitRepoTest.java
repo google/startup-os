@@ -538,14 +538,14 @@ public class GitRepoTest {
   public void testGetTheLatestCommitIdOfBranchWhenMasterBranch() {
     String expectedCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
-    assertEquals(expectedCommitId, gitRepo.getTheLatestCommitIdOfBranch("master"));
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommit("master"));
   }
 
   @Test
   public void testGetTheLatestCommitIdOfBranchWhenFeatureBranch() {
     repo.switchBranch(TEST_BRANCH);
     String expectedCommitId = gitRepo.getHeadCommitId();
-    assertEquals(expectedCommitId, gitRepo.getTheLatestCommitIdOfBranch(TEST_BRANCH));
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommit(TEST_BRANCH));
   }
 }
 

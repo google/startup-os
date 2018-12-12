@@ -468,7 +468,7 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public String getTheLatestCommitIdOfBranch(String branch) {
+  public String getMostRecentCommit(String branch) {
     return runCommand("rev-parse " + branch).stdout.trim();
   }
 

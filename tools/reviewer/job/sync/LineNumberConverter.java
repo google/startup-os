@@ -169,9 +169,8 @@ public class LineNumberConverter {
           // It isn't possible to convert Reviewer's line number to GitHub patch(diff)'s position if
           // the patch doesn't contain this line.
         } else {
-          // XXX 1)How to continue the sync without exception.
-          // XXX 2) Think over what do with these comments. Maybe we can return the nearest existed
-          // position.
+          // TODO: Return the closest position (if that's possible), and add to the comment:
+          // "Synced from line X"
           throw new IllegalArgumentException(
               String.format(
                   "It isn't possible to convert Reviewer's line number to GitHub patch(diff)'s position."

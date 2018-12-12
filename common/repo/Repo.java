@@ -87,6 +87,6 @@ public interface Repo {
    */
   String getPatch(String referenceCommitOrBranch, String filename);
 
-  String getTheLatestCommitIdOfBranch(String branch);
+  String getMostRecentCommit(String branch);
 }
 
