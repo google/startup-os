@@ -31,13 +31,13 @@ export class AuthService {
     return userEmail.split('@')[0];
   }
 
-  loginWithGoogle() {
+  loginWithGoogle(): Promise<any> {
     return this.angularFireAuth.auth.signInWithPopup(
       new firebase.auth.GoogleAuthProvider(),
     );
   }
 
-  logout() {
+  logout(): Promise<any> {
     this.firebaseStateService.destroy();
     return this.angularFireAuth.auth.signOut();
   }

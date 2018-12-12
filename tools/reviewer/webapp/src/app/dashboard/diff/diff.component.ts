@@ -74,10 +74,7 @@ export class DiffComponent implements OnInit, OnDestroy {
     this.localserverService
       .getDiffFiles(this.diff.getId(), this.diff.getWorkspace())
       .subscribe(files => {
-        // Hide deleted files
-        this.files = files.filter(
-          file => file.getAction() !== File.Action.DELETE,
-        );
+        this.files = files;
         this.isLoading = false;
       });
   }

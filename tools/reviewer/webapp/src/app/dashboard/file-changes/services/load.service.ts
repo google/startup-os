@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 
 import { Diff, File } from '@/core/proto';
@@ -15,7 +14,6 @@ import { ThreadService } from './thread.service';
 @Injectable()
 export class LoadService {
   constructor(
-    private location: Location,
     private firebaseStateService: FirebaseStateService,
     private exceptionService: ExceptionService,
     private localserverService: LocalserverService,
@@ -113,20 +111,7 @@ export class LoadService {
   changeCommitId(): void {
     this.stateService.isLoading = true;
 
-    // Update url
-    const paramList: string[][] = [
-      ['left', this.stateService.leftCommitId],
-      ['right', this.stateService.rightCommitId],
-    ];
-    const queryParams: string = paramList
-      .map(commit => commit.join('='))
-      .join('&');
-    const currentState: string = [
-      'diff',
-      this.stateService.diffId,
-      this.stateService.file.getFilenameWithRepo(),
-    ].join('/');
-    this.location.replaceState(currentState, queryParams);
+    this.commitService.updateUrl();
 
     // Update changes
     this.destroy();

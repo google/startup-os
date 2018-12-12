@@ -10,6 +10,7 @@ export interface BlockLine {
   clearCode: string;
   // Code with highlighting
   code: string;
+  wordChanges: string;
   lineNumber: number;
   // Is the line a placeholder?
   isPlaceholder: boolean;
