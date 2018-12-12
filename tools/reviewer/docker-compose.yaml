@@ -1,0 +1,39 @@
+# Docker compose for Reviewer local server and jobs
+# TODO: Add jobs services
+#
+# docker-compose up - run all images
+# docker-compose up <image> - run <image>
+# docker-compose pull - refresh image cache. Fails if there are local images.
+
+version: "3"
+services:
+
+  helloserver:
+    image: gcr.io/startup-os/hello-server:latest
+    ports:
+      - "8000:8000"
+
+  hello_server_local:
+    image: bazel/examples/docker:hello_server
+    ports:
+      - "8000:8000"
+
+  local_server_local:
+    image: bazel/tools/reviewer/local_server:local_server
+    ports:
+      - "8001:8001"
+    environment:
+      - "BUILD_WORKSPACE_DIRECTORY=/base"
+    volumes:
+      - "/home/oferb/devel/base:/base"
+
+  local_http_gateway_local:
+    image: bazel/tools/reviewer/local_server:local_http_gateway
+    ports:
+      - "7000:7000"
+    environment:
+      - "BUILD_WORKSPACE_DIRECTORY=/base"
+    command:
+      - "--local_server_host=local_server_local"
+    volumes:
+      - "/home/oferb/devel/base:/base"

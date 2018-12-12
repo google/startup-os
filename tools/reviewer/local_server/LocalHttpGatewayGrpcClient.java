@@ -21,6 +21,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import java.util.concurrent.TimeUnit;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
 import com.google.startupos.tools.localserver.service.AuthServiceGrpc;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
@@ -33,7 +35,7 @@ public class LocalHttpGatewayGrpcClient {
   private final CodeReviewServiceGrpc.CodeReviewServiceBlockingStub codeReviewBlockingStub;
 
   public LocalHttpGatewayGrpcClient(String host, int port) {
-    this(ManagedChannelBuilder.forAddress(host, port).usePlaintext(true).build());
+    this(ManagedChannelBuilder.forAddress(resolveHost(host), port).usePlaintext(true).build());
   }
 
   public LocalHttpGatewayGrpcClient(String inProcessServerName) {
@@ -44,6 +46,14 @@ public class LocalHttpGatewayGrpcClient {
     this.channel = channel;
     authBlockingStub = AuthServiceGrpc.newBlockingStub(channel);
     codeReviewBlockingStub = CodeReviewServiceGrpc.newBlockingStub(channel);
+  }
+
+  private static String resolveHost(String host) {
+    try {
+      return InetAddress.getByName(host).getHostAddress();
+    } catch (UnknownHostException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   public void shutdown() throws InterruptedException {
