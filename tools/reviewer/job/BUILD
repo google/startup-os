@@ -3,7 +3,6 @@ load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 
 java_image(
     name = "job",
-    base = "@alpine_java_git//image",
     srcs = [
         "ReviewerJob.java",
         "impl/CiTask.java",
@@ -12,6 +11,7 @@ java_image(
         "tasks/Task.java",
         "tasks/TaskExecutor.java",
     ],
+    base = "@alpine_java_git//image",
     main_class = "com.google.startupos.tools.reviewer.job.ReviewerJob",
     deps = [
         "//common",
