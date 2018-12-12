@@ -17,35 +17,26 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.common.collect.ImmutableList;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
+import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitInfo;
 import com.google.startupos.tools.reviewer.localserver.service.Protos;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
 
-import java.io.IOException;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 // Converts a Diff proto to a list of GithubPullRequestProtos.PullRequest protos
 public class DiffConverter {
 
-  private GithubClient githubClient;
-
-  public DiffConverter(GithubClient githubClient) {
-    this.githubClient = githubClient;
-  }
-
-  public List<PullRequest> toPullRequests(Diff diff) {
-    List<PullRequest> pullRequests = new ArrayList<>();
+  public ImmutableList<PullRequest> toPullRequests(Diff diff, GitRepo gitRepo) {
+    ImmutableList.Builder<PullRequest> pullRequests = ImmutableList.builder();
 
     for (GithubPr githubPr : diff.getGithubPrList()) {
       PullRequest.Builder pullRequest = PullRequest.newBuilder();
@@ -64,30 +55,39 @@ public class DiffConverter {
           .setHeadBranchName("D" + diff.getId())
           .setRepo(githubPr.getRepo())
           .addAllReviewComment(
-              getReviewCommentsByRepoName(diff, githubPr.getOwner(), githubPr.getRepo()))
-          .addAllIssueComment(getIssueComments(diff, githubPr))
+              getReviewCommentsByRepoName(
+                  diff.getCodeThreadList(),
+                  githubPr.getRepo(),
+                  gitRepo.getMostRecentCommit("master"),
+                  gitRepo))
+          .addAllIssueComment(getIssueComments(diff.getDiffThreadList(), githubPr.getRepo()))
           .setOwner(githubPr.getOwner())
           .setAssociatedReviewerDiff(diff.getId());
       pullRequests.add(pullRequest.build());
     }
-    return pullRequests;
+    return pullRequests.build();
   }
 
   private ImmutableList<ReviewComment> getReviewCommentsByRepoName(
-      Diff diff, String repoOwner, String repoName) {
-    List<ReviewComment> result = new ArrayList<>();
-    List<Thread> codeThreads =
-        diff.getCodeThreadList()
-            .stream()
-            .filter(thread -> thread.getRepoId().equals(repoName))
-            .collect(Collectors.toList());
+      List<Thread> codeThreads, String repoName, String baseBranchCommitId, GitRepo gitRepo) {
+    ImmutableList.Builder<ReviewComment> result = ImmutableList.builder();
+    ImmutableList<Thread> codeThreadsByRepo =
+        ImmutableList.copyOf(
+            codeThreads
+                .stream()
+                .filter(thread -> thread.getRepoId().equals(repoName))
+                .collect(Collectors.toList()));
 
-    for (Thread thread : codeThreads) {
+    for (Thread thread : codeThreadsByRepo) {
       for (Comment comment : thread.getCommentList()) {
         int githubCommentPosition;
         // `0` value means the comment isn't synced with GitHub
         if (thread.getGithubCommentPosition() == 0) {
-          githubCommentPosition = getReviewCommentPositionFromGitHub(thread, repoOwner, repoName);
+          githubCommentPosition =
+              getReviewCommentPositionFromGitHub(
+                  baseBranchCommitId,
+                  thread,
+                  gitRepo.getPatch(baseBranchCommitId, thread.getFile().getFilename()));
         } else {
           githubCommentPosition = thread.getGithubCommentPosition();
         }
@@ -106,7 +106,7 @@ public class DiffConverter {
         result.add(githubComment.build());
       }
     }
-    return ImmutableList.copyOf(result);
+    return result.build();
   }
 
   private String getPullRequestState(Diff.Status status) {
@@ -117,55 +117,29 @@ public class DiffConverter {
     }
   }
 
-  private int getReviewCommentPositionFromGitHub(Thread thread, String repoOwner, String repoName) {
+  private int getReviewCommentPositionFromGitHub(
+      String baseBranchCommitId, Thread thread, String patch) {
     LineNumberConverter.Side commentSide =
-        thread.getFile().getCommitId().equals(thread.getCommitId())
-            ? LineNumberConverter.Side.RIGHT
-            : LineNumberConverter.Side.LEFT;
-
-    // TODO: Implement getting `patches` using local Git
-    List<String> githubFilePatches = new ArrayList<>();
-    try {
-      githubFilePatches =
-          githubClient
-              .getCommit(
-                  CommitRequest.newBuilder()
-                      .setOwner(repoOwner)
-                      .setRepo(repoName)
-                      .setSha(thread.getFile().getCommitId())
-                      .build())
-              .getCommit()
-              .getFilesList()
-              .stream()
-              .filter(githubFile -> thread.getFile().getFilename().equals(githubFile.getFilename()))
-              .map(CommitInfo.File::getPatch)
-              .collect(Collectors.toList());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    if (githubFilePatches.size() != 1) {
-      throw new RuntimeException(
-          "Expecting only 1 patch in response for file: " + thread.getFile().getFilename());
-    }
-    String patch = githubFilePatches.get(0);
+        baseBranchCommitId.equals(thread.getCommitId())
+            ? LineNumberConverter.Side.LEFT
+            : LineNumberConverter.Side.RIGHT;
 
     if (patch.equals("")) {
       throw new RuntimeException("Patch is empty for file: " + thread.getFile().getFilename());
     }
-
     // TODO: Store the result in the Diff.Thread in Firestore
     return LineNumberConverter.getPosition(patch, thread.getLineNumber(), commentSide);
   }
 
-  private ImmutableList<IssueComment> getIssueComments(Diff diff, GithubPr githubPr) {
-    List<IssueComment> result = new ArrayList<>();
-    List<Thread> diffThreads =
-        diff.getDiffThreadList()
-            .stream()
-            .filter(thread -> thread.getRepoId().equals(githubPr.getRepo()))
-            .collect(Collectors.toList());
-    for (Protos.Thread thread : diffThreads) {
+  private ImmutableList<IssueComment> getIssueComments(List<Thread> diffThreads, String repoName) {
+    ImmutableList.Builder<IssueComment> result = ImmutableList.builder();
+    ImmutableList<Thread> diffThreadsByRepo =
+        ImmutableList.copyOf(
+            diffThreads
+                .stream()
+                .filter(thread -> thread.getRepoId().equals(repoName))
+                .collect(Collectors.toList()));
+    for (Protos.Thread thread : diffThreadsByRepo) {
       thread
           .getCommentList()
           .forEach(
@@ -181,7 +155,7 @@ public class DiffConverter {
                                   .build())
                           .build()));
     }
-    return ImmutableList.copyOf(result);
+    return result.build();
   }
 }
 

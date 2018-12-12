@@ -164,7 +164,20 @@ public class LineNumberConverter {
       }
     } else {
       if (side.equals(Side.LEFT)) {
-        return lineNumberToPositionLeftSide.get(number);
+        if (lineNumberToPositionLeftSide.containsKey(number)) {
+          return lineNumberToPositionLeftSide.get(number);
+          // It isn't possible to convert Reviewer's line number to GitHub patch(diff)'s position if
+          // the patch doesn't contain this line.
+        } else {
+          // TODO: Return the closest position (if that's possible), and add to the comment:
+          // "Synced from line X"
+          throw new IllegalArgumentException(
+              String.format(
+                  "It isn't possible to convert Reviewer's line number to GitHub patch(diff)'s position."
+                      + "\nLine number: %d"
+                      + "\nGit patch: %s",
+                  number, patch));
+        }
       } else {
         return lineNumberToPositionRightSide.get(number);
       }
