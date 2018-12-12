@@ -19,6 +19,7 @@ message CIRequest {
     string commitId = 2;
   }
   repeated Target target = 1;
+  bool forSubmission = 2;
 }
 
 message CIResponse {
@@ -29,6 +30,7 @@ message CIResponse {
     string log = 3;
   }
   repeated TargetResult results = 2;
+  bool forSubmission = 3;
 }
 
 /* Config for a Reviewer instance, stored in config_repo in

@@ -15,6 +15,7 @@ java_library(
     srcs = [
         "FirestoreClient.java",
         "FirestoreJsonFormat.java",
+        "MessageWithId.java",
     ],
     deps = [
         ":data_java_proto",
@@ -26,5 +27,6 @@ java_library(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/com/google/auto/value:auto_value",
     ],
 )
