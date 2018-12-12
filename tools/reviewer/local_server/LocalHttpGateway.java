@@ -63,19 +63,23 @@ public class LocalHttpGateway {
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
   public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
 
+  @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
+  public static final Flag<String> localServerHost = Flag.create("localhost");
+
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
   public static final Flag<Integer> localServerPort = Flag.create(8001);
 
-  private LocalHttpGateway(int httpGatewayPort, int localServerPort) throws Exception {
+  private LocalHttpGateway(int httpGatewayPort, String localServerHost, int localServerPort)
+      throws Exception {
     logger
         .atInfo()
         .log(
             String.format(
-                "Starting gateway at port %d (local server at port %d)",
-                httpGatewayPort, localServerPort));
+                "Starting gateway at port %d (local server at %s:%d)",
+                httpGatewayPort, localServerHost, localServerPort));
     httpServer = HttpServer.create(new InetSocketAddress(httpGatewayPort), 0);
     LocalHttpGatewayGrpcClient client =
-        new LocalHttpGatewayGrpcClient("localhost", localServerPort);
+        new LocalHttpGatewayGrpcClient(localServerHost, localServerPort);
 
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
     httpServer.createContext(GET_FILE_PATH, new GetFileHandler(client));
@@ -277,7 +281,8 @@ public class LocalHttpGateway {
   public static void main(String[] args) throws Exception {
     Flags.parseCurrentPackage(args);
     checkFlags();
-    new LocalHttpGateway(httpGatewayPort.get(), localServerPort.get()).serve();
+    new LocalHttpGateway(httpGatewayPort.get(), localServerHost.get(), localServerPort.get())
+        .serve();
   }
 }
 
