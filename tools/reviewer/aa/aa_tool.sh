@@ -158,7 +158,7 @@ function aa {
       AA_RESULT_CODE=$?
       $AA_RESULT
   elif [ "$1" = "killserver" ]; then
-      stop_local_server
+      stop_server
   else
       # if command is not workspace, let `aa` execute as is
       eval $AA_BINARY $*
