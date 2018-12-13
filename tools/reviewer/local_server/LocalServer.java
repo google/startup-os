@@ -39,9 +39,9 @@ import java.util.TimerTask;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
- */
-
-/* To run: bazel build //tools/reviewer/local_server:local_server
+ *
+ * To run:
+ * bazel build //tools/reviewer/local_server:local_server
  * bazel-bin/tools/reviewer/local_server/local_server
  */
 @Singleton
@@ -53,6 +53,12 @@ public class LocalServer {
 
   @FlagDesc(name = "pull_frequency", description = "Frequency of pulling head (in seconds)")
   private static final Flag<Integer> pullFrequency = Flag.create(60);
+
+  @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
+  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
+
+  @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
+  public static final Flag<String> localServerHost = Flag.create("localhost");
 
   private final Server server;
 
@@ -135,12 +141,23 @@ public class LocalServer {
     HeadUpdater getHeadUpdater();
   }
 
-  public static void main(String[] args) throws IOException, InterruptedException {
+  public static void checkFlags() {
+    if (httpGatewayPort.get().equals(localServerPort.get())) {
+      System.out.println(
+          "Error: HttpGatewayServer and LocalServer ports are the same: " + localServerPort.get());
+      System.exit(1);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
     Flags.parse(args, LocalServer.class.getPackage(), CodeReviewService.class.getPackage());
+    checkFlags();
     LocalServerComponent component = DaggerLocalServer_LocalServerComponent.builder().build();
     LocalServer server = component.getLocalServer();
     new Timer().scheduleAtFixedRate(component.getHeadUpdater(), 0, pullFrequency.get() * 1000L);
     server.start();
+    new LocalHttpGateway(httpGatewayPort.get(), localServerHost.get(), localServerPort.get())
+        .serve();
     server.blockUntilShutdown();
   }
 }

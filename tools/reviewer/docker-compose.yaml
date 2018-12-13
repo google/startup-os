@@ -21,20 +21,9 @@ services:
   local_server_local:
     image: bazel/tools/reviewer/local_server:local_server
     ports:
-      - "8001:8001"
-    environment:
-      - "BUILD_WORKSPACE_DIRECTORY=/base"
-    volumes:
-      - "/home/oferb/devel/base:/base"
-
-  local_http_gateway_local:
-    image: bazel/tools/reviewer/local_server:local_http_gateway
-    ports:
       - "7000:7000"
     environment:
       - "BUILD_WORKSPACE_DIRECTORY=/base"
-    command:
-      - "--local_server_host=local_server_local"
     volumes:
       - "/home/oferb/devel/base:/base"
 
