@@ -26,7 +26,7 @@ function _aa_completions()
     cur_word="${COMP_WORDS[COMP_CWORD]}"
     prev_word="${COMP_WORDS[COMP_CWORD-1]}"
 
-    commands="init workspace diff fix sync snapshot add_repo killserver"
+    commands="init workspace diff review fix sync snapshot add_repo killserver"
     init_options="--base_path --startupos_repo --user"
     add_repo_options="--url --name"
     diff_options="--reviewers --description --buglink"
@@ -79,68 +79,38 @@ function find_base_folder {
   return 0
 }
 
-function stop_local_server {
-    find_base_folder
-    if [[ -z "$AA_BASE" ]]; then
-      echo "BASE file not found in path until root"
-      return 1
-    fi
-
-    export STARTUP_OS=$AA_BASE/head/startup-os
-    bash $AA_BASE/head/startup-os/tools/reviewer/local_server/local_server.sh stop
+function stop_server {
+  # kill local server (port 8001)
+  # -t makes `lsof` output only PIDs so output can be piped to `kill`
+  # -n and -P prevent `lsof` from resolving addresses and ports, therefore
+  # making execution faster
+  # We filter for processes that listen on port in order to kill only
+  # servers (i.e. Angular) instead of clients (i.e. Chrome)
+  kill $(lsof -tnP -i:8001 -sTCP:LISTEN)
 }
 
 function start_local_server {
-    # starts local_server if it is not running yet
-    # server is started by tools/reviewer/local_server/local_server.sh start
-    # to check whether it is running already we try
-    # to communicate with it by gRPC via polyglot
-    # for additional output, set LOCAL_SERVER_POLYGLOT_DEBUG env variable
-
+    # Starts local_server if it is not running yet.
+    # To check whether it is running already we try to access the /health endpoint.
     find_base_folder
     if [[ -z "$AA_BASE" ]]; then
       echo "BASE file not found in path until root"
       return 1
     fi
-
     export STARTUP_OS=$AA_BASE/head/startup-os
-
-    # store stderr to debug
-    POLYGLOT_STDERR_DEBUG_FILE=$AA_BASE/logs/polyglot_stderr.log
     SERVER_LOG_FILE=$AA_BASE/logs/server.log
-    # call `ping` method via gRPC and store result (ignored for now)
-    pushd $STARTUP_OS >/dev/null
-    OUTPUT=$(echo {} | bazel run //tools:grpc_polyglot -- \
-      --command=call \
-      --endpoint=localhost:8001 \
-      --full_method=com.google.startupos.tools.reviewer.localserver.service.CodeReviewService/ping \
-      2>$POLYGLOT_STDERR_DEBUG_FILE)
-    POLYGLOT_EXIT_CODE=$?
-    popd >/dev/null
-
-    # if polyglot cannot reach gRPC server it exits with nonzero code
-    # then we need to run server
-    if [ $POLYGLOT_EXIT_CODE -ne 0 ]; then
-        if [ ! -z "$LOCAL_SERVER_POLYGLOT_DEBUG" ]; then
-          echo "$RED[DEBUG]: Polyglot exit code was $POLYGLOT_EXIT_CODE$RESET"
-          echo "$RED[DEBUG]: Polyglot output was $RESET$OUTPUT"
-          echo "$RED[DEBUG]: Polyglot stderr is stored at $RESET$POLYGLOT_STDERR_DEBUG_FILE"
-        fi
-        echo "$GREEN""Local server did not respond, starting it...$RESET"
-        echo "$GREEN""Server PID is:$RESET" # will be printed by bash
-        # nohup detaches the command from terminal it was executed on
-        echo "$GREEN""Server log is $SERVER_LOG_FILE"
-        nohup bash $AA_BASE/head/startup-os/tools/reviewer/local_server/local_server.sh start </dev/null >$SERVER_LOG_FILE 2>&1 &
-        echo "$RED""Visit$RESET http://localhost:8000$RED to log in$RESET"
-        return 1
-    else
-       # polyglot reached gRPC server so it is running already
-       if [ ! -z "$LOCAL_SERVER_POLYGLOT_DEBUG" ]; then
-          echo "$GREEN[DEBUG]: Server is already running, nothing to do$RESET"
-          echo "$RED[DEBUG]: Polyglot exit code was $POLYGLOT_EXIT_CODE$RESET"
-          echo "$RED[DEBUG]: Polyglot output was $RESET$OUTPUT"
-          echo "$RED[DEBUG]: Polyglot stderr is stored at $RESET$POLYGLOT_STDERR_DEBUG_FILE"
-       fi
+    response=$(curl --silent localhost:7000/health)
+    if [ "$response" != "OK" ]; then
+      echo "$GREEN""Local server did not respond, starting it...$RESET"
+      bazel build //tools/reviewer/local_server:local_server
+      if [ $? -ne 0 ]; then
+        exit $?
+      fi
+      # nohup detaches the command from terminal it was executed on
+      nohup bazel-bin/tools/reviewer/local_server/local_server </dev/null >$SERVER_LOG_FILE 2>&1 &
+      # TODO: Print this only if token is not available.
+      echo "$RED""Visit$RESET https://web-login-startupos.firebaseapp.com$RED to log in$RESET"
+      return 1
     fi
 }
 
@@ -188,7 +158,7 @@ function aa {
       AA_RESULT_CODE=$?
       $AA_RESULT
   elif [ "$1" = "killserver" ]; then
-      stop_local_server
+      stop_server
   else
       # if command is not workspace, let `aa` execute as is
       eval $AA_BINARY $*
