@@ -31,10 +31,17 @@ function _aa_completions()
     add_repo_options="--url --name"
     diff_options="--reviewers --description --buglink"
 
+    bazel build //tools/reviewer/aa:aa_script_helper &> /dev/null
+    COMMAND="bazel-bin/tools/reviewer/aa/aa_script_helper completions \"${prev_word}\" \"${cur_word}\""
+    RESULT=$(eval $COMMAND)
+    echo "COMMAND: " $COMMAND
+    echo "RESULT: " $RESULT
+    echo "COMPGEN_RESULT: " $($RESULT)
     if [ "$prev_word" = "aa" ] ; then
         # completing command name
         unset command
-        COMPREPLY=( $(compgen -W "${commands}" -- ${cur_word}) )
+        #COMPREPLY=( $(compgen -W "${commands}" -- "${cur_word}") )
+        COMPREPLY=( $($RESULT) )
     elif [ "$prev_word" = "workspace" ] || [ "$prev_word" = "aaw" ] ; then
         # completing names of workspaces
         find_base_folder
