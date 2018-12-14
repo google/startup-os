@@ -5,6 +5,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core';
+import { FirebaseModule } from './import';
 import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
 import { SharedModule } from './shared';
@@ -21,6 +22,7 @@ import { SharedModule } from './shared';
     AppRoutingModule,
     CoreModule,
     SharedModule,
+    FirebaseModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

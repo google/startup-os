@@ -36,3 +36,6 @@ import { DiffComponent } from './diff.component';
   ],
 })
 export class DiffModule { }
+export function DiffModuleFactory() {
+  return DiffModule;
+}
