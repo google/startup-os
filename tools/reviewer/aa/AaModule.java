@@ -84,6 +84,12 @@ public class AaModule {
     return fileUtils.joinToAbsolutePath(basePath, "head");
   }
 
+  @Provides
+  @Named("Server log path")
+  public static String getServerLogPath(FileUtils fileUtils, @Named("Base path") String basePath) {
+    return fileUtils.joinToAbsolutePath(basePath, "logs", "server.log");
+  }
+
   /**
    * Parse string representing a positive integer or minus one
    *

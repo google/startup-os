@@ -31,20 +31,31 @@ function _aa_completions()
     add_repo_options="--url --name"
     diff_options="--reviewers --description --buglink"
 
+    # TODO:
+    # 1. Add function set_BAZEL_WORKSPACE(), to set variable to either head or debug ws.
+    # 2. Add function bazel_run(force_build) to run a bazel command:
+    #    1. cd into workspace
+    #    2. Check if file exists
+    #    3. If not (or if force_build), bazel build it
+    #    4. Exit if build fails
+    #    5. Run command
+    # 3. Replace most of the code in _aa_completions() with aa_script_helper's functionality
     bazel build //tools/reviewer/aa:aa_script_helper &> /dev/null
     COMMAND="bazel-bin/tools/reviewer/aa/aa_script_helper completions \"${prev_word}\" \"${cur_word}\""
     RESULT=$(eval $COMMAND)
-    echo "COMMAND: " $COMMAND
-    echo "RESULT: " $RESULT
-    echo "COMPGEN_RESULT: " $($RESULT)
+    ORIG="compgen -W "${commands}" -- "${cur_word}""
+    # echo "ORIG: " $ORIG
+    # echo "COMMAND: " $COMMAND
+    # echo "RESULT: " $RESULT
+    # echo "COMPGEN_RESULT: " $($RESULT)
     if [ "$prev_word" = "aa" ] ; then
         # completing command name
         unset command
-        #COMPREPLY=( $(compgen -W "${commands}" -- "${cur_word}") )
-        COMPREPLY=( $($RESULT) )
+        COMPREPLY=( $(compgen -W "${commands}" -- "${cur_word}") )
+        #COMPREPLY=( $($RESULT) )
     elif [ "$prev_word" = "workspace" ] || [ "$prev_word" = "aaw" ] ; then
         # completing names of workspaces
-        find_base_folder
+        set_AA_BASE
         workspaces=$(ls -1 $AA_BASE/ws/)
         COMPREPLY=( $(compgen -W "${workspaces}" -- "${cur_word}") )
     elif echo $commands | grep --quiet -- "$prev_word"; then
@@ -71,7 +82,7 @@ function _aa_completions()
 }
 
 # Find base folder based on existence of BASE file, and put it in AA_BASE
-function find_base_folder {
+function set_AA_BASE {
   CWD=`pwd`
   while [[ `pwd` != / ]]; do
     if [ -f `pwd`/BASE ]; then
@@ -86,57 +97,17 @@ function find_base_folder {
   return 0
 }
 
-function stop_server {
-  # kill local server (port 8001)
-  # -t makes `lsof` output only PIDs so output can be piped to `kill`
-  # -n and -P prevent `lsof` from resolving addresses and ports, therefore
-  # making execution faster
-  # We filter for processes that listen on port in order to kill only
-  # servers (i.e. Angular) instead of clients (i.e. Chrome)
-  kill $(lsof -tnP -i:8001 -sTCP:LISTEN)
-}
-
-function start_local_server {
-    # Starts local_server if it is not running yet.
-    # To check whether it is running already we try to access the /health endpoint.
-    find_base_folder
-    if [[ -z "$AA_BASE" ]]; then
-      echo "BASE file not found in path until root"
-      return 1
-    fi
-    export STARTUP_OS=$AA_BASE/head/startup-os
-    SERVER_LOG_FILE=$AA_BASE/logs/server.log
-    response=$(curl --silent localhost:7000/health)
-    if [ "$response" != "OK" ]; then
-      echo "$GREEN""Local server did not respond, starting it...$RESET"
-      bazel build //tools/reviewer/local_server:local_server
-      if [ $? -ne 0 ]; then
-        exit $?
-      fi
-      # nohup detaches the command from terminal it was executed on
-      nohup bazel-bin/tools/reviewer/local_server/local_server </dev/null >$SERVER_LOG_FILE 2>&1 &
-      # TODO: Print this only if token is not available.
-      echo "$RED""Visit$RESET https://web-login-startupos.firebaseapp.com$RED to log in$RESET"
-      return 1
-    fi
-}
-
 function aa {
   CWD=`pwd`
-  find_base_folder
+  set_AA_BASE
   if [[ -z "$AA_BASE" ]]; then
     echo "BASE file not found in path until root"
     return 1
   fi
-
-  start_local_server
-  if [ ! $? -eq 0 ]; then
-    echo "$GREEN""Please execute the same command (shorthand: $RESET!!$GREEN) after server starts$RESET";
-    return 1
-  fi
-
+  bazel run //tools/reviewer/aa:aa_script_helper -- start_server /home/oferb/devel/base/ws/simplify_aa/startup-os
   STARTUP_OS=$AA_BASE/head/startup-os
 
+  # TODO: Replace most code here with bazel_run() in TODO above.
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
   if [ ! -z "$AA_FORCE_COMPILE_WS" ]; then
     echo "$RED[DEBUG]: building aa from ws $AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/$RESET"
@@ -158,16 +129,15 @@ function aa {
     AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
     cd $CWD
   fi
+
   if [ "$1" = "workspace" ]; then
       # For workspace command, instead of letting `aa` print to stdout
       # we need to capture its output and execute it as command
       AA_RESULT=$(eval $AA_BINARY $*)
       AA_RESULT_CODE=$?
       $AA_RESULT
-  elif [ "$1" = "killserver" ]; then
-      stop_server
   else
-      # if command is not workspace, let `aa` execute as is
+      # If command is not workspace, let `aa` execute as is
       eval $AA_BINARY $*
       AA_RESULT_CODE=$?
   fi
@@ -187,7 +157,7 @@ function aaw(){
   fi
 }
 
-# make aa available as command
+# Make aa available as command
 export -f aa
 export -f aaw
 complete -F _aa_completions aa

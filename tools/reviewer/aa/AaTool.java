@@ -28,6 +28,7 @@ import com.google.startupos.tools.reviewer.aa.commands.SnapshotCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SubmitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SyncCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
+import com.google.startupos.tools.reviewer.aa.commands.KillServerCommand;
 import dagger.Component;
 import dagger.Lazy;
 import java.util.HashMap;
@@ -51,7 +52,8 @@ public class AaTool {
       Lazy<SnapshotCommand> snapshotCommand,
       Lazy<SubmitCommand> submitCommand,
       Lazy<AddRepoCommand> addRepoCommand,
-      Lazy<PatchCommand> patchCommand) {
+      Lazy<PatchCommand> patchCommand,
+      Lazy<KillServerCommand> killServerCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
@@ -62,8 +64,7 @@ public class AaTool {
     commands.put("submit", submitCommand);
     commands.put("add_repo", addRepoCommand);
     commands.put("patch", patchCommand);
-    // killserver is implemented in aa_tool.sh
-    commands.put("killserver", null);
+    commands.put("killserver", killServerCommand);
   }
 
   private void printUsage() {

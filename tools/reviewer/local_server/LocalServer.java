@@ -17,6 +17,7 @@
 package com.google.startupos.tools.localserver;
 
 import com.google.common.flogger.FluentLogger;
+import com.google.common.flogger.LoggerConfig;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
@@ -36,6 +37,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.PrintStream;
+import java.io.FileNotFoundException;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
@@ -59,6 +62,9 @@ public class LocalServer {
 
   @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
   public static final Flag<String> localServerHost = Flag.create("localhost");
+
+  @FlagDesc(name = "log_to_file", description = "Log stdout and stderr to log file")
+  public static final Flag<Boolean> logToFile = Flag.create(true);
 
   private final Server server;
 
@@ -98,7 +104,20 @@ public class LocalServer {
   }
 
   @Inject
-  LocalServer(AuthService authService, CodeReviewService codeReviewService) {
+  LocalServer(
+      @Named("Server log path") String logPath,
+      AuthService authService,
+      CodeReviewService codeReviewService) {
+    if (logToFile.get()) {
+      // TODO: Figure out how to also direct Flogger to log file.
+      try {
+        PrintStream logStream = new PrintStream(logPath);
+        System.setOut(logStream);
+        System.setErr(logStream);
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
     server =
         ServerBuilder.forPort(localServerPort.get())
             .addService(authService)
