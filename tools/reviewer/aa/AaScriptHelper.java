@@ -18,38 +18,38 @@ package com.google.startupos.tools.reviewer.aa;
 
 import com.google.startupos.common.CommonModule;
 import dagger.Component;
-import dagger.Lazy;
-import java.util.HashMap;
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.inject.Named;
 import java.io.IOException;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.HttpUtils;
+import com.google.common.collect.ImmutableList;
+import java.util.stream.Collectors;
+
 import java.io.File;
 
 /** Tool with some helpful functions for aa script (aa_tool.sh) */
 @Singleton
 public class AaScriptHelper {
-  private FileUtils fileUtils;
-  private HttpUtils httpUtils;
-  private AaTool aaTool;
-  private String basePath;
-  private String headPath;
+  private final FileUtils fileUtils;
+  private final HttpUtils httpUtils;
+  private final AaTool aaTool;
+  private final String headPath;
+  private final String workspacesPath;
 
   @Inject
   AaScriptHelper(
       FileUtils fileUtils,
       HttpUtils httpUtils,
       AaTool aaTool,
-      @Named("Base path") String basePath,
-      @Named("Head path") String headPath) {
+      @Named("Head path") String headPath,
+      @Named("Workspaces path") String workspacesPath) {
     this.fileUtils = fileUtils;
     this.httpUtils = httpUtils;
     this.aaTool = aaTool;
-    this.basePath = basePath;
     this.headPath = headPath;
+    this.workspacesPath = workspacesPath;
   }
 
   @Singleton
@@ -58,25 +58,38 @@ public class AaScriptHelper {
     AaScriptHelper getAaScriptHelper();
   }
 
-  private String getBashCompletions(String previousWord, String currentWord) {
-    String commands = "init workspace diff fix sync snapshot add_repo killserver";
-    String init_options = "--base_path --startupos_repo --user";
-    String add_repo_options = "--url --name";
-    String diff_options = "--reviewers --description --buglink";
-    String command = null;
+  private String getMatches(ImmutableList<String> words, String word) {
+    return words
+        .stream()
+        .filter(x -> x.startsWith(word))
+        .sorted()
+        .collect(Collectors.joining("\n"));
+  }
+
+  private String getBashCompletions(String previousWord, String currentWord) throws IOException {
+    ImmutableList<String> commands = aaTool.getCommands();
+    // TODO: Get flags from commands. Perhaps AaTool can provide a get method for it.
+    ImmutableList<String> init_options =
+        ImmutableList.of("--base_path", "--startupos_repo", "--user");
+    ImmutableList<String> add_repo_options = ImmutableList.of("--url", "--name");
+    ImmutableList<String> diff_options =
+        ImmutableList.of("--reviewers", "--description", "--buglink");
 
     if (previousWord.equals("aa")) {
-      return String.format("compgen -W \"%s\" -- \"%s\"", commands, currentWord);
+      return getMatches(commands, currentWord);
     } else if (previousWord.equals("workspace") || previousWord.equals("aaw")) {
-      // XXX get real workspaces
-      String workspaces = "aaa bbb ccc";
-      return String.format("compgen -W \"%s\" -- %s", workspaces, currentWord);
-    } else if (commands.contains(previousWord)) { // XXX match whole word only
-      command = previousWord;
-    } else {
-      return "";
+      return getMatches(fileUtils.listSubfolders(workspacesPath), currentWord);
+    } else if (commands.contains(previousWord)) {
+      // Complete flags
+      switch (previousWord) {
+        case "init":
+          return getMatches(init_options, currentWord);
+        case "add_repo":
+          return getMatches(add_repo_options, currentWord);
+        case "diff":
+          return getMatches(diff_options, currentWord);
+      }
     }
-    // XXX Replace with bash code:
     return "";
   }
 
@@ -106,7 +119,7 @@ public class AaScriptHelper {
   }
 
   // bazelWorkspacePath is base/head/startup-os or base/ws/<some workspace>/startup-os
-  private boolean checkServer() throws IOException {
+  private boolean checkServer() {
     try {
       return "OK".equals(httpUtils.get("http://localhost:7000/health"));
     } catch (Exception e) {
@@ -124,20 +137,25 @@ public class AaScriptHelper {
     try {
       check(args.length > 0, "Please specify command");
       String command = args[0];
-      if (command.equals("completions")) {
-        check(args.length == 3, "Incorrect args. Use: 'completions previousWord currentWord'");
-        System.out.print(getBashCompletions(args[1], args[2]));
-      } else if (command.equals("head_path")) {
-        check(args.length == 1, "Incorrect args. Use: 'head_path'");
-        System.out.print(headPath);
-      } else if (command.equals("start_server")) {
-        check(args.length == 2, "Incorrect args. Use: 'start_server bazel_workspace_path'");
-        startServer(args[1]);
-      } else if (command.equals("check_server")) {
-        check(args.length == 1, "Incorrect args. Use: 'check_server'");
-        checkServer();
-      } else {
-        return false;
+      switch (command) {
+        case "completions":
+          check(args.length == 3, "Incorrect args. Use: 'completions previousWord currentWord'");
+          System.out.print(getBashCompletions(args[1], args[2]));
+          break;
+        case "head_path":
+          check(args.length == 1, "Incorrect args. Use: 'head_path'");
+          System.out.print(headPath);
+          break;
+        case "start_server":
+          check(args.length == 2, "Incorrect args. Use: 'start_server bazel_workspace_path'");
+          startServer(args[1]);
+          break;
+        case "check_server":
+          check(args.length == 1, "Incorrect args. Use: 'check_server'");
+          checkServer();
+          break;
+        default:
+          return false;
       }
       return true;
     } catch (Exception e) {

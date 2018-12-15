@@ -35,11 +35,12 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import com.google.common.collect.ImmutableList;
 
 /** aa tool. */
 @Singleton
 public class AaTool {
-  private Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
+  private final Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
 
   @Inject
   AaTool(
@@ -77,6 +78,10 @@ public class AaTool {
   @Component(modules = {CommonModule.class, AaModule.class})
   public interface AaToolComponent {
     AaTool getAaTool();
+  }
+
+  public ImmutableList<String> getCommands() {
+    return ImmutableList.sortedCopyOf(commands.keySet());
   }
 
   private boolean run(String[] args) {

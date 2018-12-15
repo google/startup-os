@@ -17,7 +17,6 @@
 package com.google.startupos.tools.localserver;
 
 import com.google.common.flogger.FluentLogger;
-import com.google.common.flogger.LoggerConfig;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.Flags;
@@ -58,13 +57,13 @@ public class LocalServer {
   private static final Flag<Integer> pullFrequency = Flag.create(60);
 
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
-  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
+  private static final Flag<Integer> httpGatewayPort = Flag.create(7000);
 
   @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
-  public static final Flag<String> localServerHost = Flag.create("localhost");
+  private static final Flag<String> localServerHost = Flag.create("localhost");
 
   @FlagDesc(name = "log_to_file", description = "Log stdout and stderr to log file")
-  public static final Flag<Boolean> logToFile = Flag.create(true);
+  private static final Flag<Boolean> logToFile = Flag.create(true);
 
   private final Server server;
 
@@ -72,7 +71,7 @@ public class LocalServer {
 
     private final FileUtils fileUtils;
     private final String basePath;
-    private GitRepoFactory repoFactory;
+    private final GitRepoFactory repoFactory;
 
     @Inject
     public HeadUpdater(
@@ -154,13 +153,13 @@ public class LocalServer {
 
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
-  public interface LocalServerComponent {
+  interface LocalServerComponent {
     LocalServer getLocalServer();
 
     HeadUpdater getHeadUpdater();
   }
 
-  public static void checkFlags() {
+  private static void checkFlags() {
     if (httpGatewayPort.get().equals(localServerPort.get())) {
       System.out.println(
           "Error: HttpGatewayServer and LocalServer ports are the same: " + localServerPort.get());

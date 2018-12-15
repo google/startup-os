@@ -16,18 +16,13 @@
 
 package com.google.startupos.tools.reviewer.aa.commands;
 
-import com.google.common.collect.ImmutableList;
-import java.util.List;
 import javax.inject.Inject;
 import com.google.startupos.common.FileUtils;
 
 public class KillServerCommand implements AaCommand {
-  private FileUtils fileUtils;
 
   @Inject
-  public KillServerCommand(FileUtils fileUtils) {
-    this.fileUtils = fileUtils;
-  }
+  public KillServerCommand() {}
 
   private Integer getPid(int port) throws Exception {
     // -t makes `lsof` output only PIDs so output can be piped to `kill`
@@ -37,7 +32,7 @@ public class KillServerCommand implements AaCommand {
     // servers (i.e. Angular) instead of clients (i.e. Chrome)
     String[] command = new String[] {"lsof", "-tnP", "-i:" + port, "-sTCP:LISTEN"};
     Process process = Runtime.getRuntime().exec(command);
-    String output = fileUtils.streamToString(process.getInputStream()).trim();
+    String output = FileUtils.streamToString(process.getInputStream()).trim();
     if (output.isEmpty()) {
       return null;
     }

@@ -53,12 +53,24 @@ public class AaModule {
   }
 
   @Provides
+  @Named("Head path")
+  public static String getHeadPath(FileUtils fileUtils, @Named("Base path") String basePath) {
+    return fileUtils.joinToAbsolutePath(basePath, "head");
+  }
+
+  @Provides
+  @Named("Workspaces path")
+  public static String getWorkspacesPath(FileUtils fileUtils, @Named("Base path") String basePath) {
+    return fileUtils.joinToAbsolutePath(basePath, "ws");
+  }
+
+  @Provides
   @Named("Workspace name")
-  public static String getWorkspaceName(FileUtils fileUtils, @Named("Base path") String basePath) {
+  public static String getWorkspaceName(
+      FileUtils fileUtils, @Named("Workspaces path") String workspacesPath) {
     Path currentFolder = Paths.get(fileUtils.getCurrentWorkingDirectory());
-    Path wsFolder = Paths.get(fileUtils.joinToAbsolutePath(basePath, "ws"));
     try {
-      Path currentWsFolder = wsFolder.relativize(currentFolder).normalize();
+      Path currentWsFolder = Paths.get(workspacesPath).relativize(currentFolder).normalize();
       String wsName = currentWsFolder.subpath(0, 1).toString();
       if (wsName.equals("..")) {
         throw new RuntimeException("You're inside base folder but not in a workspace");
@@ -73,15 +85,9 @@ public class AaModule {
   @Named("Workspace path")
   public static String getWorkspacePath(
       FileUtils fileUtils,
-      @Named("Base path") String basePath,
+      @Named("Workspaces path") String basePath,
       @Named("Workspace name") String workspaceName) {
-    return fileUtils.joinToAbsolutePath(basePath, "ws", workspaceName);
-  }
-
-  @Provides
-  @Named("Head path")
-  public static String getHeadPath(FileUtils fileUtils, @Named("Base path") String basePath) {
-    return fileUtils.joinToAbsolutePath(basePath, "head");
+    return fileUtils.joinToAbsolutePath(basePath, workspaceName);
   }
 
   @Provides
