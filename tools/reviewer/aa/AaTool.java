@@ -28,17 +28,19 @@ import com.google.startupos.tools.reviewer.aa.commands.SnapshotCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SubmitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SyncCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
+import com.google.startupos.tools.reviewer.aa.commands.KillServerCommand;
 import dagger.Component;
 import dagger.Lazy;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import com.google.common.collect.ImmutableList;
 
 /** aa tool. */
 @Singleton
 public class AaTool {
-  private Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
+  private final Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
 
   @Inject
   AaTool(
@@ -51,7 +53,8 @@ public class AaTool {
       Lazy<SnapshotCommand> snapshotCommand,
       Lazy<SubmitCommand> submitCommand,
       Lazy<AddRepoCommand> addRepoCommand,
-      Lazy<PatchCommand> patchCommand) {
+      Lazy<PatchCommand> patchCommand,
+      Lazy<KillServerCommand> killServerCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
@@ -62,8 +65,7 @@ public class AaTool {
     commands.put("submit", submitCommand);
     commands.put("add_repo", addRepoCommand);
     commands.put("patch", patchCommand);
-    // killserver is implemented in aa_tool.sh
-    commands.put("killserver", null);
+    commands.put("killserver", killServerCommand);
   }
 
   private void printUsage() {
@@ -76,6 +78,10 @@ public class AaTool {
   @Component(modules = {CommonModule.class, AaModule.class})
   public interface AaToolComponent {
     AaTool getAaTool();
+  }
+
+  public ImmutableList<String> getCommands() {
+    return ImmutableList.sortedCopyOf(commands.keySet());
   }
 
   private boolean run(String[] args) {

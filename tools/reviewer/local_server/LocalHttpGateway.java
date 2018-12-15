@@ -81,7 +81,7 @@ public class LocalHttpGateway {
       httpExchange
           .getResponseHeaders()
           .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      final byte[] response = "OK".getBytes("UTF-8");
+      final byte[] response = "OK".getBytes(UTF_8);
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);

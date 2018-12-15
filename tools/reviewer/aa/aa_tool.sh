@@ -10,61 +10,32 @@
 # To compile aa from a workspace: 'export AA_FORCE_COMPILE_WS=<>'
 # To undo: 'unset AA_FORCE_COMPILE_WS'
 
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-RESET=$(tput sgr0)
-
+# TODO:
+# 1. Add function set_BAZEL_WORKSPACE(), to set variable to either head or debug ws.
+# 2. Add function bazel_run(force_build) to run a bazel command:
+#    1. cd into workspace
+#    2. Check if file exists
+#    3. If not (or if force_build), bazel build it
+#    4. Exit if build fails
+#    5. Run command
+# 3. Use bazel_run() in _aa_completions() and in aa(), set_BAZEL_WORKSPACE() in aa()
+# 4. Make sure that after this, `aa` can be run from outside of a workspace (but inside base).
 
 function _aa_completions()
 {
-    local cur_word prev_word type_list
-
-    # COMP_WORDS is an array of words in the current command line.
-    # COMP_CWORD is the index of the current word (the one the cursor is
-    # in). So COMP_WORDS[COMP_CWORD] is the current word; we also record
-    # the previous word here
-    cur_word="${COMP_WORDS[COMP_CWORD]}"
-    prev_word="${COMP_WORDS[COMP_CWORD-1]}"
-
-    commands="init workspace diff review fix sync snapshot add_repo killserver"
-    init_options="--base_path --startupos_repo --user"
-    add_repo_options="--url --name"
-    diff_options="--reviewers --description --buglink"
-
-    if [ "$prev_word" = "aa" ] ; then
-        # completing command name
-        unset command
-        COMPREPLY=( $(compgen -W "${commands}" -- ${cur_word}) )
-    elif [ "$prev_word" = "workspace" ] || [ "$prev_word" = "aaw" ] ; then
-        # completing names of workspaces
-        find_base_folder
-        workspaces=$(ls -1 $AA_BASE/ws/)
-        COMPREPLY=( $(compgen -W "${workspaces}" -- "${cur_word}") )
-    elif echo $commands | grep --quiet -- "$prev_word"; then
-        # user entered "aa <command>" already
-        command="$prev_word"
-    else
-        COMPREPLY=()
-    fi
-
-    if [[ ${cur_word} == -* ]] ; then
-        if [[ $command = "init" ]]; then
-          # completing params for `init`
-          COMPREPLY=( $(compgen -W "${init_options}" -- ${cur_word}) )
-        elif [[ $command = "add_repo" ]]; then
-          # completing params for `add_repo`
-          COMPREPLY=( $(compgen -W "${add_repo_options}" -- ${cur_word}) )
-        elif [[ $command = "diff" ]]; then
-          # completing params for `diff`
-          COMPREPLY=( $(compgen -W "${diff_options}" -- ${cur_word}) )
-        fi
-    fi
-
-    return 0
+  # COMP_WORDS is an array of words in the current command line.
+  # COMP_WORDS[COMP_CWORD] is the word the cursor is on.
+  local cur_word prev_word
+  cur_word="${COMP_WORDS[COMP_CWORD]}"
+  prev_word="${COMP_WORDS[COMP_CWORD-1]}"
+  bazel build //tools/reviewer/aa:aa_script_helper &> /dev/null
+  COMMAND="bazel-bin/tools/reviewer/aa/aa_script_helper completions \"${prev_word}\" \"${cur_word}\""
+  COMPREPLY=( $(eval $COMMAND) )
+  return 0
 }
 
 # Find base folder based on existence of BASE file, and put it in AA_BASE
-function find_base_folder {
+function set_AA_BASE {
   CWD=`pwd`
   while [[ `pwd` != / ]]; do
     if [ -f `pwd`/BASE ]; then
@@ -79,55 +50,18 @@ function find_base_folder {
   return 0
 }
 
-function stop_server {
-  # kill local server (port 8001)
-  # -t makes `lsof` output only PIDs so output can be piped to `kill`
-  # -n and -P prevent `lsof` from resolving addresses and ports, therefore
-  # making execution faster
-  # We filter for processes that listen on port in order to kill only
-  # servers (i.e. Angular) instead of clients (i.e. Chrome)
-  kill $(lsof -tnP -i:8001 -sTCP:LISTEN)
-}
-
-function start_local_server {
-    # Starts local_server if it is not running yet.
-    # To check whether it is running already we try to access the /health endpoint.
-    find_base_folder
-    if [[ -z "$AA_BASE" ]]; then
-      echo "BASE file not found in path until root"
-      return 1
-    fi
-    export STARTUP_OS=$AA_BASE/head/startup-os
-    SERVER_LOG_FILE=$AA_BASE/logs/server.log
-    response=$(curl --silent localhost:7000/health)
-    if [ "$response" != "OK" ]; then
-      echo "$GREEN""Local server did not respond, starting it...$RESET"
-      bazel build //tools/reviewer/local_server:local_server
-      if [ $? -ne 0 ]; then
-        exit $?
-      fi
-      # nohup detaches the command from terminal it was executed on
-      nohup bazel-bin/tools/reviewer/local_server/local_server </dev/null >$SERVER_LOG_FILE 2>&1 &
-      # TODO: Print this only if token is not available.
-      echo "$RED""Visit$RESET https://web-login-startupos.firebaseapp.com$RED to log in$RESET"
-      return 1
-    fi
-}
-
 function aa {
+  local AA_BINARY AA_RESULT AA_FORCE_COMPILE RED GREEN RESET
+  RED=$(tput setaf 1)
+  GREEN=$(tput setaf 2)
+  RESET=$(tput sgr0)  
   CWD=`pwd`
-  find_base_folder
+  set_AA_BASE
   if [[ -z "$AA_BASE" ]]; then
     echo "BASE file not found in path until root"
     return 1
   fi
-
-  start_local_server
-  if [ ! $? -eq 0 ]; then
-    echo "$GREEN""Please execute the same command (shorthand: $RESET!!$GREEN) after server starts$RESET";
-    return 1
-  fi
-
+  bazel run //tools/reviewer/aa:aa_script_helper -- start_server $AA_BASE/ws/simplify_aa/startup-os
   STARTUP_OS=$AA_BASE/head/startup-os
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
@@ -151,24 +85,19 @@ function aa {
     AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
     cd $CWD
   fi
+
   if [ "$1" = "workspace" ]; then
-      # For workspace command, instead of letting `aa` print to stdout
-      # we need to capture its output and execute it as command
+      # For workspace command, `aa` prints commands to stdout, such as cd, that we need to execute.
       AA_RESULT=$(eval $AA_BINARY $*)
       AA_RESULT_CODE=$?
       $AA_RESULT
-  elif [ "$1" = "killserver" ]; then
-      stop_server
   else
-      # if command is not workspace, let `aa` execute as is
+      # If command is not workspace, let `aa` execute as is
       eval $AA_BINARY $*
       AA_RESULT_CODE=$?
   fi
   unset AA_BASE
-  unset AA_BINARY
-  unset AA_RESULT
   unset CWD
-  unset AA_FORCE_COMPILE
   return $AA_RESULT_CODE
 }
 
@@ -180,7 +109,7 @@ function aaw(){
   fi
 }
 
-# make aa available as command
+# Make aa and aaw available as commands
 export -f aa
 export -f aaw
 complete -F _aa_completions aa

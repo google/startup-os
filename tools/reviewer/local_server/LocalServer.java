@@ -36,6 +36,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.PrintStream;
+import java.io.FileNotFoundException;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
@@ -55,10 +57,13 @@ public class LocalServer {
   private static final Flag<Integer> pullFrequency = Flag.create(60);
 
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
-  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
+  private static final Flag<Integer> httpGatewayPort = Flag.create(7000);
 
   @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
-  public static final Flag<String> localServerHost = Flag.create("localhost");
+  private static final Flag<String> localServerHost = Flag.create("localhost");
+
+  @FlagDesc(name = "log_to_file", description = "Log stdout and stderr to log file")
+  private static final Flag<Boolean> logToFile = Flag.create(true);
 
   private final Server server;
 
@@ -66,7 +71,7 @@ public class LocalServer {
 
     private final FileUtils fileUtils;
     private final String basePath;
-    private GitRepoFactory repoFactory;
+    private final GitRepoFactory repoFactory;
 
     @Inject
     public HeadUpdater(
@@ -98,7 +103,20 @@ public class LocalServer {
   }
 
   @Inject
-  LocalServer(AuthService authService, CodeReviewService codeReviewService) {
+  LocalServer(
+      @Named("Server log path") String logPath,
+      AuthService authService,
+      CodeReviewService codeReviewService) {
+    if (logToFile.get()) {
+      // TODO: Figure out how to also direct Flogger to log file.
+      try {
+        PrintStream logStream = new PrintStream(logPath);
+        System.setOut(logStream);
+        System.setErr(logStream);
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
     server =
         ServerBuilder.forPort(localServerPort.get())
             .addService(authService)
@@ -135,13 +153,13 @@ public class LocalServer {
 
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
-  public interface LocalServerComponent {
+  interface LocalServerComponent {
     LocalServer getLocalServer();
 
     HeadUpdater getHeadUpdater();
   }
 
-  public static void checkFlags() {
+  private static void checkFlags() {
     if (httpGatewayPort.get().equals(localServerPort.get())) {
       System.out.println(
           "Error: HttpGatewayServer and LocalServer ports are the same: " + localServerPort.get());
