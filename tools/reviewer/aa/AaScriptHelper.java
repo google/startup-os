@@ -127,8 +127,8 @@ public class AaScriptHelper {
     }
   }
 
-  private void check(boolean predicate, String message) throws IllegalArgumentException {
-    if (!predicate) {
+  private void check(boolean predicateResult, String message) throws IllegalArgumentException {
+    if (!predicateResult) {
       throw new IllegalArgumentException(message);
     }
   }
