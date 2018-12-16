@@ -1,5 +1,5 @@
 A simple game, to help grow the community around the project. The game has no UI and is all based on the text files in the repo.
 Every developer gets "crystals" for working on the project. The developer also writes things that they are willing to trade for crystals - for example, how to cook a particular meal, or sharing knowledge about a particular subject, or things like on Fiverr.
-The crystals and the offering of the developers are written in a file, one per developer. If someone want to trade, they can do a PR and offer a trade. A test makes sure that the correct amount of crystals was added and removed. In the PR description they write what was exchanged. People can then look at the GitHub history to see what people exchanged in the past, which is interesting, and also get ideas.
+The crystals and the offering of the developers are written in a file, one per developer. If someone want to trade, they can change "reviewer_config" file, then do a PR and offer a trade. A test makes sure that the correct amount of crystals was added and removed. In the PR description they write what was exchanged. People can then look at the GitHub history to see what people exchanged in the past, which is interesting, and also get ideas.
 We don't know if this game will be good or lame, so it's more like an experiment at this point. It may need some tweaking.
 
