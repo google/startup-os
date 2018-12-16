@@ -8,6 +8,7 @@ java_image(
         "impl/CiTask.java",
         "impl/FirestoreTaskBase.java",
         "impl/ReviewerMetadataUpdaterTask.java",
+        "impl/SubmitterTask.java",
         "tasks/Task.java",
         "tasks/TaskExecutor.java",
     ],
@@ -17,6 +18,7 @@ java_image(
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common/firestore",
+        "//common/firestore:data_java_proto",
         "//common/flags",
         "//common/repo",
         "//third_party/maven/com/google/auth:google_auth_library_credentials",
@@ -24,8 +26,10 @@ java_image(
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/apache/commons:commons_lang3",
         "//tools/reviewer:reviewer_java_proto",
         "//tools/reviewer:reviewer_registry_java_proto",
+        "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
 )
 
