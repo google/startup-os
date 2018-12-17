@@ -19,9 +19,9 @@ package com.google.startupos.common.firestore;
 import com.google.auto.value.AutoValue;
 import com.google.protobuf.Message;
 
+/** A holder class for a proto message and an ID, typically the Firestore document ID. */
 @AutoValue
 public abstract class MessageWithId {
-  // A holder class for a proto message and an ID, typically the Firestore document ID.
   public abstract String id();
 
   public abstract Message message();

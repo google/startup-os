@@ -80,7 +80,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
             .stream()
             // get Diffs in SUBMITTING state
             .filter(diff -> diff.getStatus().equals(Diff.Status.SUBMITTING))
-            // for each of them, get latest CIResponse (get or pop?)
+            // for each of them, get latest CIResponse
             .map(
                 diff -> {
                   MessageWithId responseWithId =
@@ -134,12 +134,11 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                     String branch = String.format("origin/D%d", diff.getId());
                     gitRepo.switchBranch(branch);
 
-                    newRequestBuilder =
-                        newRequestBuilder.addTarget(
-                            CIRequest.Target.newBuilder()
-                                .setRepo(repo)
-                                .setCommitId(gitRepo.getHeadCommitId())
-                                .build());
+                    newRequestBuilder.addTarget(
+                        CIRequest.Target.newBuilder()
+                            .setRepo(repo)
+                            .setCommitId(gitRepo.getHeadCommitId())
+                            .build());
 
                     if (gitRepo.getHeadCommitId().equals(target.getCommitId())) {
                       // latest result for CI matches last commit on the branch
