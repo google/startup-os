@@ -24,20 +24,19 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 
 /* A command to init a base folder.
  *
  * Usage:
- * bazel run //tools/reviewer/aa:aa_tool -- init </path/to/base/folder>
+ * bazel run //tools/reviewer/aa:aa_tool -- init --base_path </path/to/base/folder>
  * or, if aa is already set up:
- * aa init </path/to/base/folder>
+ * aa init --base_path </path/to/base/folder>
  */
 public class InitCommand implements AaCommand {
   public static final String BASE_FILENAME = "BASE";
 
-  // set by processArgs
-  private String basePath;
+  @FlagDesc(name = "base_path", description = "Base path for workspaces, head etc.")
+  public static Flag<String> basePath = Flag.create("");
 
   @FlagDesc(name = "startupos_repo", description = "StartupOS git repo")
   public static Flag<String> startuposRepo =
@@ -53,16 +52,14 @@ public class InitCommand implements AaCommand {
     this.gitRepoFactory = gitRepoFactory;
   }
 
-  @Override
-  public boolean run(String[] args) {
-    if (!processArgs(args)) {
-      return false;
+  public boolean run(String basePath, String startuposRepo) {
+    if (basePath.isEmpty()) {
+      throw new IllegalArgumentException("--base_path must be set");
     }
-    Flags.parseCurrentPackage(args);
     try {
       if (!fileUtils.folderEmptyOrNotExists(basePath)) {
-        System.out.println("Error: Base folder exists and is not empty");
-        System.exit(1);
+        System.out.println("Base folder exists and is not empty");
+        return false;
       }
       baseFolderExistedBefore = fileUtils.folderExists(basePath);
       // Create folders
@@ -74,12 +71,12 @@ public class InitCommand implements AaCommand {
       // Write BASE file
       fileUtils.writeString("", fileUtils.joinToAbsolutePath(basePath, BASE_FILENAME));
 
-      if (!startuposRepo.get().isEmpty()) {
+      if (!startuposRepo.isEmpty()) {
         // Clone StartupOS repo into head:
         String startupOsPath = fileUtils.joinToAbsolutePath(basePath, "head", "startup-os");
         System.out.println("Cloning StartupOS into " + startupOsPath);
         GitRepo repo = this.gitRepoFactory.create(startupOsPath);
-        repo.cloneRepo(startuposRepo.get(), startupOsPath);
+        repo.cloneRepo(startuposRepo, startupOsPath);
         System.out.println("Completed Cloning");
       } else {
         System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");
@@ -98,34 +95,17 @@ public class InitCommand implements AaCommand {
     return true;
   }
 
-  private boolean processArgs(String[] args) {
-    // `aa init` can be called by either `bazel run //tools/reviewer/aa:aa_tool -- init`
-    // or `aa init`.
-    // For `aa init`, there is an extra first argument `aa` in `args`.
-    if (args[0].equals("aa")) {
-      if (args.length == 1) {
-        System.err.println(
-            RED_ERROR
-                + "Invalid usage. \n"
-                + "Please use \"aa init <base_path>\" command to init a base folder.");
-        return false;
-      }
-      // We remove the first element so that both calls to `aa init` have the same args
-      args = Arrays.copyOfRange(args, 1, args.length);
-    }
-    if (args.length == 1) {
-      System.err.println(RED_ERROR + "Missing base path argument" + ANSI_RESET);
-      return false;
-    }
-    basePath = args[1];
-    return true;
+  @Override
+  public boolean run(String[] args) {
+    Flags.parseCurrentPackage(args);
+    return run(basePath.get(), startuposRepo.get());
   }
 
   private void revertChanges() {
     if (baseFolderExistedBefore) {
-      fileUtils.clearDirectoryUnchecked(basePath);
+      fileUtils.clearDirectoryUnchecked(basePath.get());
     } else {
-      fileUtils.deleteDirectoryUnchecked(basePath);
+      fileUtils.deleteDirectoryUnchecked(basePath.get());
     }
   }
 }

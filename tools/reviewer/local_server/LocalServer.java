@@ -51,16 +51,16 @@ public class LocalServer {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
-  private static final Flag<Integer> localServerPort = Flag.create(8001);
+  public static final Flag<Integer> localServerPort = Flag.create(8001);
 
   @FlagDesc(name = "pull_frequency", description = "Frequency of pulling head (in seconds)")
-  private static final Flag<Integer> pullFrequency = Flag.create(60);
+  public static final Flag<Integer> pullFrequency = Flag.create(60);
 
   @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
-  private static final Flag<Integer> httpGatewayPort = Flag.create(7000);
+  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
 
   @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
-  private static final Flag<String> localServerHost = Flag.create("localhost");
+  public static final Flag<String> localServerHost = Flag.create("localhost");
 
   @FlagDesc(name = "log_to_file", description = "Log stdout and stderr to log file")
   private static final Flag<Boolean> logToFile = Flag.create(true);
@@ -125,7 +125,7 @@ public class LocalServer {
             .build();
   }
 
-  private void start() throws IOException {
+  public void start() throws IOException {
     server.start();
     logger.atInfo().log("Server started, listening on " + localServerPort.get());
     Runtime.getRuntime()
@@ -145,7 +145,7 @@ public class LocalServer {
     }
   }
 
-  private void blockUntilShutdown() throws InterruptedException {
+  public void blockUntilShutdown() throws InterruptedException {
     if (server != null) {
       server.awaitTermination();
     }
