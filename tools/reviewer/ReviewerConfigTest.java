@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
-import com.google.startupos.tools.reviewer.ReviewerProtos.FirebaseConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.tools.reviewer.ReviewerProtos.User;
 
