@@ -1,13 +1,13 @@
 import { Observable } from 'rxjs';
 
-import { FirebaseConfig, ReviewerConfig, ReviewerRegistry } from '@/core/proto';
+import { FirebaseConfig, ReviewerRegistry } from '@/core/proto';
 import { EncodingService } from '@/core/services';
 import { globalRegistryUrl, id } from 'src/environments/global-registry';
 
 export class GlobalRegistry {
-  static connect(): Observable<FirebaseConfig> {
+  static getConfig(): Observable<FirebaseConfig> {
     return new Observable(observer => {
-      // Load ReviewerRegistry
+      // Load response with reviewer registry
       this.httpGet(globalRegistryUrl).subscribe(response => {
         const protoText: string = response.fields.proto.stringValue;
 
@@ -23,26 +23,9 @@ export class GlobalRegistry {
         if (reviewerIdConfigList.length < 1) {
           throw new Error(`Project with id "${id}" not found`);
         }
-        const configUrl: string = reviewerIdConfigList[0].getConfigUrl();
-        this.getConfig(configUrl).subscribe(firebaseConfig => {
-          observer.next(firebaseConfig);
-        });
-      });
-    });
-  }
 
-  // Loads ReviewerConfig
-  static getConfig(url: string): Observable<FirebaseConfig> {
-    return new Observable(observer => {
-      this.httpGet(url).subscribe(response => {
-        const protoText: string = response.fields.proto.stringValue;
-
-        // Convert binary to ReviewerConfig
-        const encodingService = new EncodingService();
-        const binary: Uint8Array = encodingService.decodeBase64StringToUint8Array(protoText);
-        const reviewerConfig: ReviewerConfig = ReviewerConfig.deserializeBinary(binary);
-
-        observer.next(reviewerConfig.getFirebaseConfig());
+        // Provide firebase config
+        observer.next(reviewerIdConfigList[0].getFirebaseConfig());
       });
     });
   }

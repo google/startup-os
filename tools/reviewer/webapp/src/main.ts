@@ -9,7 +9,7 @@ if (environment.production) {
   enableProdMode();
 }
 
-GlobalRegistry.connect().subscribe(reviewerConfig => {
+GlobalRegistry.getConfig().subscribe(reviewerConfig => {
   platformBrowserDynamic([
     { provide: 'reviewerConfig', useValue: reviewerConfig.toObject() },
   ]).bootstrapModule(AppModule);
