@@ -1,10 +1,8 @@
 @import 'basic-styles.scss';
 
-// TODO: synchronize local scss variables
-
 $font-size: 15px;
-$border: #CCC solid 1px;
-$thread-padding: 20px;
+$border-width: 2px;
+$border: $border-width solid #979797;
 
 table {
   border-top: $border;
@@ -15,7 +13,7 @@ table {
       background: #ebebeb;
       border-left: $border;
       border-right: $border;
-      font-size: $font-size;
+      font-size: 12px;
       user-select: none;
       padding: 0 3px;
       >span {
@@ -31,22 +29,19 @@ table {
       >.add-comment-button {
         position: absolute;
         user-select: none;
-        >.icon-button {
-          margin-top: 2px;
+        top: -2px;
+        left: 2px;
+        cursor: pointer;
+        display: none;
+        >img {
           width: $font-size;
           height: $font-size;
-          cursor: pointer;
-          >.mat-icon {
-            color: #036fe8;
-            width: $font-size;
-            height: $font-size;
-            line-height: $font-size;
-          }
         }
       }
       >.chars-highlighting {
         position: absolute;
         left: $add-comment-button-width;
+        user-select: none;
         pre {
           color: rgba(0,0,0,0);
         }
@@ -56,15 +51,24 @@ table {
         min-height: $font-size;
         margin-left: $add-comment-button-width;
         padding-right: 10px;
+        user-select: none;
       }
       .code-line {
         padding-top: 1px;
       }
+      >.selectable {
+        user-select: text;
+      }
       >.threads {
-        padding-top: $thread-padding;
+        padding-top: 13px;
         >.thread {
-          max-width: 800px;
-          margin-bottom: $thread-padding;
+          width: 762px;
+          margin-bottom: 17px;
+        }
+      }
+      &:hover {
+        >.add-comment-button {
+          display: block;
         }
       }
     }

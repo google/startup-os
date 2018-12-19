@@ -40,6 +40,7 @@ java_library(
         ":full_github_pr_java_proto",
         ":github_api_java_proto",
         "//common",
+        "//common/repo",
         "//common/repo:repo_java_proto",
         "//common/repo:repo_proto",
         "//third_party/maven/com/google/flogger",

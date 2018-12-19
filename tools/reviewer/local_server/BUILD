@@ -7,6 +7,7 @@ java_binary(
     ],
     main_class = "com.google.startupos.tools.localserver.LocalServer",
     deps = [
+        ":local_http_gateway",
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common/flags",
@@ -41,12 +42,11 @@ java_library(
     ],
 )
 
-java_binary(
+java_library(
     name = "local_http_gateway",
     srcs = [
         "LocalHttpGateway.java",
     ],
-    main_class = "com.google.startupos.tools.localserver.LocalHttpGateway",
     deps = [
         ":local_http_gateway_grpc_client",
         "//common/flags",

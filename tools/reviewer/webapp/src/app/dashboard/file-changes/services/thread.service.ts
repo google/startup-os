@@ -89,10 +89,18 @@ export class ThreadService {
     newThread.setCommentList(comments);
     newThread.setRepoId(this.stateService.branchInfo.getRepoId());
     newThread.setCommitId(commitId);
-    newThread.setFile(this.stateService.file);
+    newThread.setFile(this.createThreadFile(commitId));
     newThread.setType(Thread.Type.CODE);
     newThread.setId(randstr64(6));
 
     return newThread;
+  }
+
+  private createThreadFile(commitId: string): File {
+    const file: File = this.stateService.createFile();
+    file.setFilenameWithRepo(this.stateService.file.getFilenameWithRepo());
+    file.setOriginalFilename(this.stateService.file.getOriginalFilename());
+    file.setCommitId(commitId);
+    return file;
   }
 }

@@ -1,12 +1,4 @@
 display_name: "StartupOS"
-firebase_config {
-  api_key: "AIzaSyAn-A7YXlqR2JNOvlbhkVwcnsOigmphQIw"
-  auth_domain: "startupos-5f279.firebaseapp.com"
-  database_url: "https://startupos-5f279.firebaseio.com"
-  project_id: "startupos-5f279"
-  storage_bucket: "startupos-5f279.appspot.com"
-  messaging_sender_id: "160348327132"
-}
 repo {
   id: "startup-os"
   url: "https://github.com/google/startup-os"
@@ -105,4 +97,29 @@ user {
   }
   crystals:100
  }
- total_crystal: 300
+ user {
+   id: "vmax"
+   first_name: "Max"
+   last_name: "Vorobev"
+   email: "vmax0770@gmail.com"
+   image_url: "https://www.gravatar.com/avatar/b879e79211df87616ad6f2995ec03a7d?s=400"
+   social_network {
+     type: LINKEDIN
+     url: "https://www.linkedin.com/in/max-vorobev-6a60b6b3/"
+   }
+   skill: "Java"
+   skill: "Python"
+   skill: "Starlark"
+   project_id: "google_oss_examples"
+   project_id: "reviewer"
+   top_contribution {
+     description: "Team member for StartupOS project (Google OSS examples, Reviewer)"
+     url: "https://github.com/google/startup-os"
+   }
+   top_contribution {
+     description: "CI integration for StartupOS"
+     url: "https://github.com/google/startup-os/pull/112"
+   }
+   crystals:100
+  }
+ total_crystal: 400

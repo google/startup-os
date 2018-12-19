@@ -7,6 +7,7 @@ java_library(
         "CommonComponent.java",
         "CommonModule.java",
         "FileUtils.java",
+        "HttpUtils.java",
         "Lists.java",
         "MessageDifferencer.java",
         "StringBuilder.java",
@@ -92,4 +93,19 @@ java_plugin(
 java_library(
     name = "diff_match_patch",
     srcs = ["DiffMatchPatch.java"],
+)
+
+java_binary(
+    name = "base64_tool",
+    srcs = [
+        "Base64Tool.java",
+    ],
+    main_class = "com.google.startupos.common.Base64Tool",
+    deps = [
+        "//common",
+        "//common:dagger_with_annotation_processor",
+        "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
 )

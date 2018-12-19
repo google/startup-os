@@ -9,6 +9,7 @@ export * from './localserver.service';
 export * from './exception.service';
 export * from './diff-update.service';
 export * from './user.service';
+export * from './mouse.service';
 export * from './select-dashboard.service';
 
 // Services
@@ -21,6 +22,7 @@ import { FirebaseStateService } from './firebase-state.service';
 import { FirebaseService } from './firebase.service';
 import { HighlightService } from './highlight.service';
 import { LocalserverService } from './localserver.service';
+import { MouseService } from './mouse.service';
 import { NotificationService } from './notification.service';
 import { SelectDashboardService } from './select-dashboard.service';
 import { UserService } from './user.service';
@@ -37,4 +39,5 @@ export const ServiceList = [
   DiffUpdateService,
   UserService,
   SelectDashboardService,
+  MouseService,
 ];

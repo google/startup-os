@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 
+import { WordChange } from '@/core/proto';
 import { HighlightService } from '@/core/services';
 import {
   BlockIndex,
@@ -36,27 +37,27 @@ export class TemplateService {
   }
 
   // Make line highlighted with separate chars
-  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): string {
-    // TODO: use word changes, when it's done on server side
-    const startIndex: number = 0;
-    const endIndex: number = 0;
-
+  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): void {
     // TODO: hightlight all word changes (not only first one)
-    // const startIndex: number = blockLine.diffLine.getWordChangeList()[0].getStartIndex();
-    // const endIndex: number = blockLine.diffLine.getWordChangeList()[0].getEndIndex();
+    let startIndex: number = 0;
+    let endIndex: number = 0;
+
+    const wordChanges: WordChange[] = blockLine.diffLine.getWordChangeList();
+    if (wordChanges.length > 0) {
+      startIndex = wordChanges[0].getStartIndex();
+      endIndex = wordChanges[0].getEndIndex();
+    }
 
     const className = (blockIndex === BlockIndex.rightFile) ?
       'hl-right' :
       'hl-left';
 
     if (
-      startIndex === endIndex ||
-      (startIndex === 0 && endIndex === blockLine.clearCode.length)
+      startIndex !== endIndex &&
+      startIndex !== 0 ||
+      endIndex !== blockLine.clearCode.length
     ) {
-      // No need to highlight chars, if whole line was changed.
-      return blockLine.clearCode;
-    } else {
-      return this.makeHighlighting(
+      blockLine.wordChanges = this.makeHighlighting(
         startIndex,
         endIndex,
         blockLine.clearCode,
