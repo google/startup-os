@@ -58,6 +58,7 @@ public class GithubReader {
         .addAllReviewComment(getPullRequestReviewComments(repoOwner, repoName, number))
         .addAllIssueComment(getIssueComments(repoOwner, repoName, number))
         .addAllCommitsInfo(getCommits(repoOwner, repoName, number))
+        .setOwner(repoOwner)
         .setRepo(repoName);
     return pullRequest.build();
   }

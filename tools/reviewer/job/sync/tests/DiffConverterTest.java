@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.job.sync.tests;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.sync.DiffConverter;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos;
@@ -56,8 +57,9 @@ public class DiffConverterTest {
   @Before
   public void setUp() {
     diffConverter = new DiffConverter();
-    when(gitRepo.getPatch(anyString(), anyString())).thenReturn(TEST_FILE_PATCH);
-    when(gitRepo.getMostRecentCommit(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
+    when(gitRepo.getPatch(anyString(), anyString(), anyString())).thenReturn(TEST_FILE_PATCH);
+    when(gitRepo.getMostRecentCommitOfBranch(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
+    when(gitRepo.getMostRecentCommitOfFile(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
   }
 
   @Test
@@ -97,7 +99,7 @@ public class DiffConverterTest {
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
-        diffConverter.toPullRequests(diff, gitRepo);
+        diffConverter.toPullRequests(diff, ImmutableMap.of("test-repo", gitRepo));
 
     GithubPullRequestProtos.PullRequest expectedPullRequest =
         GithubPullRequestProtos.PullRequest.newBuilder()
@@ -117,7 +119,10 @@ public class DiffConverterTest {
                             .build())
                     .setBody("R 5")
                     .setCreatedAt("2018-12-05T11:13:05.129Z")
+                    .setUpdatedAt("2018-12-05T11:13:25.696Z")
                     .setReviewerThreadId("KblmQG")
+                    .setReviewerCommentId("DPwKo")
+                    .setReviewerLineNumber(5)
                     .build())
             .setBaseBranchName("master")
             .setHeadBranchName("D1234")
@@ -166,7 +171,7 @@ public class DiffConverterTest {
             .build();
 
     List<GithubPullRequestProtos.PullRequest> actualPullRequest =
-        diffConverter.toPullRequests(diff, gitRepo);
+        diffConverter.toPullRequests(diff, ImmutableMap.of("test-repo", gitRepo));
 
     GithubPullRequestProtos.PullRequest expectedPullRequest =
         GithubPullRequestProtos.PullRequest.newBuilder()
@@ -186,7 +191,10 @@ public class DiffConverterTest {
                             .build())
                     .setBody("L 14")
                     .setCreatedAt("2018-12-05T11:13:25.695Z")
+                    .setUpdatedAt("2018-12-05T11:13:25.696Z")
                     .setReviewerThreadId("ayAF7N")
+                    .setReviewerCommentId("s47NL")
+                    .setReviewerLineNumber(14)
                     .build())
             .setBaseBranchName("master")
             .setHeadBranchName("D1234")
@@ -196,45 +204,6 @@ public class DiffConverterTest {
             .build();
 
     assertEquals(expectedPullRequest.toString(), actualPullRequest.get(0).toString());
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testCommentToBaseBranchCommit_NotExistedPositionInGitHub() {
-    Protos.Diff diff =
-        Protos.Diff.newBuilder()
-            .setId(1234)
-            .setAuthor(Protos.Author.newBuilder().setEmail("author@test.com").build())
-            .setWorkspace("ws1")
-            .setCreatedTimestamp(1543989866559L)
-            .setModifiedTimestamp(1544008405696L)
-            .addCodeThread(
-                Protos.Thread.newBuilder()
-                    .setRepoId("test-repo")
-                    .setCommitId(BASE_BRANCH_COMMIT_ID)
-                    .setFile(
-                        com.google.startupos.common.repo.Protos.File.newBuilder()
-                            .setFilename("test_file.txt")
-                            .setWorkspace("ws1")
-                            .setRepoId("test-repo")
-                            .setCommitId(BASE_BRANCH_COMMIT_ID)
-                            .setFilenameWithRepo("test-repo/test_file.txt")
-                            .build())
-                    .setLineNumber(1)
-                    .addComment(
-                        Protos.Comment.newBuilder()
-                            .setContent("L 1")
-                            .setTimestamp(1544008405695L)
-                            .setCreatedBy("reviewer@test.com")
-                            .setId("s47NL")
-                            .build())
-                    .setId("ayAF7N")
-                    .build())
-            .setModifiedBy("author@test.com")
-            .addGithubPr(
-                Protos.GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
-            .build();
-
-    diffConverter.toPullRequests(diff, gitRepo);
   }
 }
 

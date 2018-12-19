@@ -133,6 +133,7 @@ message Thread {
   string id = 8;
   // The index is 1-based. 0 marks an empty value.
   int32 github_comment_position = 9;
+  int32 closest_github_comment_position = 10;
 }
 
 message Comment {
