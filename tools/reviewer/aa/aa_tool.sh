@@ -61,7 +61,7 @@ function aa {
     echo "BASE file not found in path until root"
     return 1
   fi
-  bazel run //tools/reviewer/aa:aa_script_helper -- start_server $AA_BASE/ws/simplify_aa/startup-os
+  bazel run //tools/reviewer/aa:aa_script_helper -- start_server $AA_BASE/head/startup-os
   STARTUP_OS=$AA_BASE/head/startup-os
 
   AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
