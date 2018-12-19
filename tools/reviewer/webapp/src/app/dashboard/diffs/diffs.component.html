@@ -81,7 +81,7 @@
       ></mat-header-row>
       <mat-row
         *matRowDef="let diff; columns: displayedColumns;"
-        (click)="openDiff(diff.getId())"
+        (mouseup)="openDiff($event, diff.getId())"
       ></mat-row>
     </mat-table>
     <!-- Show the placeholder, if group contains no diffs -->
