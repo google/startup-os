@@ -4,7 +4,7 @@
 /dist
 /tmp
 /out-tsc
-/src/app/core/proto/functions
+/src/app/core/proto
 .firebase
 
 # dependencies
