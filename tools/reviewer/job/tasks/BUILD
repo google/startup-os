@@ -1,5 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
+proto_library(
+    name = "submitter_proto",
+    srcs = ["submitter.proto"],
+)
+
 java_library(
     name = "task_interface",
     srcs = [
