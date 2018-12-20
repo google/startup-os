@@ -14,8 +14,6 @@ export class DiffService {
     commitId?: string,
   ): void {
     const url: string = 'diff/' + diffId + '/' + file.getFilenameWithRepo();
-    const queryParams: Params = { right: commitId };
-
     if (isNewTab) {
       // Open in new tab
       let newTabUrl: string = url;
@@ -25,6 +23,7 @@ export class DiffService {
       window.open(newTabUrl, '_blank');
     } else {
       // Navigate to
+      const queryParams: Params = { right: commitId };
       this.router.navigate([url], { queryParams: queryParams });
     }
   }
