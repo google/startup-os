@@ -28,6 +28,7 @@ JOB_DEPS = [
     "//third_party/maven/com/google/flogger:flogger_system_backend",
     "//third_party/maven/javax/inject:javax_inject",
     "//third_party/maven/io/grpc:grpc_services",
+    "//third_party/maven/org/apache/commons:commons_lang3",
     "//tools/reviewer:reviewer_java_proto",
     "//tools/reviewer:reviewer_registry_java_proto",
     "//tools/reviewer/aa:aa_module",
@@ -35,6 +36,7 @@ JOB_DEPS = [
     "//tools/reviewer/local_server",
     "//tools/reviewer/local_server:local_http_gateway",
     "//tools/reviewer/local_server/service:code_review_service",
+    "//tools/reviewer/local_server/service:code_review_java_proto",
 ]
 
 java_binary(
