@@ -40,7 +40,7 @@
     ></mat-header-row>
     <mat-row
       *matRowDef="let file; columns: displayedColumns;"
-      (click)="openFile(file)"
+      (mouseup)="openFile($event, file)"
     ></mat-row>
   </mat-table>
 </div>
