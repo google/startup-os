@@ -476,7 +476,6 @@ public class GitRepo implements Repo {
     return runCommand("rev-parse " + branch).stdout.trim();
   }
 
-  // TODO: Add tests for `getMostRecentCommitOfFile` method
   @Override
   public String getMostRecentCommitOfFile(String filename) {
     return runCommand("log -n 1 --pretty=format:%H -- " + filename).stdout.trim();

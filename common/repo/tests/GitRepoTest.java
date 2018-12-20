@@ -537,17 +537,34 @@ public class GitRepoTest {
   }
 
   @Test
-  public void testGetTheLatestCommitIdOfBranchWhenMasterBranch() {
+  public void testGetMostRecentCommitOfBranchWhenMasterBranch() {
     String expectedCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
     assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfBranch("master"));
   }
 
   @Test
-  public void testGetTheLatestCommitIdOfBranchWhenFeatureBranch() {
+  public void testGetMostRecentCommitOfBranchWhenFeatureBranch() {
     repo.switchBranch(TEST_BRANCH);
     String expectedCommitId = gitRepo.getHeadCommitId();
     assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfBranch(TEST_BRANCH));
+  }
+
+  @Test
+  public void testGetMostRecentCommitOfFileWhenMasterBranch() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    String expectedCommitId = gitRepo.getHeadCommitId();
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfFile(TEST_FILE));
+  }
+
+  @Test
+  public void testGetMostRecentCommitOfFileWhenFeatureBranch() {
+    gitRepo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    String expectedCommitId = gitRepo.getHeadCommitId();
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfFile(TEST_FILE));
   }
 }
 
