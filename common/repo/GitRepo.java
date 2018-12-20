@@ -219,6 +219,8 @@ public class GitRepo implements Repo {
         return File.Action.COPY;
       case "??":
         return File.Action.ADD;
+      case "UU":
+        return File.Action.MODIFY;
       default:
         throw new IllegalStateException("Unknown change type " + changeType);
     }
@@ -268,8 +270,8 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public void push(String branch) {
-    runCommand("push -q --atomic -u origin " + branch);
+  public boolean push(String branch) {
+    return runCommand("push -q --atomic -u origin " + branch).stderr.isEmpty();
   }
 
   @Override

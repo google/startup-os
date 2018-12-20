@@ -163,8 +163,15 @@ export class DiffsComponent implements OnInit, OnDestroy {
   }
 
   // Navigate to a Diff
-  openDiff(diffId: number): void {
-    this.router.navigate(['diff/', diffId]);
+  openDiff(event: MouseEvent, diffId: number): void {
+    switch (event.which) {
+      case 1:
+        this.router.navigate(['diff/', diffId]);
+        break;
+      case 2:
+         window.open('diff/' + diffId, '_blank');
+        break;
+    }
   }
 
   getUsername(reviewer: Reviewer, index: number, diff: Diff): string {

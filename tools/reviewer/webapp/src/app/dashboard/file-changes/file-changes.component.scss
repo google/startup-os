@@ -11,6 +11,8 @@ $border: 1px solid #c1c1c1;
         outline: none;
         cursor: pointer;
         user-select: none;
+        text-decoration: none;
+        color: black;
         &:hover {
           text-decoration: underline;
         }
