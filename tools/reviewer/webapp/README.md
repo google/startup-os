@@ -7,7 +7,7 @@ To set up your development environment, follow these steps:
 Install these:
 * [node](https://nodejs.org/) version 8.11.4  
 * [npm](https://www.npmjs.com/) version 5.6.0  
-* [google-protobuf](https://github.com/protocolbuffers/protobuf/releases), version 3.5 or above.  
+* [google-protobuf](https://github.com/protocolbuffers/protobuf/releases), version 3.6.1  
 
 (Installation of exact versions is not required, but recommended. We can't guarantee that webapp will work properly with different versions.)
 

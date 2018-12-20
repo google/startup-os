@@ -17,24 +17,24 @@ Run the script
 bash install_nvm.sh
 ```
 
-To gain access to the nvm functionality, you'll need to log out and log back in again, or you can source the `~/.profile` file so that your current session knows about the changes:
+Update current session
 ```
 source ~/.profile
 ```
 
-Check available versions:
+Check available versions
 ```
 nvm ls-remote
 ```
 
-Install and use exact version.
+Install and use exact version
 ```
 nvm install 8.11.4
 ```
 
 Great! `node` and `npm` are installed successfully.  
 
-To check current used version:
+To check current used version
 ```
 node -v
 ```
@@ -43,8 +43,7 @@ npm -v
 ```
 
 ## Google protobuf
-Download **latest release** from [github](https://github.com/protocolbuffers/protobuf/releases/)  
-Example:
+Download protoc
 ```
 curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip
 ```
