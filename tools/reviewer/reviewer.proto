@@ -19,6 +19,7 @@ message CIRequest {
     string commitId = 2;
   }
   repeated Target target = 1;
+  bool forSubmission = 2;
 }
 
 message CIResponse {
