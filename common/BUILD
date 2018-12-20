@@ -7,6 +7,7 @@ java_library(
         "CommonComponent.java",
         "CommonModule.java",
         "FileUtils.java",
+        "HttpUtils.java",
         "Lists.java",
         "MessageDifferencer.java",
         "StringBuilder.java",

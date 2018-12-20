@@ -44,3 +44,20 @@ java_binary(
         "//tools/reviewer/aa/commands",
     ],
 )
+
+java_binary(
+    name = "aa_script_helper",
+    srcs = ["AaScriptHelper.java"],
+    main_class = "com.google.startupos.tools.reviewer.aa.AaScriptHelper",
+    deps = [
+        ":aa_module",
+        ":aa_tool",
+        "//common",
+        "//common:dagger_with_annotation_processor",
+        "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/slf4j:slf4j_simple",
+    ],
+)

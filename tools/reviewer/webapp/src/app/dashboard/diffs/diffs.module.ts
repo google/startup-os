@@ -16,3 +16,6 @@ import { DiffsComponent } from './diffs.component';
   providers: [],
 })
 export class DiffsModule { }
+export function DiffsModuleFactory() {
+  return DiffsModule;
+}

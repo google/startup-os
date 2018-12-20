@@ -3,6 +3,13 @@ reviewer_config {
   display_name: "StartupOS"
   config_repo: "https://github.com/google/startup-os"
   webapp_url: "https://startupos-5f279.firebaseapp.com"
-  config_url: "https://firestore.googleapis.com/v1beta1/projects/startupos-5f279/databases/(default)/documents/reviewer/config_binary"
   default_port: 7000
+  firebase_config {
+    api_key: "AIzaSyAn-A7YXlqR2JNOvlbhkVwcnsOigmphQIw"
+    auth_domain: "startupos-5f279.firebaseapp.com"
+    database_url: "https://startupos-5f279.firebaseio.com"
+    project_id: "startupos-5f279"
+    storage_bucket: "startupos-5f279.appspot.com"
+    messaging_sender_id: "160348327132"
+  }  
 }

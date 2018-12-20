@@ -132,7 +132,7 @@ export class ChangesService {
       throw new Error(
         `After adding all placeholders, blocks should have the same amount of lines.
 Left lines: ${leftBlockLines.length}
-Right lines: ${leftBlockLines.length}`,
+Right lines: ${rightBlockLines.length}`,
       );
     }
     const amountOfLines: number = leftBlockLines.length;

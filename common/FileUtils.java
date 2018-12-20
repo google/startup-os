@@ -191,6 +191,18 @@ public class FileUtils {
     }
   }
 
+  /** Gets subfolder names in path. Throws IllegalStateException if path is not a folder. */
+  public ImmutableList<String> listSubfolders(String path) throws IOException {
+    if (!folderExists(path)) {
+      throw new IllegalStateException("Folder does not exist");
+    }
+    return ImmutableList.sortedCopyOf(
+        listContents(path)
+            .stream()
+            .filter(x -> folderExists(joinPaths(path, x)))
+            .collect(Collectors.toList()));
+  }
+
   /**
    * Gets file and folder absolute paths recursively. Throws NoSuchFileException if directory
    * doesn't exist

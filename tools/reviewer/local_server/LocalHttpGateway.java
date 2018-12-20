@@ -39,50 +39,32 @@ import java.util.stream.Collectors;
 import org.json.JSONObject;
 
 /*
- * LocalHttpGateway is a proxy that takes HTTP calls over HTTP_GATEWAY_PORT, sends them to gRPC
- * client (which in turn communicates to gRPC server and responds) and returns responses
- *
- * To run:
- * bazel build //tools/reviewer/local_server:local_http_gateway_deploy.jar
- * bazel-bin/tools/reviewer/local_server/local_http_gateway -- {absolute_path}
- * {absolute_path} is absolute root path to serve files over (use `pwd` for current dir)
+ * LocalHttpGateway is a proxy that takes HTTP requests, sends them to gRPC client (which in turn
+ * communicates to gRPC server and responds) and returns responses.
+ * It is run together with the local server.
  */
-// TODO: Find an automated way to do this, e.g github.com/improbable-eng/grpc-web
 public class LocalHttpGateway {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   private final HttpServer httpServer;
 
+  private static final String HEALTH_CHECK_PATH = "/health";
   private static final String TOKEN_PATH = "/token";
-  private static final String GET_FILE_PATH = "/get_file";
   private static final String GET_TEXT_DIFF_PATH = "/get_text_diff";
   private static final String GET_DIFF_FILES_PATH = "/get_diff_files";
   private static final int HTTP_STATUS_CODE_OK = 200;
   private static final int HTTP_STATUS_CODE_NOT_FOUND = 404;
 
-  @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
-  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
-
-  @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
-  public static final Flag<String> localServerHost = Flag.create("localhost");
-
-  @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
-  public static final Flag<Integer> localServerPort = Flag.create(8001);
-
-  private LocalHttpGateway(int httpGatewayPort, String localServerHost, int localServerPort)
+  public LocalHttpGateway(int httpGatewayPort, String localServerHost, int localServerPort)
       throws Exception {
-    logger
-        .atInfo()
-        .log(
-            String.format(
-                "Starting gateway at port %d (local server at %s:%d)",
-                httpGatewayPort, localServerHost, localServerPort));
+    logger.atInfo().log(String.format("Starting gateway at port %d", httpGatewayPort));
     httpServer = HttpServer.create(new InetSocketAddress(httpGatewayPort), 0);
     LocalHttpGatewayGrpcClient client =
         new LocalHttpGatewayGrpcClient(localServerHost, localServerPort);
 
+    httpServer.createContext("/", new HealthCheckHandler());
+    httpServer.createContext(HEALTH_CHECK_PATH, new HealthCheckHandler());
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
-    httpServer.createContext(GET_FILE_PATH, new GetFileHandler(client));
     httpServer.createContext(GET_TEXT_DIFF_PATH, new GetTextDiffHandler(client));
     httpServer.createContext(GET_DIFF_FILES_PATH, new GetDiffFilesHandler(client));
     httpServer.setExecutor(null); // Creates a default executor
@@ -90,6 +72,21 @@ public class LocalHttpGateway {
 
   public void serve() {
     httpServer.start();
+  }
+
+  /* Handler for health check */
+  static class HealthCheckHandler implements HttpHandler {
+    public void handle(HttpExchange httpExchange) throws IOException {
+      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+      httpExchange
+          .getResponseHeaders()
+          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      final byte[] response = "OK".getBytes(UTF_8);
+      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
+      try (OutputStream stream = httpExchange.getResponseBody()) {
+        stream.write(response);
+      }
+    }
   }
 
   /* Handler for receiving Firestore token */
@@ -118,42 +115,6 @@ public class LocalHttpGateway {
     }
   }
 
-  /* Handler for serving /get_file/<file path>, <file path> is a relative path */
-  static class GetFileHandler implements HttpHandler {
-    private final LocalHttpGatewayGrpcClient client;
-
-    GetFileHandler(LocalHttpGatewayGrpcClient client) {
-      this.client = client;
-    }
-
-    public void handle(HttpExchange httpExchange) throws IOException {
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange
-          .getResponseHeaders()
-          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      String requestPath = httpExchange.getRequestURI().getPath();
-      String relativeFilePath = requestPath.substring(GET_FILE_PATH.length());
-      logger.atInfo().log("Handling get_file request for " + relativeFilePath);
-      String fileContents = client.getFile(relativeFilePath);
-
-      if (fileContents == null) {
-        httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_NOT_FOUND, 0);
-        try (OutputStream stream = httpExchange.getResponseBody()) {
-          stream.write(
-              String.format("{\"error\": \"No file at path '%s'\"}", relativeFilePath).getBytes());
-        }
-        return;
-      }
-
-      byte[] response = fileContents.getBytes();
-
-      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
-      try (OutputStream stream = httpExchange.getResponseBody()) {
-        stream.write(response);
-      }
-    }
-  }
-
   /* Handler for serving /get_text_diff?request=<protobin> where <protobin> is a request proto.
    * The response is a protobin of the response proto.
    */
@@ -164,30 +125,11 @@ public class LocalHttpGateway {
       this.client = client;
     }
 
-    private void printExampleEncodedBytes() {
-      // Here's an example of a url that should work, based on the example below:
-      // http://localhost:7000/get_text_diff?request=CkEKCVJFQURNRS5tZCIKc3RhcnR1cC1vcyooMTEyZGEyN2IzMjFlZDZhYTJlYzFiYzkxZjM5MThlYjQxZDhhOTM4YxJBCglSRUFETUUubWQiCnN0YXJ0dXAtb3MqKDExMmRhMjdiMzIxZWQ2YWEyZWMxYmM5MWYzOTE4ZWI0MWQ4YTkzOGM=
-      File file =
-          File.newBuilder()
-              .setRepoId("startup-os")
-              .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
-              .setFilename("README.md")
-              .build();
-      final TextDiffRequest request =
-          TextDiffRequest.newBuilder().setLeftFile(file).setRightFile(file).build();
-      byte[] bytes = request.toByteArray();
-      String encodedBytes = Base64.getEncoder().encodeToString(bytes);
-      System.out.println("encodedBytes");
-      System.out.println(encodedBytes);
-    }
-
     public void handle(HttpExchange httpExchange) throws IOException {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
       httpExchange
           .getResponseHeaders()
           .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // TODO: Remove printExampleEncodedBytes() once integration is working
-      printExampleEncodedBytes();
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
       String requestString = params.get("request");
       TextDiffRequest request =
@@ -212,27 +154,11 @@ public class LocalHttpGateway {
       this.client = client;
     }
 
-    private void printExampleEncodedBytes() {
-      // Here's an example of a url that should work, based on the example below:
-      // http://localhost:7000/get_diff_files?request=ChxmaXhfZmlsZXNfaW5fc2VydmVyX3Jlc3BvbnNlEBw=
-      final DiffFilesRequest request =
-          DiffFilesRequest.newBuilder()
-              .setWorkspace("fix_files_in_server_response")
-              .setDiffId(28)
-              .build();
-      byte[] bytes = request.toByteArray();
-      String encodedBytes = Base64.getEncoder().encodeToString(bytes);
-      System.out.println("encodedBytes");
-      System.out.println(encodedBytes);
-    }
-
     public void handle(HttpExchange httpExchange) throws IOException {
       httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
       httpExchange
           .getResponseHeaders()
           .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      // TODO: Remove printExampleEncodedBytes() once integration is working
-      printExampleEncodedBytes();
       ImmutableMap<String, String> params = paramsToMap(httpExchange.getRequestURI().getQuery());
       String requestString = params.get("request");
       DiffFilesRequest request =
@@ -268,21 +194,6 @@ public class LocalHttpGateway {
       }
     }
     return result.build();
-  }
-
-  private static void checkFlags() {
-    if (httpGatewayPort.get().equals(localServerPort.get())) {
-      System.out.println(
-          "Error: HttpGatewayServer and LocalServer ports are the same: " + localServerPort.get());
-      System.exit(1);
-    }
-  }
-
-  public static void main(String[] args) throws Exception {
-    Flags.parseCurrentPackage(args);
-    checkFlags();
-    new LocalHttpGateway(httpGatewayPort.get(), localServerHost.get(), localServerPort.get())
-        .serve();
   }
 }
 

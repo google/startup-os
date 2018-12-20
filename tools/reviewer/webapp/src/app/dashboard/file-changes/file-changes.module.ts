@@ -25,3 +25,6 @@ import { StateService } from './services';
   ],
 })
 export class FileChangesModule { }
+export function FileChangesModuleFactory() {
+  return FileChangesModule;
+}
