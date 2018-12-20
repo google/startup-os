@@ -68,10 +68,7 @@ public class InitCommandTest {
 
   @Test
   public void initCommandTest() throws Exception {
-    String[] args = {
-      "init", "/path/to/base",
-      "--startupos_repo", ""
-    };
+    String[] args = {"init", "--base_path", "/path/to/base", "--startupos_repo", ""};
     initCommand.run(args);
     ImmutableList<String> paths = fileUtils.listContentsRecursively("/");
     assertEquals(

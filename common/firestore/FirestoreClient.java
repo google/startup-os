@@ -257,12 +257,6 @@ public class FirestoreClient {
       } else {
         stream = connection.getInputStream();
       }
-
-      try (Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"))) {
-        for (int c; (c = in.read()) >= 0; ) {
-          System.out.print((char) c);
-        }
-      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

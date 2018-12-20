@@ -162,37 +162,6 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
         } else {
           log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
         }
-
-        for (ReviewerRegistryConfig registryConfig : registry.getReviewerConfigList()) {
-          String url =
-              String.format(
-                  REPO_REGISTRY_URL,
-                  GitRepo.getOrgName(registryConfig.getConfigRepo()),
-                  GitRepo.getProjectName(registryConfig.getConfigRepo()));
-          try {
-            String content = fileUtils.downloadUrl(url);
-            ReviewerConfig reviewerConfig =
-                (ReviewerConfig)
-                    fileUtils.readPrototxtFromString(content, ReviewerConfig.newBuilder());
-            int reviewerConfigHash = reviewerConfig.hashCode();
-            if (!reviewerConfigHashes.containsKey(registryConfig.toString())
-                || (reviewerConfigHashes.get(registryConfig.toString()) == reviewerConfigHash)) {
-              uploadReviewerConfigToFirestore(reviewerConfig);
-              reviewerConfigHashes.put(registryConfig.toString(), reviewerConfigHash);
-              log.atInfo()
-                  .log("Updated ReviewerConfig for repo %s,", registryConfig.getConfigRepo());
-            } else {
-              log.atInfo()
-                  .log(
-                      "ReviewerConfig already up-to-date for repo %s,",
-                      registryConfig.getConfigRepo());
-            }
-          } catch (Exception e) {
-            log.atWarning()
-                .withCause(e)
-                .log("Cannot update config in registry entry:\n%s", registryConfig);
-          }
-        }
         firstRun = false;
       } catch (IOException exception) {
         exception.printStackTrace();

@@ -38,29 +38,11 @@ message ReviewerConfig {
   // Display name for Reviewer instance. Should be same as
   // ReviewerRegistryConfig.display_name
   string display_name = 1;
-  FirebaseConfig firebase_config = 2;
   // Repos in this Reviewer instance
   repeated Repo repo = 3;
   repeated User user = 4;
   repeated Project project = 5;
   int32 total_crystal = 6;
-}
-
-/* Firebase config. The only field we probably need is project_id, but we're not
- * sure of that. */
-message FirebaseConfig {
-  // E.g AIzaSyAn-A7YXlqR2JNOvlbhkVwcnsOigmphQIw
-  string api_key = 1;
-  // E.g startupos-5f279.firebaseapp.com
-  string auth_domain = 2;
-  // E.g https://startupos-5f279.firebaseio.com
-  string database_url = 3;
-  // E.g startupos-5f279
-  string project_id = 4;
-  // E.g startupos-5f279.appspot.com
-  string storage_bucket = 5;
-  // E.g 160348327132
-  string messaging_sender_id = 6;
 }
 
 // A user, a contributor to the Reviewer repos.
