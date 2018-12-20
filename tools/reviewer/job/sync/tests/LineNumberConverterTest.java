@@ -61,48 +61,63 @@ public class LineNumberConverterTest {
   public void addedFile_firstLineTest() {
     String patch = "@@ -0,0 +1,5 @@" + "\n+line 1\n+line 2\n+line 3\n+line 4\n+line 5";
 
-    assertEquals(1, converter.getLineNumber(patch, 1, LineNumberConverter.Side.RIGHT));
-    assertEquals(1, converter.getPosition(patch, 1, LineNumberConverter.Side.RIGHT));
+    assertEquals(
+        1, converter.getLineNumber(patch, 1, LineNumberConverter.Side.RIGHT).getLineNumber());
+    assertEquals(
+        1,
+        converter.getPosition(patch, 1, LineNumberConverter.Side.RIGHT).getExactGithubPosition());
   }
 
   @Test
   public void addedFile_lineInTheMiddleTest() {
     String patch = "@@ -0,0 +1,5 @@" + "\n+line 1\n+line 2\n+line 3\n+line 4\n+line 5";
 
-    assertEquals(3, converter.getLineNumber(patch, 3, LineNumberConverter.Side.RIGHT));
-    assertEquals(3, converter.getPosition(patch, 3, LineNumberConverter.Side.RIGHT));
+    assertEquals(
+        3, converter.getLineNumber(patch, 3, LineNumberConverter.Side.RIGHT).getLineNumber());
+    assertEquals(
+        3,
+        converter.getPosition(patch, 3, LineNumberConverter.Side.RIGHT).getExactGithubPosition());
   }
 
   @Test
   public void addedFile_lastLineTest() {
     String patch = "@@ -0,0 +1,5 @@" + "\n+line 1\n+line 2\n+line 3\n+line 4\n+line 5";
 
-    assertEquals(5, converter.getLineNumber(patch, 5, LineNumberConverter.Side.RIGHT));
-    assertEquals(5, converter.getPosition(patch, 5, LineNumberConverter.Side.RIGHT));
+    assertEquals(
+        5, converter.getLineNumber(patch, 5, LineNumberConverter.Side.RIGHT).getLineNumber());
+    assertEquals(
+        5,
+        converter.getPosition(patch, 5, LineNumberConverter.Side.RIGHT).getExactGithubPosition());
   }
 
   @Test
   public void removedFile_firstLineTest() {
     String patch = "@@ -1,5 +0,0 @@" + "\n-line 1\n-line 2\n-line 3\n-line 4\n-line 5";
 
-    assertEquals(1, converter.getLineNumber(patch, 1, LineNumberConverter.Side.LEFT));
-    assertEquals(1, converter.getPosition(patch, 1, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        1, converter.getLineNumber(patch, 1, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        1, converter.getPosition(patch, 1, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
   public void removedFile_lineInTheMiddleTest() {
     String patch = "@@ -1,5 +0,0 @@" + "\n-line 1\n-line 2\n-line 3\n-line 4\n-line 5";
 
-    assertEquals(3, converter.getLineNumber(patch, 3, LineNumberConverter.Side.LEFT));
-    assertEquals(3, converter.getPosition(patch, 3, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        3, converter.getLineNumber(patch, 3, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        3, converter.getPosition(patch, 3, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
   public void removedFile_lastLineTest() {
     String patch = "@@ -1,5 +0,0 @@" + "\n-line 1\n-line 2\n-line 3\n-line 4\n-line 5";
 
-    assertEquals(5, converter.getLineNumber(patch, 5, LineNumberConverter.Side.LEFT));
-    assertEquals(5, converter.getPosition(patch, 5, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        5, converter.getLineNumber(patch, 5, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        5, converter.getPosition(patch, 5, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
@@ -114,8 +129,10 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line5"
             + "\n line6\n line7\n line8";
 
-    assertEquals(2, converter.getLineNumber(patch, 1, LineNumberConverter.Side.LEFT));
-    assertEquals(1, converter.getPosition(patch, 2, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        2, converter.getLineNumber(patch, 1, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        1, converter.getPosition(patch, 2, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
@@ -127,8 +144,10 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line5"
             + "\n line6\n line7\n line8";
 
-    assertEquals(8, converter.getLineNumber(patch, 8, LineNumberConverter.Side.LEFT));
-    assertEquals(8, converter.getPosition(patch, 8, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        8, converter.getLineNumber(patch, 8, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        8, converter.getPosition(patch, 8, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
@@ -140,8 +159,10 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line5"
             + "\n line6\n line7\n line8";
 
-    assertEquals(5, converter.getLineNumber(patch, 4, LineNumberConverter.Side.LEFT));
-    assertEquals(4, converter.getPosition(patch, 5, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        5, converter.getLineNumber(patch, 4, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        4, converter.getPosition(patch, 5, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
@@ -153,8 +174,26 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line5"
             + "\n line6\n line7\n line8";
 
-    assertEquals(5, converter.getLineNumber(patch, 5, LineNumberConverter.Side.RIGHT));
-    assertEquals(5, converter.getPosition(patch, 5, LineNumberConverter.Side.RIGHT));
+    assertEquals(
+        5, converter.getLineNumber(patch, 5, LineNumberConverter.Side.RIGHT).getLineNumber());
+    assertEquals(
+        5,
+        converter.getPosition(patch, 5, LineNumberConverter.Side.RIGHT).getExactGithubPosition());
+  }
+
+  // TODO: Add additional tests to check the correct of getting the closest position
+  @Test
+  public void closestPosition_beforePatchTest() {
+    String patch =
+        "@@ -2,7 +2,7 @@"
+            + "\n line2\n line3\n line4"
+            + "\n-line5"
+            + "\n+CHANGED_line5"
+            + "\n line6\n line7\n line8";
+
+    assertEquals(
+        1,
+        converter.getPosition(patch, 1, LineNumberConverter.Side.LEFT).getClosestGithubPosition());
   }
 
   @Test
@@ -165,8 +204,11 @@ public class LineNumberConverterTest {
             + "\n+NEW_LINE_#1\n+NEW_LINE_#2\n+NEW_LINE_#3"
             + "\n line6\n line7\n line8";
 
-    assertEquals(7, converter.getLineNumber(patch, 5, LineNumberConverter.Side.RIGHT));
-    assertEquals(5, converter.getPosition(patch, 7, LineNumberConverter.Side.RIGHT));
+    assertEquals(
+        7, converter.getLineNumber(patch, 5, LineNumberConverter.Side.RIGHT).getLineNumber());
+    assertEquals(
+        5,
+        converter.getPosition(patch, 7, LineNumberConverter.Side.RIGHT).getExactGithubPosition());
   }
 
   @Test
@@ -178,8 +220,11 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line4\n+CHANGED_line5\n+CHANGED_line6"
             + "\n line7\n line8\n line9";
 
-    assertEquals(7, converter.getLineNumber(patch, 10, LineNumberConverter.Side.LEFT));
-    assertEquals(10, converter.getPosition(patch, 7, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        7, converter.getLineNumber(patch, 10, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        10,
+        converter.getPosition(patch, 7, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
@@ -191,8 +236,10 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line4\n+CHANGED_line5\n+CHANGED_line6"
             + "\n line7\n line8\n line9";
 
-    assertEquals(6, converter.getLineNumber(patch, 6, LineNumberConverter.Side.LEFT));
-    assertEquals(6, converter.getPosition(patch, 6, LineNumberConverter.Side.LEFT));
+    assertEquals(
+        6, converter.getLineNumber(patch, 6, LineNumberConverter.Side.LEFT).getLineNumber());
+    assertEquals(
+        6, converter.getPosition(patch, 6, LineNumberConverter.Side.LEFT).getExactGithubPosition());
   }
 
   @Test
@@ -204,72 +251,123 @@ public class LineNumberConverterTest {
             + "\n+CHANGED_line4\n+CHANGED_line5\n+CHANGED_line6"
             + "\n line7\n line8\n line9";
 
-    assertEquals(6, converter.getLineNumber(patch, 9, LineNumberConverter.Side.RIGHT));
-    assertEquals(9, converter.getPosition(patch, 6, LineNumberConverter.Side.RIGHT));
+    assertEquals(
+        6, converter.getLineNumber(patch, 9, LineNumberConverter.Side.RIGHT).getLineNumber());
+    assertEquals(
+        9,
+        converter.getPosition(patch, 6, LineNumberConverter.Side.RIGHT).getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line24_OnTheLeftTest() {
     assertEquals(
-        24, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 19, LineNumberConverter.Side.LEFT));
+        24,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 19, LineNumberConverter.Side.LEFT)
+            .getLineNumber());
     assertEquals(
-        19, converter.getPosition(COMPLEX_CHANGES_PATCH, 24, LineNumberConverter.Side.LEFT));
+        19,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 24, LineNumberConverter.Side.LEFT)
+            .getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line38_OnTheLeftTest() {
     assertEquals(
-        38, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 41, LineNumberConverter.Side.LEFT));
+        38,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 41, LineNumberConverter.Side.LEFT)
+            .getLineNumber());
     assertEquals(
-        41, converter.getPosition(COMPLEX_CHANGES_PATCH, 38, LineNumberConverter.Side.LEFT));
+        41,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 38, LineNumberConverter.Side.LEFT)
+            .getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line65_OnTheLeftTest() {
     assertEquals(
-        65, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 54, LineNumberConverter.Side.LEFT));
+        65,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 54, LineNumberConverter.Side.LEFT)
+            .getLineNumber());
     assertEquals(
-        54, converter.getPosition(COMPLEX_CHANGES_PATCH, 65, LineNumberConverter.Side.LEFT));
+        54,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 65, LineNumberConverter.Side.LEFT)
+            .getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line100_OnTheLeftTest() {
     assertEquals(
-        100, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 81, LineNumberConverter.Side.LEFT));
+        100,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 81, LineNumberConverter.Side.LEFT)
+            .getLineNumber());
     assertEquals(
-        81, converter.getPosition(COMPLEX_CHANGES_PATCH, 100, LineNumberConverter.Side.LEFT));
+        81,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 100, LineNumberConverter.Side.LEFT)
+            .getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line18_OnTheRightTest() {
     assertEquals(
-        18, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 24, LineNumberConverter.Side.RIGHT));
+        18,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 24, LineNumberConverter.Side.RIGHT)
+            .getLineNumber());
     assertEquals(
-        24, converter.getPosition(COMPLEX_CHANGES_PATCH, 18, LineNumberConverter.Side.RIGHT));
+        24,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 18, LineNumberConverter.Side.RIGHT)
+            .getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line30_OnTheRightTest() {
     assertEquals(
-        30, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 35, LineNumberConverter.Side.RIGHT));
+        30,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 35, LineNumberConverter.Side.RIGHT)
+            .getLineNumber());
     assertEquals(
-        35, converter.getPosition(COMPLEX_CHANGES_PATCH, 30, LineNumberConverter.Side.RIGHT));
+        35,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 30, LineNumberConverter.Side.RIGHT)
+            .getExactGithubPosition());
   }
 
   @Test
   public void complexChanges_line100_OnTheRightTest() {
     assertEquals(
-        100, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 80, LineNumberConverter.Side.RIGHT));
+        100,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 80, LineNumberConverter.Side.RIGHT)
+            .getLineNumber());
     assertEquals(
-        80, converter.getPosition(COMPLEX_CHANGES_PATCH, 100, LineNumberConverter.Side.RIGHT));
+        80,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 100, LineNumberConverter.Side.RIGHT)
+            .getExactGithubPosition());
   }
 
   @Test
-  public void complexChanges_line106_OnTheRightTest() {
+  public void complexChanges_line105_OnTheRightTest() {
     assertEquals(
-        106, converter.getLineNumber(COMPLEX_CHANGES_PATCH, 86, LineNumberConverter.Side.RIGHT));
+        105,
+        converter
+            .getLineNumber(COMPLEX_CHANGES_PATCH, 85, LineNumberConverter.Side.RIGHT)
+            .getLineNumber());
     assertEquals(
-        86, converter.getPosition(COMPLEX_CHANGES_PATCH, 106, LineNumberConverter.Side.RIGHT));
+        85,
+        converter
+            .getPosition(COMPLEX_CHANGES_PATCH, 105, LineNumberConverter.Side.RIGHT)
+            .getExactGithubPosition());
   }
 }
 

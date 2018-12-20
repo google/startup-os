@@ -21,6 +21,7 @@ java_test(
         "//common",
         "//common/repo",
         "//common/repo:repo_java_proto",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/junit",
         "//third_party/maven/org/mockito:mockito_core",
         "//tools/reviewer/job/sync:full_github_pr_java_proto",

@@ -497,9 +497,10 @@ public class GitRepoTest {
     fileUtils.writeStringUnchecked(
         "New file content\n", fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
-    String expectedPatch = "@@ -1 +1 @@\n" + "-Some test file contents\n" + "+New file content\n";
-    assertEquals(expectedPatch, gitRepo.getPatch(masterCommitId, TEST_FILE));
-    assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_FILE));
+    String testBranchCommitId = gitRepo.getHeadCommitId();
+    String expectedPatch = "@@ -1 +1 @@\n" + "-Some test file contents\n" + "+New file content";
+    assertEquals(expectedPatch, gitRepo.getPatch(masterCommitId, testBranchCommitId, TEST_FILE));
+    assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_BRANCH, TEST_FILE));
   }
 
   @Test
@@ -516,6 +517,7 @@ public class GitRepoTest {
     fileUtils.writeStringUnchecked(
         fileContentInTestBranch, fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
+    String testBranchCommitId = gitRepo.getHeadCommitId();
 
     String expectedPatch =
         "@@ -1,5 +1,5 @@\n"
@@ -529,23 +531,40 @@ public class GitRepoTest {
             + " line8\n"
             + " line9\n"
             + " line10\n"
-            + "+(ADDED)line11\n";
-    assertEquals(expectedPatch, gitRepo.getPatch(masterCommitId, TEST_FILE));
-    assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_FILE));
+            + "+(ADDED)line11";
+    assertEquals(expectedPatch, gitRepo.getPatch(masterCommitId, testBranchCommitId, TEST_FILE));
+    assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_BRANCH, TEST_FILE));
   }
 
   @Test
-  public void testGetTheLatestCommitIdOfBranchWhenMasterBranch() {
+  public void testGetMostRecentCommitOfBranchWhenMasterBranch() {
     String expectedCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
-    assertEquals(expectedCommitId, gitRepo.getMostRecentCommit("master"));
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfBranch("master"));
   }
 
   @Test
-  public void testGetTheLatestCommitIdOfBranchWhenFeatureBranch() {
+  public void testGetMostRecentCommitOfBranchWhenFeatureBranch() {
     repo.switchBranch(TEST_BRANCH);
     String expectedCommitId = gitRepo.getHeadCommitId();
-    assertEquals(expectedCommitId, gitRepo.getMostRecentCommit(TEST_BRANCH));
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfBranch(TEST_BRANCH));
+  }
+
+  @Test
+  public void testGetMostRecentCommitOfFileWhenMasterBranch() {
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), "commit in master");
+    String expectedCommitId = gitRepo.getHeadCommitId();
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfFile(TEST_FILE));
+  }
+
+  @Test
+  public void testGetMostRecentCommitOfFileWhenFeatureBranch() {
+    gitRepo.switchBranch(TEST_BRANCH);
+    fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
+    repo.commit(repo.getUncommittedFiles(), COMMIT_MESSAGE);
+    String expectedCommitId = gitRepo.getHeadCommitId();
+    assertEquals(expectedCommitId, gitRepo.getMostRecentCommitOfFile(TEST_FILE));
   }
 }
 

@@ -459,14 +459,28 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public String getPatch(String referenceCommitOrBranch, String filename) {
+  public String getPatch(
+      String firstReferenceCommitOrBranch, String secondReferenceCommitOrBranch, String filename) {
     return removeDiffHeader(
-        runCommand("diff " + referenceCommitOrBranch + " -- " + filename).stdout);
+            runCommand(
+                    "diff "
+                        + firstReferenceCommitOrBranch
+                        + " "
+                        + secondReferenceCommitOrBranch
+                        + " -- "
+                        + filename)
+                .stdout)
+        .trim();
   }
 
   @Override
-  public String getMostRecentCommit(String branch) {
+  public String getMostRecentCommitOfBranch(String branch) {
     return runCommand("rev-parse " + branch).stdout.trim();
+  }
+
+  @Override
+  public String getMostRecentCommitOfFile(String filename) {
+    return runCommand("log -n 1 --pretty=format:%H -- " + filename).stdout.trim();
   }
 
   private void switchToMasterBranch() {
