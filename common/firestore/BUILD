@@ -15,12 +15,14 @@ java_library(
     srcs = [
         "FirestoreClient.java",
         "FirestoreJsonFormat.java",
+        "MessageWithId.java",
     ],
     deps = [
         ":data_java_proto",
         "//common:auto_factory",
         "//common:auto_factory_plugin",
         "//common:dagger_with_annotation_processor",
+        "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/code/gson",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",

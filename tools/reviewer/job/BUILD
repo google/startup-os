@@ -1,11 +1,17 @@
 load("@io_bazel_rules_docker//java:image.bzl", "java_image")
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 
+proto_library(
+    name = "submitter_proto",
+    srcs = ["submitter.proto"],
+)
+
 JOB_FILES = [
     "ReviewerJob.java",
     "impl/CiTask.java",
     "impl/FirestoreTaskBase.java",
     "impl/ReviewerMetadataUpdaterTask.java",
+    "impl/SubmitterTask.java",
     "tasks/Task.java",
     "tasks/TaskExecutor.java",
 ]
@@ -22,6 +28,7 @@ JOB_DEPS = [
     "//third_party/maven/com/google/flogger:flogger_system_backend",
     "//third_party/maven/javax/inject:javax_inject",
     "//third_party/maven/io/grpc:grpc_services",
+    "//third_party/maven/org/apache/commons:commons_lang3",
     "//tools/reviewer:reviewer_java_proto",
     "//tools/reviewer:reviewer_registry_java_proto",
     "//tools/reviewer/aa:aa_module",
@@ -29,6 +36,7 @@ JOB_DEPS = [
     "//tools/reviewer/local_server",
     "//tools/reviewer/local_server:local_http_gateway",
     "//tools/reviewer/local_server/service:code_review_service",
+    "//tools/reviewer/local_server/service:code_review_java_proto",
 ]
 
 java_binary(

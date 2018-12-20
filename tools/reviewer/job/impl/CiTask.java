@@ -20,6 +20,7 @@ import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.CommandLine;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreClientFactory;
+import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
@@ -41,7 +42,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
   private GitRepoFactory gitRepoFactory;
 
   private static String CI_REQUESTS_PATH = "/reviewer/ci/requests";
-  private static String CI_RESPONSES_PATH = "/reviewer/ci/responses";
+  private static String CI_RESPONSES_PATH = "/reviewer/ci/responses/%s/history";
 
   @Inject
   public CiTask(
@@ -61,14 +62,16 @@ public class CiTask extends FirestoreTaskBase implements Task {
   @Override
   public void run() {
     CIResponse.Builder responseBuilder = CIResponse.newBuilder();
+    MessageWithId requestWithDiffId = null;
     if (lock.tryLock()) {
       try {
         initializeFirestoreClientIfNull();
 
         log.atInfo().log("Running CI job (Firestore client @ %s)", firestoreClient);
 
-        CIRequest request =
-            (CIRequest) this.firestoreClient.popDocument(CI_REQUESTS_PATH, CIRequest.newBuilder());
+        requestWithDiffId =
+            this.firestoreClient.popDocument(CI_REQUESTS_PATH, CIRequest.newBuilder());
+        CIRequest request = (CIRequest) requestWithDiffId.message();
 
         if (request == null) {
           // there is no request to process
@@ -124,7 +127,8 @@ public class CiTask extends FirestoreTaskBase implements Task {
                   .build());
         }
       } finally {
-        firestoreClient.createDocument(CI_RESPONSES_PATH, responseBuilder.build());
+        firestoreClient.createDocument(
+            String.format(CI_RESPONSES_PATH, requestWithDiffId.id()), responseBuilder.build());
         lock.unlock();
       }
     }
