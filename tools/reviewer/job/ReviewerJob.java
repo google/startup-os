@@ -28,6 +28,10 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
 import dagger.Component;
+import com.google.startupos.tools.reviewer.job.tasks.ReviewerMetadataUpdaterTask;
+import com.google.startupos.tools.reviewer.job.tasks.CiTask;
+import com.google.startupos.tools.reviewer.job.tasks.SubmitterTask;
+import com.google.common.collect.ImmutableList;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,19 +63,16 @@ public class ReviewerJob {
   private Lazy<LocalServer> lazyLocalServer;
   private Lazy<HeadUpdater> lazyHeadUpdater;
 
-  @FlagDesc(name = "service_account_json", description = "", required = true)
-  public static Flag<String> serviceAccountJson = Flag.create("");
-
-  @FlagDesc(name = "repo_url", description = "", required = false)
-  public static Flag<String> repoUrl = Flag.create("");
-
   @Inject
   public ReviewerJob(
-      TaskExecutor taskExecutor,
       InitCommand initCommand,
       Lazy<LocalServer> lazyLocalServer,
-      Lazy<HeadUpdater> lazyHeadUpdater) {
-    this.taskExecutor = taskExecutor;
+      Lazy<HeadUpdater> lazyHeadUpdater,
+      ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask,
+      CiTask ciTask,
+      SubmitterTask submitterTask) {
+    this.taskExecutor =
+        new TaskExecutor(ImmutableList.of(reviewerMetadataUpdaterTask, ciTask, submitterTask));
     this.initCommand = initCommand;
     this.lazyLocalServer = lazyLocalServer;
     this.lazyHeadUpdater = lazyHeadUpdater;
@@ -103,6 +104,7 @@ public class ReviewerJob {
     Flags.parse(
         args,
         ReviewerJob.class.getPackage(),
+        ReviewerMetadataUpdaterTask.class.getPackage(),
         InitCommand.class.getPackage(),
         LocalServer.class.getPackage(),
         CodeReviewService.class.getPackage());

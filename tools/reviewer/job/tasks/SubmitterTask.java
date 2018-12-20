@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.job.impl;
+package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
