@@ -5,9 +5,13 @@ To set up your development environment, follow these steps:
 
 ## Installation
 Install these:
-* [node](https://nodejs.org/) LTS version
-* [npm](https://www.npmjs.com/)  
-* [google-protobuf](https://github.com/protocolbuffers/protobuf/releases), version 3.5 or above.
+* [node](https://nodejs.org/) version 8.11.4  
+* [npm](https://www.npmjs.com/) version 5.6.0  
+* [google-protobuf](https://github.com/protocolbuffers/protobuf/releases), version 3.6.1  
+
+(Installation of exact versions is not required, but recommended. We can't guarantee that webapp will work properly with different versions.)
+
+[How to install on Linux](https://github.com/google/startup-os/blob/master/tools/reviewer/webapp/how-to-linux.md) 
 
 Optional:
 * [firebase](https://firebase.google.com/docs/hosting/quickstart), to be able to deploy.  
