@@ -47,7 +47,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
   private final ReentrantLock lock = new ReentrantLock();
-  private final HashSet<Long> ciSubmittedDiffIds = new HashSet<>();
+  private final HashSet<CIRequest> ciSubmittedDiffIds = new HashSet<>();
 
   @Inject
   public SubmitterTask(
@@ -167,12 +167,13 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                       throw new RuntimeException("Not all pushes were successful");
                     }
                   } else {
-                    if (!ciSubmittedDiffIds.contains(diff.getId())) {
+                    CIRequest newRequest = newRequestBuilder.build();
+                    if (!ciSubmittedDiffIds.contains(newRequest)) {
                       this.firestoreClient.createDocument(
                           CI_REQUESTS_PATH,
                           String.valueOf(diff.getId()),
-                          newRequestBuilder.build());
-                      ciSubmittedDiffIds.add(diff.getId());
+                          newRequest);
+                      ciSubmittedDiffIds.add(newRequest);
                     }
                   }
                 });
