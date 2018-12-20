@@ -17,16 +17,3 @@ java_library(
         "//third_party/maven/org/codehaus/mojo:animal_sniffer_annotations",
     ],
 )
-
-java_library(
-    name = "guava_jdk5",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvncom/google/guava/guava_jdk5",
-    ],
-)

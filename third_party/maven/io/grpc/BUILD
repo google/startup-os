@@ -69,6 +69,22 @@ java_library(
 )
 
 java_library(
+    name = "grpc_netty_shaded",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/grpc/grpc_netty_shaded",
+    ],
+    runtime_deps = [
+        ":grpc_core",
+    ],
+)
+
+java_library(
     name = "grpc_protobuf",
     licenses = [
         "permissive",

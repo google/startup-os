@@ -30,3 +30,37 @@ java_library(
         ":opencensus_api",
     ],
 )
+
+java_library(
+    name = "opencensus_contrib_grpc_util",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/opencensus/opencensus_contrib_grpc_util",
+    ],
+    runtime_deps = [
+        ":opencensus_api",
+        "//third_party/maven/io/grpc:grpc_core",
+    ],
+)
+
+java_library(
+    name = "opencensus_contrib_http_util",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/opencensus/opencensus_contrib_http_util",
+    ],
+    runtime_deps = [
+        ":opencensus_api",
+        "//third_party/maven/com/google/guava",
+    ],
+)
