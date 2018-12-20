@@ -1,6 +1,11 @@
 load("@io_bazel_rules_docker//java:image.bzl", "java_image")
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 
+proto_library(
+    name = "submitter_proto",
+    srcs = ["submitter.proto"]
+)
+
 JOB_FILES = [
     "ReviewerJob.java",
     "impl/CiTask.java",

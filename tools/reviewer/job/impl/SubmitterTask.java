@@ -163,6 +163,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                       diff = diff.toBuilder().setStatus(Diff.Status.SUBMITTED).build();
                       this.firestoreClient.createProtoDocument(
                           DIFF_PATH, String.valueOf(diff.getId()), diff);
+                      // TODO: store `SubmitterMergeResult`
                     } else {
                       throw new RuntimeException("Not all pushes were successful");
                     }
