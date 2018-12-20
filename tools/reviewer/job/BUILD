@@ -3,7 +3,7 @@ load("@io_bazel_rules_docker//container:container.bzl", "container_push")
 
 proto_library(
     name = "submitter_proto",
-    srcs = ["submitter.proto"]
+    srcs = ["submitter.proto"],
 )
 
 JOB_FILES = [

@@ -171,9 +171,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                     CIRequest newRequest = newRequestBuilder.build();
                     if (!ciSubmittedDiffIds.contains(newRequest)) {
                       this.firestoreClient.createDocument(
-                          CI_REQUESTS_PATH,
-                          String.valueOf(diff.getId()),
-                          newRequest);
+                          CI_REQUESTS_PATH, String.valueOf(diff.getId()), newRequest);
                       ciSubmittedDiffIds.add(newRequest);
                     }
                   }
