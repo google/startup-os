@@ -51,7 +51,7 @@ export class CommitMenuComponent implements OnDestroy {
 
   constructor(
     private mouseService: MouseService,
-    private stateService: StateService,
+    public stateService: StateService,
     private commitService: CommitService,
     private loadService: LoadService,
   ) {
