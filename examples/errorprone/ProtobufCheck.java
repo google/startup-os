@@ -40,12 +40,13 @@ import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 /** Matches on .newBuilder().build() called on proto message class. */
 @AutoService(BugChecker.class)
 @BugPattern(
-    name = "ProtobufCheck",
-    category = JDK,
-    summary = "Invocation of .newBuilder().build() on proto messages",
-    severity = ERROR,
-    linkType = CUSTOM,
-    link = "github.com/google/startup-os/tree/master/examples/errorprone#ProtobufCheck")
+  name = "ProtobufCheck",
+  category = JDK,
+  summary = "Invocation of .newBuilder().build() on proto messages",
+  severity = ERROR,
+  linkType = CUSTOM,
+  link = "github.com/google/startup-os/tree/master/examples/errorprone#ProtobufCheck"
+)
 public class ProtobufCheck extends BugChecker implements MethodInvocationTreeMatcher {
 
   private Matcher<ExpressionTree> NEW_BUILDER =

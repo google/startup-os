@@ -109,9 +109,11 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       if (!file.getCommitId().isEmpty()) {
         if (!workspaceExists(file.getWorkspace())) {
           if (!getHeadRepo(file.getRepoId()).commitExists(file.getCommitId())) {
-            logger.atInfo().log(
-                "Workspace %s doesn't exist, and commit %s doesn't exist in head repo",
-                file.getWorkspace(), file.getCommitId());
+            logger
+                .atInfo()
+                .log(
+                    "Workspace %s doesn't exist, and commit %s doesn't exist in head repo",
+                    file.getWorkspace(), file.getCommitId());
             file = file.toBuilder().clearWorkspace().build();
           }
         }
@@ -373,8 +375,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
       branch = "D" + request.getDiffId();
       isHead = false;
     } else {
-      logger.atInfo().log(
-          "Workspace %s does not exist. Fallbacking to head.", request.getWorkspace());
+      logger
+          .atInfo()
+          .log("Workspace %s does not exist. Fallbacking to head.", request.getWorkspace());
       workspacePath = fileUtils.joinToAbsolutePath(basePath, "head");
       workspace = "";
       branch = "remotes/origin/D" + request.getDiffId();

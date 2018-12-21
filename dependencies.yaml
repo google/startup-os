@@ -87,7 +87,7 @@ dependencies:
   com.google.googlejavaformat:
     google-java-format:
       lang: java
-      version: "1.6"
+      version: "1.5"
   
   com.google.guava:
     guava:
