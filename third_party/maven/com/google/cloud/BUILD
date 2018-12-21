@@ -4,7 +4,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvncom/google/cloud/google_cloud_core",
@@ -18,6 +18,7 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/http_client:google_http_client",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/joda_time",
     ],
 )
@@ -45,6 +46,7 @@ java_library(
         "//third_party/maven/io/grpc:grpc_netty_shaded",
         "//third_party/maven/io/grpc:grpc_protobuf",
         "//third_party/maven/io/grpc:grpc_stub",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
     ],
 )
 
@@ -82,7 +84,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvncom/google/cloud/google_cloud_firestore",
@@ -99,6 +101,7 @@ java_library(
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/io/opencensus:opencensus_api",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_util",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
     ],
 )
 

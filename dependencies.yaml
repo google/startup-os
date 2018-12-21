@@ -15,23 +15,23 @@ dependencies:
   com.google.api:
     api-common:
       lang: java
-      version: "1.1.0"
+      version: "1.7.0"
   
   com.google.auth:
     google:
       lang: java
       modules: [ "auth-library-credentials", "auth-library-oauth2-http" ]
-      version: "0.11.0"
-
+      version: "0.12.0"
+  
   com.google.auto:
     auto-common:
       lang: java
-      version: "0.6"
+      version: "0.10"
   
   com.google.auto.factory:
     auto-factory:
       lang: java
-      version: "1.0-beta5"
+      version: "1.0-beta6"
   
   com.google.auto.service:
     auto-service:
@@ -45,6 +45,13 @@ dependencies:
       processorClasses: [ "com.google.auto.value.processor.AutoValueProcessor" ]
       version: "1.5"
   
+  com.google.cloud:
+    google-cloud-core:
+      lang: java
+    google-cloud-firestore:
+      lang: java
+      version: "0.74.0-beta"
+  
   com.google.code.findbugs:
     jsr305:
       lang: java
@@ -53,13 +60,13 @@ dependencies:
   com.google.code.gson:
     gson:
       lang: java
-      version: "2.8.2"
+      version: "2.8.5"
   
   com.google.dagger:
     dagger:
       lang: java
       modules: [ "", "compiler" ]
-      version: "2.15"
+      version: "2.20"
   
   com.google.errorprone:
     error_prone_ant:
@@ -75,17 +82,17 @@ dependencies:
     flogger:
       lang: java
       modules: [ "", "system-backend" ]
-      version: "0.1"
+      version: "0.3.1"
   
   com.google.googlejavaformat:
     google-java-format:
       lang: java
-      version: "1.5"
+      version: "1.6"
   
   com.google.guava:
     guava:
       lang: java
-      version: "26.0-jre"
+      version: "27.0.1-jre"
   
   com.google.jimfs:
     jimfs:
@@ -96,7 +103,7 @@ dependencies:
     protobuf:
       lang: java
       modules: [ "java", "java-util" ]
-      version: "3.6.0"
+      version: "3.6.1"
   
   com.jcraft:
     jsch:
@@ -122,12 +129,17 @@ dependencies:
     grpc:
       lang: java
       modules: [ "core", "netty", "protobuf", "services", "stub" ]
-      version: "1.12.0"
+      version: "1.16.1"
+  
+  io.netty:
+    netty-codec-http2:
+      lang: java
+      version: "4.1.32.Final"
   
   io.opencensus:
     opencensus-contrib-grpc-metrics:
       lang: java
-      version: "0.15.0"
+      version: "0.18.0"
   
   javax.annotation:
     javax.annotation-api:

@@ -7,9 +7,9 @@ maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
-    sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",
-    strip_prefix = "grpc-java-1.12.0",
-    urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
+    #sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",
+    strip_prefix = "grpc-java-1.16.1",
+    urls = ["https://github.com/grpc/grpc-java/archive/v1.16.1.tar.gz"],
 )
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")

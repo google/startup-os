@@ -52,7 +52,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvnio/netty/netty_codec_http2",

@@ -63,3 +63,25 @@ java_proto_library(
     name = "test_java_proto",
     deps = [":test_proto"],
 )
+
+java_binary(
+    name = "firestore_admin_client_tool",
+    srcs = [
+        "FirestoreAdminClientTool.java",
+    ],
+    main_class = "com.google.startupos.common.firestore.tests.FirestoreAdminClientTool",
+    deps = [
+        "//common",
+        "//common:dagger_with_annotation_processor",
+        "//common:diff_match_patch",
+        "//common:text_difference_java_proto",
+        "//common:text_differencer",
+        "//common/firestore:firestore_admin_client",
+        "//common/flags",
+        "//common/repo",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/org/slf4j:slf4j_simple",
+    ],
+)

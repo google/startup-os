@@ -152,10 +152,9 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
           if (firstRun) {
             log.atInfo().log("Storing on first run, checksum: %s", newChecksum);
           } else {
-            log.atInfo()
-                .log(
-                    "New checksum not equal to stored one: new %s, stored %s",
-                    newChecksum, registryChecksum);
+            log.atInfo().log(
+                "New checksum not equal to stored one: new %s, stored %s",
+                newChecksum, registryChecksum);
           }
           uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;

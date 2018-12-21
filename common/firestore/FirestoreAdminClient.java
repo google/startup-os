@@ -20,8 +20,14 @@ import static java.net.HttpURLConnection.HTTP_OK;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auto.factory.AutoFactory;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.FirebaseApp;
+import com.google.cloud.firestore.Firestore;
+import com.google.firebase.cloud.FirestoreClient;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -29,34 +35,59 @@ import com.google.gson.JsonParser;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.startupos.common.firestore.Protos.ProtoDocument;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.WriteResult;
+import java.util.concurrent.ExecutionException;
 
-import java.io.*;
+import java.io.InputStream;
+import java.io.FileInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
-// TODO: Fix open Firestore rules
-@AutoFactory(allowSubclasses = true)
 public class FirestoreAdminClient {
-  // Base path formatted by project name and path, that starts with a /.
-  private final String project;
-  private final String token;
+  Firestore client;
 
-  public FirestoreAdminClient(String project, String token) {
-    this.project = project;
-    this.token = token;
-    // TODO: Finish implementation of FirestoreAdminClient
+  public FirestoreAdminClient(String serviceAccountJson) {
     try {
-      FileInputStream serviceAccount = new FileInputStream("path/to/serviceAccountKey.json");
-
-      FirebaseOptions options =
-          new FirebaseOptions.Builder()
-              .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-              .setDatabaseUrl("https://<DATABASE_NAME>.firebaseio.com/")
-              .build();
-
+      InputStream serviceAccount = new FileInputStream(serviceAccountJson);
+      GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
+      FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(credentials).build();
       FirebaseApp.initializeApp(options);
+
+      client = FirestoreClient.getFirestore();
     } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  // TODO: Replace method with actual usage
+  public void testFunctionality() {
+    try {
+      DocumentReference docRef = client.collection("users").document("alovelace2");
+      // Add document data  with id "alovelace" using a hashmap
+      Map<String, Object> data = new HashMap<>();
+      data.put("first", "Ada");
+      data.put("last", "Lovelace");
+      data.put("born", 1815);
+      ApiFuture<WriteResult> result = docRef.set(data);
+      System.out.println("Update time : " + result.get().getUpdateTime());
+
+      CollectionReference reference = client.collection("users");
+      ApiFuture<QuerySnapshot> query = reference.get();
+      QuerySnapshot querySnapshot = query.get();
+      List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
+      for (QueryDocumentSnapshot document : documents) {
+        System.out.println("User: " + document.getId());
+        System.out.println("First: " + document.getString("first"));
+        System.out.println("Last: " + document.getString("last"));
+        System.out.println("Born: " + document.getLong("born"));
+      }
+    } catch (ExecutionException | InterruptedException e) {
+      e.printStackTrace();
     }
   }
 }

@@ -10,7 +10,6 @@ java_library(
         "//external:jar/mvnio/opencensus/opencensus_api",
     ],
     runtime_deps = [
-        "//third_party/maven/com/google/guava",
         "//third_party/maven/io/grpc:grpc_context",
     ],
 )
@@ -28,6 +27,7 @@ java_library(
     ],
     runtime_deps = [
         ":opencensus_api",
+        "//third_party/maven/com/google/guava",
     ],
 )
 
