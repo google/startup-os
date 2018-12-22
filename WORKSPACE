@@ -1,15 +1,19 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
-    sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",
-    strip_prefix = "grpc-java-1.12.0",
-    urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
+    sha256 = "48425cd631afb117fd355fd961deb313b3ac8e43f2b95c1598f35fbfcf684fbc",
+    strip_prefix = "grpc-java-1.16.1",
+    urls = ["https://github.com/grpc/grpc-java/archive/v1.16.1.tar.gz"],
 )
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
@@ -253,9 +257,8 @@ http_file(
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_osx"],
 )
 
-http_file(
+http_jar(
     name = "bazel_deps",
-    executable = True,
     sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
 )
