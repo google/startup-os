@@ -25,6 +25,7 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.tools.reviewer.job.tasks.Task;
 
@@ -104,7 +105,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
                 responseBuilder.addResults(
                     CIResponse.TargetResult.newBuilder()
                         .setTarget(target)
-                        .setSuccess(false)
+                        .setStatus(CIResponse.TargetResult.Status.SUCCESS)
                         .setLog(e.toString())
                         .build());
             return;
@@ -120,7 +121,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
           responseBuilder.addResults(
               CIResponse.TargetResult.newBuilder()
                   .setTarget(target)
-                  .setSuccess(result.exitValue == 0)
+                  .setStatus(result.exitValue == 0 ? Status.SUCCESS : Status.FAIL)
                   // TODO: Firestore's limit is 1MB. Truncate log to 950Kb, to leave room for the
                   // rest of the message.
                   .setLog(result.stderr)

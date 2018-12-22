@@ -44,6 +44,7 @@ proto_library(
     deps = [
         "//common:text_difference_proto",
         "//common/repo:repo_proto",
+        "//tools/reviewer:reviewer_proto",
     ],
 )
 
