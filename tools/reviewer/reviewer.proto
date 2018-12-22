@@ -34,9 +34,7 @@ message CIResponse {
     }
     CIRequest.Target target = 1;
     Status status = 2;
-    // Log weighs too much
-    // TODO: move log somewhere else
-    // string log = 3;
+    string log = 3;
   }
   repeated TargetResult results = 2;
 }
