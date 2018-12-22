@@ -28,7 +28,7 @@ export class ReplyPopupComponent implements OnInit {
   @Output() toggleReplyPopup = new EventEmitter<boolean>();
 
   constructor(
-    private userService: UserService,
+    public userService: UserService,
     private diffUpdateService: DiffUpdateService,
     private diffHeaderService: DiffHeaderService,
   ) { }

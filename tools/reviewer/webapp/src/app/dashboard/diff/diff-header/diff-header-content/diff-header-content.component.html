@@ -89,6 +89,13 @@
         <td>Modified</td>
         <td>{{ diff.getModifiedTimestamp() | time:'fullDate' }}</td>
       </tr>
+      <tr>
+        <td>CI</td>
+        <td
+          class="ci-status"
+          [style.color]="status.color"
+        >{{ status.message }}</td>
+      </tr>
     </table>
   </div>
 

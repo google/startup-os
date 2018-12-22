@@ -25,6 +25,11 @@ $transparent-grey: rgba(0,0,0,0.54);
           }
         }
       }
+      >.ci-status {
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: underline;
+      }
     }
     user-popup {
       margin-right: 5px;
