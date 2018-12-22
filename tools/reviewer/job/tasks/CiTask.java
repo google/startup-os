@@ -105,7 +105,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
                 responseBuilder.addResults(
                     CIResponse.TargetResult.newBuilder()
                         .setTarget(target)
-                        .setStatus(CIResponse.TargetResult.Status.SUCCESS)
+                        .setStatus(Status.SUCCESS)
                         .setLog(e.toString())
                         .build());
             return;
