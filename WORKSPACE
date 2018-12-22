@@ -1,6 +1,10 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
@@ -253,9 +257,8 @@ http_file(
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_osx"],
 )
 
-http_file(
+http_jar(
     name = "bazel_deps",
-    executable = True,
     sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
 )
