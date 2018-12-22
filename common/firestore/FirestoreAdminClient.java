@@ -38,6 +38,10 @@ import com.google.startupos.common.firestore.Protos.ProtoDocument;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.WriteResult;
 import java.util.concurrent.ExecutionException;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.EventListener;
+import com.google.cloud.firestore.FirestoreException;
+import javax.annotation.Nullable;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -86,6 +90,26 @@ public class FirestoreAdminClient {
         System.out.println("Last: " + document.getString("last"));
         System.out.println("Born: " + document.getLong("born"));
       }
+
+      docRef = client.collection("users").document("alovelace");
+      docRef.addSnapshotListener(
+          new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(
+                @Nullable DocumentSnapshot snapshot, @Nullable FirestoreException e) {
+              if (e != null) {
+                System.err.println("Listen failed: " + e);
+                return;
+              }
+
+              if (snapshot != null && snapshot.exists()) {
+                System.out.println("Current data: " + snapshot.getData());
+              } else {
+                System.out.print("Current data: null");
+              }
+            }
+          });
+
     } catch (ExecutionException | InterruptedException e) {
       e.printStackTrace();
     }

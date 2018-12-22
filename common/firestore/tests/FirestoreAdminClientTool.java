@@ -27,6 +27,7 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import java.io.IOException;
 import com.google.startupos.common.firestore.FirestoreAdminClient;
+import java.util.concurrent.Executors;
 
 /** A tool for testing TextDifferencer. */
 @Singleton
@@ -43,7 +44,19 @@ public class FirestoreAdminClientTool {
 
   void run() throws IOException {
     FirestoreAdminClient firestoreAdminClient = new FirestoreAdminClient(serviceAccountJson.get());
-    firestoreAdminClient.testFunctionality();
+
+    Executors.newSingleThreadExecutor()
+        .execute(
+            new Runnable() {
+              @Override
+              public void run() {
+                firestoreAdminClient.testFunctionality();
+              }
+            });
+    try {
+      Thread.sleep(100000000);
+    } catch (Exception e) {
+    }
   }
 
   @Singleton

@@ -51,6 +51,8 @@ dependencies:
     google-cloud-firestore:
       lang: java
       version: "0.74.0-beta"
+    google-cloud-core-grpc:
+      lang: java
   
   com.google.code.findbugs:
     jsr305:

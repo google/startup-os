@@ -29,7 +29,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvncom/google/cloud/google_cloud_core_grpc",
