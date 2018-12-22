@@ -10,16 +10,52 @@
 # To compile aa from a workspace: 'export AA_FORCE_COMPILE_WS=<>'
 # To undo: 'unset AA_FORCE_COMPILE_WS'
 
-# TODO:
-# 1. Add function set_BAZEL_WORKSPACE(), to set variable to either head or debug ws.
-# 2. Add function bazel_run(force_build) to run a bazel command:
-#    1. cd into workspace
-#    2. Check if file exists
-#    3. If not (or if force_build), bazel build it
-#    4. Exit if build fails
-#    5. Run command
-# 3. Use bazel_run() in _aa_completions() and in aa(), set_BAZEL_WORKSPACE() in aa()
-# 4. Make sure that after this, `aa` can be run from outside of a workspace (but inside base).
+function set_STARTUP_OS_REPO() {
+    set_AA_BASE
+    if [[ -z "$AA_BASE" ]]; then
+    echo "BASE file not found in path until root"
+    return 1
+
+    fi
+    if [[ -z "$AA_FORCE_COMPILE_WS" ]]; then
+        # we want to use `aa` from head
+        export STARTUP_OS_REPO="$AA_BASE/head/startup-os/"
+    else
+        # there's a workspace we want to use `aa` from
+        export STARTUP_OS_REPO="$AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/"
+    fi
+}
+
+function bazel_run() {
+    local target=$1
+    shift;
+    local force_compile=$1
+    shift;
+    local args="$@"
+
+    #sed replaces bazel target name with name of the binary 'bazel build' would produce
+    #by doing the following (sed commands are split by ;):
+    #
+    #add bazel-bin/ to the beginning
+    #replace // with nothing
+    #replace : with /
+    local binary_for_target=$(echo "$target" | sed -e 's|^|bazel-bin/|g; s|//||g; s|:|/|g;')
+
+    set_STARTUP_OS_REPO
+    pushd $STARTUP_OS_REPO
+
+    if [[ ! -f ${binary_for_target} ]] || [[ "${force_compile}" -eq 1 ]]; then
+        bazel build ${target} &> /dev/null
+        if [[ $? -ne 0 ]]; then
+            exit 1
+        fi
+    fi
+
+    eval "${binary_for_target} ${args}"
+    return_code="$?"
+    popd
+    return ${return_code}
+}
 
 function _aa_completions()
 {
@@ -28,9 +64,7 @@ function _aa_completions()
   local cur_word prev_word
   cur_word="${COMP_WORDS[COMP_CWORD]}"
   prev_word="${COMP_WORDS[COMP_CWORD-1]}"
-  bazel build //tools/reviewer/aa:aa_script_helper &> /dev/null
-  COMMAND="bazel-bin/tools/reviewer/aa/aa_script_helper completions \"${prev_word}\" \"${cur_word}\""
-  COMPREPLY=( $(eval $COMMAND) )
+  COMPREPLY=( bazel_run //tools/reviewer/aa:aa_script_helper 0 completions \"${prev_word}\" \"${cur_word}\" )
   return 0
 }
 
@@ -38,7 +72,7 @@ function _aa_completions()
 function set_AA_BASE {
   CWD=`pwd`
   while [[ `pwd` != / ]]; do
-    if [ -f `pwd`/BASE ]; then
+    if [[ -f `pwd`/BASE ]]; then
       AA_BASE=`pwd`
       cd $CWD
       return 0
@@ -46,7 +80,7 @@ function set_AA_BASE {
       cd ..
     fi
   done
-  cd $CWD
+  cd ${CWD}
   return 0
 }
 
@@ -55,56 +89,33 @@ function aa {
   RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
   RESET=$(tput sgr0)  
-  CWD=`pwd`
   set_AA_BASE
   if [[ -z "$AA_BASE" ]]; then
     echo "BASE file not found in path until root"
     return 1
   fi
-  bazel run //tools/reviewer/aa:aa_script_helper -- start_server $AA_BASE/head/startup-os
-  STARTUP_OS=$AA_BASE/head/startup-os
 
-  AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
-  if [ ! -z "$AA_FORCE_COMPILE_WS" ]; then
-    echo "$RED[DEBUG]: building aa from ws $AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/$RESET"
-    cd $AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/
-    bazel build //tools/reviewer/aa:aa_tool
-    if [ $? -ne 0 ]; then
-      cd $CWD
-      return 1
-    fi
-    AA_BINARY="$AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/bazel-bin/tools/reviewer/aa/aa_tool"
-    cd $CWD
-  elif [ ! -f $AA_BINARY ]; then
-    cd $STARTUP_OS
-    bazel build //tools/reviewer/aa:aa_tool
-    if [ $? -ne 0 ]; then
-      cd $CWD
-      return 1
-    fi
-    AA_BINARY="$STARTUP_OS/bazel-bin/tools/reviewer/aa/aa_tool"
-    cd $CWD
-  fi
+  set_STARTUP_OS_REPO
+  bazel_run //tools/reviewer/aa:aa_script_helper 0 start_server $AA_BASE/head/startup-os
 
-  if [ "$1" = "workspace" ]; then
+  if [[ "$1" = "workspace" ]]; then
       # For workspace command, `aa` prints commands to stdout, such as cd, that we need to execute.
-      AA_RESULT=$(eval $AA_BINARY $*)
+      AA_RESULT=$( bazel_run //tools/reviewer/aa:aa_tool 0 $* )
       AA_RESULT_CODE=$?
       $AA_RESULT
   else
       # If command is not workspace, let `aa` execute as is
-      eval $AA_BINARY $*
+      bazel_run //tools/reviewer/aa:aa_tool 0 $*
       AA_RESULT_CODE=$?
   fi
   unset AA_BASE
-  unset CWD
-  return $AA_RESULT_CODE
+  return ${AA_RESULT_CODE}
 }
 
 function aaw(){
   aa workspace $*
   # Workspace command succeeded, and was "-f"
-  if [ $? -eq 0 ] && [[ $* == -f* ]]; then
+  if [[ $? -eq 0 ]] && [[ $* == -f* ]]; then
     aa diff
   fi
 }
