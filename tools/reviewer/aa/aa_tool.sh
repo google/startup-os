@@ -32,7 +32,14 @@ function bazel_run() {
     local force_compile=$1
     shift;
     local args="$@"
-    local binary_for_target=$(echo "$target" | sed -e 's|//||g; s|:|/|g; s|^|bazel-bin/|g')
+
+    #sed replaces bazel target name with name of the binary 'bazel build' would produce
+    #by doing the following (sed commands are split by ;):
+    #
+    #add bazel-bin/ to the beginning
+    #replace // with nothing
+    #replace : with /
+    local binary_for_target=$(echo "$target" | sed -e 's|^|bazel-bin/|g; s|//||g; s|:|/|g;')
 
     set_STARTUP_OS_REPO
     pushd $STARTUP_OS_REPO
