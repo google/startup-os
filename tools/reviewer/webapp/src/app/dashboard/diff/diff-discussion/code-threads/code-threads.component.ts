@@ -97,9 +97,22 @@ export class CodeThreadsComponent implements OnChanges, OnInit {
     fileGroups.sort((a, b) => this.discussionService.compareLastTimestamps(a[0], b[0]));
   }
 
-  openFile(fileGroup: Thread[]): void {
+  openFile(event: MouseEvent, fileGroup: Thread[]): void {
+    // Which button is clicked?
+    let isNewTab: boolean;
+    switch (event.which) {
+      case 1: // Left mouse button
+        isNewTab = false;
+        break;
+      case 2: // Middle mouse button
+        isNewTab = true;
+        break;
+      default: return; // Do nothing, if it's another button
+    }
+
     const groupFile: File = fileGroup[0].getFile();
     this.diffService.openFile(
+      isNewTab,
       groupFile,
       this.diff.getId(),
     );

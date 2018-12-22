@@ -19,10 +19,12 @@ package com.google.startupos.common.firestore;
 import static java.net.HttpURLConnection.HTTP_OK;
 
 import com.google.auto.factory.AutoFactory;
+import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.MessageOrBuilder;
 import com.google.startupos.common.firestore.Protos.ProtoDocument;
@@ -34,6 +36,7 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
+import java.util.List;
 
 // TODO: Fix open Firestore rules
 @AutoFactory(allowSubclasses = true)
@@ -110,13 +113,17 @@ public class FirestoreClient {
     try {
       ProtoDocument.Builder protoDocument = ProtoDocument.newBuilder();
       FirestoreJsonFormat.parser().merge(getDocumentResponse(path), protoDocument);
-      byte[] protoBytes = Base64.getDecoder().decode(protoDocument.getProto());
-
-      // We just need the proto Message to get a parser
-      return proto.build().getParserForType().parseFrom(protoBytes);
+      return fromProtoDocument(protoDocument.build(), proto);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private Message fromProtoDocument(ProtoDocument protoDocument, Message.Builder proto)
+      throws InvalidProtocolBufferException {
+    byte[] protoBytes = Base64.getDecoder().decode(protoDocument.getProto());
+    // We just need the proto Message to get a parser
+    return proto.build().getParserForType().parseFrom(protoBytes);
   }
 
   public void createProtoDocument(String path, Message proto) {
@@ -147,14 +154,8 @@ public class FirestoreClient {
     }
   }
 
-  /**
-   * Pops (FIFO) document from collection
-   *
-   * @param path document path
-   * @param proto builder for proto message
-   * @return proto message
-   */
-  public Message popDocument(String path, Message.Builder proto) {
+  private MessageWithId getDocumentFromCollection(
+      String path, Message.Builder proto, boolean shouldRemove) {
     // TODO: pop a document without fetching all documents in the list
     try {
       // this is *document* list, containing 'Firestore-flavored' JSON documents
@@ -167,9 +168,63 @@ public class FirestoreClient {
         String keyName = document.get("name").getAsJsonPrimitive().getAsString();
         // TODO: refactor to have separate .deleteDocument() method
         // keyName starts with 'projects/' so it's full path rather than only document id
-        this.httpDelete(API_ROOT + keyName);
-        return proto.build();
+        if (shouldRemove) {
+          this.httpDelete(API_ROOT + keyName);
+        }
+        return MessageWithId.create(keyName.substring(keyName.lastIndexOf('/') + 1), proto.build());
       }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  /**
+   * Pops (FIFO) document from collection
+   *
+   * @param path document path
+   * @param proto builder for proto message
+   * @return proto message
+   */
+  public MessageWithId popDocument(String path, Message.Builder proto) {
+    return getDocumentFromCollection(path, proto, true);
+  }
+
+  /**
+   * Gets (FIFO) document from collection
+   *
+   * @param path document path
+   * @param proto builder for proto message
+   * @return proto message
+   */
+  public MessageWithId getDocumentFromCollection(String path, Message.Builder proto) {
+    return getDocumentFromCollection(path, proto, false);
+  }
+
+  /**
+   * Gets a (homogeneous) list of documents from collection;
+   *
+   * @param path document path
+   * @param proto builder for proto message
+   * @return list of proto messages
+   */
+  public List<Message> listDocuments(String path, Message.Builder proto) {
+    try {
+      // this is *document* list, containing 'Firestore-flavored' JSON documents
+      String documentList = this.httpGet(getGetUrl(path));
+      JsonElement element = new JsonParser().parse(documentList);
+      JsonArray documents = element.getAsJsonObject().getAsJsonArray("documents");
+      ImmutableList.Builder<Message> result = ImmutableList.builder();
+
+      if (documents != null && documents.size() > 0) {
+        for (JsonElement document : documents) {
+          proto.clear();
+          ProtoDocument.Builder protoDocumentBuilder = ProtoDocument.newBuilder();
+          FirestoreJsonFormat.parser().merge(document.toString(), protoDocumentBuilder);
+          result.add(fromProtoDocument(protoDocumentBuilder.build(), proto));
+        }
+      }
+      return result.build();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -201,12 +256,6 @@ public class FirestoreClient {
         stream = connection.getErrorStream();
       } else {
         stream = connection.getInputStream();
-      }
-
-      try (Reader in = new BufferedReader(new InputStreamReader(stream, "UTF-8"))) {
-        for (int c; (c = in.read()) >= 0; ) {
-          System.out.print((char) c);
-        }
       }
     } catch (IOException e) {
       throw new RuntimeException(e);

@@ -79,12 +79,8 @@ public class GithubWriter {
     return pullRequestNumber;
   }
 
-  public long createReviewComment(
-      String repoOwner,
-      String repoName,
-      long pullRequestNumber,
-      ReviewComment reviewComment,
-      PullRequest pullRequest) {
+  public ReviewComment createReviewComment(
+      long pullRequestNumber, ReviewComment reviewComment, PullRequest pullRequest) {
     final String reviewerLink =
         reviewerUrl
             + pullRequest.getAssociatedReviewerDiff()
@@ -92,46 +88,42 @@ public class GithubWriter {
             + pullRequest.getRepo()
             + "/"
             + reviewComment.getPath();
-    long reviewCommentId =
+
+    ReviewComment githubComment =
         githubClient
             .createReviewComment(
                 CreateReviewCommentRequest.newBuilder()
-                    .setOwner(repoOwner)
-                    .setRepo(repoName)
+                    .setOwner(pullRequest.getOwner())
+                    .setRepo(pullRequest.getRepo())
                     .setNumber(pullRequestNumber)
                     .setRequestData(
                         CreateReviewCommentRequest.CreateReviewCommentRequestData.newBuilder()
-                            .setBody(
-                                "Author: "
-                                    + reviewComment.getUser().getEmail()
-                                    + "\nCreated time: "
-                                    + reviewComment.getCreatedAt()
-                                    + "\nBody: "
-                                    + reviewComment.getBody()
-                                    + "\nSee in Reviewer: "
-                                    + reviewerLink)
+                            .setBody(getReviewCommentContent(reviewComment, reviewerLink))
                             .setCommitId(reviewComment.getCommitId())
                             .setPath(reviewComment.getPath())
                             .setPosition(reviewComment.getPosition())
                             .build())
                     .build())
-            .getReviewComment()
-            .getId();
+            .getReviewComment();
     log.atInfo()
         .log(
-            "Review comment with id *%s* was СREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
-            reviewCommentId, repoOwner, repoName, pullRequestNumber, reviewComment);
-    return reviewCommentId;
+            "Review comment with id *%s* was CREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
+            githubComment.getId(),
+            pullRequest.getOwner(),
+            pullRequest.getRepo(),
+            pullRequestNumber,
+            reviewComment);
+    return githubComment;
   }
 
-  public long createIssueComment(
+  public IssueComment createIssueComment(
       String repoOwner,
       String repoName,
       long pullRequestNumber,
       IssueComment issueComment,
       long diffId) {
     final String reviewerLink = reviewerUrl + diffId;
-    long issueCommentId =
+    IssueComment comment =
         githubClient
             .createIssueComment(
                 CreateIssueCommentRequest.newBuilder()
@@ -141,26 +133,30 @@ public class GithubWriter {
                     .setRequestData(
                         CreateIssueCommentRequest.CreateIssueCommentRequestData.newBuilder()
                             .setBody(
-                                "Author: "
-                                    + issueComment.getUser().getEmail()
-                                    + "\nCreated time: "
-                                    + issueComment.getCreatedAt()
-                                    + "\nBody: "
-                                    + issueComment.getBody()
-                                    + "\nSee in Reviewer: "
-                                    + reviewerLink)
+                                addReviewerBotInfo(
+                                    issueComment.getUser().getEmail(),
+                                    issueComment.getCreatedAt(),
+                                    issueComment.getBody(),
+                                    reviewerLink))
                             .build())
                     .build())
-            .getIssueComment()
-            .getId();
+            .getIssueComment();
     log.atInfo()
         .log(
-            "Issue comment with id *%s* was СREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
-            issueCommentId, repoOwner, repoName, pullRequestNumber, issueComment);
-    return issueCommentId;
+            "Issue comment with id *%s* was CREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
+            comment.getId(), repoOwner, repoName, pullRequestNumber, issueComment);
+    return comment;
   }
 
-  public void editIssueComment(String repoOwner, String repoName, long commentId, String newBody) {
+  public void editIssueComment(
+      String repoOwner,
+      String repoName,
+      long commentId,
+      String newBody,
+      String author,
+      String createdAt,
+      long diffId) {
+    final String reviewerLink = reviewerUrl + diffId;
     githubClient.editIssueComment(
         EditIssueCommentRequest.newBuilder()
             .setOwner(repoOwner)
@@ -168,7 +164,7 @@ public class GithubWriter {
             .setCommentId(commentId)
             .setRequestData(
                 EditIssueCommentRequest.EditIssueCommentRequestData.newBuilder()
-                    .setBody(newBody)
+                    .setBody(addReviewerBotInfo(author, createdAt, newBody, reviewerLink))
                     .build())
             .build());
     log.atInfo()
@@ -190,7 +186,14 @@ public class GithubWriter {
             commentId, repoOwner, repoName);
   }
 
-  public void editReviewComment(String repoOwner, String repoName, long commentId, String newBody) {
+  public void editReviewComment(
+      long diffNumber,
+      String repoOwner,
+      String repoName,
+      long commentId,
+      ReviewComment priorityComment) {
+    final String reviewerLink =
+        reviewerUrl + diffNumber + "/" + repoName + "/" + priorityComment.getPath();
     githubClient.editReviewComment(
         EditReviewCommentRequest.newBuilder()
             .setOwner(repoOwner)
@@ -198,13 +201,13 @@ public class GithubWriter {
             .setCommentId(commentId)
             .setRequestData(
                 EditReviewCommentRequest.EditReviewCommentRequestData.newBuilder()
-                    .setBody(newBody)
+                    .setBody(getReviewCommentContent(priorityComment, reviewerLink))
                     .build())
             .build());
     log.atInfo()
         .log(
             "Review comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
-            commentId, repoOwner, repoName, newBody);
+            commentId, repoOwner, repoName, priorityComment.getBody());
   }
 
   public void deleteReviewComment(String repoOwner, String repoName, long commentId) {
@@ -218,6 +221,32 @@ public class GithubWriter {
         .log(
             "Review comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
             commentId, repoOwner, repoName);
+  }
+
+  private String getReviewCommentContent(ReviewComment reviewComment, String reviewerLink) {
+    String result =
+        addReviewerBotInfo(
+            reviewComment.getUser().getEmail(),
+            reviewComment.getCreatedAt(),
+            reviewComment.getBody(),
+            reviewerLink);
+    if (reviewComment.getIsOutsideDiffComment()) {
+      return "Synced from line: " + reviewComment.getReviewerLineNumber() + "\n" + result;
+    } else {
+      return result;
+    }
+  }
+
+  private String addReviewerBotInfo(
+      String author, String createdAt, String commentBody, String reviewerLink) {
+    return "Author: "
+        + author
+        + "\nCreated time: "
+        + createdAt
+        + "\nBody: "
+        + commentBody
+        + "\nSee in Reviewer: "
+        + reviewerLink;
   }
 }
 

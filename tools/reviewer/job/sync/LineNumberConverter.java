@@ -16,9 +16,12 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * The class for determining line number of the file relative to a position in the diff and in the
@@ -44,7 +47,8 @@ public class LineNumberConverter {
    * @param position is line number in the diff(patch)
    * @param side the side(LEFT or RIGHT) where the comment is added
    */
-  public static int getLineNumber(String patch, int position, Side side) {
+  public static LineNumberToGithubPositionCorrelation getLineNumber(
+      String patch, int position, Side side) {
     return processDiffPatch(patch, position, side, ReturnValueFor.REVIEWER);
   }
 
@@ -55,19 +59,38 @@ public class LineNumberConverter {
    * @param lineNumber is the absolute line number in the file
    * @param side the side(LEFT or RIGHT) where the comment is added
    */
-  public static int getPosition(String patch, int lineNumber, Side side) {
+  public static LineNumberToGithubPositionCorrelation getPosition(
+      String patch, int lineNumber, Side side) {
     return processDiffPatch(patch, lineNumber, side, ReturnValueFor.GITHUB);
   }
 
-  // XXX: Need to come up with a more appropriate name
   private enum ReturnValueFor {
     GITHUB,
     REVIEWER
   }
 
-  // XXX: Need to come up with a more appropriate name
-  private static int processDiffPatch(
+  public class LineNumberToGithubPositionCorrelation {
+    private int exactGithubPosition;
+    private int closestGithubPosition;
+    private int lineNumber;
+
+    public int getExactGithubPosition() {
+      return exactGithubPosition;
+    }
+
+    public int getClosestGithubPosition() {
+      return closestGithubPosition;
+    }
+
+    public int getLineNumber() {
+      return lineNumber;
+    }
+  }
+
+  private static LineNumberToGithubPositionCorrelation processDiffPatch(
       String patch, int number, Side side, ReturnValueFor valueFor) {
+    LineNumberToGithubPositionCorrelation result =
+        new LineNumberConverter().new LineNumberToGithubPositionCorrelation();
     // The relationship between position in the diff and line number in file for the left side
     Map<Integer, Integer> positionToLineNumberLeftSide = new HashMap<>();
     // The relationship between position in the diff and line number in file for the right side
@@ -112,7 +135,9 @@ public class LineNumberConverter {
           */
         case "\n":
           {
-            ++diffHunkIndex;
+            if (diffHunkIndex < diffHunkHeaders.size() - 1) {
+              ++diffHunkIndex;
+            }
             positionToLineNumberLeftSide.put(
                 positionIndex, diffHunkHeaders.get(diffHunkIndex).getLeftStartLine());
             positionToLineNumberRightSide.put(
@@ -158,17 +183,32 @@ public class LineNumberConverter {
     }
     if (valueFor.equals(ReturnValueFor.REVIEWER)) {
       if (side.equals(Side.LEFT)) {
-        return positionToLineNumberLeftSide.get(number);
+        result.lineNumber = positionToLineNumberLeftSide.get(number);
       } else {
-        return positionToLineNumberRightSide.get(number);
+        result.lineNumber = positionToLineNumberRightSide.get(number);
       }
     } else {
       if (side.equals(Side.LEFT)) {
-        return lineNumberToPositionLeftSide.get(number);
+        if (lineNumberToPositionLeftSide.containsKey(number)) {
+          result.exactGithubPosition = lineNumberToPositionLeftSide.get(number);
+        } else {
+          List<Integer> availablePositions = new ArrayList<>(lineNumberToPositionLeftSide.keySet());
+          int closestPositionKey =
+              availablePositions
+                  .stream()
+                  .min(Comparator.comparingInt(i -> Math.abs(i - number)))
+                  .orElseThrow(
+                      () ->
+                          new NoSuchElementException(
+                              "No value present for line number: " + number));
+          result.closestGithubPosition = lineNumberToPositionLeftSide.get(closestPositionKey);
+        }
       } else {
-        return lineNumberToPositionRightSide.get(number);
+        result.exactGithubPosition = lineNumberToPositionRightSide.get(number);
       }
+      result.lineNumber = number;
     }
+    return result;
   }
 }
 

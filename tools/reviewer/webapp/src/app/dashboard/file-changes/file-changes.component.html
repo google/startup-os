@@ -5,23 +5,23 @@
   <!-- Titlebar -->
   <div class="cr-titlebar titlebar">
     <div class="title">
-      <span
+      <a
         class="diff bold"
         routerLink="/diff/{{ stateService.diffId }}"
-      >Diff {{ stateService.diff.getId() }}</span>
+      >Diff {{ stateService.diff.getId() }}</a>
       <span>by</span>
       <span
-        [ngClass]="{
-          'username': true,
-          'bold': stateService.diff.getAuthor().getNeedsAttention()
-        }"
+        class="username"
+        [ngClass]="{ 'bold': stateService.diff.getAuthor().getNeedsAttention() }"
       >{{ getAuthor() }}</span>
     </div>
     <diff-status [diff]="stateService.diff"></diff-status>
   </div>
 
-  <!-- Header -->
-  <div class="file-header">
+  <div
+    class="header-menu"
+    [ngClass]="{ 'header-fixed': isHeaderFixed }"
+  >
     <!-- Path -->
     <div class="filename">
       <span>{{ stateService.file.getFilenameWithRepo() }}</span>
@@ -29,18 +29,10 @@
 
     <!-- Commit Menu -->
     <div class="commit-menu">
-      <commit-select
-        title="Left commit id"
-        [commitId]="stateService.leftCommitId"
-        (selectChanges)="commitSelectService.leftSelectChanged($event)"
-      ></commit-select>
-      <commit-select
-        title="Right commit id"
-        [commitId]="stateService.rightCommitId"
-        (selectChanges)="commitSelectService.rightSelectChanged($event)"
-      ></commit-select>
+      <commit-menu></commit-menu>
     </div>
   </div>
+  <div class="header-cover" *ngIf="isHeaderFixed"></div>
 
   <!-- Code changes -->
   <div class="code-changes" *ngIf="stateService.isCommitFound">

@@ -4,7 +4,7 @@ import { SharedModule } from '@/shared';
 
 import { CodeChangesComponentList } from './code-changes';
 import { CodeChangesServiceList } from './code-changes';
-import { CommitSelectComponent } from './commit-select';
+import { CommitMenuComponentList } from './commit-menu';
 import { FileChangesRoutingModule } from './file-changes-routing.module';
 import { FileChangesComponent } from './file-changes.component';
 import { StateService } from './services';
@@ -16,8 +16,8 @@ import { StateService } from './services';
   ],
   declarations: [
     FileChangesComponent,
-  CommitSelectComponent,
-  ...CodeChangesComponentList,
+    ...CommitMenuComponentList,
+    ...CodeChangesComponentList,
   ],
   providers: [
     StateService,
@@ -25,3 +25,6 @@ import { StateService } from './services';
   ],
 })
 export class FileChangesModule { }
+export function FileChangesModuleFactory() {
+  return FileChangesModule;
+}

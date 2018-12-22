@@ -19,7 +19,19 @@ export class DiffFilesComponent {
 
   constructor(public diffService: DiffService) { }
 
-  openFile(file: File) {
-    this.diffService.openFile(file, this.diffId);
+  openFile(event: MouseEvent, file: File): void {
+    // Which button is clicked?
+    let isNewTab: boolean;
+    switch (event.which) {
+      case 1: // Left mouse button
+        isNewTab = false;
+        break;
+      case 2: // Middle mouse button
+        isNewTab = true;
+        break;
+      default: return; // Do nothing, if it's another button
+    }
+
+    this.diffService.openFile(isNewTab, file, this.diffId);
   }
 }

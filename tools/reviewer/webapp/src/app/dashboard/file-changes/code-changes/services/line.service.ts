@@ -14,6 +14,7 @@ export class LineService {
     return {
       code: '',
       clearCode: '',
+      wordChanges: '',
       lineNumber: 0,
       isChanged: false,
       isPlaceholder: false,

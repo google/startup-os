@@ -49,7 +49,7 @@ public interface Repo {
   /** Commits files to current branch and returns commit */
   Commit commit(ImmutableList<File> files, String message);
   /** Pushes branch to remote repo */
-  void push(String branch);
+  boolean push(String branch);
   /** Pulls all branches from remote repo */
   void pull();
   /** Merges branch to master, keeping conflicting changes in tree. * Returns true on success. */
@@ -81,5 +81,16 @@ public interface Repo {
   String getRemoteURL();
   /** Checks if there are commits added since master, or any uncommitted files */
   boolean hasChanges(String branch);
+  /**
+   * Gets patch(diff) between file in `firstReferenceCommitOrBranch` and the file in the
+   * `secondReferenceCommitOrBranch`. It's possible to use branch name or commit ID. The response
+   * can have one and more diff hunks
+   */
+  String getPatch(
+      String firstReferenceCommitOrBranch, String secondReferenceCommitOrBranch, String filename);
+
+  String getMostRecentCommitOfBranch(String branch);
+
+  String getMostRecentCommitOfFile(String filename);
 }
 

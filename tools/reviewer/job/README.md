@@ -26,3 +26,11 @@ from previous version, push it to Firestore.
 Pulls `CIRequest` from `/reviewer/ci/requests`, clones all the `Repo`s it
 contains, checks out relevant commits for each of them, runs `reviewer-ci.sh`
 and stores `CIResponse` in `/reviewer/ci/responses/`
+
+
+### SubmitterTask
+For each `Diff` which has `Status.SUBMITTING`, pulls latest `CIResponse` 
+from `/reviewer/ci/responses/<diffId>/history`, verifies that all `TargetResult`s are 
+successful, clones all the `Repo`s it contains,
+checks out `D<diffId>` branch for each of them, checks it matches the commit CI has been ran for,
+merges them to `master`, pushes all repos and updates status to `Status.SUBMITTED`

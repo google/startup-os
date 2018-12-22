@@ -171,10 +171,6 @@ http_archive(
     urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.5.1.tar.gz"],
 )
 
-load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
-
-_java_image_repos()
-
 http_jar(
     name = "grpc_polyglot",
     sha256 = "c2a453921632c0c3559f9df92e1699b69c784181f36a316f9927b70f52e5a7d5",
@@ -265,4 +261,23 @@ http_jar(
     name = "bazel_deps",
     sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
+)
+
+# Docker rules and containers
+load("@io_bazel_rules_docker//container:container.bzl", "container_pull")
+load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
+_java_image_repos()
+container_pull(
+    name = "java_base",
+    registry = "gcr.io",
+    repository = "distroless/java",
+    # 'tag' is also supported, but digest is encouraged for reproducibility.
+    digest = "sha256:8c1769cb253bdecc257470f7fba05446a55b70805fa686f227a11655a90dfe9e",
+)
+container_pull(
+    name = "alpine_java_git",
+    registry = "gcr.io",
+    repository = "startup-os/alpine-java-git",
+    #tag = "latest",
+    digest = "sha256:d27494f6034ff3cd38bd2cde9bfea019f568565d2bb14d2d450a44cd891cf28c",
 )

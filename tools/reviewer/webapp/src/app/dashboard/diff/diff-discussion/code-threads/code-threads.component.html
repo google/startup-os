@@ -5,7 +5,7 @@
   <!-- List of groups -->
   <div class="file-group" *ngFor="let fileGroup of fileGroupList; let fileGroupIndex = index;">
     <div class="filename">
-      <a (click)="openFile(fileGroup)">{{ getFileLabel(fileGroup) }}</a>
+      <a (mouseup)="openFile($event, fileGroup)">{{ getFileLabel(fileGroup) }}</a>
     </div>
     <!-- List of threads in a group -->
     <div class="thread" *ngFor="let thread of fileGroup">

@@ -16,21 +16,48 @@
 
 package com.google.startupos.tools.reviewer.job;
 
+import com.google.startupos.tools.localserver.LocalHttpGateway;
+import com.google.startupos.tools.localserver.LocalServer;
+import com.google.startupos.tools.localserver.LocalServer.HeadUpdater;
+import com.google.startupos.tools.reviewer.aa.AaModule;
+import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
 import com.google.startupos.tools.reviewer.job.tasks.TaskExecutor;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
 import dagger.Component;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Timer;
+import dagger.Lazy;
 
+// To run on server:
+// bazel run //tools/reviewer/job -- \
+// --service_account_json
+// /home/startup_os_project/base/local/startupos-5f279-firebase-adminsdk-v8n9e-2418a5ae73.json \
+// --repo_url https://github.com/google/startup-os &
+// disown -a
+
+/* TODO:
+ * Would be nice to be able to have every task run at different periodicity, and choose whether it:
+ *
+ * Wants overlapping runs
+ * Wants to skip overlapping runs
+ * Wants to run immediately after overlapping run ends
+ * Wants to run some time after previous run ended
+ * We don't have to implement that now, but those are the main scenarios I think we'll encounter.
+ * It would be nice it the task would choose the strategy and parameters, and some common code would take care of it.
+ */
 @Singleton
 public class ReviewerJob {
   private static final Long TASK_EXECUTION_PERIOD_MS = 5 * 60 * 1000L;
   private TaskExecutor taskExecutor;
+  private InitCommand initCommand;
+  private Lazy<LocalServer> lazyLocalServer;
+  private Lazy<HeadUpdater> lazyHeadUpdater;
 
   @FlagDesc(name = "service_account_json", description = "", required = true)
   public static Flag<String> serviceAccountJson = Flag.create("");
@@ -39,37 +66,47 @@ public class ReviewerJob {
   public static Flag<String> repoUrl = Flag.create("");
 
   @Inject
-  public ReviewerJob(TaskExecutor taskExecutor) {
+  public ReviewerJob(
+      TaskExecutor taskExecutor,
+      InitCommand initCommand,
+      Lazy<LocalServer> lazyLocalServer,
+      Lazy<HeadUpdater> lazyHeadUpdater) {
     this.taskExecutor = taskExecutor;
+    this.initCommand = initCommand;
+    this.lazyLocalServer = lazyLocalServer;
+    this.lazyHeadUpdater = lazyHeadUpdater;
   }
 
   @Singleton
-  @Component(modules = {CommonModule.class})
+  @Component(modules = {AaModule.class, CommonModule.class})
   public interface JobComponent {
     ReviewerJob getJob();
   }
 
-  private void run(String[] args) {
-    Flags.parseCurrentPackage(args);
-
+  private void run() throws Exception {
+    initCommand.run(InitCommand.basePath.get(), InitCommand.startuposRepo.get());
+    new Timer()
+        .scheduleAtFixedRate(lazyHeadUpdater.get(), 0, LocalServer.pullFrequency.get() * 1000L);
     // delay = 0, meaning timer starts right away
     // TASK_EXECUTION_PERIOD_MS denotes period at which task is being queued
-
-    /* TODO:
-     * Would be nice to be able to have every task run at different periodicity, and choose whether it:
-     *
-     * Wants overlapping runs
-     * Wants to skip overlapping runs
-     * Wants to run immediately after overlapping run ends
-     * Wants to run some time after previous run ended
-     * We don't have to implement that now, but those are the main scenarios I think we'll encounter.
-     * It would be nice it the task would choose the strategy and parameters, and some common code would take care of it.
-     */
     new Timer().scheduleAtFixedRate(this.taskExecutor, 0, TASK_EXECUTION_PERIOD_MS);
+    lazyLocalServer.get().start();
+    new LocalHttpGateway(
+            LocalServer.httpGatewayPort.get(),
+            LocalServer.localServerHost.get(),
+            LocalServer.localServerPort.get())
+        .serve();
+    lazyLocalServer.get().blockUntilShutdown();
   }
 
-  public static void main(String[] args) {
-    DaggerReviewerJob_JobComponent.create().getJob().run(args);
+  public static void main(String[] args) throws Exception {
+    Flags.parse(
+        args,
+        ReviewerJob.class.getPackage(),
+        InitCommand.class.getPackage(),
+        LocalServer.class.getPackage(),
+        CodeReviewService.class.getPackage());
+    DaggerReviewerJob_JobComponent.create().getJob().run();
   }
 }
 

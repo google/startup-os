@@ -175,8 +175,7 @@ public class CodeReviewServiceTextDiffTest {
   private void initAaBase(String initialRepoFolder, String aaBaseFolder) {
     InitCommand initCommand = component.getInitCommand();
     String[] args = {
-      "init", aaBaseFolder,
-      "--startupos_repo", initialRepoFolder,
+      "init", "--base_path", aaBaseFolder, "--startupos_repo", initialRepoFolder,
     };
     initCommand.run(args);
   }

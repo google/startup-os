@@ -36,12 +36,14 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.PrintStream;
+import java.io.FileNotFoundException;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
- */
-
-/* To run: bazel build //tools/reviewer/local_server:local_server
+ *
+ * To run:
+ * bazel build //tools/reviewer/local_server:local_server
  * bazel-bin/tools/reviewer/local_server/local_server
  */
 @Singleton
@@ -49,10 +51,19 @@ public class LocalServer {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   @FlagDesc(name = "local_server_port", description = "Port for local gRPC server")
-  private static final Flag<Integer> localServerPort = Flag.create(8001);
+  public static final Flag<Integer> localServerPort = Flag.create(8001);
 
   @FlagDesc(name = "pull_frequency", description = "Frequency of pulling head (in seconds)")
-  private static final Flag<Integer> pullFrequency = Flag.create(60);
+  public static final Flag<Integer> pullFrequency = Flag.create(60);
+
+  @FlagDesc(name = "http_gateway_port", description = "Port for local HTTP gateway server")
+  public static final Flag<Integer> httpGatewayPort = Flag.create(7000);
+
+  @FlagDesc(name = "local_server_host", description = "Hostname for local gRPC server")
+  public static final Flag<String> localServerHost = Flag.create("localhost");
+
+  @FlagDesc(name = "log_to_file", description = "Log stdout and stderr to log file")
+  private static final Flag<Boolean> logToFile = Flag.create(true);
 
   private final Server server;
 
@@ -60,7 +71,7 @@ public class LocalServer {
 
     private final FileUtils fileUtils;
     private final String basePath;
-    private GitRepoFactory repoFactory;
+    private final GitRepoFactory repoFactory;
 
     @Inject
     public HeadUpdater(
@@ -92,7 +103,20 @@ public class LocalServer {
   }
 
   @Inject
-  LocalServer(AuthService authService, CodeReviewService codeReviewService) {
+  LocalServer(
+      @Named("Server log path") String logPath,
+      AuthService authService,
+      CodeReviewService codeReviewService) {
+    if (logToFile.get()) {
+      // TODO: Figure out how to also direct Flogger to log file.
+      try {
+        PrintStream logStream = new PrintStream(logPath);
+        System.setOut(logStream);
+        System.setErr(logStream);
+      } catch (FileNotFoundException e) {
+        e.printStackTrace();
+      }
+    }
     server =
         ServerBuilder.forPort(localServerPort.get())
             .addService(authService)
@@ -101,7 +125,7 @@ public class LocalServer {
             .build();
   }
 
-  private void start() throws IOException {
+  public void start() throws IOException {
     server.start();
     logger.atInfo().log("Server started, listening on " + localServerPort.get());
     Runtime.getRuntime()
@@ -121,7 +145,7 @@ public class LocalServer {
     }
   }
 
-  private void blockUntilShutdown() throws InterruptedException {
+  public void blockUntilShutdown() throws InterruptedException {
     if (server != null) {
       server.awaitTermination();
     }
@@ -129,18 +153,29 @@ public class LocalServer {
 
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
-  public interface LocalServerComponent {
+  interface LocalServerComponent {
     LocalServer getLocalServer();
 
     HeadUpdater getHeadUpdater();
   }
 
-  public static void main(String[] args) throws IOException, InterruptedException {
+  private static void checkFlags() {
+    if (httpGatewayPort.get().equals(localServerPort.get())) {
+      System.out.println(
+          "Error: HttpGatewayServer and LocalServer ports are the same: " + localServerPort.get());
+      System.exit(1);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
     Flags.parse(args, LocalServer.class.getPackage(), CodeReviewService.class.getPackage());
+    checkFlags();
     LocalServerComponent component = DaggerLocalServer_LocalServerComponent.builder().build();
     LocalServer server = component.getLocalServer();
     new Timer().scheduleAtFixedRate(component.getHeadUpdater(), 0, pullFrequency.get() * 1000L);
     server.start();
+    new LocalHttpGateway(httpGatewayPort.get(), localServerHost.get(), localServerPort.get())
+        .serve();
     server.blockUntilShutdown();
   }
 }

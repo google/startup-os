@@ -82,8 +82,6 @@ public class TextDifferencer {
   }
 
   public TextDiff getTextDiff(String leftText, String rightText, String diffString) {
-    System.out.println("********* diffString *************");
-    System.out.println(diffString);
     TextDiff.Builder result =
         TextDiff.newBuilder().setLeftFileContents(leftText).setRightFileContents(rightText);
     if (diffString.isEmpty()) {
@@ -151,9 +149,6 @@ public class TextDifferencer {
     result.addAllLeftDiffLine(leftLines);
     result.addAllRightDiffLine(rightLines);
     TextDiff textDiff = result.build();
-    System.out.println("*************** TEXT DIFF **************");
-    System.out.println(
-        textDiff.toBuilder().clearLeftFileContents().clearRightFileContents().build());
     return textDiff;
   }
 

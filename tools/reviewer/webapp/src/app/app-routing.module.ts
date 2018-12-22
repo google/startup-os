@@ -2,12 +2,9 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from '@/core';
+import { DiffModuleFactory, DiffsModuleFactory, FileChangesModuleFactory } from '@/dashboard';
 import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
-
-import { DiffModule } from './dashboard/diff/diff.module';
-import { DiffsModule } from './dashboard/diffs/diffs.module';
-import { FileChangesModule } from './dashboard/file-changes/file-changes.module';
 
 const routes: Routes = [
   { path: '', redirectTo: 'diffs', pathMatch: 'full' },
@@ -15,12 +12,12 @@ const routes: Routes = [
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: 'diffs', loadChildren: () => DiffsModule },
-      { path: 'diff/:id', loadChildren: () => DiffModule },
+      { path: 'diffs', loadChildren: DiffsModuleFactory },
+      { path: 'diff/:id', loadChildren: DiffModuleFactory },
       {
         path: 'diff', children: [{
           path: '**',
-          loadChildren: () => FileChangesModule,
+          loadChildren: FileChangesModuleFactory,
         }],
       },
     ],

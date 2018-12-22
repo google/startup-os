@@ -1,28 +1,52 @@
+$background: #f3f3f3;
+$border: 1px solid #c1c1c1;
+
 .file-changes {
-  background: #f3f3f3;
-  .titlebar {
-    border-bottom: 1px solid #c1c1c1;
+  background: $background;
+  >.titlebar {
+    border-bottom: $border;
     >.title {
       margin-right: 30px;
       >.diff {
         outline: none;
         cursor: pointer;
         user-select: none;
+        text-decoration: none;
+        color: black;
         &:hover {
           text-decoration: underline;
         }
       }
     }
   }
-  .file-header,
-  .code-changes {
+  >.header-menu {
     display: flex;
-    margin: 0 23px;
-    padding: 10px 0;
+    padding: 10px 23px;
     align-items: center;
+    background: $background;
+    position: relative;
+    z-index: 5;
     >.commit-menu {
       margin-left: 70px;
       display: flex;
     }
+    >.filename {
+      >span {
+        color: #5d5d5d;
+      }
+    }
+  }
+  >.header-fixed {
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-bottom: 1px solid #979797;
+    width: 100%;
+  }
+  >.header-cover {
+    height: 42px;
+  }
+  >.code-changes {
+    padding-bottom: 10px;
   }
 }

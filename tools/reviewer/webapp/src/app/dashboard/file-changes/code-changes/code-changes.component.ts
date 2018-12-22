@@ -12,7 +12,6 @@ import {
 import {
   ChangesService,
   CommentsService,
-  HoverService,
   TemplateService,
 } from './services';
 
@@ -25,7 +24,6 @@ import {
   templateUrl: './code-changes.component.html',
   styleUrls: ['./code-changes.component.scss'],
   providers: [
-    HoverService,
     ChangesService,
     TemplateService,
     ThreadService,
@@ -35,6 +33,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
   changesLines: ChangesLine[] = [];
   changesLinesMap: { [id: number]: number }[];
   isComponentInit: boolean = false;
+  clickIndex: number = -1;
 
   @Input() textDiff: TextDiff;
   @Input() language: string;
@@ -43,7 +42,6 @@ export class CodeChangesComponent implements OnInit, OnChanges {
   constructor(
     private userService: UserService,
     private changesService: ChangesService,
-    public hoverService: HoverService,
     public commentsService: CommentsService,
     public templateService: TemplateService,
     private commitService: CommitService,

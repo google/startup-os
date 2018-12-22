@@ -42,7 +42,7 @@ export class DiffHeaderTitlebarComponent {
     this.diffUpdateService.updateAttention(this.diff, 'author');
   }
 
-  clickReplyButton() {
+  clickReplyButton(): void {
     this.toggleReplyPopup.emit(true);
   }
 

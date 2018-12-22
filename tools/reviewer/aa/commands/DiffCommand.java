@@ -165,7 +165,6 @@ public class DiffCommand implements AaCommand {
       // replace buglink if specified
       diffBuilder.addAllIssue(getIssues(buglink.get()));
     }
-
     addGithubRepos(diffBuilder);
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 

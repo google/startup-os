@@ -52,6 +52,9 @@ message ReviewComment {
   string updated_at = 13;
   Link _links = 14;
   string reviewer_thread_id = 15;
+  string reviewer_comment_id = 16;
+  bool is_outside_diff_comment = 17;
+  int32 reviewer_line_number = 18;
 }
 
 message IssueComment {
@@ -62,6 +65,7 @@ message IssueComment {
   string created_at = 4;
   string updated_at = 5;
   string reviewer_thread_id = 6;
+  string reviewer_comment_id = 7;
 }
 
 message User {
