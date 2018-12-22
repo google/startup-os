@@ -59,16 +59,11 @@ sh_binary(
     visibility = ["//visibility:public"],
 )
 
-java_import(
-    name = "bazel_deps_jar",
-    jars = ["@bazel_deps//file"],
-)
-
 java_binary(
     name = "bazel_deps",
     main_class = "com.github.johnynek.bazel_deps.ParseProject",
     visibility = ["//visibility:public"],
-    runtime_deps = [":bazel_deps_jar"],
+    runtime_deps = ["@bazel_deps//jar"],
 )
 
 sh_binary(
