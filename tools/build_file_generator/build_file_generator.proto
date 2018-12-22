@@ -1,0 +1,19 @@
+syntax = "proto3";
+package com.google.startupos.tools.buildfilegenerator;
+
+option java_package = "com.google.startupos.tools.buildfilegenerator";
+option java_outer_classname = "Protos";
+
+message Import {
+  string root_dir = 1;
+  repeated string subdir = 2;
+  string imported_class_name = 3;
+  bool whole_package_import = 4;
+  bool standard_java_package = 5;
+}
+
+message JavaClass {
+  repeated Import import = 1;
+  bool has_main_method = 2;
+  bool is_test_class = 3;
+}
