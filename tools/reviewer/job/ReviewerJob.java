@@ -61,7 +61,7 @@ public class ReviewerJob {
   private TaskExecutor taskExecutor;
   private InitCommand initCommand;
   // These are lazy because constructing them requires us to be in a base folder.
-  // That base folder is only set up in run() using initCommand(). We also assumme we're inside it.
+  // That base folder is only set up in run() using initCommand. We also assumme we're inside it.
   private Lazy<LocalServer> lazyLocalServer;
   private Lazy<HeadUpdater> lazyHeadUpdater;
 
