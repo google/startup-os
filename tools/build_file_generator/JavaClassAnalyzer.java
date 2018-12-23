@@ -75,8 +75,6 @@ public class JavaClassAnalyzer {
       String fileContent, String keyword, String lineShouldContain) {
     return Arrays.stream(fileContent.split(System.lineSeparator()))
         .map(String::trim)
-        .collect(Collectors.toList())
-        .stream()
         .filter(
             line ->
                 line.startsWith(keyword + " ")
