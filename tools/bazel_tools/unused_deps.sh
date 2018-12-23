@@ -4,14 +4,13 @@
 
 platform=$(uname)
 
-if [ "$platform" == "Darwin" ]; then
-    UNUSED_DEPS_BINARY=$(pwd)/external/unused_deps_osx/file/unused_deps.osx
-elif [ "$platform" == "Linux" ]; then
-    UNUSED_DEPS_BINARY=$(pwd)/external/unused_deps/file/unused_deps
+if [[ "$platform" == "Darwin" ]]; then
+    BINARY=$(find . -iwholename "*unused_deps_osx/file/downloaded" | head -n1)
+elif [[ "$platform" == "Linux" ]]; then
+    BINARY=find . -iwholename "*unused_deps/file/downloaded" | head -n1
 else
-    echo "unused_deps does not have a binary for $platform"
+    echo "Buildifier does not have a binary for $platform"
     exit 1
 fi
 
-cd $BUILD_WORKSPACE_DIRECTORY
-$UNUSED_DEPS_BINARY $*
+${BINARY} $*
