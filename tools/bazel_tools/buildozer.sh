@@ -9,7 +9,7 @@ if [[ "$platform" == "Darwin" ]]; then
 elif [[ "$platform" == "Linux" ]]; then
     BINARY=find . -iwholename "*buildozer/file/downloaded" | head -n1
 else
-    echo "Buildifier does not have a binary for $platform"
+    echo "Buildozer does not have a binary for $platform"
     exit 1
 fi
 
