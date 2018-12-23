@@ -26,6 +26,30 @@ function set_STARTUP_OS_REPO() {
     fi
 }
 
+function bazel_build() {
+    local target=$1
+    shift;
+
+    #sed replaces bazel target name with name of the binary 'bazel build' would produce
+    #by doing the following (sed commands are split by ;):
+    #
+    #add bazel-bin/ to the beginning
+    #replace // with nothing
+    #replace : with /
+    local binary_for_target=$(echo "$target" | sed -e 's|^|bazel-bin/|g; s|//||g; s|:|/|g;')
+
+    set_STARTUP_OS_REPO
+    pushd $STARTUP_OS_REPO &> /dev/null
+
+    if [[ ! -f ${binary_for_target} ]]; then
+        bazel build ${target} &> /dev/null
+        return_code="$?"
+    fi
+
+    popd &> /dev/null
+    return ${return_code}
+}
+
 function bazel_run() {
     local target=$1
     shift;
@@ -42,7 +66,7 @@ function bazel_run() {
     local binary_for_target=$(echo "$target" | sed -e 's|^|bazel-bin/|g; s|//||g; s|:|/|g;')
 
     set_STARTUP_OS_REPO
-    pushd $STARTUP_OS_REPO
+    pushd $STARTUP_OS_REPO &> /dev/null
 
     if [[ ! -f ${binary_for_target} ]] || [[ "${force_compile}" -eq 1 ]]; then
         bazel build ${target} &> /dev/null
@@ -53,7 +77,7 @@ function bazel_run() {
 
     eval "${binary_for_target} ${args}"
     return_code="$?"
-    popd
+    popd &> /dev/null
     return ${return_code}
 }
 
@@ -64,7 +88,7 @@ function _aa_completions()
   local cur_word prev_word
   cur_word="${COMP_WORDS[COMP_CWORD]}"
   prev_word="${COMP_WORDS[COMP_CWORD-1]}"
-  COMPREPLY=( bazel_run //tools/reviewer/aa:aa_script_helper 0 completions \"${prev_word}\" \"${cur_word}\" )
+  COMPREPLY=( $(bazel_run //tools/reviewer/aa:aa_script_helper 0 completions \"${prev_word}\" \"${cur_word}\") )
   return 0
 }
 
@@ -96,6 +120,8 @@ function aa {
   fi
 
   set_STARTUP_OS_REPO
+  # `start_server` relies on having already-built version of local_server
+  bazel_build //tools/reviewer/local_server:local_server
   bazel_run //tools/reviewer/aa:aa_script_helper 0 start_server $AA_BASE/head/startup-os
 
   if [[ "$1" = "workspace" ]]; then
