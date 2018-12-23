@@ -24,6 +24,7 @@ java_library(
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/auto/value:auto_value_plugin",
+        "//third_party/maven/com/google/auto/value:auto_value_annotations",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/jcraft:jsch",
         "//third_party/maven/javax/annotation:javax_annotation_api",
