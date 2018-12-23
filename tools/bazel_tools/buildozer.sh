@@ -4,14 +4,13 @@
 
 platform=$(uname)
 
-if [ "$platform" == "Darwin" ]; then
-    BUILDOZER_BINARY=$(pwd)/external/buildozer_osx/file/buildozer.osx
-elif [ "$platform" == "Linux" ]; then
-    BUILDOZER_BINARY=$(pwd)/external/buildozer/file/buildozer
+if [[ "$platform" == "Darwin" ]]; then
+    BINARY=$(find . -iwholename "*buildozer_osx/file/downloaded" | head -n1)
+elif [[ "$platform" == "Linux" ]]; then
+    BINARY=find . -iwholename "*buildozer/file/downloaded" | head -n1
 else
     echo "Buildozer does not have a binary for $platform"
     exit 1
 fi
 
-cd $BUILD_WORKSPACE_DIRECTORY
-$BUILDOZER_BINARY "$@"
+${BINARY} $*
