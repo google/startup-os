@@ -1,12 +1,14 @@
 java_library(
     name = "json",
+    exports = [
+        "//external:jar/mvnorg/json/json"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//visibility:public",
-    ],
-    exports = [
-        "//external:jar/mvnorg/json/json",
-    ],
+        "//visibility:public"
+    ]
 )
+
+

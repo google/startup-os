@@ -1,28 +1,32 @@
 java_library(
     name = "ant",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/mvnorg/apache/ant/ant",
+        "//external:jar/mvnorg/apache/ant/ant"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":ant_launcher",
+        ":ant_launcher"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "ant_launcher",
+    exports = [
+        "//external:jar/mvnorg/apache/ant/ant_launcher"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvnorg/apache/ant/ant_launcher",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
