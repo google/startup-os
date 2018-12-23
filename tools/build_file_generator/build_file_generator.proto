@@ -5,15 +5,26 @@ option java_package = "com.google.startupos.tools.buildfilegenerator";
 option java_outer_classname = "Protos";
 
 message Import {
-  string root_dir = 1;
-  repeated string subdir = 2;
-  string imported_class_name = 3;
-  bool whole_package_import = 4;
-  bool standard_java_package = 5;
+  // list of dirs, order from root to subdirs
+  repeated string import_dir = 1;
+  // imported Java class name. (e.g. for `import org.junit.Test` line it will be
+  // `Test`)
+  string imported_class_name = 2;
+  // is `true` when imported whole package (e.g. `import java.util.*`)
+  bool whole_package_import = 3;
+  // is `true` when imported java starts with `java` or `javax` (e.g `import
+  // java.nio.file.Paths`)
+  bool standard_java_package = 4;
 }
 
 message JavaClass {
-  repeated Import import = 1;
-  bool has_main_method = 2;
-  bool is_test_class = 3;
+  // Java class name
+  string classname = 1;
+  // Java package (e.g. `com.google.startupos.common`)
+  string package = 2;
+  repeated Import import = 3;
+  // is `true` when the class contains the `main` method
+  bool has_main_method = 4;
+  // is `true` when the class is test class
+  bool is_test_class = 5;
 }

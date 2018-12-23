@@ -16,19 +16,32 @@
 
 package com.google.startupos.tools.buildfilegenerator;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.buildfilegenerator.Protos.Import;
 import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
 
+import javax.inject.Inject;
+
 public class JavaClassAnalyzer {
-  public static JavaClass getJavaClass(String fileContent) {
+  private FileUtils fileUtils;
+
+  @Inject
+  public JavaClassAnalyzer(FileUtils fileUtils) {
+    this.fileUtils = fileUtils;
+  }
+
+  public JavaClass getJavaClass(String filePath) throws IOException {
     JavaClass.Builder result = JavaClass.newBuilder();
 
-    List<String> importLines = getImportLines(fileContent);
-    importLines.forEach(line -> result.addImport(getImport(line)));
+    String fileContent = fileUtils.readFile(filePath);
+    String classname = getClassname(filePath);
+    result.setClassname(classname).setPackage(getPackage(fileContent, classname));
+    getImportLines(fileContent).forEach(line -> result.addImport(getImport(line)));
 
     result.setIsTestClass(isTestClass(fileContent));
     result.setHasMainMethod(hasMainMethod(fileContent));
@@ -36,12 +49,38 @@ public class JavaClassAnalyzer {
     return result.build();
   }
 
+  private static String getClassname(String filePath) {
+    String[] parts = filePath.split("/");
+    return parts[parts.length - 1].replace(".java", "");
+  }
+
+  private static String getPackage(String fileContent, String classname) {
+    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package", "");
+    if (packageLines.isEmpty()) {
+      throw new IllegalArgumentException(
+          String.format("Can't find package for the file: %s", classname));
+    }
+    if (packageLines.size() > 1) {
+      throw new IllegalArgumentException(
+          String.format("Found %d packages for the file: %s", packageLines.size(), classname));
+    }
+    return packageLines.get(0).split(" ")[1].replace(";", "");
+  }
+
   private static List<String> getImportLines(String fileContent) {
+    return getLinesStartWithKeyword(fileContent, "import", ".");
+  }
+
+  private static List<String> getLinesStartWithKeyword(
+      String fileContent, String keyword, String lineShouldContain) {
     return Arrays.stream(fileContent.split(System.lineSeparator()))
+        .map(String::trim)
+        .collect(Collectors.toList())
+        .stream()
         .filter(
             line ->
-                line.startsWith("import ")
-                    && line.contains(".")
+                line.startsWith(keyword + " ")
+                    && line.contains(lineShouldContain)
                     && line.substring(line.length() - 1).equals(";"))
         .collect(Collectors.toList());
   }
@@ -49,34 +88,31 @@ public class JavaClassAnalyzer {
   private static Import getImport(String importLine) {
     Import.Builder importBuilder = Import.newBuilder();
 
-    boolean isStaticImport = importLine.split(" ")[1].equals("static");
+    boolean isStaticImport = importLine.split(" ")[1].trim().equals("static");
 
-    String lastImportPart;
-    List<String> importParts;
+    List<String> lineParts = Arrays.asList(importLine.replace(";", "").split(" "));
+    String importBody = isStaticImport ? lineParts.get(2) : lineParts.get(1);
+    List<String> importParts = Arrays.asList(importBody.split("\\."));
+
+    String importedClassName;
     if (isStaticImport) {
-      String importBody = importLine.split(" ")[2].replace(";", "");
-      importParts = Arrays.asList(importBody.split("\\."));
-      importBuilder.addAllSubdir(importParts.subList(1, importParts.size() - 2));
-      lastImportPart = importParts.get(importParts.size() - 2);
+      importBuilder.addAllImportDir(importParts.subList(0, importParts.size() - 2));
+      importedClassName = importParts.get(importParts.size() - 2);
     } else {
-      String importBody = importLine.split(" ")[1].replace(";", "");
-      importParts = Arrays.asList(importBody.split("\\."));
-      importBuilder.addAllSubdir(importParts.subList(1, importParts.size() - 1));
-      lastImportPart = importParts.get(importParts.size() - 1);
+      importBuilder.addAllImportDir(importParts.subList(0, importParts.size() - 1));
+      importedClassName = importParts.get(importParts.size() - 1);
     }
-    if (lastImportPart.equals("*")) {
+    if (importedClassName.equals("*")) {
       importBuilder.setWholePackageImport(true);
     } else {
-      importBuilder.setImportedClassName(lastImportPart);
+      importBuilder.setImportedClassName(importedClassName);
     }
-    String rootDir = importParts.get(0);
 
-    importBuilder.setRootDir(rootDir).setStandardJavaPackage(isStandardJavaPackage(rootDir));
+    importBuilder.setStandardJavaPackage(isStandardJavaPackage(importParts.get(0)));
     return importBuilder.build();
   }
 
   private static boolean isStandardJavaPackage(String rootImportDir) {
-    // XXX: Is it needed to create dependencies for classes starts with "javax"?
     List<String> standardJavaPackages = Arrays.asList("java", "javax");
     return standardJavaPackages.contains(rootImportDir);
   }
@@ -91,7 +127,8 @@ public class JavaClassAnalyzer {
 
   private static boolean hasMainMethod(String fileContent) {
     return fileContent.contains("public static void main(String[] args)")
-        || fileContent.contains("public static void main(String... args)");
+        || fileContent.contains("public static void main(String... args)")
+        || fileContent.contains("public static void main(String args[])");
   }
 }
 

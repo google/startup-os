@@ -31,15 +31,14 @@ import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
 
 public class BuildFileGeneratorTool {
   @FlagDesc(name = "file_path", description = "Path to file")
-  static Flag<String> filePath = Flag.create("");
+  private static Flag<String> filePath = Flag.create("");
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
     FileUtils fileUtils =
         DaggerBuildFileGeneratorTool_BuildFileGeneratorToolComponent.create().getFileUtils();
 
-    String fileContent = fileUtils.readFile(filePath.get());
-    JavaClass javaClass = JavaClassAnalyzer.getJavaClass(fileContent);
+    JavaClass javaClass = new JavaClassAnalyzer(fileUtils).getJavaClass(filePath.get());
     System.out.println(javaClass);
   }
 

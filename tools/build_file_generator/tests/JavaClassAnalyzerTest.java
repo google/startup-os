@@ -16,78 +16,136 @@
 
 package com.google.startupos.tools.buildfilegenerator.tests;
 
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.buildfilegenerator.JavaClassAnalyzer;
+import dagger.Component;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
 import com.google.startupos.tools.buildfilegenerator.Protos.Import;
 
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
 public class JavaClassAnalyzerTest {
+  private FileUtils fileUtils;
+  private String testFolder;
+  private JavaClassAnalyzer javaClassAnalyzer;
+
+  @Before
+  public void setup() throws IOException {
+    fileUtils = DaggerJavaClassAnalyzerTest_TestComponent.create().getFileUtils();
+    testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
+    javaClassAnalyzer = new JavaClassAnalyzer(fileUtils);
+  }
+
+  @Singleton
+  @Component(modules = CommonModule.class)
+  interface TestComponent {
+    FileUtils getFileUtils();
+  }
+
   @Test
-  public void isTestClassTest() {
+  public void isTestClassTest() throws IOException {
     String fileContent =
-        "package com.test.tests;\n\n"
-            + "import org.junit.Test;\n"
-            + "import static org.junit.Assert.assertEquals;\n\n"
-            + "public class TestClass {\n"
-            + "  @Test\n"
-            + "  public void test() {\n"
-            + "    assertEquals(4, 2+2);\n"
-            + "  }\n"
-            + "}\n";
+        "package com.test.tests;"
+            + System.lineSeparator()
+            + "import org.junit.Test;"
+            + System.lineSeparator()
+            + "import static org.junit.Assert.assertEquals;"
+            + System.lineSeparator()
+            + "public class TestClass {"
+            + System.lineSeparator()
+            + "  @Test"
+            + System.lineSeparator()
+            + "  public void test() {"
+            + System.lineSeparator()
+            + "    assertEquals(4, 2+2);"
+            + System.lineSeparator()
+            + "  }"
+            + System.lineSeparator()
+            + "}";
+
+    String filePath = fileUtils.joinToAbsolutePath(testFolder, "TestClass.java");
+    fileUtils.writeStringUnchecked(fileContent, filePath);
+
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
+            .setClassname("TestClass")
+            .setPackage("com.test.tests")
             .addImport(
                 Import.newBuilder()
-                    .setRootDir("org")
-                    .addAllSubdir(Arrays.asList("junit"))
+                    .addAllImportDir(Arrays.asList("org", "junit"))
                     .setImportedClassName("Test")
                     .build())
             .addImport(
                 Import.newBuilder()
-                    .setRootDir("org")
-                    .addAllSubdir(Arrays.asList("junit"))
+                    .addAllImportDir(Arrays.asList("org", "junit"))
                     .setImportedClassName("Assert")
                     .build())
             .setIsTestClass(true)
             .build();
-    assertEquals(expectedJavaClass, JavaClassAnalyzer.getJavaClass(fileContent));
+
+    assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
   }
 
   @Test
-  public void isWholePackageImportTest() {
+  public void isWholePackageImportTest() throws IOException {
     String fileContent =
-        "package com.test.tests;\n\n"
-            + "import java.util.*;\n\n"
-            + "public class TestClass {\n"
-            + "  List<Integer> list = new ArrayList<>();\n"
+        "package com.test.tests;"
+            + System.lineSeparator()
+            + "import java.util.*;"
+            + System.lineSeparator()
+            + "public class TestClass {"
+            + System.lineSeparator()
+            + "  List<Integer> list = new ArrayList<>();"
+            + System.lineSeparator()
             + "}";
+    String filePath = fileUtils.joinToAbsolutePath(testFolder, "TestClass.java");
+    fileUtils.writeStringUnchecked(fileContent, filePath);
+
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
+            .setClassname("TestClass")
+            .setPackage("com.test.tests")
             .addImport(
                 Import.newBuilder()
-                    .setRootDir("java")
-                    .addAllSubdir(Arrays.asList("util"))
+                    .addAllImportDir(Arrays.asList("java", "util"))
                     .setWholePackageImport(true)
                     .setStandardJavaPackage(true)
                     .build())
             .build();
-    assertEquals(expectedJavaClass, JavaClassAnalyzer.getJavaClass(fileContent));
+
+    assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
   }
 
   @Test
-  public void hasMainMethodTest() {
+  public void hasMainMethodTest() throws IOException {
     String fileContent =
-        "package com.test.tests;\n\n"
-            + "public class TestClass {\n"
-            + "  public static void main(String[] args) {}\n"
+        "package com.test.tests;"
+            + System.lineSeparator()
+            + "public class TestClass {"
+            + System.lineSeparator()
+            + "  public static void main(String[] args) {}"
+            + System.lineSeparator()
             + "}";
-    JavaClass expectedJavaClass = JavaClass.newBuilder().setHasMainMethod(true).build();
-    assertEquals(expectedJavaClass, JavaClassAnalyzer.getJavaClass(fileContent));
+    String filePath = fileUtils.joinToAbsolutePath(testFolder, "TestClass.java");
+    fileUtils.writeStringUnchecked(fileContent, filePath);
+
+    JavaClass expectedJavaClass =
+        JavaClass.newBuilder()
+            .setClassname("TestClass")
+            .setPackage("com.test.tests")
+            .setHasMainMethod(true)
+            .build();
+
+    assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
   }
 }
 
