@@ -7,8 +7,8 @@
 # If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
 
 # Debugging:
-# To compile aa from a workspace: 'export AA_FORCE_COMPILE_WS=<>'
-# To undo: 'unset AA_FORCE_COMPILE_WS'
+# To compile aa from a workspace: 'export AA_STARTUP_OS_REPO_OVERRIDE=<>'
+# To undo: 'unset AA_STARTUP_OS_REPO_OVERRIDE'
 
 function set_STARTUP_OS_REPO() {
     set_AA_BASE
@@ -17,12 +17,12 @@ function set_STARTUP_OS_REPO() {
     return 1
 
     fi
-    if [[ -z "$AA_FORCE_COMPILE_WS" ]]; then
+    if [[ -z "$AA_STARTUP_OS_REPO_OVERRIDE" ]]; then
         # we want to use `aa` from head
         export STARTUP_OS_REPO="$AA_BASE/head/startup-os/"
     else
         # there's a workspace we want to use `aa` from
-        export STARTUP_OS_REPO="$AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/"
+        export STARTUP_OS_REPO="$AA_BASE/ws/$AA_STARTUP_OS_REPO_OVERRIDE/startup-os/"
     fi
 }
 
