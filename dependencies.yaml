@@ -89,7 +89,7 @@ dependencies:
   com.google.googlejavaformat:
     google-java-format:
       lang: java
-      version: "1.5"
+      version: "1.6"
   
   com.google.guava:
     guava:
@@ -110,7 +110,7 @@ dependencies:
   com.jcraft:
     jsch:
       lang: java
-      version: "0.1.54"
+      version: "0.1.55"
   
   com.squareup.okhttp:
     okhttp:
@@ -120,7 +120,7 @@ dependencies:
   com.squareup.okio:
     okio:
       lang: java
-      version: "1.15.0"
+      version: "1.16.0"
   
   commons-logging:
     commons-logging:
@@ -161,48 +161,48 @@ dependencies:
   org.apache.commons:
     commons-csv:
       lang: java
-      version: "1.5"
+      version: "1.6"
     commons-lang3:
       lang: java
-      version: "3.7"
+      version: "3.8.1"
   
   org.apache.httpcomponents:
     fluent-hc:
       lang: java
-      version: "4.5.5"
+      version: "4.5.6"
   
   org.apache.pdfbox:
     fontbox:
       lang: java
-      version: "2.0.8"
+      version: "2.0.13"
     pdfbox:
       lang: java
-      version: "2.0.8"
+      version: "2.0.13"
   
   org.javassist:
     javassist:
       lang: java
-      version: "3.22.0-GA"
+      version: "3.24.1-GA"
   
   org.json:
     json:
       lang: java
-      version: "20180130"
+      version: "20180813"
   
   org.jsoup:
     jsoup:
       lang: java
-      version: "1.11.2"
+      version: "1.11.3"
   
   org.mockito:
     mockito-core:
       lang: java
-      version: "2.15.0"
+      version: "2.23.4"
   
   org.objenesis:
     objenesis:
       lang: java
-      version: "2.6"
+      version: "3.0.1"
   
   org.slf4j:
     slf4j-simple:
@@ -212,4 +212,4 @@ dependencies:
   org.yaml:
     snakeyaml:
       lang: java
-      version: "1.21"
+      version: "1.23"

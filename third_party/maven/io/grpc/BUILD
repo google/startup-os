@@ -1,158 +1,176 @@
 java_library(
     name = "grpc_auth",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_auth",
+        "//external:jar/mvnio/grpc/grpc_auth"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_core",
         "//third_party/maven/com/google/auth:google_auth_library_credentials",
+        ":grpc_core"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_context",
+    exports = [
+        "//external:jar/mvnio/grpc/grpc_context"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvnio/grpc/grpc_context",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_core",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_core",
+        "//external:jar/mvnio/grpc/grpc_core"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_context",
         "//third_party/maven/com/google/code/findbugs:jsr305",
-        "//third_party/maven/com/google/code/gson",
+        "//third_party/maven/com/google/code/gson:gson",
         "//third_party/maven/com/google/errorprone:error_prone_annotations",
-        "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/guava:guava",
         "//third_party/maven/io/opencensus:opencensus_api",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/org/codehaus/mojo:animal_sniffer_annotations",
+        ":grpc_context"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_netty",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_netty",
+        "//external:jar/mvnio/grpc/grpc_netty"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_core",
         "//third_party/maven/io/netty:netty_codec_http2",
         "//third_party/maven/io/netty:netty_handler_proxy",
+        ":grpc_core"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_netty_shaded",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_netty_shaded",
+        "//external:jar/mvnio/grpc/grpc_netty_shaded"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_core",
+        ":grpc_core"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_protobuf",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_protobuf",
+        "//external:jar/mvnio/grpc/grpc_protobuf"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_core",
-        ":grpc_protobuf_lite",
         "//third_party/maven/com/google/api/grpc:proto_google_common_protos",
-        "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/guava:guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
+        ":grpc_core",
+        ":grpc_protobuf_lite"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_protobuf_lite",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_protobuf_lite",
+        "//external:jar/mvnio/grpc/grpc_protobuf_lite"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_core",
-        "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/guava:guava",
+        ":grpc_core"
     ],
+    visibility = [
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_services",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_services",
+        "//external:jar/mvnio/grpc/grpc_services"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_protobuf",
-        ":grpc_stub",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
-        "//third_party/maven/com/google/re2j",
+        "//third_party/maven/com/google/re2j:re2j",
+        ":grpc_protobuf",
+        ":grpc_stub"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
 
 java_library(
     name = "grpc_stub",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvnio/grpc/grpc_stub",
+        "//external:jar/mvnio/grpc/grpc_stub"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        ":grpc_core",
+        ":grpc_core"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+

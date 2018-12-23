@@ -1,12 +1,14 @@
 java_library(
     name = "hamcrest_core",
+    exports = [
+        "//external:jar/mvnorg/hamcrest/hamcrest_core"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvnorg/hamcrest/hamcrest_core",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

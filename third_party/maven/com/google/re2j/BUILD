@@ -1,12 +1,14 @@
 java_library(
     name = "re2j",
+    exports = [
+        "//external:jar/mvncom/google/re2j/re2j"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvncom/google/re2j/re2j",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+
