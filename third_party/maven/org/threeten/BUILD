@@ -1,14 +1,12 @@
 java_library(
     name = "threetenbp",
-    exports = [
-        "//external:jar/mvnorg/threeten/threetenbp"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnorg/threeten/threetenbp",
+    ],
 )
-
-

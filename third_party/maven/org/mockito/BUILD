@@ -1,19 +1,17 @@
 java_library(
     name = "mockito_core",
-    exports = [
-        "//external:jar/mvnorg/mockito/mockito_core"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnorg/mockito/mockito_core",
     ],
     runtime_deps = [
         "//third_party/maven/net/bytebuddy:byte_buddy",
         "//third_party/maven/net/bytebuddy:byte_buddy_agent",
-        "//third_party/maven/org/objenesis:objenesis"
+        "//third_party/maven/org/objenesis",
     ],
-    visibility = [
-        "//visibility:public"
-    ]
 )
-
-

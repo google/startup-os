@@ -1,36 +1,32 @@
 java_library(
     name = "fontbox",
-    exports = [
-        "//external:jar/mvnorg/apache/pdfbox/fontbox"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/commons_logging:commons_logging"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnorg/apache/pdfbox/fontbox",
+    ],
+    runtime_deps = [
+        "//third_party/maven/commons_logging",
+    ],
 )
-
-
 
 java_library(
     name = "pdfbox",
-    exports = [
-        "//external:jar/mvnorg/apache/pdfbox/pdfbox"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/commons_logging:commons_logging",
-        ":fontbox"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnorg/apache/pdfbox/pdfbox",
+    ],
+    runtime_deps = [
+        ":fontbox",
+        "//third_party/maven/commons_logging",
+    ],
 )
-
-
