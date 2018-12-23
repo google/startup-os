@@ -7,8 +7,8 @@
 # If you're on macOS, substitute ~/.bashrc with ~/.bash_profile
 
 # Debugging:
-# To compile aa from a workspace: 'export AA_FORCE_COMPILE_WS=<>'
-# To undo: 'unset AA_FORCE_COMPILE_WS'
+# To compile aa from a workspace: 'export AA_STARTUP_OS_REPO_OVERRIDE=<>'
+# To undo: 'unset AA_STARTUP_OS_REPO_OVERRIDE'
 
 function set_STARTUP_OS_REPO() {
     set_AA_BASE
@@ -17,13 +17,37 @@ function set_STARTUP_OS_REPO() {
     return 1
 
     fi
-    if [[ -z "$AA_FORCE_COMPILE_WS" ]]; then
+    if [[ -z "$AA_STARTUP_OS_REPO_OVERRIDE" ]]; then
         # we want to use `aa` from head
         export STARTUP_OS_REPO="$AA_BASE/head/startup-os/"
     else
         # there's a workspace we want to use `aa` from
-        export STARTUP_OS_REPO="$AA_BASE/ws/$AA_FORCE_COMPILE_WS/startup-os/"
+        export STARTUP_OS_REPO="$AA_BASE/ws/$AA_STARTUP_OS_REPO_OVERRIDE/startup-os/"
     fi
+}
+
+function bazel_build() {
+    local target=$1
+    local force_compile=$2
+
+    #sed replaces bazel target name with name of the binary 'bazel build' would produce
+    #by doing the following (sed commands are split by ;):
+    #
+    #add bazel-bin/ to the beginning
+    #replace // with nothing
+    #replace : with /
+    local binary_for_target=$(echo "$target" | sed -e 's|^|bazel-bin/|g; s|//||g; s|:|/|g;')
+
+    set_STARTUP_OS_REPO
+    pushd $STARTUP_OS_REPO &> /dev/null
+
+    if [[ ! -f ${binary_for_target} ]] || [[ "${force_compile}" -eq 1 ]]; then
+        bazel build ${target} &> /dev/null
+        return_code="$?"
+    fi
+
+    popd &> /dev/null
+    return ${return_code}
 }
 
 function bazel_run() {
@@ -42,18 +66,13 @@ function bazel_run() {
     local binary_for_target=$(echo "$target" | sed -e 's|^|bazel-bin/|g; s|//||g; s|:|/|g;')
 
     set_STARTUP_OS_REPO
-    pushd $STARTUP_OS_REPO
+    pushd $STARTUP_OS_REPO &> /dev/null
 
-    if [[ ! -f ${binary_for_target} ]] || [[ "${force_compile}" -eq 1 ]]; then
-        bazel build ${target} &> /dev/null
-        if [[ $? -ne 0 ]]; then
-            exit 1
-        fi
-    fi
+    bazel_build ${target} ${force_compile}
 
     eval "${binary_for_target} ${args}"
     return_code="$?"
-    popd
+    popd &> /dev/null
     return ${return_code}
 }
 
@@ -64,7 +83,7 @@ function _aa_completions()
   local cur_word prev_word
   cur_word="${COMP_WORDS[COMP_CWORD]}"
   prev_word="${COMP_WORDS[COMP_CWORD-1]}"
-  COMPREPLY=( bazel_run //tools/reviewer/aa:aa_script_helper 0 completions \"${prev_word}\" \"${cur_word}\" )
+  COMPREPLY=( $(bazel_run //tools/reviewer/aa:aa_script_helper 0 completions \"${prev_word}\" \"${cur_word}\") )
   return 0
 }
 
@@ -96,6 +115,8 @@ function aa {
   fi
 
   set_STARTUP_OS_REPO
+  # `start_server` relies on having already-built version of local_server
+  bazel_build //tools/reviewer/local_server:local_server
   bazel_run //tools/reviewer/aa:aa_script_helper 0 start_server $AA_BASE/head/startup-os
 
   if [[ "$1" = "workspace" ]]; then
