@@ -31,8 +31,8 @@ java_library(
     name = "lists",
     srcs = ["Lists.java"],
     deps = [
-        "//third_party/maven/com/google/auto/value:auto_value_annotations",
         "//third_party/maven/com/google/auto/value:auto_value",
+        "//third_party/maven/com/google/auto/value:auto_value_annotations",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
     ],

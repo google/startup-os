@@ -1,14 +1,12 @@
 java_library(
     name = "snakeyaml",
-    exports = [
-        "//external:jar/mvnorg/yaml/snakeyaml"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnorg/yaml/snakeyaml",
+    ],
 )
-
-

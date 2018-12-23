@@ -1,74 +1,66 @@
 java_library(
     name = "opencensus_api",
-    exports = [
-        "//external:jar/mvnio/opencensus/opencensus_api"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/io/grpc:grpc_context"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/opencensus/opencensus_api",
+    ],
+    runtime_deps = [
+        "//third_party/maven/io/grpc:grpc_context",
+    ],
 )
-
-
 
 java_library(
     name = "opencensus_contrib_grpc_metrics",
-    exports = [
-        "//external:jar/mvnio/opencensus/opencensus_contrib_grpc_metrics"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/com/google/guava:guava",
-        ":opencensus_api"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnio/opencensus/opencensus_contrib_grpc_metrics",
+    ],
+    runtime_deps = [
+        ":opencensus_api",
+        "//third_party/maven/com/google/guava",
+    ],
 )
-
-
 
 java_library(
     name = "opencensus_contrib_grpc_util",
-    exports = [
-        "//external:jar/mvnio/opencensus/opencensus_contrib_grpc_util"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/io/grpc:grpc_core",
-        ":opencensus_api"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/opencensus/opencensus_contrib_grpc_util",
+    ],
+    runtime_deps = [
+        ":opencensus_api",
+        "//third_party/maven/io/grpc:grpc_core",
+    ],
 )
-
-
 
 java_library(
     name = "opencensus_contrib_http_util",
-    exports = [
-        "//external:jar/mvnio/opencensus/opencensus_contrib_http_util"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/com/google/guava:guava",
-        ":opencensus_api"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/opencensus/opencensus_contrib_http_util",
+    ],
+    runtime_deps = [
+        ":opencensus_api",
+        "//third_party/maven/com/google/guava",
+    ],
 )
-
-
