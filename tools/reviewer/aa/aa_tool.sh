@@ -28,7 +28,7 @@ function set_STARTUP_OS_REPO() {
 
 function bazel_build() {
     local target=$1
-    shift;
+    local force_compile=$2
 
     #sed replaces bazel target name with name of the binary 'bazel build' would produce
     #by doing the following (sed commands are split by ;):
@@ -41,7 +41,7 @@ function bazel_build() {
     set_STARTUP_OS_REPO
     pushd $STARTUP_OS_REPO &> /dev/null
 
-    if [[ ! -f ${binary_for_target} ]]; then
+    if [[ ! -f ${binary_for_target} ]] || [[ "${force_compile}" -eq 1 ]]; then
         bazel build ${target} &> /dev/null
         return_code="$?"
     fi
@@ -68,12 +68,7 @@ function bazel_run() {
     set_STARTUP_OS_REPO
     pushd $STARTUP_OS_REPO &> /dev/null
 
-    if [[ ! -f ${binary_for_target} ]] || [[ "${force_compile}" -eq 1 ]]; then
-        bazel build ${target} &> /dev/null
-        if [[ $? -ne 0 ]]; then
-            exit 1
-        fi
-    fi
+    bazel_build ${target} ${force_compile}
 
     eval "${binary_for_target} ${args}"
     return_code="$?"
