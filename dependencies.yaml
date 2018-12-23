@@ -43,7 +43,10 @@ dependencies:
     auto-value:
       lang: java
       processorClasses: [ "com.google.auto.value.processor.AutoValueProcessor" ]
-      version: "1.5"
+      version: "1.6.3"
+    auto-value-annotations:
+      lang: java
+      version: "1.6.3"
   
   com.google.cloud:
     google-cloud-core:

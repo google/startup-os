@@ -29,3 +29,18 @@ java_plugin(
 
 
 
+
+java_library(
+    name = "auto_value_annotations",
+    exports = [
+        "//external:jar/mvncom/google/auto/value/auto_value_annotations"
+    ],
+    licenses = [
+        "permissive"
+    ],
+    visibility = [
+        "//visibility:public"
+    ]
+)
+
+
