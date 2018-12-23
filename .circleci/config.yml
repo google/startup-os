@@ -4,7 +4,7 @@ version: 2
 # We use a docker image as the basis for our build, so that all the toolchains we use
 # are already installed and the build can start running right away. It also guarantees
 # the environment is portable and reproducible on your local machine.
-var_1: &docker_image angular/ngcontainer:0.3.2
+var_1: &docker_image angular/ngcontainer:0.8.0
 
 # Each job will inherit these defaults
 anchor_1: &job_defaults
@@ -28,10 +28,9 @@ jobs:
       - checkout:
           <<: *post_checkout
       - restore_cache:
-          key: "v3-bazel_cache"
+          key: "v4-bazel_cache"
       - run: './tools/pre-commit.sh'
-      - run: sudo apt update
-      - run: sudo apt -y install yapf3 python3-pkg-resources libstdc++6
+      - run: sudo apt update && sudo apt -y install yapf3 python3-pkg-resources libstdc++6
       - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
       - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
@@ -46,8 +45,9 @@ jobs:
           key: "android_sdk"
 
       - restore_cache:
-          key: "v3-bazel_cache"
+          key: "v4-bazel_cache"
 
+      - run: sudo apt update && sudo apt -y install libstdc++6
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
       - run: './tools/get_android_sdk.sh'
@@ -66,7 +66,7 @@ jobs:
             - "/home/circleci/android_sdk"
 
       - save_cache:
-          key: "v3-bazel_cache"
+          key: "v4-bazel_cache"
           paths:
             - "/home/circleci/.cache/bazel/"
 
