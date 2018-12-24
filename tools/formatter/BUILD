@@ -7,6 +7,7 @@ java_binary(
     runtime_deps = [
         ":clang_format",
         "//tools:buildifier",
+        "//tools:shfmt",
     ],
     deps = [
         "//common/flags",

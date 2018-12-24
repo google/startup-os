@@ -134,6 +134,15 @@ public class FormatterTool {
     }
   }
 
+  static class ShFormatter implements BaseFormatter {
+
+    @Override
+    public void format(Path path) throws IOException {
+      executeWithProcess(
+          "/usr/bin/env", "bash", "tools/bazel_tools/shfmt.sh", path.toAbsolutePath().toString());
+    }
+  }
+
   @FlagDesc(name = "path", description = "Format files in this path, recursively")
   private static final Flag<String> path = Flag.create(".");
 
@@ -154,6 +163,9 @@ public class FormatterTool {
 
   @FlagDesc(name = "build", description = "Format bazel BUILD files")
   private static final Flag<Boolean> build = Flag.create(false);
+
+  @FlagDesc(name = "sh", description = "Format shell files")
+  private static final Flag<Boolean> sh = Flag.create(false);
 
   @FlagDesc(name = "ignore_directories", description = "Ignored directories, split by comma")
   private static final Flag<String> ignoreDirectories = Flag.create("");
@@ -177,6 +189,10 @@ public class FormatterTool {
     return getExtension(file).equals(".cc");
   }
 
+  private static boolean isSh(Path file) {
+    return getExtension(file).equals(".sh");
+  }
+
   private static boolean isBuild(Path file) {
     return file.getFileName().toString().equals("BUILD")
         || file.getFileName().toString().equals("BUILD.bazel");
@@ -197,7 +213,8 @@ public class FormatterTool {
             || (isProto(file) && proto.get())
             || (isPython(file) && python.get())
             || (isCpp(file) && cpp.get())
-            || (isBuild(file) && build.get()));
+            || (isBuild(file) && build.get())
+            || (isSh(file) && sh.get()));
     if (ignoreNodeModules.get()) {
       if (file.normalize().toString().contains("node_modules")) {
         return false;
@@ -215,6 +232,7 @@ public class FormatterTool {
           .put(".cc", new ClangFormatter())
           .put(".bazel", new BuildFormatter())
           .put("", new BuildFormatter())
+          .put(".sh", new ShFormatter())
           .build();
 
   public static void main(String[] args) {
