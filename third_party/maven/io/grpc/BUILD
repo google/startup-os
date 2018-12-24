@@ -47,6 +47,7 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/io/opencensus:opencensus_api",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
+        "//third_party/maven/org/codehaus/mojo:animal_sniffer_annotations",
     ],
 )
 
@@ -69,6 +70,22 @@ java_library(
 )
 
 java_library(
+    name = "grpc_netty_shaded",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/grpc/grpc_netty_shaded",
+    ],
+    runtime_deps = [
+        ":grpc_core",
+    ],
+)
+
+java_library(
     name = "grpc_protobuf",
     licenses = [
         "permissive",
@@ -85,7 +102,6 @@ java_library(
         "//third_party/maven/com/google/api/grpc:proto_google_common_protos",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
-        "//third_party/maven/com/google/protobuf:protobuf_java_util",
     ],
 )
 
@@ -120,7 +136,8 @@ java_library(
     runtime_deps = [
         ":grpc_protobuf",
         ":grpc_stub",
-        "//third_party/maven/com/google/instrumentation:instrumentation_api",
+        "//third_party/maven/com/google/protobuf:protobuf_java_util",
+        "//third_party/maven/com/google/re2j",
     ],
 )
 

@@ -18,6 +18,7 @@ java_library(
         ":text_differencer",
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/auto/value:auto_value",
+        "//third_party/maven/com/google/auto/value:auto_value_annotations",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
@@ -31,6 +32,7 @@ java_library(
     srcs = ["Lists.java"],
     deps = [
         "//third_party/maven/com/google/auto/value:auto_value",
+        "//third_party/maven/com/google/auto/value:auto_value_annotations",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
     ],

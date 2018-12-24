@@ -72,10 +72,9 @@ public class GithubWriter {
                     .build())
             .getPullRequest()
             .getNumber();
-    log.atInfo()
-        .log(
-            "Pull Request with number *%s* was CREATED on GitHub(owner: %s, name: %s).",
-            pullRequestNumber, repoOwner, repoName);
+    log.atInfo().log(
+        "Pull Request with number *%s* was CREATED on GitHub(owner: %s, name: %s).",
+        pullRequestNumber, repoOwner, repoName);
     return pullRequestNumber;
   }
 
@@ -105,14 +104,13 @@ public class GithubWriter {
                             .build())
                     .build())
             .getReviewComment();
-    log.atInfo()
-        .log(
-            "Review comment with id *%s* was CREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
-            githubComment.getId(),
-            pullRequest.getOwner(),
-            pullRequest.getRepo(),
-            pullRequestNumber,
-            reviewComment);
+    log.atInfo().log(
+        "Review comment with id *%s* was CREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
+        githubComment.getId(),
+        pullRequest.getOwner(),
+        pullRequest.getRepo(),
+        pullRequestNumber,
+        reviewComment);
     return githubComment;
   }
 
@@ -141,10 +139,9 @@ public class GithubWriter {
                             .build())
                     .build())
             .getIssueComment();
-    log.atInfo()
-        .log(
-            "Issue comment with id *%s* was CREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
-            comment.getId(), repoOwner, repoName, pullRequestNumber, issueComment);
+    log.atInfo().log(
+        "Issue comment with id *%s* was CREATED on GitHub(owner: %s, name: %s, PR number: %s): %s",
+        comment.getId(), repoOwner, repoName, pullRequestNumber, issueComment);
     return comment;
   }
 
@@ -167,10 +164,9 @@ public class GithubWriter {
                     .setBody(addReviewerBotInfo(author, createdAt, newBody, reviewerLink))
                     .build())
             .build());
-    log.atInfo()
-        .log(
-            "Issue comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
-            commentId, repoOwner, repoName, newBody);
+    log.atInfo().log(
+        "Issue comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
+        commentId, repoOwner, repoName, newBody);
   }
 
   public void deleteIssueComment(String repoOwner, String repoName, long commentId) {
@@ -180,10 +176,9 @@ public class GithubWriter {
             .setRepo(repoName)
             .setCommentId(commentId)
             .build());
-    log.atInfo()
-        .log(
-            "Issue comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
-            commentId, repoOwner, repoName);
+    log.atInfo().log(
+        "Issue comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
+        commentId, repoOwner, repoName);
   }
 
   public void editReviewComment(
@@ -204,10 +199,9 @@ public class GithubWriter {
                     .setBody(getReviewCommentContent(priorityComment, reviewerLink))
                     .build())
             .build());
-    log.atInfo()
-        .log(
-            "Review comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
-            commentId, repoOwner, repoName, priorityComment.getBody());
+    log.atInfo().log(
+        "Review comment with id *%s* was EDITED on GitHub(owner: %s, name: %s). New content: %s",
+        commentId, repoOwner, repoName, priorityComment.getBody());
   }
 
   public void deleteReviewComment(String repoOwner, String repoName, long commentId) {
@@ -217,10 +211,9 @@ public class GithubWriter {
             .setRepo(repoName)
             .setCommentId(commentId)
             .build());
-    log.atInfo()
-        .log(
-            "Review comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
-            commentId, repoOwner, repoName);
+    log.atInfo().log(
+        "Review comment with id *%s* was DELETED on GitHub(owner: %s, name: %s)",
+        commentId, repoOwner, repoName);
   }
 
   private String getReviewCommentContent(ReviewComment reviewComment, String reviewerLink) {

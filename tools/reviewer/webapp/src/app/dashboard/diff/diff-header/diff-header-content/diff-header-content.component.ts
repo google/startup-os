@@ -1,8 +1,18 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
-import { Diff, Reviewer } from '@/core/proto';
-import { DiffUpdateService, HighlightService, UserService } from '@/core/services';
+import { CIResponse, Commit, Diff, Reviewer } from '@/core/proto';
+import {
+  DiffUpdateService,
+  HighlightService,
+  LocalserverService,
+  UserService,
+} from '@/core/services';
 import { DiffHeaderService } from '../diff-header.service';
+
+interface Status {
+  message: string;
+  color: string;
+}
 
 // The component implements content of the header
 // How it looks: https://i.imgur.com/TgqzvTW.jpg
@@ -12,9 +22,10 @@ import { DiffHeaderService } from '../diff-header.service';
   styleUrls: ['./diff-header-content.component.scss'],
   providers: [DiffHeaderService],
 })
-export class DiffHeaderContentComponent implements OnChanges {
+export class DiffHeaderContentComponent implements OnChanges, OnInit {
   description: string = '';
   isDescriptionEditMode: boolean = false;
+  status: Status = this.getStatus(CIResponse.TargetResult.Status.NONE);
 
   @Input() diff: Diff;
 
@@ -23,10 +34,61 @@ export class DiffHeaderContentComponent implements OnChanges {
     public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
     public highlightService: HighlightService,
+    public localserverService: LocalserverService,
   ) { }
 
   ngOnChanges() {
     this.description = this.diff.getDescription();
+  }
+
+  ngOnInit() {
+    // If CI exists then convert it to UI status
+    if (this.diff.getCi()) {
+      const results: CIResponse.TargetResult[] = this.diff.getCi().getResultsList();
+      this.setStatus(results[results.length - 1]);
+    }
+  }
+
+  // Loads commits list from localserver to compare it with CI result
+  private setStatus(result: CIResponse.TargetResult): void {
+    // Get branchInfoList from localserver
+    this.localserverService
+      .getBranchInfoList(
+        this.diff.getId(),
+        this.diff.getWorkspace(),
+      )
+      .subscribe(branchInfoList => {
+        // Find branchInfo by repo id
+        for (const branchInfo of branchInfoList) {
+          if (branchInfo.getRepoId() === result.getTarget().getRepo().getId()) {
+            const commits: Commit[] = branchInfo.getCommitList();
+            // Take last commit (newest change)
+            const commitId: string = commits[commits.length - 1].getId();
+
+            // Set status from the result,
+            // or set outdated status if result with the commit not found.
+            this.status = (commitId === result.getTarget().getCommitid()) ?
+              this.getStatus(result.getStatus()) :
+              this.getStatus(CIResponse.TargetResult.Status.OUTDATED);
+          }
+        }
+      });
+  }
+
+  // Convers enum to UI status
+  getStatus(status: CIResponse.TargetResult.Status): Status {
+    switch (status) {
+      case CIResponse.TargetResult.Status.SUCCESS:
+        return { message: 'Passed', color: '#12a736' };
+      case CIResponse.TargetResult.Status.FAIL:
+        return { message: 'Failed', color: '#db4040' };
+      case CIResponse.TargetResult.Status.RUNNING:
+        return { message: 'Running', color: '#1545bd' };
+      case CIResponse.TargetResult.Status.OUTDATED:
+        return { message: 'Outdated', color: '#808080' };
+      default:
+        return { message: '', color: '' };
+    }
   }
 
   changeAttention(email: string): void {

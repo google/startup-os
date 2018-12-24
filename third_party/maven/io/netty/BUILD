@@ -52,7 +52,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvnio/netty/netty_codec_http2",
@@ -141,19 +141,6 @@ java_library(
     ],
     runtime_deps = [
         ":netty_common",
-    ],
-)
-
-java_library(
-    name = "netty_tcnative_boringssl_static",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvnio/netty/netty_tcnative_boringssl_static",
     ],
 )
 

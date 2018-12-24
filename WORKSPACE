@@ -1,15 +1,19 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
-    sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",
-    strip_prefix = "grpc-java-1.12.0",
-    urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
+    sha256 = "48425cd631afb117fd355fd961deb313b3ac8e43f2b95c1598f35fbfcf684fbc",
+    strip_prefix = "grpc-java-1.16.1",
+    urls = ["https://github.com/grpc/grpc-java/archive/v1.16.1.tar.gz"],
 )
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
@@ -176,15 +180,15 @@ http_jar(
 http_file(
     name = "protoc_bin",
     executable = True,
-    sha256 = "84e29b25de6896c6c4b22067fb79472dac13cf54240a7a210ef1cac623f5231d",
-    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-linux-x86_64.zip"]
+    sha256 = "6003de742ea3fcf703cfec1cd4a3380fd143081a2eb0e559065563496af27807",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip"]
 )
 
 http_file(
     name = "protoc_bin_osx",
     executable = True,
-    sha256 = "768a42032718accd12e056447b0d93d42ffcdc27d1b0f21fc1e30a900da94842",
-    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
+    sha256 = "0decc6ce5beed07f8c20361ddeb5ac7666f09cf34572cca530e16814093f9c0c",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-osx-x86_64.zip"]
 )
 
 # clang-format tool download, to be used by Formatter tool
@@ -228,8 +232,8 @@ bind(
 http_file(
     name = "grpc_java_plugin_linux",
     executable = True,
-    sha256 = "d9117f0a987004bee3379654871b4cfeb81e49ebba346442dac84c82c5c20887",
-    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpc_java_plugin_linux"],
+    sha256 = "cdd93cdf24d11ccd7bad6a4d55c9bbe55e776c3972ef177974512d5aa58debd7",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.02/grpc_java_plugin_linux"],
 )
 
 http_file(
@@ -253,9 +257,8 @@ http_file(
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpcwebproxy_osx"],
 )
 
-http_file(
+http_jar(
     name = "bazel_deps",
-    executable = True,
     sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
 )
