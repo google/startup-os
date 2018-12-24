@@ -10,20 +10,29 @@
 # To compile aa from a workspace: 'export AA_STARTUP_OS_REPO_OVERRIDE=<>'
 # To undo: 'unset AA_STARTUP_OS_REPO_OVERRIDE'
 
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+RESET=$(tput sgr0)
+
 function set_STARTUP_OS_REPO() {
-  set_AA_BASE
-  if [[ -z "$AA_BASE" ]]; then
+    local debug=$1
+    set_AA_BASE
+    if [[ -z "$AA_BASE" ]]; then
     echo "BASE file not found in path until root"
     return 1
 
-  fi
-  if [[ -z "$AA_STARTUP_OS_REPO_OVERRIDE" ]]; then
-    # we want to use `aa` from head
-    export STARTUP_OS_REPO="$AA_BASE/head/startup-os/"
-  else
-    # there's a workspace we want to use `aa` from
-    export STARTUP_OS_REPO="$AA_BASE/ws/$AA_STARTUP_OS_REPO_OVERRIDE/startup-os/"
-  fi
+    fi
+    if [[ -z "$AA_STARTUP_OS_REPO_OVERRIDE" ]]; then
+        # we want to use `aa` from head
+        export STARTUP_OS_REPO="$AA_BASE/head/startup-os/"
+    else
+        # there's a workspace we want to use `aa` from
+        export STARTUP_OS_REPO="$AA_BASE/ws/$AA_STARTUP_OS_REPO_OVERRIDE/startup-os/"
+
+        if [[ "${debug}" -eq 1 ]]; then
+          echo "$RED[DEBUG]: using aa from ws $AA_BASE/ws/$AA_STARTUP_OS_REPO_OVERRIDE/startup-os/$RESET"
+        fi
+    fi
 }
 
 function bazel_build() {
@@ -113,7 +122,7 @@ function aa() {
     return 1
   fi
 
-  set_STARTUP_OS_REPO
+  set_STARTUP_OS_REPO 1
   # `start_server` relies on having already-built version of local_server
   bazel_build //tools/reviewer/local_server:local_server
   bazel_run //tools/reviewer/aa:aa_script_helper 0 start_server $AA_BASE/head/startup-os
