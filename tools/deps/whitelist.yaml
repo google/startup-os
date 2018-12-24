@@ -44,3 +44,4 @@ workspace_dependencies:
   - https://github.com/oferb/startupos-binaries
   - https://github.com/open-source-parsers/jsoncpp
   - https://releases.llvm.org
+  - https://github.com/mvdan/sh

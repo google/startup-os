@@ -35,21 +35,19 @@ if [[ $1 != "build" && $1 != "test" ]]; then
   exit 1
 fi
 
-
 if [[ ! -z "$CIRCLECI" ]]; then
-    echo "$RED""Due to flakiness in bazel execution on CircleCI, trying to build several times"
-    for i in `seq 1 ${CIRCLECI_MAX_ATTEMPTS}`;
-    do
-      echo "$RED""[Attempt $i/${CIRCLECI_MAX_ATTEMPTS}]: building$RESET"
-      bazel_build $1
-      if [[ $? -eq 0 ]]; then
-        echo "$GREEN""[Attempt $i/${CIRCLECI_MAX_ATTEMPTS}]: successful$RESET"
-        exit 0
-      fi
-    done
+  echo "$RED""Due to flakiness in bazel execution on CircleCI, trying to build several times"
+  for i in $(seq 1 ${CIRCLECI_MAX_ATTEMPTS}); do
+    echo "$RED""[Attempt $i/${CIRCLECI_MAX_ATTEMPTS}]: building$RESET"
+    bazel_build $1
+    if [[ $? -eq 0 ]]; then
+      echo "$GREEN""[Attempt $i/${CIRCLECI_MAX_ATTEMPTS}]: successful$RESET"
+      exit 0
+    fi
+  done
 
-    echo "$RED""[Attempts exhausted]: Seems it's a problem with your code and not a CircleCI flake.$RESET"
-    exit 1
+  echo "$RED""[Attempts exhausted]: Seems it's a problem with your code and not a CircleCI flake.$RESET"
+  exit 1
 fi
 
 bazel_build $1

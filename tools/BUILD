@@ -27,6 +27,15 @@ sh_binary(
     ],
 )
 
+sh_binary(
+    name = "shfmt",
+    srcs = ["bazel_tools/shfmt.sh"],
+    data = [
+        "@shfmt//file",
+        "@shfmt_osx//file",
+    ],
+)
+
 java_binary(
     name = "grpc_polyglot",
     main_class = "me.dinowernli.grpc.polyglot.Main",
