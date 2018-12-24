@@ -13,4 +13,8 @@ else
   exit 1
 fi
 
+# Follow Google's style when formatting scripts
+# (-i 2) Indent with 2 spaces
+# (-ci) switch cases will be indented
+# (-w) write result to file instead of stdout
 ${BINARY} -i 2 -ci -w $*
