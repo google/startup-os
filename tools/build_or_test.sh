@@ -48,7 +48,7 @@ if [[ ! -z "$CIRCLECI" ]]; then
       fi
     done
 
-    echo "$RED""[Attempts exhausted]: Seems it's a problem without your code and not a CircleCI flake.$RESET"
+    echo "$RED""[Attempts exhausted]: Seems it's a problem with your code and not a CircleCI flake.$RESET"
     exit 1
 fi
 
