@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.job.impl;
+package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
@@ -22,6 +22,7 @@ import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.tasks.Task;
@@ -99,7 +100,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                         .getValue()
                         .getResultsList()
                         .stream()
-                        .allMatch(CIResponse.TargetResult::getSuccess))
+                        .allMatch(x -> x.getStatus() == Status.SUCCESS))
             .forEach(
                 diffCiPair -> {
                   Diff diff = diffCiPair.getKey();

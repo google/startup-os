@@ -15,23 +15,23 @@ dependencies:
   com.google.api:
     api-common:
       lang: java
-      version: "1.1.0"
+      version: "1.7.0"
 
   com.google.auth:
     google:
       lang: java
       modules: [ "auth-library-credentials", "auth-library-oauth2-http" ]
-      version: "0.11.0"
+      version: "0.12.0"
 
   com.google.auto:
     auto-common:
       lang: java
-      version: "0.6"
+      version: "0.10"
 
   com.google.auto.factory:
     auto-factory:
       lang: java
-      version: "1.0-beta5"
+      version: "1.0-beta6"
 
   com.google.auto.service:
     auto-service:
@@ -43,7 +43,18 @@ dependencies:
     auto-value:
       lang: java
       processorClasses: [ "com.google.auto.value.processor.AutoValueProcessor" ]
-      version: "1.5"
+      version: "1.6.3"
+    auto-value-annotations:
+      lang: java
+      version: "1.6.3"
+
+  com.google.cloud:
+    google:
+      lang: java
+      modules: [ "cloud-core", "cloud-core-grpc" ]
+    google-cloud-firestore:
+      lang: java
+      version: "0.74.0-beta"
 
   com.google.code.findbugs:
     jsr305:
@@ -53,13 +64,13 @@ dependencies:
   com.google.code.gson:
     gson:
       lang: java
-      version: "2.8.2"
+      version: "2.8.5"
 
   com.google.dagger:
     dagger:
       lang: java
       modules: [ "", "compiler" ]
-      version: "2.15"
+      version: "2.20"
 
   com.google.errorprone:
     error_prone_ant:
@@ -69,23 +80,23 @@ dependencies:
   com.google.firebase:
     firebase-admin:
       lang: java
-      version: "5.9.0"
+      version: "6.6.0"
 
   com.google.flogger:
     flogger:
       lang: java
       modules: [ "", "system-backend" ]
-      version: "0.1"
+      version: "0.3.1"
 
   com.google.googlejavaformat:
     google-java-format:
       lang: java
-      version: "1.5"
+      version: "1.6"
 
   com.google.guava:
     guava:
       lang: java
-      version: "26.0-jre"
+      version: "27.0.1-jre"
 
   com.google.jimfs:
     jimfs:
@@ -96,12 +107,12 @@ dependencies:
     protobuf:
       lang: java
       modules: [ "java", "java-util" ]
-      version: "3.6.0"
+      version: "3.6.1"
 
   com.jcraft:
     jsch:
       lang: java
-      version: "0.1.54"
+      version: "0.1.55"
 
   com.squareup.okhttp:
     okhttp:
@@ -111,7 +122,7 @@ dependencies:
   com.squareup.okio:
     okio:
       lang: java
-      version: "1.15.0"
+      version: "1.16.0"
 
   commons-logging:
     commons-logging:
@@ -122,12 +133,17 @@ dependencies:
     grpc:
       lang: java
       modules: [ "core", "netty", "protobuf", "services", "stub" ]
-      version: "1.12.0"
+      version: "1.16.1"
+
+  io.netty:
+    netty-codec-http2:
+      lang: java
+      version: "4.1.32.Final"
 
   io.opencensus:
     opencensus-contrib-grpc-metrics:
       lang: java
-      version: "0.15.0"
+      version: "0.18.0"
 
   javax.annotation:
     javax.annotation-api:
@@ -147,48 +163,48 @@ dependencies:
   org.apache.commons:
     commons-csv:
       lang: java
-      version: "1.5"
+      version: "1.6"
     commons-lang3:
       lang: java
-      version: "3.7"
+      version: "3.8.1"
 
   org.apache.httpcomponents:
     fluent-hc:
       lang: java
-      version: "4.5.5"
+      version: "4.5.6"
 
   org.apache.pdfbox:
     fontbox:
       lang: java
-      version: "2.0.8"
+      version: "2.0.13"
     pdfbox:
       lang: java
-      version: "2.0.8"
+      version: "2.0.13"
 
   org.javassist:
     javassist:
       lang: java
-      version: "3.22.0-GA"
+      version: "3.24.1-GA"
 
   org.json:
     json:
       lang: java
-      version: "20180130"
+      version: "20180813"
 
   org.jsoup:
     jsoup:
       lang: java
-      version: "1.11.2"
+      version: "1.11.3"
 
   org.mockito:
     mockito-core:
       lang: java
-      version: "2.15.0"
+      version: "2.23.4"
 
   org.objenesis:
     objenesis:
       lang: java
-      version: "2.6"
+      version: "3.0.1"
 
   org.slf4j:
     slf4j-simple:
@@ -198,4 +214,4 @@ dependencies:
   org.yaml:
     snakeyaml:
       lang: java
-      version: "1.21"
+      version: "1.23"

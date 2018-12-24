@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.job.impl;
+package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.startupos.common.firestore.FirestoreClient;
 import com.google.startupos.common.firestore.FirestoreClientFactory;
-import com.google.startupos.tools.reviewer.job.ReviewerJob;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,6 +32,9 @@ public abstract class FirestoreTaskBase {
   protected FirestoreClient firestoreClient;
   protected FirestoreClientFactory firestoreClientFactory;
 
+  @FlagDesc(name = "service_account_json", description = "", required = true)
+  public static Flag<String> serviceAccountJson = Flag.create("");
+
   protected void initializeFirestoreClientIfNull() {
     if (this.firestoreClientFactory == null) {
       throw new IllegalArgumentException("this.firestoreClientFactory should be initialized");
@@ -38,7 +43,7 @@ public abstract class FirestoreTaskBase {
     if (this.firestoreClient == null) {
       FileInputStream serviceAccount = null;
       try {
-        serviceAccount = new FileInputStream(ReviewerJob.serviceAccountJson.get());
+        serviceAccount = new FileInputStream(serviceAccountJson.get());
         ServiceAccountCredentials cred =
             (ServiceAccountCredentials)
                 GoogleCredentials.fromStream(serviceAccount)

@@ -37,7 +37,7 @@ gulp.task('protoc', () => {
     .on('data', () => {})
     .on('end', createFunctions);
 
-  const protoImportList = [];
+  let protoImportList = [];
   function createFunctions() {
     // Create a proto folder
     fs.mkdirSync(protoPath);
@@ -86,7 +86,11 @@ gulp.task('protoc', () => {
         }
       }
     }
-    
+
+    // Remove duplicate proto paths, in case of same proto was imported twice
+    protoImportList = protoImportList.filter(
+      (item, index) => protoImportList.indexOf(item) == index
+    );
 
     // Create proto functions from the packages in the proto folder
     const protoImport = protoImportList.join(' ');

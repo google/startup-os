@@ -25,8 +25,15 @@ message CIRequest {
 message CIResponse {
   CIRequest request = 1;
   message TargetResult {
+    enum Status {
+      NONE = 0;
+      SUCCESS = 1;
+      FAIL = 2;
+      RUNNING = 3;
+      OUTDATED = 4;
+    }
     CIRequest.Target target = 1;
-    bool success = 2;
+    Status status = 2;
     string log = 3;
   }
   repeated TargetResult results = 2;

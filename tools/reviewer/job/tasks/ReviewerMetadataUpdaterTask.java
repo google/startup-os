@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.job.impl;
+package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.flogger.FluentLogger;
-import com.google.startupos.tools.reviewer.job.ReviewerJob;
 import com.google.startupos.tools.reviewer.job.tasks.Task;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreClient;
@@ -29,7 +28,7 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistryConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
-import com.google.startupos.tools.reviewer.job.impl.FirestoreTaskBase;
+import com.google.startupos.tools.reviewer.job.tasks.FirestoreTaskBase;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
@@ -59,6 +58,9 @@ import java.util.Map;
  */
 public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
+
+  @FlagDesc(name = "repo_url", description = "", required = false)
+  public static Flag<String> repoUrl = Flag.create("");
 
   private static final String REVIEWER_COLLECTION = "/reviewer";
   private static final String REVIEWER_REGISTRY_DOCUMENT_NAME = "registry";
@@ -135,7 +137,7 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
         GitRepo repo = gitRepoFactory.create(REPO_DIRECTORY);
 
         if (fileUtils.folderEmptyOrNotExists(REPO_DIRECTORY)) {
-          repo.cloneRepo(ReviewerJob.repoUrl.get(), REPO_DIRECTORY);
+          repo.cloneRepo(repoUrl.get(), REPO_DIRECTORY);
         } else {
           repo.pull();
         }
@@ -152,10 +154,9 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
           if (firstRun) {
             log.atInfo().log("Storing on first run, checksum: %s", newChecksum);
           } else {
-            log.atInfo()
-                .log(
-                    "New checksum not equal to stored one: new %s, stored %s",
-                    newChecksum, registryChecksum);
+            log.atInfo().log(
+                "New checksum not equal to stored one: new %s, stored %s",
+                newChecksum, registryChecksum);
           }
           uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;
