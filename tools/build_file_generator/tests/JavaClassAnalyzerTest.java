@@ -29,7 +29,6 @@ import com.google.startupos.tools.buildfilegenerator.Protos.Import;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -77,17 +76,12 @@ public class JavaClassAnalyzerTest {
 
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
-            .setClassname("TestClass")
-            .setPackage("com.test.tests")
+            .addImport(Import.newBuilder().setPackage("org.junit").setClassName("Test").build())
             .addImport(
                 Import.newBuilder()
-                    .addAllImportDir(Arrays.asList("org", "junit"))
-                    .setImportedClassName("Test")
-                    .build())
-            .addImport(
-                Import.newBuilder()
-                    .addAllImportDir(Arrays.asList("org", "junit"))
-                    .setImportedClassName("Assert")
+                    .setPackage("org.junit")
+                    .setClassName("Assert")
+                    .setIsStatic(true)
                     .build())
             .setIsTestClass(true)
             .build();
@@ -102,24 +96,18 @@ public class JavaClassAnalyzerTest {
             + System.lineSeparator()
             + "import java.util.*;"
             + System.lineSeparator()
-            + "public class TestClass {"
+            + "public class SomeClass {"
             + System.lineSeparator()
             + "  List<Integer> list = new ArrayList<>();"
             + System.lineSeparator()
             + "}";
-    String filePath = fileUtils.joinToAbsolutePath(testFolder, "TestClass.java");
+    String filePath = fileUtils.joinToAbsolutePath(testFolder, "SomeClass.java");
     fileUtils.writeStringUnchecked(fileContent, filePath);
 
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
-            .setClassname("TestClass")
-            .setPackage("com.test.tests")
             .addImport(
-                Import.newBuilder()
-                    .addAllImportDir(Arrays.asList("java", "util"))
-                    .setWholePackageImport(true)
-                    .setStandardJavaPackage(true)
-                    .build())
+                Import.newBuilder().setPackage("java.util").setWholePackageImport(true).build())
             .build();
 
     assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
@@ -130,22 +118,32 @@ public class JavaClassAnalyzerTest {
     String fileContent =
         "package com.test.tests;"
             + System.lineSeparator()
-            + "public class TestClass {"
+            + "public class SomeClass {"
             + System.lineSeparator()
             + "  public static void main(String[] args) {}"
             + System.lineSeparator()
             + "}";
-    String filePath = fileUtils.joinToAbsolutePath(testFolder, "TestClass.java");
+    String filePath = fileUtils.joinToAbsolutePath(testFolder, "SomeClass.java");
     fileUtils.writeStringUnchecked(fileContent, filePath);
 
-    JavaClass expectedJavaClass =
-        JavaClass.newBuilder()
-            .setClassname("TestClass")
-            .setPackage("com.test.tests")
-            .setHasMainMethod(true)
-            .build();
+    JavaClass expectedJavaClass = JavaClass.newBuilder().setHasMainMethod(true).build();
 
     assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void tooBroadImportTest() throws IOException {
+    String fileContent =
+        "package com.test.tests;"
+            + System.lineSeparator()
+            + "import org.*;"
+            + System.lineSeparator()
+            + "public class SomeClass {"
+            + System.lineSeparator()
+            + "}";
+    String filePath = fileUtils.joinToAbsolutePath(testFolder, "SomeClass.java");
+    fileUtils.writeStringUnchecked(fileContent, filePath);
+    javaClassAnalyzer.getJavaClass(filePath);
   }
 }
 

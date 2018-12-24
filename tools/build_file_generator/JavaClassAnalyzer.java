@@ -39,80 +39,56 @@ public class JavaClassAnalyzer {
     JavaClass.Builder result = JavaClass.newBuilder();
 
     String fileContent = fileUtils.readFile(filePath);
-    String classname = getClassname(filePath);
-    result.setClassname(classname).setPackage(getPackage(fileContent, classname));
-    getImportLines(fileContent).forEach(line -> result.addImport(getImport(line)));
 
-    result.setIsTestClass(isTestClass(fileContent));
-    result.setHasMainMethod(hasMainMethod(fileContent));
+    getImportLines(fileContent).forEach(line -> result.addImport(getImport(line)));
+    result.setIsTestClass(isTestClass(fileContent)).setHasMainMethod(hasMainMethod(fileContent));
 
     return result.build();
   }
 
-  private static String getClassname(String filePath) {
-    String[] parts = filePath.split("/");
-    return parts[parts.length - 1].replace(".java", "");
-  }
-
-  private static String getPackage(String fileContent, String classname) {
-    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package", "");
-    if (packageLines.isEmpty()) {
-      throw new IllegalArgumentException(
-          String.format("Can't find package for the file: %s", classname));
-    }
-    if (packageLines.size() > 1) {
-      throw new IllegalArgumentException(
-          String.format("Found %d packages for the file: %s", packageLines.size(), classname));
-    }
-    return packageLines.get(0).split(" ")[1].replace(";", "");
-  }
-
   private static List<String> getImportLines(String fileContent) {
-    return getLinesStartWithKeyword(fileContent, "import", ".");
-  }
-
-  private static List<String> getLinesStartWithKeyword(
-      String fileContent, String keyword, String lineShouldContain) {
     return Arrays.stream(fileContent.split(System.lineSeparator()))
         .map(String::trim)
         .filter(
             line ->
-                line.startsWith(keyword + " ")
-                    && line.contains(lineShouldContain)
+                line.startsWith("import ")
+                    && line.contains(".")
                     && line.substring(line.length() - 1).equals(";"))
         .collect(Collectors.toList());
   }
 
   private static Import getImport(String importLine) {
-    Import.Builder importBuilder = Import.newBuilder();
+    Import.Builder result = Import.newBuilder();
 
-    boolean isStaticImport = importLine.split(" ")[1].trim().equals("static");
+    // e.g. `import static org.mockito.Mockito.mock;` will be converted to array [static,
+    // org.mockito.Mockito.mock]
+    String[] importLineParts = importLine.replace("import ", "").replace(";", "").split(" ");
 
-    List<String> lineParts = Arrays.asList(importLine.replace(";", "").split(" "));
-    String importBody = isStaticImport ? lineParts.get(2) : lineParts.get(1);
-    List<String> importParts = Arrays.asList(importBody.split("\\."));
+    boolean isStaticImport =
+        importLineParts.length > 1 && importLineParts[0].trim().equals("static");
+    result.setIsStatic(isStaticImport);
 
-    String importedClassName;
-    if (isStaticImport) {
-      importBuilder.addAllImportDir(importParts.subList(0, importParts.size() - 2));
-      importedClassName = importParts.get(importParts.size() - 2);
-    } else {
-      importBuilder.addAllImportDir(importParts.subList(0, importParts.size() - 1));
-      importedClassName = importParts.get(importParts.size() - 1);
+    String[] importBodyParts =
+        isStaticImport ? importLineParts[1].split("\\.") : importLineParts[0].split("\\.");
+    if (importBodyParts.length < 3) {
+      throw new IllegalArgumentException("Import is too broad: " + importLine);
     }
-    if (importedClassName.equals("*")) {
-      importBuilder.setWholePackageImport(true);
-    } else {
-      importBuilder.setImportedClassName(importedClassName);
+    if (!isStaticImport) {
+      result.setWholePackageImport(
+          (importBodyParts[importBodyParts.length - 1].equals("*"))
+              && (!Character.isUpperCase(importBodyParts[importBodyParts.length - 2].charAt(0))));
     }
-
-    importBuilder.setStandardJavaPackage(isStandardJavaPackage(importParts.get(0)));
-    return importBuilder.build();
-  }
-
-  private static boolean isStandardJavaPackage(String rootImportDir) {
-    List<String> standardJavaPackages = Arrays.asList("java", "javax");
-    return standardJavaPackages.contains(rootImportDir);
+    for (String current : importBodyParts) {
+      if (!current.equals("*")) {
+        if (Character.isUpperCase(current.charAt(0))) {
+          result.setClassName(current);
+          break;
+        }
+        result.setPackage(
+            result.getPackage().isEmpty() ? current : result.getPackage() + "." + current);
+      }
+    }
+    return result.build();
   }
 
   private static boolean isTestClass(String fileContent) {
