@@ -76,6 +76,7 @@ public class JavaClassAnalyzerTest {
 
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
+            .setPackage("com.test.tests")
             .addImport(Import.newBuilder().setPackage("org.junit").setClassName("Test").build())
             .addImport(
                 Import.newBuilder()
@@ -83,6 +84,7 @@ public class JavaClassAnalyzerTest {
                     .setClassName("Assert")
                     .setIsStatic(true)
                     .build())
+            .setClassName("TestClass")
             .setIsTestClass(true)
             .build();
 
@@ -106,8 +108,10 @@ public class JavaClassAnalyzerTest {
 
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
+            .setPackage("com.test.tests")
             .addImport(
                 Import.newBuilder().setPackage("java.util").setWholePackageImport(true).build())
+            .setClassName("SomeClass")
             .build();
 
     assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
@@ -126,7 +130,12 @@ public class JavaClassAnalyzerTest {
     String filePath = fileUtils.joinToAbsolutePath(testFolder, "SomeClass.java");
     fileUtils.writeStringUnchecked(fileContent, filePath);
 
-    JavaClass expectedJavaClass = JavaClass.newBuilder().setHasMainMethod(true).build();
+    JavaClass expectedJavaClass =
+        JavaClass.newBuilder()
+            .setPackage("com.test.tests")
+            .setClassName("SomeClass")
+            .setHasMainMethod(true)
+            .build();
 
     assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
   }

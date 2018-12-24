@@ -12,7 +12,9 @@ message Import {
 }
 
 message JavaClass {
-  repeated Import import = 1;
-  bool has_main_method = 2;
-  bool is_test_class = 3;
+  string package = 1;
+  repeated Import import = 2;
+  string class_name = 3;
+  bool has_main_method = 4;
+  bool is_test_class = 5;
 }
