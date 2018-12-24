@@ -37,8 +37,10 @@ public class JavaClassAnalyzer {
 
   public JavaClass getJavaClass(String filePath) throws IOException {
     JavaClass.Builder result = JavaClass.newBuilder();
+    result.setClassName(getJavaClassName(filePath));
 
     String fileContent = fileUtils.readFile(filePath);
+    result.setPackage(getPackage(fileContent, result.getClassName()));
 
     getImportLines(fileContent).forEach(line -> result.addImport(getImport(line)));
     result.setIsTestClass(isTestClass(fileContent)).setHasMainMethod(hasMainMethod(fileContent));
@@ -46,15 +48,38 @@ public class JavaClassAnalyzer {
     return result.build();
   }
 
-  private static List<String> getImportLines(String fileContent) {
+  private static String getJavaClassName(String filePath) {
+    String[] parts = filePath.split("/");
+    return parts[parts.length - 1].replace(".java", "");
+  }
+
+  private static List<String> getLinesStartWithKeyword(
+      String fileContent, String keyword, String lineShouldContain) {
     return Arrays.stream(fileContent.split(System.lineSeparator()))
         .map(String::trim)
         .filter(
             line ->
-                line.startsWith("import ")
-                    && line.contains(".")
+                line.startsWith(keyword)
+                    && line.contains(lineShouldContain)
                     && line.substring(line.length() - 1).equals(";"))
         .collect(Collectors.toList());
+  }
+
+  private static String getPackage(String fileContent, String className) {
+    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package", "");
+    if (packageLines.isEmpty()) {
+      throw new IllegalArgumentException(
+          String.format("Can't find package for the file: %s", className));
+    }
+    if (packageLines.size() > 1) {
+      throw new IllegalArgumentException(
+          String.format("Found %d packages for the file: %s", packageLines.size(), className));
+    }
+    return packageLines.get(0).split(" ")[1].replace(";", "");
+  }
+
+  private static List<String> getImportLines(String fileContent) {
+    return getLinesStartWithKeyword(fileContent, "import ", ".");
   }
 
   private static Import getImport(String importLine) {
