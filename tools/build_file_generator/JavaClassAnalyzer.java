@@ -71,7 +71,7 @@ public class JavaClassAnalyzer {
     String[] importBodyParts =
         isStaticImport ? importLineParts[1].split("\\.") : importLineParts[0].split("\\.");
     if (importBodyParts.length < 3) {
-      throw new IllegalArgumentException("Import is too broad: " + importLine);
+      throw new IllegalArgumentException("Package must have at least 2 part: " + importLine);
     }
     if (!isStaticImport) {
       result.setWholePackageImport(
