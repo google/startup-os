@@ -20,6 +20,7 @@ java_test(
     srcs = [
         "ProtoFileAnalyzerTest.java",
     ],
+    resources = ["resources/test_proto.proto"],
     test_class = "com.google.startupos.tools.buildfilegenerator.tests.ProtoFileAnalyzerTest",
     deps = [
         "//common",

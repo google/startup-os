@@ -53,41 +53,8 @@ public class ProtoFileAnalyzerTest {
   @Test
   public void getProtoFileTest() throws IOException {
     String fileContent =
-        "syntax = \"proto3\";"
-            + System.lineSeparator()
-            + "package com.test.package;"
-            + System.lineSeparator()
-            + "option java_package = \"com.test.javapackage\";"
-            + System.lineSeparator()
-            + "option java_outer_classname = \"Protos\";"
-            + System.lineSeparator()
-            + "import \"path/to/another_proto_file.proto\";"
-            + System.lineSeparator()
-            + "service FileService {"
-            + System.lineSeparator()
-            + "  rpc getFile(FileRequest) returns (FileResponse);"
-            + System.lineSeparator()
-            + "}"
-            + System.lineSeparator()
-            + "message FileRequest { string filename = 1; }"
-            + System.lineSeparator()
-            + "message FileResponse {"
-            + System.lineSeparator()
-            + "  string content = 1;"
-            + System.lineSeparator()
-            + "  int64 size = 2;"
-            + System.lineSeparator()
-            + "}"
-            + System.lineSeparator()
-            + "enum BooleanEnum {"
-            + System.lineSeparator()
-            + "    FALSE = 0;"
-            + System.lineSeparator()
-            + "    TRUE = 1;"
-            + System.lineSeparator()
-            + "}"
-            + System.lineSeparator();
-
+        fileUtils.readFileFromResourcesUnchecked(
+            "tools/build_file_generator/tests/resources/test_proto.proto");
     String filePath = fileUtils.joinToAbsolutePath(testFolder, "test_proto.proto");
     fileUtils.writeStringUnchecked(fileContent, filePath);
 
