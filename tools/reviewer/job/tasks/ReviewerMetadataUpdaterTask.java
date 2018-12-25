@@ -21,8 +21,6 @@ import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.tools.reviewer.job.tasks.Task;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.common.firestore.FirestoreClient;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
@@ -83,27 +81,15 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
   private boolean firstRun;
 
   @Inject
-  public ReviewerMetadataUpdaterTask(
-      FileUtils fileUtils,
-      GitRepoFactory gitRepoFactory,
-      FirestoreClientFactory firestoreClientFactory) {
+  public ReviewerMetadataUpdaterTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
-    this.firestoreClientFactory = firestoreClientFactory;
     this.firstRun = true;
   }
 
   private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
-    firestoreClient.createDocument(REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME, registry);
-    firestoreClient.createProtoDocument(
+    firestoreClient.setProtoDocument(
         REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
-  }
-
-  private void uploadReviewerConfigToFirestore(ReviewerConfig reviewerConfig) {
-    firestoreClient.createDocument(
-        REVIEWER_COLLECTION, REVIEWER_CONFIG_DOCUMENT_NAME, reviewerConfig);
-    firestoreClient.createProtoDocument(
-        REVIEWER_COLLECTION, REVIEWER_CONFIG_DOCUMENT_NAME_BIN, reviewerConfig);
   }
 
   private static Stream<Integer> intStream(byte[] array) {
