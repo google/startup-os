@@ -75,6 +75,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       projectId = req.getProjectId();
       apiKey = req.getApiKey();
       jwtToken = req.getJwtToken();
+      System.out.println("token=" + jwtToken);
       refreshToken = req.getRefreshToken();
       decodeJwtToken();
       setTokenRefreshScheduler();
@@ -130,6 +131,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       JSONObject json =
           new JSONObject(
               new String(Base64.getUrlDecoder().decode(parts[1].getBytes("UTF-8")), "UTF-8"));
+      System.out.println("XXXXXXXXXXXXXX " + json);
       userName = json.getString("name");
       userEmail = json.getString("email");
       tokenExpiration = json.getLong("exp");
@@ -176,6 +178,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
     return jwtToken;
   }
 
+  public long getTokenExpiration() {
+    return tokenExpiration;
+  }
+
   public String getProjectId() {
     return projectId;
   }
@@ -186,6 +192,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   public String getUserEmail() {
     return userEmail;
+  }
+
+  public String getRefreshToken() {
+    return refreshToken;
   }
 }
 

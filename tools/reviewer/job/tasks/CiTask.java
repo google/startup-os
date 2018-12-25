@@ -19,7 +19,6 @@ package com.google.startupos.tools.reviewer.job.tasks;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.CommandLine;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
@@ -46,13 +45,9 @@ public class CiTask extends FirestoreTaskBase implements Task {
   private static String CI_RESPONSES_PATH = "/reviewer/ci/responses/%s/history";
 
   @Inject
-  public CiTask(
-      FileUtils fileUtils,
-      GitRepoFactory gitRepoFactory,
-      FirestoreClientFactory firestoreClientFactory) {
+  public CiTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
-    this.firestoreClientFactory = firestoreClientFactory;
   }
 
   @Override
@@ -128,7 +123,7 @@ public class CiTask extends FirestoreTaskBase implements Task {
                   .build());
         }
       } finally {
-        firestoreClient.createDocument(
+        firestoreClient.setProtoDocument(
             String.format(CI_RESPONSES_PATH, requestWithDiffId.id()), responseBuilder.build());
         lock.unlock();
       }

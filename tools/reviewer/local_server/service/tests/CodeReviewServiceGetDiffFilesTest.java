@@ -19,8 +19,7 @@ package com.google.startupos.tools.reviewer.localserver.service.tests;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
-import com.google.startupos.common.firestore.FirestoreClient;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
@@ -86,8 +85,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   // set by createAaWorkspace
   private String repoPath;
 
-  private FirestoreClientFactory firestoreClientFactory = mock(FirestoreClientFactory.class);
-  private FirestoreClient firestoreClient = mock(FirestoreClient.class);
+  private FirestoreProtoClient firestoreClient = mock(FirestoreProtoClient.class);
 
   @Before
   public void setup() throws IOException {
@@ -112,16 +110,13 @@ public class CodeReviewServiceGetDiffFilesTest {
     String initialRepoFolder = fileUtils.joinToAbsolutePath(testFolder, "initial_repo");
     aaBaseFolder = fileUtils.joinToAbsolutePath(testFolder, "base_folder");
 
-    when(firestoreClientFactory.create(any(), any())).thenReturn(firestoreClient);
-
     codeReviewService =
         new CodeReviewService(
             component.getAuthService(),
             fileUtils,
             aaBaseFolder,
             gitRepoFactory,
-            component.getTextDifferencer(),
-            firestoreClientFactory);
+            component.getTextDifferencer());
 
     createInitialRepo(initialRepoFolder);
     initAaBase(initialRepoFolder, aaBaseFolder);
@@ -207,7 +202,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   }
 
   private void mockFirestoreClientMethods() {
-    when(firestoreClient.getDocument(
+    when(firestoreClient.getProtoDocument(
             "reviewer/data/diff/" + DIFF_ID, DiffFilesResponse.newBuilder()))
         .thenReturn(
             DiffFilesResponse.newBuilder()
@@ -220,7 +215,7 @@ public class CodeReviewServiceGetDiffFilesTest {
                             .build()))
                 .build());
 
-    when(firestoreClient.getDocument(
+    when(firestoreClient.getProtoDocument(
             "/reviewer/data/last_diff_id", DiffNumberResponse.newBuilder()))
         .thenReturn(DiffNumberResponse.newBuilder().setLastDiffId(1).build());
   }
