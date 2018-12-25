@@ -84,8 +84,7 @@ public class FirestoreClientTool {
     WriteResult result = client.setProtoDocument("test/bla", Diff.newBuilder().setId(123).build());
     System.out.println("Update time : " + result.getUpdateTime());
 
-    System.out.println(
-        client.getProtoDocument("reviewer/data/diff/100", Diff.newBuilder()));
+    System.out.println(client.getProtoDocument("reviewer/data/diff/100", Diff.newBuilder()));
 
     System.out.println(
         client.getDocumentFromCollection("reviewer/data/diff", Diff.newBuilder(), false));
