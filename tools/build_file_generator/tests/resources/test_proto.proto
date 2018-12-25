@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.test.package;
+
+option java_package = "com.test.javapackage";
+option java_outer_classname = "Protos";
+
+service FileService { rpc getFile(FileRequest) returns (FileResponse); }
+
+message FileRequest { string filename = 1; }
+
+message FileResponse {
+  string content = 1;
+  int64 size = 2;
+}
+
+enum BooleanEnum {
+  FALSE = 0;
+  TRUE = 1;
+}

@@ -18,3 +18,13 @@ message JavaClass {
   bool has_main_method = 4;
   bool is_test_class = 5;
 }
+
+message ProtoFile {
+  string package = 1;
+  string file_name = 2;
+  string java_package = 3;
+  string java_outer_classname = 4;
+  repeated string messages = 5;
+  repeated string services = 6;
+  repeated string enums = 7;
+}

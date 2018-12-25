@@ -49,6 +49,9 @@ public class JavaClassAnalyzer {
   }
 
   private static String getJavaClassName(String filePath) {
+    if (!filePath.endsWith(".java")) {
+      throw new IllegalArgumentException("Java class must have `.java` extension: " + filePath);
+    }
     String[] parts = filePath.split("/");
     return parts[parts.length - 1].replace(".java", "");
   }
