@@ -131,7 +131,6 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       JSONObject json =
           new JSONObject(
               new String(Base64.getUrlDecoder().decode(parts[1].getBytes("UTF-8")), "UTF-8"));
-      System.out.println("XXXXXXXXXXXXXX " + json);
       userName = json.getString("name");
       userEmail = json.getString("email");
       tokenExpiration = json.getLong("exp");
