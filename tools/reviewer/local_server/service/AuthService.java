@@ -75,7 +75,6 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       projectId = req.getProjectId();
       apiKey = req.getApiKey();
       jwtToken = req.getJwtToken();
-      System.out.println("token=" + jwtToken);
       refreshToken = req.getRefreshToken();
       decodeJwtToken();
       setTokenRefreshScheduler();
