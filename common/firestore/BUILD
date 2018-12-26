@@ -1,15 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-proto_library(
-    name = "data_proto",
-    srcs = ["data.proto"],
-)
-
-java_proto_library(
-    name = "data_java_proto",
-    deps = [":data_proto"],
-)
-
 java_library(
     name = "firestore",
     srcs = [
@@ -17,8 +7,7 @@ java_library(
         "MessageWithId.java",
     ],
     deps = [
-        ":data_java_proto",
-        "//common:dagger_with_annotation_processor",
+         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/com/google/auto/value:auto_value_annotations",
         "//third_party/maven/com/google/code/gson",

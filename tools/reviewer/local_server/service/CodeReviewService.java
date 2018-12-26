@@ -17,7 +17,6 @@
 package com.google.startupos.tools.reviewer.localserver.service;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.Protos.TextDiff;
@@ -51,7 +50,6 @@ import io.grpc.stub.StreamObserver;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;

@@ -62,18 +62,11 @@ public class FirestoreClientTool {
     this.authService = authService;
   }
 
-  void run() throws IOException {
+  void run() {
     authService.refreshToken();
     client = new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
 
-    Executors.newSingleThreadExecutor()
-        .execute(
-            new Runnable() {
-              @Override
-              public void run() {
-                testFunctionality();
-              }
-            });
+    Executors.newSingleThreadExecutor().execute(() -> testFunctionality());
     try {
       Thread.sleep(100000000);
     } catch (Exception e) {

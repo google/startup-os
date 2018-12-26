@@ -26,7 +26,6 @@ import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
-import com.google.startupos.tools.reviewer.job.tasks.Task;
 
 import javax.inject.Inject;
 import java.io.IOException;

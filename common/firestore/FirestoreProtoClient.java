@@ -16,11 +16,8 @@
 
 package com.google.startupos.common.firestore;
 
-import static java.net.HttpURLConnection.HTTP_OK;
-
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.auto.factory.AutoFactory;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
@@ -29,30 +26,17 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.FirebaseApp;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.protobuf.Message;
-import com.google.protobuf.MessageOrBuilder;
-import com.google.startupos.common.firestore.Protos.ProtoDocument;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.WriteResult;
 import java.util.concurrent.ExecutionException;
 import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.EventListener;
-import com.google.cloud.firestore.FirestoreException;
-import javax.annotation.Nullable;
-import java.util.Date;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableList;
-import com.google.protobuf.Parser;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.io.InputStream;
 import java.io.FileInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +63,7 @@ public class FirestoreProtoClient {
   public FirestoreProtoClient(String project, String token) {
     FirebaseOptions options =
         new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.of(new AccessToken(token, null)))
+            .setCredentials(GoogleCredentials.create(new AccessToken(token, null)))
             .setProjectId(project)
             .build();
     FirebaseApp.initializeApp(options);
@@ -118,7 +102,7 @@ public class FirestoreProtoClient {
   public DocumentReference getDocumentReference(String path) {
     String[] parts = path.split("/");
     if (parts.length % 2 != 0) {
-      throw new IllegalArgumentException("path length should be even but is " + parts.length);
+      throw new IllegalArgumentException("Path length should be even but is " + parts.length);
     }
     return getCollectionReference(parts, parts.length - 1).document(parts[parts.length - 1]);
   }
@@ -163,7 +147,8 @@ public class FirestoreProtoClient {
     return getDocumentReference(path).set(map);
   }
 
-  public ApiFuture<WriteResult> setDocumentAsync(String collection, String documentId, Map map) {
+  public ApiFuture<WriteResult> setDocumentAsync(
+      String collection, String documentId, Map<String, ?> map) {
     return setDocumentAsync(joinPath(collection, documentId), map);
   }
 
@@ -182,7 +167,6 @@ public class FirestoreProtoClient {
   public ApiFuture<WriteResult> setProtoDocumentAsync(String path, Message proto) {
     byte[] protoBytes = proto.toByteArray();
     String base64BinaryString = Base64.getEncoder().encodeToString(protoBytes);
-    Map<String, Object> data = new HashMap<>();
     return setDocumentAsync(path, ImmutableMap.of(PROTO_FIELD, base64BinaryString));
   }
 
@@ -206,7 +190,7 @@ public class FirestoreProtoClient {
   public CollectionReference getCollectionReference(String path) {
     String[] parts = path.split("/");
     if (parts.length % 2 != 1) {
-      throw new IllegalArgumentException("path length should be odd but is " + parts.length);
+      throw new IllegalArgumentException("Path length should be odd but is " + parts.length);
     }
     return getCollectionReference(parts, parts.length);
   }
