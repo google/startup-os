@@ -18,7 +18,6 @@ package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse;
@@ -51,13 +50,9 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
   private final HashSet<CIRequest> ciSubmittedDiffIds = new HashSet<>();
 
   @Inject
-  public SubmitterTask(
-      FileUtils fileUtils,
-      GitRepoFactory gitRepoFactory,
-      FirestoreClientFactory firestoreClientFactory) {
+  public SubmitterTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
-    this.firestoreClientFactory = firestoreClientFactory;
   }
 
   @Override
@@ -71,7 +66,8 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
       try {
         initializeFirestoreClientIfNull();
         // noinspection unchecked
-        List<Diff> diffs = (List) this.firestoreClient.listDocuments(DIFF_PATH, Diff.newBuilder());
+        List<Diff> diffs =
+            (List) this.firestoreClient.getProtoDocuments(DIFF_PATH, Diff.newBuilder());
 
         if (!fileUtils.folderExists("submitter")) {
           fileUtils.mkdirs("submitter");
@@ -162,7 +158,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                         gitRepos.stream().allMatch(repo -> repo.push("master"));
                     if (allPushesSuccessful) {
                       diff = diff.toBuilder().setStatus(Diff.Status.SUBMITTED).build();
-                      this.firestoreClient.createProtoDocument(
+                      this.firestoreClient.setProtoDocument(
                           DIFF_PATH, String.valueOf(diff.getId()), diff);
                       // TODO: store `SubmitterMergeResult`
                     } else {
@@ -171,7 +167,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                   } else {
                     CIRequest newRequest = newRequestBuilder.build();
                     if (!ciSubmittedDiffIds.contains(newRequest)) {
-                      this.firestoreClient.createDocument(
+                      this.firestoreClient.setProtoDocument(
                           CI_REQUESTS_PATH, String.valueOf(diff.getId()), newRequest);
                       ciSubmittedDiffIds.add(newRequest);
                     }

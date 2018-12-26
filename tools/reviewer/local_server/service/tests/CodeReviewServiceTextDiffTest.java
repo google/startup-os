@@ -18,7 +18,6 @@ package com.google.startupos.tools.reviewer.localserver.service.tests;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.startupos.common.firestore.FirestoreClientFactory;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
 import com.google.startupos.tools.localserver.service.AuthService;
 import io.grpc.inprocess.InProcessChannelBuilder;
@@ -125,8 +124,7 @@ public class CodeReviewServiceTextDiffTest {
             fileUtils,
             aaBaseFolder,
             gitRepoFactory,
-            component.getTextDifferencer(),
-            component.getFirestoreClientFactory());
+            component.getTextDifferencer());
 
     createInitialRepo(initialRepoFolder);
     initAaBase(initialRepoFolder, aaBaseFolder);
@@ -147,8 +145,6 @@ public class CodeReviewServiceTextDiffTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   interface TestComponent {
-    FirestoreClientFactory getFirestoreClientFactory();
-
     AuthService getAuthService();
 
     GitRepoFactory getGitRepoFactory();

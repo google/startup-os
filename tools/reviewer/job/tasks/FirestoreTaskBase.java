@@ -18,8 +18,7 @@ package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
-import com.google.startupos.common.firestore.FirestoreClient;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
@@ -29,17 +28,12 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public abstract class FirestoreTaskBase {
-  protected FirestoreClient firestoreClient;
-  protected FirestoreClientFactory firestoreClientFactory;
+  protected FirestoreProtoClient firestoreClient;
 
   @FlagDesc(name = "service_account_json", description = "", required = true)
   public static Flag<String> serviceAccountJson = Flag.create("");
 
   protected void initializeFirestoreClientIfNull() {
-    if (this.firestoreClientFactory == null) {
-      throw new IllegalArgumentException("this.firestoreClientFactory should be initialized");
-    }
-
     if (this.firestoreClient == null) {
       FileInputStream serviceAccount = null;
       try {
@@ -52,7 +46,7 @@ public abstract class FirestoreTaskBase {
                             "https://www.googleapis.com/auth/cloud-platform",
                             "https://www.googleapis.com/auth/datastore"));
         this.firestoreClient =
-            this.firestoreClientFactory.create(
+            new FirestoreProtoClient(
                 cred.getProjectId(), cred.refreshAccessToken().getTokenValue());
       } catch (IOException e) {
         e.printStackTrace();
