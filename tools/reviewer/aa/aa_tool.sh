@@ -125,6 +125,7 @@ function aa() {
   # `start_server` relies on having already-built version of local_server
   bazel_build //tools/reviewer/local_server:local_server
   bazel_run //tools/reviewer/aa:aa_script_helper 0 start_server $AA_BASE/head/startup-os
+
   if [[ "$1" == "workspace" ]]; then
     # For workspace command, `aa` prints commands to stdout, such as cd, that we need to execute.
     AA_RESULT=$(bazel_run //tools/reviewer/aa:aa_tool 0 $*)
