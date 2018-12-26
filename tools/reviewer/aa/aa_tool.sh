@@ -76,12 +76,11 @@ function bazel_run() {
 
   set_STARTUP_OS_REPO
   pushd $STARTUP_OS_REPO &>/dev/null
-
   bazel_build ${target} ${force_compile}
-
-  eval "${binary_for_target} ${args}"
-  return_code="$?"
   popd &>/dev/null
+
+  eval "${STARTUP_OS_REPO}${binary_for_target} ${args}"
+  return_code="$?"
   return ${return_code}
 }
 
@@ -126,7 +125,6 @@ function aa() {
   # `start_server` relies on having already-built version of local_server
   bazel_build //tools/reviewer/local_server:local_server
   bazel_run //tools/reviewer/aa:aa_script_helper 0 start_server $AA_BASE/head/startup-os
-
   if [[ "$1" == "workspace" ]]; then
     # For workspace command, `aa` prints commands to stdout, such as cd, that we need to execute.
     AA_RESULT=$(bazel_run //tools/reviewer/aa:aa_tool 0 $*)
