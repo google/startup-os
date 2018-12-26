@@ -76,12 +76,11 @@ function bazel_run() {
 
   set_STARTUP_OS_REPO
   pushd $STARTUP_OS_REPO &>/dev/null
-
   bazel_build ${target} ${force_compile}
-
-  eval "${binary_for_target} ${args}"
-  return_code="$?"
   popd &>/dev/null
+
+  eval "${STARTUP_OS_REPO}${binary_for_target} ${args}"
+  return_code="$?"
   return ${return_code}
 }
 
