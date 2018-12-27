@@ -23,7 +23,6 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Issu
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
-import com.google.startupos.tools.reviewer.localserver.service.Protos;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
@@ -35,6 +34,12 @@ import java.util.stream.Collectors;
 
 // Converts a Diff proto to a list of GithubPullRequestProtos.PullRequest protos
 public class DiffConverter {
+
+  private ReviewerClient reviewerClient;
+
+  public DiffConverter(ReviewerClient reviewerClient) {
+    this.reviewerClient = reviewerClient;
+  }
 
   public ImmutableList<PullRequest> toPullRequests(
       Diff diff, ImmutableMap<String, GitRepo> repoNameToGitRepos) {
@@ -61,7 +66,8 @@ public class DiffConverter {
                   diff.getCodeThreadList(),
                   githubPr.getRepo(),
                   repoNameToGitRepos,
-                  diff.getModifiedTimestamp()))
+                  diff.getModifiedTimestamp(),
+                  diff.getId()))
           .addAllIssueComment(getIssueComments(diff.getDiffThreadList(), githubPr.getRepo()))
           .setOwner(githubPr.getOwner())
           .setAssociatedReviewerDiff(diff.getId());
@@ -74,7 +80,8 @@ public class DiffConverter {
       List<Thread> codeThreads,
       String repoName,
       ImmutableMap<String, GitRepo> repoNameToGitRepos,
-      long modifiedTimestamp) {
+      long modifiedTimestamp,
+      long diffId) {
     ImmutableList.Builder<ReviewComment> result = ImmutableList.builder();
     ImmutableList<Thread> codeThreadsByRepo =
         ImmutableList.copyOf(
@@ -109,13 +116,13 @@ public class DiffConverter {
           LineNumberConverter.LineNumberToGithubPositionCorrelation correlation =
               getGithubReviewCommentPosition(baseBranchCommitId, thread, patch);
           if (correlation.getExactGithubPosition() != 0) {
-            // TODO: Store the result in the Diff.Thread in Firestore
             githubCommentPosition = correlation.getExactGithubPosition();
           } else {
-            // TODO: Store the result in the Diff.Thread in Firestore
             githubCommentPosition = correlation.getClosestGithubPosition();
             isOutsideDiffComment = true;
           }
+          reviewerClient.addGithubReviewCommentPosition(
+              diffId, thread.getId(), githubCommentPosition, comment.getId());
         } else {
           if (thread.getGithubCommentPosition() != 0) {
             githubCommentPosition = thread.getGithubCommentPosition();
@@ -176,7 +183,7 @@ public class DiffConverter {
                 .stream()
                 .filter(thread -> thread.getRepoId().equals(repoName))
                 .collect(Collectors.toList()));
-    for (Protos.Thread thread : diffThreadsByRepo) {
+    for (Thread thread : diffThreadsByRepo) {
       thread
           .getCommentList()
           .forEach(

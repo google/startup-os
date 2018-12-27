@@ -21,6 +21,7 @@ java_test(
         "//common",
         "//common/repo",
         "//common/repo:repo_java_proto",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/junit",
         "//third_party/maven/org/mockito:mockito_core",

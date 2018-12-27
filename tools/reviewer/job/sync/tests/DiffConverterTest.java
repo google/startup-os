@@ -19,14 +19,22 @@ package com.google.startupos.tools.reviewer.job.sync.tests;
 import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.sync.DiffConverter;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos;
-import com.google.startupos.tools.reviewer.localserver.service.Protos;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
+import com.google.startupos.tools.reviewer.job.sync.ReviewerClient;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,26 +61,28 @@ public class DiffConverterTest {
 
   private DiffConverter diffConverter;
   private GitRepo gitRepo = mock(GitRepo.class);
+  private ReviewerClient reviewerClient = mock(ReviewerClient.class);
 
   @Before
   public void setUp() {
-    diffConverter = new DiffConverter();
+    diffConverter = new DiffConverter(reviewerClient);
     when(gitRepo.getPatch(anyString(), anyString(), anyString())).thenReturn(TEST_FILE_PATCH);
     when(gitRepo.getMostRecentCommitOfBranch(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
     when(gitRepo.getMostRecentCommitOfFile(anyString())).thenReturn(BASE_BRANCH_COMMIT_ID);
+    when(reviewerClient.getDiff(anyLong())).thenReturn(Diff.getDefaultInstance());
   }
 
   @Test
   public void testCommentToFeatureBranchCommit() {
-    Protos.Diff diff =
-        Protos.Diff.newBuilder()
+    Diff diff =
+        Diff.newBuilder()
             .setId(1234)
-            .setAuthor(Protos.Author.newBuilder().setEmail("author@test.com").build())
+            .setAuthor(Author.newBuilder().setEmail("author@test.com").build())
             .setWorkspace("ws1")
             .setCreatedTimestamp(1543989866559L)
             .setModifiedTimestamp(1544008405696L)
             .addCodeThread(
-                Protos.Thread.newBuilder()
+                Thread.newBuilder()
                     .setRepoId("test-repo")
                     .setCommitId(FEATURE_BRANCH_COMMIT_ID)
                     .setFile(
@@ -85,7 +95,7 @@ public class DiffConverterTest {
                             .build())
                     .setLineNumber(5)
                     .addComment(
-                        Protos.Comment.newBuilder()
+                        Comment.newBuilder()
                             .setContent("R 5")
                             .setTimestamp(1544008385129L)
                             .setCreatedBy("reviewer@test.com")
@@ -94,29 +104,25 @@ public class DiffConverterTest {
                     .setId("KblmQG")
                     .build())
             .setModifiedBy("author@test.com")
-            .addGithubPr(
-                Protos.GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
+            .addGithubPr(GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
             .build();
 
-    List<GithubPullRequestProtos.PullRequest> actualPullRequest =
+    List<PullRequest> actualPullRequest =
         diffConverter.toPullRequests(diff, ImmutableMap.of("test-repo", gitRepo));
 
-    GithubPullRequestProtos.PullRequest expectedPullRequest =
-        GithubPullRequestProtos.PullRequest.newBuilder()
+    PullRequest expectedPullRequest =
+        PullRequest.newBuilder()
             .setState("open")
             .setTitle("D1234")
-            .setUser(GithubPullRequestProtos.User.newBuilder().setEmail("author@test.com").build())
+            .setUser(User.newBuilder().setEmail("author@test.com").build())
             .setCreatedAt("2018-12-05T06:04:26.559Z")
             .setUpdatedAt("2018-12-05T11:13:25.696Z")
             .addReviewComment(
-                GithubPullRequestProtos.ReviewComment.newBuilder()
+                ReviewComment.newBuilder()
                     .setPath("test_file.txt")
                     .setPosition(5)
                     .setCommitId(FEATURE_BRANCH_COMMIT_ID)
-                    .setUser(
-                        GithubPullRequestProtos.User.newBuilder()
-                            .setEmail("reviewer@test.com")
-                            .build())
+                    .setUser(User.newBuilder().setEmail("reviewer@test.com").build())
                     .setBody("R 5")
                     .setCreatedAt("2018-12-05T11:13:05.129Z")
                     .setUpdatedAt("2018-12-05T11:13:25.696Z")
@@ -136,15 +142,15 @@ public class DiffConverterTest {
 
   @Test
   public void testCommentToBaseBranchCommit() {
-    Protos.Diff diff =
-        Protos.Diff.newBuilder()
+    Diff diff =
+        Diff.newBuilder()
             .setId(1234)
-            .setAuthor(Protos.Author.newBuilder().setEmail("author@test.com").build())
+            .setAuthor(Author.newBuilder().setEmail("author@test.com").build())
             .setWorkspace("ws1")
             .setCreatedTimestamp(1543989866559L)
             .setModifiedTimestamp(1544008405696L)
             .addCodeThread(
-                Protos.Thread.newBuilder()
+                Thread.newBuilder()
                     .setRepoId("test-repo")
                     .setCommitId(BASE_BRANCH_COMMIT_ID)
                     .setFile(
@@ -157,7 +163,7 @@ public class DiffConverterTest {
                             .build())
                     .setLineNumber(14)
                     .addComment(
-                        Protos.Comment.newBuilder()
+                        Comment.newBuilder()
                             .setContent("L 14")
                             .setTimestamp(1544008405695L)
                             .setCreatedBy("reviewer@test.com")
@@ -166,29 +172,25 @@ public class DiffConverterTest {
                     .setId("ayAF7N")
                     .build())
             .setModifiedBy("author@test.com")
-            .addGithubPr(
-                Protos.GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
+            .addGithubPr(GithubPr.newBuilder().setOwner("val-fed").setRepo("test-repo").build())
             .build();
 
-    List<GithubPullRequestProtos.PullRequest> actualPullRequest =
+    List<PullRequest> actualPullRequest =
         diffConverter.toPullRequests(diff, ImmutableMap.of("test-repo", gitRepo));
 
-    GithubPullRequestProtos.PullRequest expectedPullRequest =
-        GithubPullRequestProtos.PullRequest.newBuilder()
+    PullRequest expectedPullRequest =
+        PullRequest.newBuilder()
             .setState("open")
             .setTitle("D1234")
-            .setUser(GithubPullRequestProtos.User.newBuilder().setEmail("author@test.com").build())
+            .setUser(User.newBuilder().setEmail("author@test.com").build())
             .setCreatedAt("2018-12-05T06:04:26.559Z")
             .setUpdatedAt("2018-12-05T11:13:25.696Z")
             .addReviewComment(
-                GithubPullRequestProtos.ReviewComment.newBuilder()
+                ReviewComment.newBuilder()
                     .setPath("test_file.txt")
                     .setPosition(12)
                     .setCommitId(BASE_BRANCH_COMMIT_ID)
-                    .setUser(
-                        GithubPullRequestProtos.User.newBuilder()
-                            .setEmail("reviewer@test.com")
-                            .build())
+                    .setUser(User.newBuilder().setEmail("reviewer@test.com").build())
                     .setBody("L 14")
                     .setCreatedAt("2018-12-05T11:13:25.695Z")
                     .setUpdatedAt("2018-12-05T11:13:25.696Z")
