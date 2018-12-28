@@ -79,6 +79,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       decodeJwtToken();
       setTokenRefreshScheduler();
       logger.atInfo().log("Loaded token from filesystem");
+      refreshToken();
     }
   }
 

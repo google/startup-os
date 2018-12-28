@@ -89,6 +89,13 @@ public class FirestoreProtoClient {
         .parseFrom(Base64.getDecoder().decode(document.getString(PROTO_FIELD)));
   }
 
+  private ImmutableMap<String, String> encodeProto(Message proto)
+      throws InvalidProtocolBufferException {
+    byte[] protoBytes = proto.toByteArray();
+    String base64BinaryString = Base64.getEncoder().encodeToString(protoBytes);
+    return ImmutableMap.of(PROTO_FIELD, base64BinaryString);
+  }
+
   private CollectionReference getCollectionReference(String[] parts, int length) {
     DocumentReference docRef;
     CollectionReference collectionRef = client.collection(parts[0]);
@@ -100,6 +107,9 @@ public class FirestoreProtoClient {
   }
 
   public DocumentReference getDocumentReference(String path) {
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
     String[] parts = path.split("/");
     if (parts.length % 2 != 0) {
       throw new IllegalArgumentException("Path length should be even but is " + parts.length);
@@ -165,9 +175,11 @@ public class FirestoreProtoClient {
   }
 
   public ApiFuture<WriteResult> setProtoDocumentAsync(String path, Message proto) {
-    byte[] protoBytes = proto.toByteArray();
-    String base64BinaryString = Base64.getEncoder().encodeToString(protoBytes);
-    return setDocumentAsync(path, ImmutableMap.of(PROTO_FIELD, base64BinaryString));
+    try {
+      return setDocumentAsync(path, encodeProto(proto));
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   public ApiFuture<WriteResult> setProtoDocumentAsync(
@@ -187,7 +199,27 @@ public class FirestoreProtoClient {
     return setProtoDocument(joinPath(collection, documentId), proto);
   }
 
+  public ApiFuture<DocumentReference> addProtoDocumentToCollectionAsync(
+      String path, Message proto) {
+    try {
+      return getCollectionReference(path).add(encodeProto(proto));
+    } catch (InvalidProtocolBufferException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  public DocumentReference addProtoDocumentToCollection(String path, Message proto) {
+    try {
+      return addProtoDocumentToCollectionAsync(path, proto).get();
+    } catch (ExecutionException | InterruptedException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
   public CollectionReference getCollectionReference(String path) {
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
     String[] parts = path.split("/");
     if (parts.length % 2 != 1) {
       throw new IllegalArgumentException("Path length should be odd but is " + parts.length);
@@ -221,11 +253,13 @@ public class FirestoreProtoClient {
         return null;
       }
       QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.getDocuments().get(0);
+      MessageWithId result =
+          MessageWithId.create(
+              queryDocumentSnapshot.getId(), parseProto(queryDocumentSnapshot, builder));
       if (shouldRemove) {
-        deleteDocument(path);
+        deleteDocument(path + "/" + queryDocumentSnapshot.getId());
       }
-      return MessageWithId.create(
-          queryDocumentSnapshot.getId(), parseProto(queryDocumentSnapshot, builder));
+      return result;
     } catch (ExecutionException | InterruptedException | InvalidProtocolBufferException e) {
       throw new IllegalStateException(e);
     }

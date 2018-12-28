@@ -28,10 +28,13 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
 import dagger.Component;
+import dagger.BindsInstance;
+
 import com.google.startupos.tools.reviewer.job.tasks.ReviewerMetadataUpdaterTask;
 import com.google.startupos.tools.reviewer.job.tasks.CiTask;
 import com.google.startupos.tools.reviewer.job.tasks.SubmitterTask;
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -58,6 +61,10 @@ import dagger.Lazy;
 @Singleton
 public class ReviewerJob {
   private static final Long TASK_EXECUTION_PERIOD_MS = 5 * 60 * 1000L;
+
+  @FlagDesc(name = "service_account_json", description = "", required = true)
+  public static Flag<String> serviceAccountJson = Flag.create("");
+
   private TaskExecutor taskExecutor;
   private InitCommand initCommand;
   // These are lazy because constructing them requires us to be in a base folder.
@@ -84,6 +91,14 @@ public class ReviewerJob {
   @Component(modules = {AaModule.class, CommonModule.class})
   public interface JobComponent {
     ReviewerJob getJob();
+
+    @Component.Builder
+    interface Builder {
+      @BindsInstance
+      Builder setFirestoreProtoClient(FirestoreProtoClient firestoreProtoClient);
+
+      JobComponent build();
+    }
   }
 
   private void run() throws Exception {
@@ -110,7 +125,8 @@ public class ReviewerJob {
         InitCommand.class.getPackage(),
         LocalServer.class.getPackage(),
         CodeReviewService.class.getPackage());
-    DaggerReviewerJob_JobComponent.create().getJob().run();
+    FirestoreProtoClient client = new FirestoreProtoClient(serviceAccountJson.get());
+    DaggerReviewerJob_JobComponent.builder().setFirestoreProtoClient(client).build().getJob().run();
   }
 }
 

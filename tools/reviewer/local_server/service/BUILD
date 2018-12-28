@@ -84,6 +84,7 @@ java_library(
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
+        "//tools/reviewer:reviewer_constants",
         "//tools/reviewer/local_server/service:auth_service",
     ],
 )

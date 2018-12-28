@@ -13,17 +13,18 @@ message Repo {
   string url = 2;
 }
 
-message CIRequest {
+message CiRequest {
   message Target {
     Repo repo = 1;
-    string commitId = 2;
+    string commit_id = 2;
   }
-  repeated Target target = 1;
-  bool forSubmission = 2;
+  int64 diff_id = 1;
+  repeated Target target = 2;
+  bool for_submission = 3;
 }
 
-message CIResponse {
-  CIRequest request = 1;
+message CiResponse {
+  CiRequest request = 1;
   message TargetResult {
     enum Status {
       NONE = 0;
@@ -32,7 +33,7 @@ message CIResponse {
       RUNNING = 3;
       OUTDATED = 4;
     }
-    CIRequest.Target target = 1;
+    CiRequest.Target target = 1;
     Status status = 2;
     string log = 3;
   }

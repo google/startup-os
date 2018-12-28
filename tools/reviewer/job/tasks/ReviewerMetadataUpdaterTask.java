@@ -26,10 +26,10 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistryConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
-import com.google.startupos.tools.reviewer.job.tasks.FirestoreTaskBase;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 
 import javax.inject.Inject;
 import java.io.FileInputStream;
@@ -54,7 +54,7 @@ import java.util.Map;
  * 3. If it did, a newly updated version is posted to Firestore in proto and binary formats.
  * 4. Doing the same for the config of every Reviewer in the registry.
  */
-public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Task {
+public class ReviewerMetadataUpdaterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
   @FlagDesc(name = "repo_url", description = "", required = false)
@@ -78,13 +78,15 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
   private Map<String, Integer> reviewerConfigHashes = new HashMap();
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
-  private boolean firstRun;
+  protected FirestoreProtoClient firestoreClient;
+  private boolean firstRun = true;
 
   @Inject
-  public ReviewerMetadataUpdaterTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
+  public ReviewerMetadataUpdaterTask(
+      FileUtils fileUtils, GitRepoFactory gitRepoFactory, FirestoreProtoClient firestoreClient) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
-    this.firstRun = true;
+    this.firestoreClient = firestoreClient;
   }
 
   private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
@@ -118,8 +120,6 @@ public class ReviewerMetadataUpdaterTask extends FirestoreTaskBase implements Ta
   public void run() {
     if (lock.tryLock()) {
       try {
-        initializeFirestoreClientIfNull();
-
         GitRepo repo = gitRepoFactory.create(REPO_DIRECTORY);
 
         if (fileUtils.folderEmptyOrNotExists(REPO_DIRECTORY)) {
