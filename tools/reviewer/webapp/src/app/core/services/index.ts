@@ -10,6 +10,7 @@ export * from './exception.service';
 export * from './diff-update.service';
 export * from './user.service';
 export * from './mouse.service';
+export * from './text-diff.service';
 export * from './select-dashboard.service';
 
 // Services
@@ -25,6 +26,7 @@ import { LocalserverService } from './localserver.service';
 import { MouseService } from './mouse.service';
 import { NotificationService } from './notification.service';
 import { SelectDashboardService } from './select-dashboard.service';
+import { TextDiffService } from './text-diff.service';
 import { UserService } from './user.service';
 export const ServiceList = [
   AuthGuard,
@@ -40,4 +42,5 @@ export const ServiceList = [
   UserService,
   SelectDashboardService,
   MouseService,
+  TextDiffService,
 ];

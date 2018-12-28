@@ -13,14 +13,12 @@ import {
   UserService,
 } from '@/core/services';
 import { DeleteDiffDialogComponent, DeleteDiffReturn } from './delete-diff-dialog';
-import { DiffService } from './diff.service';
 
 // The component implements diff page
 // How it looks: https://i.imgur.com/nBGrGuc.jpg
 @Component({
   selector: 'cr-diff',
   templateUrl: './diff.component.html',
-  providers: [DiffService],
 })
 export class DiffComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;

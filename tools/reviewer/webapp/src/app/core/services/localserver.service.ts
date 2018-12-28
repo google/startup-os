@@ -177,29 +177,32 @@ export class LocalserverService {
     throw new Error('File not found');
   }
 
-  getCommitIdList(filenameWithRepo: string, branchInfo: BranchInfo): string[] {
-    const commitIdList: string[] = [];
+  getFileChronoList(file: File, branchInfo: BranchInfo): File[] {
+    const fileChronoList: File[] = [];
 
-    // Add HEAD commit id
+    // Add HEAD file
     const headCommitId: string = branchInfo.getCommitList()[0].getId();
-    commitIdList.push(headCommitId);
+    const headFile = File.deserializeBinary(file.serializeBinary()); // Copy proto object
+    headFile.setCommitId(headCommitId);
+    headFile.setAction(File.Action.ADD);
+    fileChronoList.push(headFile);
 
-    // Add all commit ids, where the file is present
+    // Add all commited files with the name
     for (const commit of branchInfo.getCommitList()) {
-      for (const file of commit.getFileList()) {
-        if (file.getFilenameWithRepo() === filenameWithRepo) {
-          commitIdList.push(commit.getId());
+      for (const committedFile of commit.getFileList()) {
+        if (committedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
+          fileChronoList.push(committedFile);
         }
       }
     }
 
-    // Add uncommited point too
-    for (const commit of branchInfo.getUncommittedFileList()) {
-      if (commit.getFilenameWithRepo() === filenameWithRepo) {
-        commitIdList.push('');
+    // Add uncommited files with the name
+    for (const uncommittedFile of branchInfo.getUncommittedFileList()) {
+      if (uncommittedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
+        fileChronoList.push(uncommittedFile);
       }
     }
 
-    return commitIdList;
+    return fileChronoList;
   }
 }

@@ -14,43 +14,27 @@
       <span class="diff-amount">- {{ diffGroup.length }}</span>
     </div>
     <!-- Diff list inside a group -->
-    <mat-table
-      class="diff-list"
-      [dataSource]="diffGroup"
-      *ngIf="diffGroup.length > 0"
-    >
-      <!-- Columns -->
-
-      <ng-container matColumnDef="id">
-        <mat-header-cell *matHeaderCellDef> Diff </mat-header-cell>
-        <mat-cell *matCellDef="let diff"> {{ diff.getId() }} </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="author">
-        <mat-header-cell *matHeaderCellDef> Author </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
-          {{ userService.getUsername(diff.getAuthor().getEmail()) }}
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="status">
-        <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
+    <ng-container *ngIf="diffGroup.length > 0">
+      <div class="cr-header">
+        <div class="column column-id">Diff</div>
+        <div class="column column-author">Author</div>
+        <div class="column column-status">Status</div>
+        <div class="column column-action">Last Action</div>
+        <div class="column column-reviewers">Reviewers</div>
+        <div class="column column-workspace">Workspace</div>
+        <div class="column column-description">Description</div>
+      </div>
+      <a class="diff" *ngFor="let diff of diffGroup" [routerLink]="'/diff/' + diff.getId()">
+        <div class="column-id">{{ diff.getId() }}</div>
+        <div class="column-author">{{ userService.getUsername(diff.getAuthor().getEmail()) }}</div>
+        <div class="column-status">
           <diff-status [diff]="diff"></diff-status>
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="action">
-        <mat-header-cell *matHeaderCellDef> Last Action </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
+        </div>
+        <div class="column-action">
           {{ diff.getModifiedTimestamp() | time }}
           {{ getModifiedBy(diff) }}
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="reviewers">
-        <mat-header-cell *matHeaderCellDef> Reviewers </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
+        </div>
+        <div class="column-reviewers">
           <span
             [ngClass]="{
               'bold': reviewer.getNeedsAttention(),
@@ -58,32 +42,11 @@
             }"
             *ngFor="let reviewer of diff.getReviewerList(); let i = index;"
           >{{ getUsername(reviewer, i, diff) }}</span>
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="workspace">
-        <mat-header-cell *matHeaderCellDef> Workspace </mat-header-cell>
-        <mat-cell *matCellDef="let diff">
-          {{ diff.getWorkspace() }}
-        </mat-cell>
-      </ng-container>
-
-      <ng-container matColumnDef="description">
-        <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
-        <mat-cell class="ellipsis" *matCellDef="let diff">
-          {{ diff.getDescription() }}
-        </mat-cell>
-      </ng-container>
-
-      <mat-header-row
-        class="cr-header"
-        *matHeaderRowDef="displayedColumns"
-      ></mat-header-row>
-      <mat-row
-        *matRowDef="let diff; columns: displayedColumns;"
-        (mouseup)="openDiff($event, diff.getId())"
-      ></mat-row>
-    </mat-table>
+        </div>
+        <div class="column-workspace">{{ diff.getWorkspace() }}</div>
+        <div class="column-description ellipsis">{{ diff.getDescription() }}</div>
+      </a>
+    </ng-container>
     <!-- Show the placeholder, if group contains no diffs -->
     <div class="cr-table-placeholder" *ngIf="diffGroup.length === 0">
       No Diffs

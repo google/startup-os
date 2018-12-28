@@ -1,8 +1,14 @@
-mat-table {
-  .mat-column-filename {
-    flex: 0 0 50%;
+.files {
+  >.file {
+    padding: 12px 23px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #1a1a1a;
+    display: flex;
+    border-bottom: 1px solid #d8d8d8;
   }
-  .mat-row {
-    cursor: pointer;
-  }
+  .column-file { width: 50%; }
+  .column-comments,
+  .column-modified,
+  .column-delta { width: 16%; }
 }

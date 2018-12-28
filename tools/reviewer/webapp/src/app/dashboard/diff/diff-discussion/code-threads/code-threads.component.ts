@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
-import { Diff, File, Thread } from '@/core/proto';
+import { Diff, Thread } from '@/core/proto';
 import { CommentExpandedMap } from '@/shared/thread';
-import { DiffService } from '../../diff.service';
 import { DiscussionService } from '../discussion.service';
 import { ThreadStateService } from '../thread-state.service';
 
@@ -25,7 +24,6 @@ export class CodeThreadsComponent implements OnChanges, OnInit {
   @Output() expandEmitter = new EventEmitter<void>();
 
   constructor(
-    private diffService: DiffService,
     public discussionService: DiscussionService,
     public threadStateService: ThreadStateService,
   ) {
@@ -95,27 +93,6 @@ export class CodeThreadsComponent implements OnChanges, OnInit {
     }
 
     fileGroups.sort((a, b) => this.discussionService.compareLastTimestamps(a[0], b[0]));
-  }
-
-  openFile(event: MouseEvent, fileGroup: Thread[]): void {
-    // Which button is clicked?
-    let isNewTab: boolean;
-    switch (event.which) {
-      case 1: // Left mouse button
-        isNewTab = false;
-        break;
-      case 2: // Middle mouse button
-        isNewTab = true;
-        break;
-      default: return; // Do nothing, if it's another button
-    }
-
-    const groupFile: File = fileGroup[0].getFile();
-    this.diffService.openFile(
-      isNewTab,
-      groupFile,
-      this.diff.getId(),
-    );
   }
 
   getFileLabel(threads: Thread[]): string {

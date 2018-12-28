@@ -23,15 +23,6 @@ export enum DiffGroups {
 export class DiffsComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   diffGroups: Diff[][] = [];
-  displayedColumns: string[] = [
-    'id',
-    'author',
-    'status',
-    'action',
-    'reviewers',
-    'workspace',
-    'description',
-  ];
   diffGroupNameList: string[] = [];
   onloadSubscription = new Subscription();
   changesSubscription = new Subscription();
@@ -159,18 +150,6 @@ export class DiffsComponent implements OnInit, OnDestroy {
         // Newest on top
         return Math.sign(b.getModifiedTimestamp() - a.getModifiedTimestamp());
       });
-    }
-  }
-
-  // Navigate to a Diff
-  openDiff(event: MouseEvent, diffId: number): void {
-    switch (event.which) {
-      case 1:
-        this.router.navigate(['diff/', diffId]);
-        break;
-      case 2:
-         window.open('diff/' + diffId, '_blank');
-        break;
     }
   }
 

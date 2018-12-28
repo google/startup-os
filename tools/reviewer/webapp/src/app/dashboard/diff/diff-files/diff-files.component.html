@@ -6,43 +6,42 @@
     <button
       mat-button
       class="cr-light-button sky-button"
-      [disabled]="true"
-    >Expand</button>
+      (click)="toggleExpand()"
+      [disabled]="isCodeLoading"
+    >{{ isExpanded ? 'Collapse' : 'Expand' }}</button>
   </div>
 </div>
-<div *ngIf="files.length > 0">
-  <mat-table [dataSource]="files">
-    <ng-container matColumnDef="filename">
-      <mat-header-cell *matHeaderCellDef> File </mat-header-cell>
-      <mat-cell *matCellDef="let file">
-        {{ file.getFilenameWithRepo() }}
-      </mat-cell>
-    </ng-container>
+<div class="files" *ngIf="files.length > 0">
+  <div class="cr-header">
+    <div class="column column-file">File</div>
+    <div class="column column-comments">Comments</div>
+    <div class="column column-modified">Modified</div>
+    <div class="column column-delta">Delta</div>
+  </div>
 
-    <ng-container matColumnDef="comments">
-      <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
-      <mat-cell *matCellDef="let file"></mat-cell>
+  <!-- Collapsed files -->
+  <ng-container *ngIf="!isExpanded || isCodeLoading">
+    <a class="file" [routerLink]="file.getFilenameWithRepo()" *ngFor="let file of files">
+      {{ file.getFilenameWithRepo() }}
+    </a>
+  </ng-container>
+  
+  <!-- Expanded files -->
+  <ng-container *ngIf="isExpanded && !isCodeLoading">
+    <ng-container *ngFor="let change of changes">
+      <a class="file" [routerLink]="change.leftFile.getFilenameWithRepo()">
+        {{ change.leftFile.getFilenameWithRepo() }}
+      </a>
+      <code-changes
+        [diff]="diff"
+        [branchInfo]="change.branchInfo"
+        [textDiff]="change.textDiff"
+        [threads]="change.localThreads"
+        [leftFile]="change.leftFile"
+        [rightFile]="change.rightFile"
+      ></code-changes>
     </ng-container>
-
-    <ng-container matColumnDef="modified">
-      <mat-header-cell *matHeaderCellDef> Modified </mat-header-cell>
-      <mat-cell *matCellDef="let file"></mat-cell>
-    </ng-container>
-
-    <ng-container matColumnDef="delta">
-      <mat-header-cell *matHeaderCellDef> Delta </mat-header-cell>
-      <mat-cell *matCellDef="let file"></mat-cell>
-    </ng-container>
-
-    <mat-header-row
-      class="cr-header"
-      *matHeaderRowDef="displayedColumns"
-    ></mat-header-row>
-    <mat-row
-      *matRowDef="let file; columns: displayedColumns;"
-      (mouseup)="openFile($event, file)"
-    ></mat-row>
-  </mat-table>
+  </ng-container>
 </div>
 <div class="cr-table-placeholder" *ngIf="files.length === 0">
   No Files yet

@@ -65,9 +65,14 @@
             *ngFor="let thread of blockLine.threads; let threadIndex = index"
           >
             <cr-thread
-              [diff]="stateService.diff"
+              [diff]="diff"
               [thread]="thread"
-              (closeEmitter)="commentsService.closeThread(blockLine, threadIndex, blockIndex)"
+              (closeEmitter)="commentsService.closeThread(
+                blockLine,
+                threadIndex,
+                blockIndex,
+                openThreadsMap
+              )"
               (addEmitter)="addThread(
                 $event,
                 blockLine,

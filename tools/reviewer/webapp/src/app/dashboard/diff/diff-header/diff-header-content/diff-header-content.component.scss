@@ -4,6 +4,8 @@ $transparent-grey: rgba(0,0,0,0.54);
   display: flex;
   padding: 15px 24px;
   min-height: 250px;
+  font-size: 14px;
+  background: #f3f3f3;
   >.info {
     padding-right: 20px;
     tr {
