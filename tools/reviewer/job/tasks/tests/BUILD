@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:private"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "ci_task_tool",
     srcs = [
@@ -27,4 +29,10 @@ java_binary(
         "//tools/reviewer/local_server/service:auth_service",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "ci_task_tool-checkstyle",
+    allow_failure = 1,
+    target = ":ci_task_tool",
 )

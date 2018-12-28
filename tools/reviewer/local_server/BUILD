@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "local_server",
     srcs = [
@@ -26,6 +28,12 @@ java_binary(
     ],
 )
 
+checkstyle_test(
+    name = "local_server-checkstyle",
+    allow_failure = 1,
+    target = ":local_server",
+)
+
 java_library(
     name = "local_http_gateway_grpc_client",
     srcs = [
@@ -40,6 +48,12 @@ java_library(
         "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "local_http_gateway_grpc_client-checkstyle",
+    allow_failure = 1,
+    target = ":local_http_gateway_grpc_client",
 )
 
 java_library(
@@ -57,4 +71,10 @@ java_library(
         "//third_party/maven/org/json",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "local_http_gateway-checkstyle",
+    allow_failure = 1,
+    target = ":local_http_gateway",
 )

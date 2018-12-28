@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:private"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "firestore_client_tool",
     srcs = [
@@ -26,4 +28,10 @@ java_binary(
         "//tools/reviewer/local_server/service:auth_service",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "firestore_client_tool-checkstyle",
+    allow_failure = 1,
+    target = ":firestore_client_tool",
 )

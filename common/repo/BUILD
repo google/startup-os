@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "repo_proto",
     srcs = ["repo.proto"],
@@ -31,4 +33,10 @@ java_library(
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "repo-checkstyle",
+    allow_failure = 1,
+    target = ":repo",
 )

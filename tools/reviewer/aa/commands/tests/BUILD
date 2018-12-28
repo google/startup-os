@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:private"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_test(
     name = "InitCommandTest",
     srcs = [
@@ -19,6 +21,12 @@ java_test(
         "//tools/reviewer/aa:aa_module",
         "//tools/reviewer/aa/commands",
     ],
+)
+
+checkstyle_test(
+    name = "InitCommandTest-checkstyle",
+    allow_failure = 1,
+    target = ":InitCommandTest",
 )
 
 java_test(
@@ -41,4 +49,10 @@ java_test(
         "//tools/reviewer/aa:aa_module",
         "//tools/reviewer/aa/commands",
     ],
+)
+
+checkstyle_test(
+    name = "WorkspaceCommandTest-checkstyle",
+    allow_failure = 1,
+    target = ":WorkspaceCommandTest",
 )

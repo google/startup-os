@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_library(
     name = "firestore",
     srcs = [
@@ -26,4 +28,10 @@ java_library(
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "firestore-checkstyle",
+    allow_failure = 1,
+    target = ":firestore",
 )

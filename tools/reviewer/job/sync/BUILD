@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "github_api_proto",
     srcs = [
@@ -57,6 +59,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "github_sync-checkstyle",
+    allow_failure = 1,
+    target = ":github_sync",
+)
+
 java_binary(
     name = "github_sync_tool",
     srcs = [
@@ -79,4 +87,10 @@ java_binary(
         "//tools/reviewer/local_server/service:code_review_proto",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "github_sync_tool-checkstyle",
+    allow_failure = 1,
+    target = ":github_sync_tool",
 )

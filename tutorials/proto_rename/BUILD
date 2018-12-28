@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:private"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "person_proto",
     srcs = ["person.proto"],
@@ -25,4 +27,10 @@ java_binary(
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "person_tool-checkstyle",
+    allow_failure = 1,
+    target = ":person_tool",
 )

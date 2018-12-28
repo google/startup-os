@@ -39,6 +39,7 @@ sh_binary(
 java_binary(
     name = "grpc_polyglot",
     main_class = "me.dinowernli.grpc.polyglot.Main",
+    tags = ["checkstyle_ignore"],
     runtime_deps = ["@grpc_polyglot//jar"],
 )
 
@@ -71,6 +72,7 @@ sh_binary(
 java_binary(
     name = "bazel_deps",
     main_class = "com.github.johnynek.bazel_deps.ParseProject",
+    tags = ["checkstyle_ignore"],
     visibility = ["//visibility:public"],
     runtime_deps = ["@bazel_deps//jar"],
 )

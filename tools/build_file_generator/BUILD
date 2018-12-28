@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "build_file_generator_proto",
     srcs = ["build_file_generator.proto"],
@@ -25,6 +27,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "build_file_generator-checkstyle",
+    allow_failure = 1,
+    target = ":build_file_generator",
+)
+
 java_binary(
     name = "build_file_generator_tool",
     srcs = ["BuildFileGeneratorTool.java"],
@@ -38,4 +46,10 @@ java_binary(
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "build_file_generator_tool-checkstyle",
+    allow_failure = 1,
+    target = ":build_file_generator_tool",
 )

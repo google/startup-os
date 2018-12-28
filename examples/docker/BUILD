@@ -1,4 +1,5 @@
 load("@io_bazel_rules_docker//java:image.bzl", "java_image")
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
 # You can use these 3 bazel build targets:
 #
@@ -29,6 +30,12 @@ java_image(
     srcs = ["HelloServer.java"],
     base = "@alpine_java_git//image",
     main_class = "com.google.startupos.examples.docker.HelloServer",
+)
+
+checkstyle_test(
+    name = "hello_server.binary-checkstyle",
+    allow_failure = 1,
+    target = ":hello_server.binary",
 )
 
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")

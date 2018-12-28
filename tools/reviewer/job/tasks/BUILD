@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "submitter_proto",
     srcs = ["submitter.proto"],
@@ -32,6 +34,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "task_interface-checkstyle",
+    allow_failure = 1,
+    target = ":task_interface",
+)
+
 java_library(
     name = "task_executor",
     srcs = [
@@ -60,6 +68,12 @@ java_library(
         "//tools/reviewer/local_server:local_http_gateway",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "task_executor-checkstyle",
+    allow_failure = 1,
+    target = ":task_executor",
 )
 
 java_library(
@@ -91,6 +105,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "ci_task-checkstyle",
+    allow_failure = 1,
+    target = ":ci_task",
+)
+
 java_library(
     name = "reviewer_metadata_updater_task",
     srcs = [
@@ -117,6 +137,12 @@ java_library(
         "//tools/reviewer/local_server:local_http_gateway",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "reviewer_metadata_updater_task-checkstyle",
+    allow_failure = 1,
+    target = ":reviewer_metadata_updater_task",
 )
 
 java_library(
@@ -147,4 +173,10 @@ java_library(
         "//tools/reviewer/local_server/service:code_review_java_proto",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "submitter_task-checkstyle",
+    allow_failure = 1,
+    target = ":submitter_task",
 )

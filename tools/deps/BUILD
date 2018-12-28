@@ -1,3 +1,5 @@
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 exports_files([
     "whitelist.yaml",
 ])
@@ -25,6 +27,12 @@ java_test(
     ],
 )
 
+checkstyle_test(
+    name = "MavenDepsWhitelistTest-checkstyle",
+    allow_failure = 1,
+    target = ":MavenDepsWhitelistTest",
+)
+
 java_test(
     name = "WorkspaceDepsWhitelistTest",
     srcs = ["WorkspaceDepsWhitelistTest.java"],
@@ -37,6 +45,12 @@ java_test(
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/yaml:snakeyaml",
     ],
+)
+
+checkstyle_test(
+    name = "WorkspaceDepsWhitelistTest-checkstyle",
+    allow_failure = 1,
+    target = ":WorkspaceDepsWhitelistTest",
 )
 
 java_test(
@@ -52,4 +66,10 @@ java_test(
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/org/yaml:snakeyaml",
     ],
+)
+
+checkstyle_test(
+    name = "PackageLockWhitelistTest-checkstyle",
+    allow_failure = 1,
+    target = ":PackageLockWhitelistTest",
 )

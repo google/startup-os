@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "config_proto",
     srcs = ["config.proto"],
@@ -26,6 +28,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "aa_module-checkstyle",
+    allow_failure = 1,
+    target = ":aa_module",
+)
+
 java_binary(
     name = "aa_tool",
     srcs = ["AaTool.java"],
@@ -45,6 +53,12 @@ java_binary(
     ],
 )
 
+checkstyle_test(
+    name = "aa_tool-checkstyle",
+    allow_failure = 1,
+    target = ":aa_tool",
+)
+
 java_binary(
     name = "aa_script_helper",
     srcs = ["AaScriptHelper.java"],
@@ -60,4 +74,10 @@ java_binary(
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/slf4j:slf4j_simple",
     ],
+)
+
+checkstyle_test(
+    name = "aa_script_helper-checkstyle",
+    allow_failure = 1,
+    target = ":aa_script_helper",
 )
