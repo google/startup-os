@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
-import { CIResponse, Commit, Diff, Reviewer } from '@/core/proto';
+import { CiResponse, Commit, Diff, Reviewer } from '@/core/proto';
 import {
   DiffUpdateService,
   HighlightService,
@@ -25,7 +25,7 @@ interface Status {
 export class DiffHeaderContentComponent implements OnChanges, OnInit {
   description: string = '';
   isDescriptionEditMode: boolean = false;
-  status: Status = this.getStatus(CIResponse.TargetResult.Status.NONE);
+  status: Status = this.getStatus(CiResponse.TargetResult.Status.NONE);
 
   @Input() diff: Diff;
 
@@ -44,13 +44,13 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
   ngOnInit() {
     // If CI exists then convert it to UI status
     if (this.diff.getCi()) {
-      const results: CIResponse.TargetResult[] = this.diff.getCi().getResultsList();
+      const results: CiResponse.TargetResult[] = this.diff.getCi().getResultsList();
       this.setStatus(results[results.length - 1]);
     }
   }
 
   // Loads commits list from localserver to compare it with CI result
-  private setStatus(result: CIResponse.TargetResult): void {
+  private setStatus(result: CiResponse.TargetResult): void {
     // Get branchInfoList from localserver
     this.localserverService
       .getBranchInfoList(
@@ -69,22 +69,22 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
             // or set outdated status if result with the commit not found.
             this.status = (commitId === result.getTarget().getCommitid()) ?
               this.getStatus(result.getStatus()) :
-              this.getStatus(CIResponse.TargetResult.Status.OUTDATED);
+              this.getStatus(CiResponse.TargetResult.Status.OUTDATED);
           }
         }
       });
   }
 
   // Convers enum to UI status
-  getStatus(status: CIResponse.TargetResult.Status): Status {
+  getStatus(status: CiResponse.TargetResult.Status): Status {
     switch (status) {
-      case CIResponse.TargetResult.Status.SUCCESS:
+      case CiResponse.TargetResult.Status.SUCCESS:
         return { message: 'Passed', color: '#12a736' };
-      case CIResponse.TargetResult.Status.FAIL:
+      case CiResponse.TargetResult.Status.FAIL:
         return { message: 'Failed', color: '#db4040' };
-      case CIResponse.TargetResult.Status.RUNNING:
+      case CiResponse.TargetResult.Status.RUNNING:
         return { message: 'Running', color: '#1545bd' };
-      case CIResponse.TargetResult.Status.OUTDATED:
+      case CiResponse.TargetResult.Status.OUTDATED:
         return { message: 'Outdated', color: '#808080' };
       default:
         return { message: '', color: '' };

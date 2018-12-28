@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.File;
 import java.util.Arrays;
 
 /** Class allowing to interact with system utils such as `bash` */
@@ -56,17 +57,18 @@ public class CommandLine {
    * @param command command to run
    * @return command execution result
    */
-  public static CommandResult runCommandForError(String command) {
+  public static CommandResult runCommandForError(String command, String workingDirectory) {
     CommandResult result = new CommandResult();
     try {
       Process process =
           new ProcessBuilder(Arrays.asList(command.split(" ")))
+              .directory(new File(workingDirectory))
               .redirectErrorStream(true) // redirects stderr to stdout
               .start();
+      result.exitValue = process.waitFor();
       // stdout and stderr are merged together
       result.stderr = result.stdout = readLines(process.getInputStream());
-      result.exitValue = process.exitValue();
-    } catch (IOException e) {
+    } catch (IOException | InterruptedException e) {
       e.printStackTrace();
       // Thrown exception means command execution was not successful.
       result.exitValue = 1;

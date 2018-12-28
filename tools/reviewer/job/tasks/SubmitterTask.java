@@ -19,12 +19,13 @@ package com.google.startupos.tools.reviewer.job.tasks;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.MessageWithId;
-import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
-import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse;
-import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse.TargetResult.Status;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.tasks.Task;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
@@ -37,7 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class SubmitterTask extends FirestoreTaskBase implements Task {
+public class SubmitterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
   private static String DIFF_PATH = "/reviewer/data/diff";
@@ -47,12 +48,15 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
   private final ReentrantLock lock = new ReentrantLock();
-  private final HashSet<CIRequest> ciSubmittedDiffIds = new HashSet<>();
+  private final HashSet<CiRequest> ciSubmittedDiffIds = new HashSet<>();
+  protected FirestoreProtoClient firestoreClient;
 
   @Inject
-  public SubmitterTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
+  public SubmitterTask(
+      FileUtils fileUtils, GitRepoFactory gitRepoFactory, FirestoreProtoClient firestoreClient) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
+    this.firestoreClient = firestoreClient;
   }
 
   @Override
@@ -64,10 +68,8 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
   public void run() {
     if (lock.tryLock()) {
       try {
-        initializeFirestoreClientIfNull();
         // noinspection unchecked
-        List<Diff> diffs =
-            (List) this.firestoreClient.getProtoDocuments(DIFF_PATH, Diff.newBuilder());
+        List<Diff> diffs = (List) firestoreClient.getProtoDocuments(DIFF_PATH, Diff.newBuilder());
 
         if (!fileUtils.folderExists("submitter")) {
           fileUtils.mkdirs("submitter");
@@ -77,18 +79,21 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
             .stream()
             // get Diffs in SUBMITTING state
             .filter(diff -> diff.getStatus().equals(Diff.Status.SUBMITTING))
-            // for each of them, get latest CIResponse
+            // for each of them, get latest CiResponse
             .map(
                 diff -> {
                   MessageWithId responseWithId =
-                      this.firestoreClient.getDocumentFromCollection(
+                      firestoreClient.getDocumentFromCollection(
                           String.format(CI_RESPONSES_HISTORY_PATH, diff.getId()),
-                          CIResponse.newBuilder());
-                  CIResponse response = (CIResponse) responseWithId.message();
+                          CiResponse.newBuilder());
+                  if (responseWithId == null) {
+                    return null;
+                  }
+                  CiResponse response = (CiResponse) responseWithId.message();
                   return Pair.of(diff, response);
                 })
-            // only proceed if CIResponse was present
-            .filter(diffCiPair -> diffCiPair.getValue() != null)
+            // only proceed if CiResponse was present
+            .filter(diffCiPair -> diffCiPair != null)
             // only proceed if TargetResult.success = true for all Results
             .filter(
                 diffCiPair ->
@@ -100,22 +105,22 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
             .forEach(
                 diffCiPair -> {
                   Diff diff = diffCiPair.getKey();
-                  CIResponse response = diffCiPair.getValue();
+                  CiResponse response = diffCiPair.getValue();
 
                   boolean shouldPush = true;
                   List<GitRepo> gitRepos = new ArrayList<>();
 
-                  CIRequest.Builder newRequestBuilder =
-                      CIRequest.newBuilder().setForSubmission(true);
+                  CiRequest.Builder newRequestBuilder =
+                      CiRequest.newBuilder().setForSubmission(true);
 
-                  for (CIResponse.TargetResult targetResult : response.getResultsList()) {
-                    CIRequest.Target target = targetResult.getTarget();
+                  for (CiResponse.TargetResult targetResult : response.getResultsList()) {
+                    CiRequest.Target target = targetResult.getTarget();
 
                     Repo repo = target.getRepo();
                     String repoPath =
                         fileUtils.joinPaths(
                             fileUtils.getCurrentWorkingDirectory(), "submitter", repo.getId());
-                    GitRepo gitRepo = this.gitRepoFactory.create(repoPath);
+                    GitRepo gitRepo = gitRepoFactory.create(repoPath);
                     gitRepos.add(gitRepo);
 
                     try {
@@ -132,7 +137,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                     gitRepo.switchBranch(branch);
 
                     newRequestBuilder.addTarget(
-                        CIRequest.Target.newBuilder()
+                        CiRequest.Target.newBuilder()
                             .setRepo(repo)
                             .setCommitId(gitRepo.getHeadCommitId())
                             .build());
@@ -148,7 +153,7 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
 
                     } else {
                       // commit on the branch is newer than results in CI
-                      // it means we'll need to later push a new CIRequest
+                      // it means we'll need to later push a new CiRequest
                       shouldPush = false;
                     }
                   }
@@ -158,16 +163,16 @@ public class SubmitterTask extends FirestoreTaskBase implements Task {
                         gitRepos.stream().allMatch(repo -> repo.push("master"));
                     if (allPushesSuccessful) {
                       diff = diff.toBuilder().setStatus(Diff.Status.SUBMITTED).build();
-                      this.firestoreClient.setProtoDocument(
+                      firestoreClient.setProtoDocument(
                           DIFF_PATH, String.valueOf(diff.getId()), diff);
                       // TODO: store `SubmitterMergeResult`
                     } else {
                       throw new RuntimeException("Not all pushes were successful");
                     }
                   } else {
-                    CIRequest newRequest = newRequestBuilder.build();
+                    CiRequest newRequest = newRequestBuilder.build();
                     if (!ciSubmittedDiffIds.contains(newRequest)) {
-                      this.firestoreClient.setProtoDocument(
+                      firestoreClient.setProtoDocument(
                           CI_REQUESTS_PATH, String.valueOf(diff.getId()), newRequest);
                       ciSubmittedDiffIds.add(newRequest);
                     }

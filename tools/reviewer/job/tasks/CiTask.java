@@ -22,31 +22,39 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.reviewer.ReviewerProtos.CIRequest;
-import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse;
-import com.google.startupos.tools.reviewer.ReviewerProtos.CIResponse.TargetResult.Status;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.ReviewerConstants;
 
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class CiTask extends FirestoreTaskBase implements Task {
+public class CiTask implements Task {
+  // Firestore's message limit is 1MB, so we don't want to pass that.
+  // Protobin gets translated to Base64, which can increase size by roughly 30%.
+  // So our limit is ~700KB. We limit the log below that to leave room for multiple CiResponses.
+  private static final int MAX_LOG_LENGTH = 15 * 1024;
+
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
-  // we acquire a lock to process single CIRequest at a time
+  // We acquire a lock to process a single CiRequest at a time.
   private final ReentrantLock lock = new ReentrantLock();
 
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
-
-  private static String CI_REQUESTS_PATH = "/reviewer/ci/requests";
-  private static String CI_RESPONSES_PATH = "/reviewer/ci/responses/%s/history";
+  protected FirestoreProtoClient firestoreClient;
 
   @Inject
-  public CiTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
+  public CiTask(
+      FileUtils fileUtils, GitRepoFactory gitRepoFactory, FirestoreProtoClient firestoreClient) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
+    this.firestoreClient = firestoreClient;
   }
 
   @Override
@@ -56,74 +64,89 @@ public class CiTask extends FirestoreTaskBase implements Task {
 
   @Override
   public void run() {
-    CIResponse.Builder responseBuilder = CIResponse.newBuilder();
+    CiResponse.Builder responseBuilder = CiResponse.newBuilder();
     MessageWithId requestWithDiffId = null;
     if (lock.tryLock()) {
       try {
-        initializeFirestoreClientIfNull();
-
-        log.atInfo().log("Running CI job (Firestore client @ %s)", firestoreClient);
-
         requestWithDiffId =
-            this.firestoreClient.popDocument(CI_REQUESTS_PATH, CIRequest.newBuilder());
-        CIRequest request = (CIRequest) requestWithDiffId.message();
-
-        if (request == null) {
-          // there is no request to process
+            firestoreClient.getDocumentFromCollection(
+                ReviewerConstants.CI_REQUESTS_PATH, CiRequest.newBuilder());
+        if (requestWithDiffId == null) {
+          // There is no request to process
           return;
         }
+
+        CiRequest request = (CiRequest) requestWithDiffId.message();
+        System.out.println("Processing request:\n" + request);
 
         if (!fileUtils.folderExists("ci")) {
           fileUtils.mkdirs("ci");
         }
 
-        responseBuilder = CIResponse.newBuilder().setRequest(request);
+        responseBuilder = CiResponse.newBuilder().setRequest(request);
 
-        for (CIRequest.Target target : request.getTargetList()) {
+        for (CiRequest.Target target : request.getTargetList()) {
           Repo repo = target.getRepo();
 
           String repoPath =
               fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "ci", repo.getId());
 
           GitRepo gitRepo = this.gitRepoFactory.create(repoPath);
-
           try {
             if (fileUtils.folderEmptyOrNotExists(repoPath)) {
               gitRepo.cloneRepo(repo.getUrl(), repoPath);
             } else {
+              gitRepo.switchBranch("master");
               gitRepo.pull();
             }
           } catch (IOException e) {
             e.printStackTrace();
             responseBuilder =
                 responseBuilder.addResults(
-                    CIResponse.TargetResult.newBuilder()
+                    CiResponse.TargetResult.newBuilder()
                         .setTarget(target)
-                        .setStatus(Status.SUCCESS)
+                        .setStatus(Status.FAIL)
                         .setLog(e.toString())
                         .build());
             return;
           }
-
           gitRepo.switchBranch(target.getCommitId());
 
           log.atInfo().log("Running reviewer-ci.sh in %s", repoPath);
           CommandLine.CommandResult result =
               CommandLine.runCommandForError(
-                  "/usr/bin/env bash " + fileUtils.joinPaths(repoPath, "reviewer-ci.sh"));
-
+                  "/usr/bin/env bash " + fileUtils.joinPaths(repoPath, "reviewer-ci.sh"), repoPath);
+          String log = result.stderr;
+          if (log.length() > MAX_LOG_LENGTH) {
+            log =
+                log.substring(0, MAX_LOG_LENGTH)
+                    + "[log truncated from length "
+                    + log.length()
+                    + "]\n";
+          }
           responseBuilder.addResults(
-              CIResponse.TargetResult.newBuilder()
+              CiResponse.TargetResult.newBuilder()
                   .setTarget(target)
                   .setStatus(result.exitValue == 0 ? Status.SUCCESS : Status.FAIL)
-                  // TODO: Firestore's limit is 1MB. Truncate log to 950Kb, to leave room for the
-                  // rest of the message.
-                  .setLog(result.stderr)
+                  .setLog(log)
                   .build());
+          CiResponse ciResponse = responseBuilder.build();
+          // XXX: Tell Vadim about s/CIResponse/CiResponse
+          Diff diff =
+              (Diff)
+                  firestoreClient.getProtoDocument(
+                      ReviewerConstants.DIFF_COLLECTION,
+                      String.valueOf(request.getDiffId()),
+                      Diff.newBuilder());
+          firestoreClient.setProtoDocument(
+              ReviewerConstants.DIFF_COLLECTION,
+              String.valueOf(request.getDiffId()),
+              diff.toBuilder().addCiResponse(ciResponse).build());
+          firestoreClient.addProtoDocumentToCollection(
+              String.format(ReviewerConstants.CI_RESPONSES_PATH, requestWithDiffId.id()),
+              ciResponse);
         }
       } finally {
-        firestoreClient.setProtoDocument(
-            String.format(CI_RESPONSES_PATH, requestWithDiffId.id()), responseBuilder.build());
         lock.unlock();
       }
     }

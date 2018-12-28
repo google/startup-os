@@ -98,7 +98,7 @@ message Diff {
   string modified_by = 16;
   // GitHub PRs associated with this repo.
   repeated GithubPr github_pr = 17;
-  com.google.startupos.tools.reviewer.CIResponse ci = 18;
+  repeated com.google.startupos.tools.reviewer.CiResponse ci_response = 18;
 }
 
 message Reviewer {

@@ -1,4 +1,4 @@
-package(default_visibility = ["//tools/reviewer:__subpackages__"])
+package(default_visibility = ["//visibility:public"])
 
 exports_files(["global_registry.prototxt"])
 
@@ -21,6 +21,11 @@ proto_library(
 java_proto_library(
     name = "reviewer_registry_java_proto",
     deps = [":reviewer_registry_proto"],
+)
+
+java_library(
+    name = "reviewer_constants",
+    srcs = ["ReviewerConstants.java"],
 )
 
 java_test(

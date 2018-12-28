@@ -55,6 +55,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.stream.Stream;
+import com.google.startupos.tools.reviewer.ReviewerConstants;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
@@ -62,11 +63,6 @@ import java.util.stream.Stream;
 @Singleton
 public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceImplBase {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
-
-  @FlagDesc(name = "firestore_review_root", description = "Review root path in Firestore")
-  private static final Flag<String> firestoreReviewRoot = Flag.create("/reviewer");
-
-  private static final String DOCUMENT_FOR_LAST_DIFF_NUMBER = "data";
 
   private final AuthService authService;
   private final FileUtils fileUtils;
@@ -187,7 +183,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     checkAuth();
     FirestoreProtoClient client =
         new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
-    String diffPath = fileUtils.joinToAbsolutePath(firestoreReviewRoot.get(), "data/diff");
+    String diffPath = fileUtils.joinToAbsolutePath(ReviewerConstants.DIFF_COLLECTION);
     Diff diff =
         req.getDiff()
             .toBuilder()
@@ -285,16 +281,13 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     DiffNumberResponse diffNumberResponse =
         (DiffNumberResponse)
             client.getProtoDocument(
-                firestoreReviewRoot.get(),
-                DOCUMENT_FOR_LAST_DIFF_NUMBER,
-                DiffNumberResponse.newBuilder());
+                ReviewerConstants.LAST_DIFF_NUMBER_DOCUMENT, DiffNumberResponse.newBuilder());
     diffNumberResponse =
         diffNumberResponse
             .toBuilder()
             .setLastDiffId(diffNumberResponse.getLastDiffId() + 1)
             .build();
-    client.setProtoDocument(
-        firestoreReviewRoot.get(), DOCUMENT_FOR_LAST_DIFF_NUMBER, diffNumberResponse);
+    client.setProtoDocument(ReviewerConstants.LAST_DIFF_NUMBER_DOCUMENT, diffNumberResponse);
     responseObserver.onNext(diffNumberResponse);
     responseObserver.onCompleted();
   }
@@ -304,10 +297,12 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     checkAuth();
     FirestoreProtoClient client =
         new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
-    String diffPath =
-        fileUtils.joinToAbsolutePath(
-            firestoreReviewRoot.get(), "data/diff", String.valueOf(request.getDiffId()));
-    Diff diff = (Diff) client.getProtoDocument(diffPath, Diff.newBuilder());
+    Diff diff =
+        (Diff)
+            client.getProtoDocument(
+                ReviewerConstants.DIFF_COLLECTION,
+                String.valueOf(request.getDiffId()),
+                Diff.newBuilder());
 
     responseObserver.onNext(diff);
     responseObserver.onCompleted();

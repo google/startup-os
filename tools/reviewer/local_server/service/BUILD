@@ -67,6 +67,7 @@ java_library(
         "CodeReviewService.java",
     ],
     deps = [
+        "//tools/reviewer:reviewer_constants",
         ":code_review_java_grpc",
         ":code_review_java_proto",
         "//common",
