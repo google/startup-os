@@ -23,8 +23,8 @@ java_binary(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/slf4j:slf4j_simple",
+        "//tools/reviewer:reviewer_java_proto",
         "//tools/reviewer/local_server/service:auth_service",
         "//tools/reviewer/local_server/service:code_review_java_proto",
-        "//tools/reviewer:reviewer_java_proto",
     ],
 )
