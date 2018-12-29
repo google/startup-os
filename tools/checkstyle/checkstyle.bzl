@@ -58,14 +58,16 @@ def checkstyle_dependencies(
         artifact = "org.slf4j:jcl-over-slf4j:" + versions["org_slf4j_slf4j_jcl"],
     )
 
-
+# Structure representing info about Java source files
 JavaSourceFiles = provider(
     fields = {
         'files' : 'java source files'
     }
 )
 
-
+# This aspect is responsible for collecting Java sources for target
+# When applied to target, `JavaSourceFiles` struct will be attached to
+# target info
 def collect_sources_impl(target, ctx):
     files = []
     if hasattr(ctx.rule.attr, 'srcs'):
@@ -81,14 +83,18 @@ collect_sources = aspect(
 )
 
 
+# `ctx` is rule context: https://docs.bazel.build/versions/master/skylark/lib/ctx.html
 def _checkstyle_test_impl(ctx):
+    # verify target name matches naming conventions
     if "{}-checkstyle".format(ctx.attr.target.label.name) != ctx.attr.name:
         fail("target should follow `{java_library target name}-checkstyle` pattern")
+
     properties = ctx.file.properties
     suppressions = ctx.file.suppressions
     opts = ctx.attr.opts
     sopts = ctx.attr.string_opts
 
+    # Checkstyle and its dependencies
     classpath = ":".join([file.path for file in ctx.files._classpath])
 
     args = ""
@@ -102,6 +108,7 @@ def _checkstyle_test_impl(ctx):
     if suppressions:
       inputs.append(suppressions)
 
+    # Build command to run Checkstyle test
     cmd = " ".join(
         ["java -cp %s com.puppycrawl.tools.checkstyle.Main" % classpath] +
         [args] +
@@ -110,6 +117,7 @@ def _checkstyle_test_impl(ctx):
         [file.path for file in ctx.attr.target[JavaSourceFiles].files]
     )
 
+    # Wrap checkstyle command in a shell script so allow_failure is supported
     ctx.actions.expand_template(
         template = ctx.file._checkstyle_sh_template,
         output = ctx.outputs.checkstyle_script,
