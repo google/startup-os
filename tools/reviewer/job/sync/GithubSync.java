@@ -50,7 +50,7 @@ public class GithubSync {
       throws IOException {
     Diff diff = reviewerClient.getDiff(diffNumber);
     ImmutableList<PullRequest> reviewerPullRequests =
-        new DiffConverter().toPullRequests(diff, repoNameToGitRepos);
+        new DiffConverter(reviewerClient).toPullRequests(diff, repoNameToGitRepos);
 
     for (PullRequest reviewerPullRequest : reviewerPullRequests) {
       boolean isFirstSync = reviewerPullRequest.getNumber() == 0;
