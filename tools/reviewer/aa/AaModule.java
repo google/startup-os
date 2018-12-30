@@ -97,7 +97,7 @@ public class AaModule {
   }
 
   /**
-   * Parse string representing a positive integer or minus one
+   * Parse string representing a positive integer or minus one.
    *
    * @param s string to parse
    * @return parsed value or -1
