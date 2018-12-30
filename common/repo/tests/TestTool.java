@@ -17,13 +17,13 @@
 package com.google.startupos.common.repo.tests;
 
 import com.google.startupos.common.CommonModule;
-import com.google.startupos.common.repo.Repo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.common.repo.Protos.Commit;
+import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Repo;
 import dagger.Component;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.common.repo.Protos.File;
 
 /** Test tool for GitRepo. */
 @Singleton
@@ -35,6 +35,7 @@ public class TestTool {
     this.repoFactory = repoFactory;
   }
 
+  @SuppressWarnings({"checkstyle:LeftCurly", "checkstyle:Indentation"})
   void run(String[] args) throws Exception {
     if (args.length > 0) {
       String command = args[0];
