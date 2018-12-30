@@ -56,7 +56,6 @@ java_test(
 
 checkstyle_test(
     name = "GlobalRegistryTest-checkstyle",
-    allow_failure = 1,
     target = ":GlobalRegistryTest",
 )
 
