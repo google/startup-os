@@ -24,8 +24,8 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -185,7 +185,7 @@ public class LocalHttpGateway {
     ImmutableMap.Builder<String, String> result = new ImmutableMap.Builder<>();
     if (query != null) {
       for (String param : query.split("&")) {
-        String pair[] = param.split("=");
+        String[] pair = param.split("=");
         if (pair.length > 1) {
           result.put(pair[0], pair[1]);
         } else {
