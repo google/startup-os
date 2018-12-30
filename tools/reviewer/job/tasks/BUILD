@@ -140,7 +140,6 @@ java_library(
 
 checkstyle_test(
     name = "reviewer_metadata_updater_task-checkstyle",
-    allow_failure = 1,
     target = ":reviewer_metadata_updater_task",
 )
 
