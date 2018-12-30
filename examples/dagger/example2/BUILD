@@ -13,7 +13,6 @@ java_library(
 
 checkstyle_test(
     name = "example2_lib-checkstyle",
-    allow_failure = 1,
     target = ":example2_lib",
 )
 
