@@ -17,10 +17,10 @@
 package com.google.startupos.common;
 
 import com.google.auto.value.AutoValue;
-import java.util.List;
 import com.google.common.collect.ImmutableList;
+import java.util.List;
 
-/** List utils */
+/** List utils. */
 public class Lists {
 
   /**

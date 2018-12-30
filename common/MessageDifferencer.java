@@ -143,7 +143,9 @@ public final class MessageDifferencer {
     return new Builder();
   }
 
-  /** Builder object for {@link MessageDifferencer}. */
+  /**
+   * Builder object for {@link MessageDifferencer}.
+   */
   public static final class Builder {
     private final Set<FieldDescriptor> setFields = Sets.newHashSet();
     private final Set<FieldDescriptor> ignoreFields = Sets.newHashSet();
@@ -547,7 +549,9 @@ public final class MessageDifferencer {
    * unknown fields.
    */
   public interface FieldComparator {
-    /** Comparison result for {@link FieldComparator#compare} */
+    /**
+     * Comparison result for {@link FieldComparator#compare}.
+     */
     public enum ComparisonResult {
       /**
        * Compared fields are equal. In case of comparing submessages, user should not recursively
@@ -624,15 +628,21 @@ public final class MessageDifferencer {
 
   /** The type of the reported difference. */
   public enum ReportType {
-    /** A field has been added to {@code message2}. */
+    /**
+     * A field has been added to {@code message2}.
+     */
     ADDED,
 
-    /** A field has been deleted in {@code message2}. */
+    /**
+     * A field has been deleted in {@code message2}.
+     */
     DELETED,
 
     IGNORED,
 
-    /** A field has been modified. */
+    /**
+     * A field has been modified.
+     */
     MODIFIED,
 
     /**
@@ -656,7 +666,9 @@ public final class MessageDifferencer {
    * in messages.
    */
   public enum MessageFieldComparison {
-    /** Fields must be present in both messages for the messages to be considered the same. */
+    /**
+     * Fields must be present in both messages for the messages to be considered the same.
+     */
     EQUAL,
 
     /**
@@ -683,7 +695,9 @@ public final class MessageDifferencer {
     /** Floats and doubles are compared exactly. */
     EXACT,
 
-    /** Floats and doubles are compared using an equivalent of C++ {@code MathUtil::AlmostEqual}. */
+    /**
+     * Floats and doubles are compared using an equivalent of C++ {@code MathUtil::AlmostEqual}.
+     */
     APPROXIMATE
   }
 
@@ -696,7 +710,9 @@ public final class MessageDifferencer {
      */
     AS_LIST,
 
-    /** Treat all the repeated fields as sets by default. See {@link Builder#treatAsSet}. */
+    /**
+     * Treat all the repeated fields as sets by default. See {@link Builder#treatAsSet}.
+     */
     AS_SET
   }
 
@@ -1342,7 +1358,9 @@ public final class MessageDifferencer {
     private final Appendable output;
     private final boolean reportModifiedAggregates;
 
-    /** Equivalent to {@code new StreamReporter(output, false)}. */
+    /**
+     * Equivalent to {@code new StreamReporter(output, false)}.
+     */
     public StreamReporter(Appendable output) {
       this(output, false);
     }
@@ -1432,6 +1450,8 @@ public final class MessageDifferencer {
             output.append(" : ");
             appendValue(message1, fieldPath, true);
             break;
+          default:
+            throw new RuntimeException("Unknown ReportType");
         }
         output.append("\n" + tentativeNewline);
       } catch (IOException e) {

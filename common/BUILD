@@ -31,7 +31,6 @@ java_library(
 
 checkstyle_test(
     name = "common-checkstyle",
-    allow_failure = 1,
     target = ":common",
 )
 
@@ -48,7 +47,6 @@ java_library(
 
 checkstyle_test(
     name = "lists-checkstyle",
-    allow_failure = 1,
     target = ":lists",
 )
 
