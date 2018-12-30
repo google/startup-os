@@ -33,6 +33,5 @@ java_binary(
 
 checkstyle_test(
     name = "ci_task_tool-checkstyle",
-    allow_failure = 1,
     target = ":ci_task_tool",
 )
