@@ -16,28 +16,28 @@
 
 package com.google.startupos.tools.reviewer.job.sync.tests;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.startupos.common.repo.GitRepo;
-import com.google.startupos.tools.reviewer.job.sync.DiffConverter;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
-import com.google.startupos.tools.reviewer.job.sync.ReviewerClient;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.List;
-
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.tools.reviewer.job.sync.DiffConverter;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
+import com.google.startupos.tools.reviewer.job.sync.ReviewerClient;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
+import java.util.List;
+import org.junit.Before;
+import org.junit.Test;
+
 
 public class DiffConverterTest {
   private static final String TEST_FILE_PATCH =
