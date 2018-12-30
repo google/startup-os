@@ -53,7 +53,6 @@ java_library(
 
 checkstyle_test(
     name = "local_http_gateway_grpc_client-checkstyle",
-    allow_failure = 1,
     target = ":local_http_gateway_grpc_client",
 )
 
