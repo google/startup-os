@@ -17,12 +17,13 @@
 package com.google.startupos.common.flags;
 
 import com.google.common.annotations.VisibleForTesting;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.IOException;
 import java.util.stream.Collectors;
+
 
 /**
  * Static API for creating and reading flags.
@@ -66,7 +67,7 @@ public class Flags {
    */
   public static String[] parse(String[] args, String... packages) {
     instance().scanPackages(Arrays.asList(packages));
-    return instance._parse(args);
+    return instance.parseImpl(args);
   }
 
   /**
@@ -77,7 +78,7 @@ public class Flags {
    */
   public static String[] parse(String[] args, Class clazz) {
     instance().scanClass(clazz);
-    return instance._parse(args);
+    return instance.parseImpl(args);
   }
 
   /**
@@ -95,10 +96,10 @@ public class Flags {
     } catch (ClassNotFoundException e) {
       throw new IllegalArgumentException(e);
     }
-    return instance._parse(args);
+    return instance.parseImpl(args);
   }
 
-  /** Prints user-readable usage help for all flags in a given package */
+  /** Prints user-readable usage help for all flags in a given package. */
   public static void printUsage() {
     UsagePrinter.printUsage(getFlags(), System.out);
   }
@@ -114,7 +115,8 @@ public class Flags {
     if (flagData == null) {
       throw new IllegalArgumentException(
           String.format(
-              "Flag data '%s' is null; did you forget to call FlagData.parse() or add the package for the flag?",
+              "Flag data '%s' is null; did you forget to "
+              + "call FlagData.parse() or add the package for the flag?",
               name));
     }
     if (!flagData.getHasValue()) {
@@ -171,7 +173,7 @@ public class Flags {
     instance = new Flags(new ClassScanner(), new HashMap<>());
   }
 
-  private String[] _parse(String[] args) {
+  private String[] parseImpl(String[] args) {
     GflagsParser parser = new GflagsParser(flags);
     return parser.parse(args).unusedArgs.toArray(new String[0]);
   }
