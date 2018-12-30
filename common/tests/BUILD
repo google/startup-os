@@ -36,7 +36,6 @@ java_test(
 
 checkstyle_test(
     name = "FileUtilsTest-checkstyle",
-    allow_failure = 1,
     target = ":FileUtilsTest",
 )
 
