@@ -104,6 +104,5 @@ java_binary(
 
 checkstyle_test(
     name = "text_differencer_tool-checkstyle",
-    allow_failure = 1,
     target = ":text_differencer_tool",
 )
