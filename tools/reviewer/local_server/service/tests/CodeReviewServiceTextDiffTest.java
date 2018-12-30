@@ -18,41 +18,41 @@ package com.google.startupos.tools.reviewer.localserver.service.tests;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
-import com.google.startupos.tools.localserver.service.AuthService;
-import io.grpc.inprocess.InProcessChannelBuilder;
-import io.grpc.inprocess.InProcessServerBuilder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import dagger.Component;
-import org.junit.Before;
-import org.junit.After;
 import com.google.startupos.common.CommonModule;
-import com.google.startupos.tools.reviewer.aa.AaModule;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
-import java.io.IOException;
-import java.nio.file.Files;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.TextDifferencer;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.flags.Flags;
-import javax.inject.Named;
-import dagger.Provides;
-import java.nio.file.FileSystems;
+import com.google.startupos.common.repo.Protos.File.Action;
+import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
-import com.google.startupos.common.TextDifferencer;
-import io.grpc.Server;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
+import dagger.Component;
+import dagger.Provides;
 import io.grpc.ManagedChannel;
-import java.util.concurrent.TimeUnit;
+import io.grpc.Server;
 import io.grpc.StatusRuntimeException;
-import com.google.startupos.common.repo.Protos.File.Action;
-
+import io.grpc.inprocess.InProcessChannelBuilder;
+import io.grpc.inprocess.InProcessServerBuilder;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
 
 /*
  * Unit tests for {@link CodeReviewService}.
@@ -100,7 +100,7 @@ public class CodeReviewServiceTextDiffTest {
     Flags.parse(
         new String[0], AuthService.class.getPackage(), CodeReviewService.class.getPackage());
     String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
-    String initialRepoFolder = joinToAbsolutePath(testFolder, "initial_repo");
+    final String initialRepoFolder = joinToAbsolutePath(testFolder, "initial_repo");
     aaBaseFolder = joinToAbsolutePath(testFolder, "base_folder");
 
     component =

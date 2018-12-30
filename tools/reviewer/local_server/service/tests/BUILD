@@ -60,7 +60,6 @@ java_test(
 
 checkstyle_test(
     name = "CodeReviewServiceTextDiffTest-checkstyle",
-    allow_failure = 1,
     target = ":CodeReviewServiceTextDiffTest",
 )
 
