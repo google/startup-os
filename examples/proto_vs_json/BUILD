@@ -30,6 +30,5 @@ java_binary(
 
 checkstyle_test(
     name = "proto_vs_json_tool-checkstyle",
-    allow_failure = 1,
     target = ":proto_vs_json_tool",
 )
