@@ -48,7 +48,6 @@ java_test(
 
 checkstyle_test(
     name = "WorkspaceDepsWhitelistTest-checkstyle",
-    allow_failure = 1,
     target = ":WorkspaceDepsWhitelistTest",
 )
 
