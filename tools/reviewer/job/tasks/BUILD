@@ -36,7 +36,6 @@ java_library(
 
 checkstyle_test(
     name = "task_interface-checkstyle",
-    allow_failure = 1,
     target = ":task_interface",
 )
 
