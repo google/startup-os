@@ -98,6 +98,5 @@ java_test(
 
 checkstyle_test(
     name = "CodeReviewServiceGetDiffFilesTest-checkstyle",
-    allow_failure = 1,
     target = ":CodeReviewServiceGetDiffFilesTest",
 )
