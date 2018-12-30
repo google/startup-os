@@ -40,6 +40,5 @@ java_test(
 
 checkstyle_test(
     name = "proto_file_analyzer_test-checkstyle",
-    allow_failure = 1,
     target = ":proto_file_analyzer_test",
 )
