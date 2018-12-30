@@ -30,7 +30,7 @@ public class TaskExecutor extends TimerTask {
 
   public TaskExecutor(ImmutableList<Task> tasks) {
     this.tasks = tasks;
-    threadPool = Executors.newFixedThreadPool(4);
+    threadPool = Executors.newFixedThreadPool(tasks.size());
   }
 
   @Override

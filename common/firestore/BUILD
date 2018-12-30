@@ -7,6 +7,9 @@ java_library(
     srcs = [
         "FirestoreProtoClient.java",
         "MessageWithId.java",
+        "ProtoChange.java",
+        "ProtoEventListener.java",
+        "ProtoQuerySnapshot.java",
     ],
     deps = [
         "//common:auto_factory",

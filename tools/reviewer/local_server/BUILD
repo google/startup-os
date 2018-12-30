@@ -19,6 +19,7 @@ java_binary(
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/grpc:grpc_services",
+        "//third_party/maven/io/netty:netty_tcnative_boringssl_static",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/reviewer/aa:aa_module",

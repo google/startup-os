@@ -144,6 +144,9 @@ dependencies:
     netty-codec-http2:
       lang: java
       version: "4.1.32.Final"
+    netty-tcnative-boringssl-static:
+      lang: java
+      version: "2.0.20.Final"
 
   io.opencensus:
     opencensus-contrib-grpc-metrics:

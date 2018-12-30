@@ -16,33 +16,35 @@
 
 package com.google.startupos.common.firestore;
 
+import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.EventListener;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.FirestoreException;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.FirebaseApp;
-import com.google.cloud.firestore.Firestore;
-import com.google.firebase.cloud.FirestoreClient;
-import com.google.protobuf.Message;
-import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.WriteResult;
-import java.util.concurrent.ExecutionException;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
 import com.google.protobuf.InvalidProtocolBufferException;
-
-import java.io.InputStream;
+import com.google.protobuf.Message;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import javax.annotation.Nullable;
 
+/** A proto wrapper for Firestore's client, that uses protos' binary format. */
 public class FirestoreProtoClient {
   private static final String PROTO_FIELD = "proto";
 
@@ -53,7 +55,15 @@ public class FirestoreProtoClient {
       InputStream serviceAccount = new FileInputStream(serviceAccountJson);
       GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
       FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(credentials).build();
-      FirebaseApp.initializeApp(options);
+      try {
+        FirebaseApp.initializeApp(options);
+      } catch (IllegalStateException e) {
+        if (e.getMessage().contains("already exists")) {
+          // Firestore is probably already initialized - do nothing
+        } else {
+          throw e;
+        }
+      }
       client = FirestoreClient.getFirestore();
     } catch (IOException e) {
       e.printStackTrace();
@@ -66,7 +76,15 @@ public class FirestoreProtoClient {
             .setCredentials(GoogleCredentials.create(new AccessToken(token, null)))
             .setProjectId(project)
             .build();
-    FirebaseApp.initializeApp(options);
+    try {
+      FirebaseApp.initializeApp(options);
+    } catch (IllegalStateException e) {
+      if (e.getMessage().contains("already exists")) {
+        // Firestore is probably already initialized - do nothing
+      } else {
+        throw e;
+      }
+    }
     client = FirestoreClient.getFirestore();
   }
 
@@ -81,7 +99,7 @@ public class FirestoreProtoClient {
     return collection + "/" + documentId;
   }
 
-  private Message parseProto(DocumentSnapshot document, Message.Builder builder)
+  public static Message parseProto(DocumentSnapshot document, Message.Builder builder)
       throws InvalidProtocolBufferException {
     return builder
         .build()
@@ -283,6 +301,27 @@ public class FirestoreProtoClient {
     } catch (ExecutionException | InterruptedException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  public void addCollectionListener(
+      String path, Message.Builder builder, ProtoEventListener listener) {
+    getCollectionReference(path)
+        .addSnapshotListener(
+            new EventListener<QuerySnapshot>() {
+              @Override
+              public void onEvent(
+                  @Nullable QuerySnapshot querySnapshot, @Nullable FirestoreException e) {
+                if (e != null) {
+                  listener.onEvent(null, e);
+                  return;
+                }
+                try {
+                  listener.onEvent(new ProtoQuerySnapshot(querySnapshot, builder), null);
+                } catch (InvalidProtocolBufferException e2) {
+                  listener.onEvent(null, new IllegalArgumentException(e2));
+                }
+              }
+            });
   }
 }
 
