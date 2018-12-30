@@ -15,6 +15,5 @@ java_binary(
 
 checkstyle_test(
     name = "rules_updater-checkstyle",
-    allow_failure = 1,
     target = ":rules_updater",
 )

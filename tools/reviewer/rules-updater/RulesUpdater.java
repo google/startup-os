@@ -49,7 +49,8 @@ class RulesUpdater {
   public static void main(String[] args) {
     Flags.parseCurrentPackage(args);
     FileUtils fileUtils = DaggerCommonComponent.create().getFileUtils();
-    String configPath, outputPath;
+    String configPath;
+    String outputPath;
 
     String buildWorkspaceDirectory = System.getenv("BUILD_WORKSPACE_DIRECTORY");
 
