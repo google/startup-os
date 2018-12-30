@@ -25,7 +25,6 @@ java_test(
 
 checkstyle_test(
     name = "InitCommandTest-checkstyle",
-    allow_failure = 1,
     target = ":InitCommandTest",
 )
 
