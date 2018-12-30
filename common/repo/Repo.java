@@ -33,37 +33,50 @@ import java.io.IOException;
 public interface Repo {
   /** Switches to branch. Creates branch if needed. */
   void switchBranch(String branch);
+
   /** Tags the commit at head. */
   void tagHead(String name);
+
   /**
    * Gets commits on branch since it diverged from master, including the last master commit, at
    * position 0.
    */
   ImmutableList<Commit> getCommits(String branch);
+
   /** Gets all uncommited files. This includes new, modified and deleted files. */
   ImmutableList<File> getUncommittedFiles();
+
   /** Does commit exist. */
   boolean commitExists(String commitId);
+
   /** Gets files in commit. */
   ImmutableList<File> getFilesInCommit(String commitId);
-  /** Commits files to current branch and returns commit */
+
+  /** Commits files to current branch and returns commit. */
   Commit commit(ImmutableList<File> files, String message);
-  /** Pushes branch to remote repo */
+
+  /** Pushes branch to remote repo. */
   boolean push(String branch);
-  /** Pulls all branches from remote repo */
+
+  /** Pulls all branches from remote repo. */
   void pull();
+
   /** Merges branch to master, keeping conflicting changes in tree. * Returns true on success. */
   boolean merge(String branch);
-  /** Is branch merged to master */
+
+  /** Is branch merged to master. */
   boolean isMerged(String branch);
+
   /**
    * Reset current branch. All changes introduced after it would be marked as unstaged but saved in
    * working tree
    */
   void reset(String ref);
-  /** Remove branch */
+
+  /** Remove branch. */
   void removeBranch(String branch);
-  /** List branches */
+
+  /** List branches. */
   ImmutableList<String> listBranches();
 
   boolean branchExists(String name);
@@ -75,16 +88,21 @@ public interface Repo {
   String getTextDiff(File file1, File file2) throws IOException;
 
   String getFileContents(String commitId, String path);
-  /** Get current branch name */
+
+  /** Get current branch name. */
   String currentBranch();
-  /** Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git) */
+
+  /** Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git). */
+  @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
   String getRemoteURL();
-  /** Checks if there are commits added since master, or any uncommitted files */
+
+  /** Checks if there are commits added since master, or any uncommitted files. */
   boolean hasChanges(String branch);
   /**
    * Gets patch(diff) between file in `firstReferenceCommitOrBranch` and the file in the
    * `secondReferenceCommitOrBranch`. It's possible to use branch name or commit ID. The response
    * can have one and more diff hunks
+
    */
   String getPatch(
       String firstReferenceCommitOrBranch, String secondReferenceCommitOrBranch, String filename);
