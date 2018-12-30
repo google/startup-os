@@ -78,7 +78,6 @@ java_test(
 
 checkstyle_test(
     name = "TextDifferencerTest-checkstyle",
-    allow_failure = 1,
     target = ":TextDifferencerTest",
 )
 
