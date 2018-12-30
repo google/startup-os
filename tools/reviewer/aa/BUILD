@@ -30,7 +30,6 @@ java_library(
 
 checkstyle_test(
     name = "aa_module-checkstyle",
-    allow_failure = 1,
     target = ":aa_module",
 )
 
