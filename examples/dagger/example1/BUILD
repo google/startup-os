@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_library(
     name = "example1_lib",
     srcs = glob(["**/*.java"]),
@@ -7,6 +9,12 @@ java_library(
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "example1_lib-checkstyle",
+    allow_failure = 1,
+    target = ":example1_lib",
 )
 
 java_binary(
@@ -17,4 +25,10 @@ java_binary(
     ],
     main_class = "com.google.startupos.examples.dagger.example1.App",
     runtime_deps = [":example1_lib"],
+)
+
+checkstyle_test(
+    name = "example1-checkstyle",
+    allow_failure = 1,
+    target = ":example1",
 )

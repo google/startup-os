@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:private"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_test(
     name = "FlagsTest",
     srcs = [
@@ -16,4 +18,10 @@ java_test(
         "//third_party/maven/org/mockito:mockito_core",
         "//third_party/maven/org/objenesis",
     ],
+)
+
+checkstyle_test(
+    name = "FlagsTest-checkstyle",
+    allow_failure = 1,
+    target = ":FlagsTest",
 )

@@ -1,5 +1,6 @@
 load("@io_bazel_rules_docker//java:image.bzl", "java_image")
 load("@io_bazel_rules_docker//container:container.bzl", "container_push")
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
 JOB_DEPS = [
     "//common",
@@ -36,12 +37,24 @@ java_binary(
     deps = JOB_DEPS,
 )
 
+checkstyle_test(
+    name = "job-checkstyle",
+    allow_failure = 1,
+    target = ":job",
+)
+
 java_image(
     name = "job_image",
     srcs = ["ReviewerJob.java"],
     base = "@alpine_java_git//image",
     main_class = "com.google.startupos.tools.reviewer.job.ReviewerJob",
     deps = JOB_DEPS,
+)
+
+checkstyle_test(
+    name = "job_image.binary-checkstyle",
+    allow_failure = 1,
+    target = ":job_image.binary",
 )
 
 container_push(

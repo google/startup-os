@@ -2,6 +2,8 @@
 
 package(default_visibility = ["//visibility:private"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "test_proto",
     srcs = ["resources/file_utils_test.proto"],
@@ -32,6 +34,12 @@ java_test(
     ],
 )
 
+checkstyle_test(
+    name = "FileUtilsTest-checkstyle",
+    allow_failure = 1,
+    target = ":FileUtilsTest",
+)
+
 java_test(
     name = "ListsTest",
     srcs = ["ListsTest.java"],
@@ -44,6 +52,12 @@ java_test(
         "//third_party/maven/org/mockito:mockito_core",
         "//third_party/maven/org/objenesis",
     ],
+)
+
+checkstyle_test(
+    name = "ListsTest-checkstyle",
+    allow_failure = 1,
+    target = ":ListsTest",
 )
 
 java_test(
@@ -62,6 +76,12 @@ java_test(
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/junit",
     ],
+)
+
+checkstyle_test(
+    name = "TextDifferencerTest-checkstyle",
+    allow_failure = 1,
+    target = ":TextDifferencerTest",
 )
 
 java_binary(
@@ -83,4 +103,10 @@ java_binary(
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/slf4j:slf4j_simple",
     ],
+)
+
+checkstyle_test(
+    name = "text_differencer_tool-checkstyle",
+    allow_failure = 1,
+    target = ":text_differencer_tool",
 )

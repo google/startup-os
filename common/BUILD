@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_library(
     name = "common",
     srcs = [
@@ -27,6 +29,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "common-checkstyle",
+    allow_failure = 1,
+    target = ":common",
+)
+
 java_library(
     name = "lists",
     srcs = ["Lists.java"],
@@ -36,6 +44,12 @@ java_library(
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
     ],
+)
+
+checkstyle_test(
+    name = "lists-checkstyle",
+    allow_failure = 1,
+    target = ":lists",
 )
 
 java_library(
@@ -53,6 +67,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "text_differencer-checkstyle",
+    allow_failure = 1,
+    target = ":text_differencer",
+)
+
 proto_library(
     name = "text_difference_proto",
     srcs = ["text_difference.proto"],
@@ -67,18 +87,21 @@ java_plugin(
     name = "dagger_compiler_plugin",
     generates_api = True,
     processor_class = "dagger.internal.codegen.ComponentProcessor",
+    tags = ["checkstyle_ignore"],
     deps = ["//third_party/maven/com/google/dagger:dagger_compiler"],
 )
 
 java_library(
     name = "dagger_with_annotation_processor",
     exported_plugins = [":dagger_compiler_plugin"],
+    tags = ["checkstyle_ignore"],
     exports = ["//third_party/maven/com/google/dagger"],
 )
 
 java_library(
     name = "auto_factory",
     exported_plugins = [":auto_factory_plugin"],
+    tags = ["checkstyle_ignore"],
     exports = ["//third_party/maven/com/google/auto/factory:auto_factory"],
 )
 
@@ -86,6 +109,7 @@ java_plugin(
     name = "auto_factory_plugin",
     generates_api = True,
     processor_class = "com.google.auto.factory.processor.AutoFactoryProcessor",
+    tags = ["checkstyle_ignore"],
     deps = [
         "//third_party/maven/com/google/auto:auto_common",
         "//third_party/maven/com/google/auto/factory:auto_factory",
@@ -95,6 +119,12 @@ java_plugin(
 java_library(
     name = "diff_match_patch",
     srcs = ["DiffMatchPatch.java"],
+)
+
+checkstyle_test(
+    name = "diff_match_patch-checkstyle",
+    allow_failure = 1,
+    target = ":diff_match_patch",
 )
 
 java_binary(
@@ -110,4 +140,10 @@ java_binary(
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "base64_tool-checkstyle",
+    allow_failure = 1,
+    target = ":base64_tool",
 )

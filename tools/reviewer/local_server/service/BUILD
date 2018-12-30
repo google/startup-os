@@ -1,6 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 load("//third_party:java_grpc_library.bzl", "java_grpc_library")
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
 proto_library(
     name = "auth_service_proto",
@@ -15,6 +16,7 @@ java_proto_library(
 java_grpc_library(
     name = "auth_service_java_grpc",
     srcs = [":auth_service_proto"],
+    tags = ["checkstyle_ignore"],
     deps = [
         ":auth_service_java_proto",
     ],
@@ -38,6 +40,12 @@ java_library(
     ],
 )
 
+checkstyle_test(
+    name = "auth_service-checkstyle",
+    allow_failure = 1,
+    target = ":auth_service",
+)
+
 proto_library(
     name = "code_review_proto",
     srcs = ["code_review.proto"],
@@ -56,6 +64,7 @@ java_proto_library(
 java_grpc_library(
     name = "code_review_java_grpc",
     srcs = [":code_review_proto"],
+    tags = ["checkstyle_ignore"],
     deps = [
         ":code_review_java_proto",
     ],
@@ -87,4 +96,10 @@ java_library(
         "//tools/reviewer:reviewer_constants",
         "//tools/reviewer/local_server/service:auth_service",
     ],
+)
+
+checkstyle_test(
+    name = "code_review_service-checkstyle",
+    allow_failure = 1,
+    target = ":code_review_service",
 )

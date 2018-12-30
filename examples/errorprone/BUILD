@@ -1,3 +1,5 @@
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_plugin(
     name = "StringFmtInPrintMethodsCheckPlugin",
     srcs = ["StringFmtInPrintMethodsCheck.java"],
@@ -6,6 +8,12 @@ java_plugin(
         "//third_party/maven/com/google/errorprone:error_prone_ant",
         "//third_party/maven/com/google/guava",
     ],
+)
+
+checkstyle_test(
+    name = "StringFmtInPrintMethodsCheckPlugin-checkstyle",
+    allow_failure = 1,
+    target = ":StringFmtInPrintMethodsCheckPlugin",
 )
 
 java_plugin(
@@ -19,6 +27,12 @@ java_plugin(
     ],
 )
 
+checkstyle_test(
+    name = "ProtobufCheckPlugin-checkstyle",
+    allow_failure = 1,
+    target = ":ProtobufCheckPlugin",
+)
+
 java_binary(
     name = "Hello",
     srcs = ["Hello.java"],
@@ -28,4 +42,10 @@ java_binary(
         ":ProtobufCheckPlugin",
     ],
     deps = ["//examples/proto_vs_json:data_java_proto"],
+)
+
+checkstyle_test(
+    name = "Hello-checkstyle",
+    allow_failure = 1,
+    target = ":Hello",
 )

@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 exports_files(["global_registry.prototxt"])
 
 proto_library(
@@ -28,6 +30,12 @@ java_library(
     srcs = ["ReviewerConstants.java"],
 )
 
+checkstyle_test(
+    name = "reviewer_constants-checkstyle",
+    allow_failure = 1,
+    target = ":reviewer_constants",
+)
+
 java_test(
     name = "GlobalRegistryTest",
     srcs = [
@@ -46,6 +54,12 @@ java_test(
     ],
 )
 
+checkstyle_test(
+    name = "GlobalRegistryTest-checkstyle",
+    allow_failure = 1,
+    target = ":GlobalRegistryTest",
+)
+
 java_test(
     name = "ReviewerConfigTest",
     srcs = [
@@ -62,4 +76,10 @@ java_test(
         "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "ReviewerConfigTest-checkstyle",
+    allow_failure = 1,
+    target = ":ReviewerConfigTest",
 )

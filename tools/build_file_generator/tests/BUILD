@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_test(
     name = "java_class_analyzer_test",
     srcs = [
@@ -13,6 +15,12 @@ java_test(
         "//tools/build_file_generator",
         "//tools/build_file_generator:build_file_generator_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "java_class_analyzer_test-checkstyle",
+    allow_failure = 1,
+    target = ":java_class_analyzer_test",
 )
 
 java_test(
@@ -29,4 +37,10 @@ java_test(
         "//tools/build_file_generator",
         "//tools/build_file_generator:build_file_generator_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "proto_file_analyzer_test-checkstyle",
+    allow_failure = 1,
+    target = ":proto_file_analyzer_test",
 )
