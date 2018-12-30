@@ -29,7 +29,6 @@ java_test(
 
 checkstyle_test(
     name = "MavenDepsWhitelistTest-checkstyle",
-    allow_failure = 1,
     target = ":MavenDepsWhitelistTest",
 )
 
