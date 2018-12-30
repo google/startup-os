@@ -61,7 +61,6 @@ java_library(
 
 checkstyle_test(
     name = "github_sync-checkstyle",
-    allow_failure = 1,
     target = ":github_sync",
 )
 

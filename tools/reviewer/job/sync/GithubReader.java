@@ -16,19 +16,19 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitInfo;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.CommitInfo;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Reads GitHub Pull Request using GitHub API and creates

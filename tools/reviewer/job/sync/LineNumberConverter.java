@@ -41,7 +41,7 @@ public class LineNumberConverter {
   }
 
   /**
-   * Returns the absolute line number in the file
+   * Returns the absolute line number in the file.
    *
    * @param patch is `patch`(diff) of GitHub Pull Request file in string format
    * @param position is line number in the diff(patch)
@@ -53,7 +53,7 @@ public class LineNumberConverter {
   }
 
   /**
-   * Returns the position in the diff(patch)
+   * Returns the position in the diff(patch).
    *
    * @param patch is `patch`(diff) of GitHub Pull Request file in string format
    * @param lineNumber is the absolute line number in the file
@@ -87,6 +87,11 @@ public class LineNumberConverter {
     }
   }
 
+  @SuppressWarnings({
+          "checkstyle:LeftCurly",
+          "checkstyle:Indentation",
+          "checkstyle:CommentsIndentation"
+  })
   private static LineNumberToGithubPositionCorrelation processDiffPatch(
       String patch, int number, Side side, ReturnValueFor valueFor) {
     LineNumberToGithubPositionCorrelation result =
@@ -98,15 +103,16 @@ public class LineNumberConverter {
     // The relationship between line number in file and position in the diff for the left side
     Map<Integer, Integer> lineNumberToPositionLeftSide = new HashMap<>();
     // The relationship between line number in file and position in the diff for the right side
-    Map<Integer, Integer> lineNumberToPositionRightSide = new HashMap<>();
+    final Map<Integer, Integer> lineNumberToPositionRightSide = new HashMap<>();
 
     GithubPatch githubPatch = new GithubPatch(patch);
-    List<String> newLineSymbols = githubPatch.getNewlineSymbols();
+    final List<String> newLineSymbols = githubPatch.getNewlineSymbols();
     // The diff patch can contain one of several parts. We name this part diff hunk.
     List<GithubPatch.DiffHunkHeader> diffHunkHeaders = githubPatch.getDiffHunkHeaders();
     int diffHunkIndex = 0;
     /*
-    The line just below the first diff hunk header line is position 1, the next line is position 2, and so on.
+    The line just below the first diff hunk header line is position 1,
+     the next line is position 2, and so on.
     The position in the file's diff continues to increase through lines of whitespace
     and additional hunks until a new file is reached.
      */
@@ -179,6 +185,8 @@ public class LineNumberConverter {
             positionIndex++;
             break;
           }
+        default:
+          break;
       }
     }
     if (valueFor.equals(ReturnValueFor.REVIEWER)) {

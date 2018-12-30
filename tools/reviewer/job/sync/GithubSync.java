@@ -19,15 +19,15 @@ package com.google.startupos.tools.reviewer.job.sync;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.repo.GitRepo;
-import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
 
 // TODO: Think about how to solve this issue:
 /* In a situation where a comment was created on GitHub and then removed using Reviewer,
@@ -175,6 +175,15 @@ public class GithubSync {
     return ReviewComment.getDefaultInstance();
   }
 
+  private IssueComment getAssociatedComment(List<IssueComment> comments, IssueComment comment) {
+    for (IssueComment issueComment : comments) {
+      if (issueComment.getId() == comment.getId()) {
+        return issueComment;
+      }
+    }
+    return IssueComment.getDefaultInstance();
+  }
+
   private ImmutableList<IssueCommentCorrelation> getIssueCommentCorrelations(
       List<IssueComment> reviewerIssueComments, List<IssueComment> githubIssueComments) {
     List<IssueCommentCorrelation> result = new ArrayList<>();
@@ -205,15 +214,6 @@ public class GithubSync {
       }
     }
     return ImmutableList.copyOf(result);
-  }
-
-  private IssueComment getAssociatedComment(List<IssueComment> comments, IssueComment comment) {
-    for (IssueComment issueComment : comments) {
-      if (issueComment.getId() == comment.getId()) {
-        return issueComment;
-      }
-    }
-    return IssueComment.getDefaultInstance();
   }
 
   private void syncReviewComments(
