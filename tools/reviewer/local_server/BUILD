@@ -31,7 +31,6 @@ java_binary(
 
 checkstyle_test(
     name = "local_server-checkstyle",
-    allow_failure = 1,
     target = ":local_server",
 )
 
