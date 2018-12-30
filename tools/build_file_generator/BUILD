@@ -49,6 +49,5 @@ java_binary(
 
 checkstyle_test(
     name = "build_file_generator_tool-checkstyle",
-    allow_failure = 1,
     target = ":build_file_generator_tool",
 )
