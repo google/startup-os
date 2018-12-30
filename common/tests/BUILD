@@ -55,7 +55,6 @@ java_test(
 
 checkstyle_test(
     name = "ListsTest-checkstyle",
-    allow_failure = 1,
     target = ":ListsTest",
 )
 
