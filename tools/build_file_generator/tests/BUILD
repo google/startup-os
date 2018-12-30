@@ -19,7 +19,6 @@ java_test(
 
 checkstyle_test(
     name = "java_class_analyzer_test-checkstyle",
-    allow_failure = 1,
     target = ":java_class_analyzer_test",
 )
 
