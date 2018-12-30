@@ -16,10 +16,11 @@
 
 package com.google.startupos.common.flags.testpackage;
 
-import com.google.startupos.common.flags.Flags;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import com.google.startupos.common.flags.Flags;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ public class FlagsTest {
 
   @Test
   public void defaultsTest() {
-    List<String> leftOverArgs = Arrays.asList(Flags.parse(new String[0], TESTFLAGS_PACKAGE));
+    final List<String> leftOverArgs = Arrays.asList(Flags.parse(new String[0], TESTFLAGS_PACKAGE));
 
     assertEquals(FLAG_SHOULD_HAVE_VALUE, "default value", FlagDescTestClass.getStringFlagValue());
     assertEquals(FLAG_SHOULD_HAVE_VALUE, true, FlagDescTestClass.booleanFlag.get());
@@ -54,7 +55,8 @@ public class FlagsTest {
 
   @Test
   public void listDefaultsTest() {
-    List<String> leftOverArgs = Arrays.asList(Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
+    final List<String> leftOverArgs = Arrays.asList(
+            Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
 
     assertEquals(
         FLAG_SHOULD_HAVE_VALUE, Arrays.asList("ab", "cd"), FlagDescTestClass.stringsListFlag.get());
@@ -77,7 +79,8 @@ public class FlagsTest {
 
   @Test
   public void getItemFromDefaultValuesListTest() {
-    List<String> leftOverArgs = Arrays.asList(Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
+    final List<String> leftOverArgs = Arrays.asList(
+            Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
 
     assertEquals(
         LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,
@@ -155,7 +158,7 @@ public class FlagsTest {
 
   @Test
   public void printUsageTest() {
-    PrintStream stdout = System.out;
+    final PrintStream stdout = System.out;
     ByteArrayOutputStream catchStream = new ByteArrayOutputStream();
     System.setOut(new PrintStream(catchStream));
 
