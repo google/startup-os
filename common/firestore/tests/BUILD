@@ -33,6 +33,5 @@ java_binary(
 
 checkstyle_test(
     name = "firestore_client_tool-checkstyle",
-    allow_failure = 1,
     target = ":firestore_client_tool",
 )
