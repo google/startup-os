@@ -77,6 +77,5 @@ java_binary(
 
 checkstyle_test(
     name = "aa_script_helper-checkstyle",
-    allow_failure = 1,
     target = ":aa_script_helper",
 )
