@@ -46,6 +46,5 @@ java_binary(
 
 checkstyle_test(
     name = "Hello-checkstyle",
-    allow_failure = 1,
     target = ":Hello",
 )
