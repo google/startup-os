@@ -67,7 +67,6 @@ java_library(
 
 checkstyle_test(
     name = "text_differencer-checkstyle",
-    allow_failure = 1,
     target = ":text_differencer",
 )
 
