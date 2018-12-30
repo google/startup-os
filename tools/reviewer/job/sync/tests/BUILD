@@ -17,7 +17,6 @@ java_test(
 
 checkstyle_test(
     name = "line_number_converter_test-checkstyle",
-    allow_failure = 1,
     target = ":line_number_converter_test",
 )
 

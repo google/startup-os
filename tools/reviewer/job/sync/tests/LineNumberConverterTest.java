@@ -16,10 +16,11 @@
 
 package com.google.startupos.tools.reviewer.job.sync.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import com.google.startupos.tools.reviewer.job.sync.LineNumberConverter;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
 
 public class LineNumberConverterTest {
 
