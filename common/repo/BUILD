@@ -37,5 +37,6 @@ java_library(
 
 checkstyle_test(
     name = "repo-checkstyle",
+    allow_failure = 1,
     target = ":repo",
 )
