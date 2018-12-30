@@ -32,7 +32,6 @@ java_library(
 
 checkstyle_test(
     name = "reviewer_constants-checkstyle",
-    allow_failure = 1,
     target = ":reviewer_constants",
 )
 
