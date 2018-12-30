@@ -60,10 +60,10 @@ import java.util.Objects;
         "github.com/google/startup-os/tree/master/examples/errorprone#StringFmtInPrintMethodsCheck")
 public class StringFmtInPrintMethodsCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
-
+  @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private Matcher<ExpressionTree> PRINT_METHOD =
       instanceMethod().onDescendantOf(PrintStream.class.getName()).named("print");
-
+  @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private Matcher<ExpressionTree> STRING_FORMAT =
       staticMethod().onClass(String.class.getName()).named("format");
 

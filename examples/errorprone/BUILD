@@ -12,7 +12,6 @@ java_plugin(
 
 checkstyle_test(
     name = "StringFmtInPrintMethodsCheckPlugin-checkstyle",
-    allow_failure = 1,
     target = ":StringFmtInPrintMethodsCheckPlugin",
 )
 
