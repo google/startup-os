@@ -24,12 +24,12 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import dagger.Component;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 
 public class GithubSyncTool {
   // TODO: Add checking input Flags
