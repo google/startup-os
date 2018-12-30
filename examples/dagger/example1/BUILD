@@ -23,6 +23,6 @@ java_binary(
         "-Xmx128m",
     ],
     main_class = "com.google.startupos.examples.dagger.example1.App",
-    runtime_deps = [":example1_lib"],
     tags = ["checkstyle_ignore"],
+    runtime_deps = [":example1_lib"],
 )

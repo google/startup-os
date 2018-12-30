@@ -206,7 +206,7 @@ public class DiffCommand implements AaCommand {
                     System.out.println(
                         String.format(
                             "Repository name from the URL(%s) and folder "
-                            + "name from workspace(%s) aren't the same.",
+                                + "name from workspace(%s) aren't the same.",
                             repoName, folderName));
                   }
 

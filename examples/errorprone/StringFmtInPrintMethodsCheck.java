@@ -63,6 +63,7 @@ public class StringFmtInPrintMethodsCheck extends BugChecker
   @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private Matcher<ExpressionTree> PRINT_METHOD =
       instanceMethod().onDescendantOf(PrintStream.class.getName()).named("print");
+
   @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private Matcher<ExpressionTree> STRING_FORMAT =
       staticMethod().onClass(String.class.getName()).named("format");

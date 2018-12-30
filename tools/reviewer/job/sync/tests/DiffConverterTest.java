@@ -38,7 +38,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class DiffConverterTest {
   private static final String TEST_FILE_PATCH =
       "@@ -2,7 +2,7 @@ line-1\n"

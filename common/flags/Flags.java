@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 /**
  * Static API for creating and reading flags.
  *
@@ -116,7 +115,7 @@ public class Flags {
       throw new IllegalArgumentException(
           String.format(
               "Flag data '%s' is null; did you forget to "
-              + "call FlagData.parse() or add the package for the flag?",
+                  + "call FlagData.parse() or add the package for the flag?",
               name));
     }
     if (!flagData.getHasValue()) {

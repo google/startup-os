@@ -39,7 +39,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)
  *

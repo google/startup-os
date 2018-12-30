@@ -55,8 +55,8 @@ public class FlagsTest {
 
   @Test
   public void listDefaultsTest() {
-    final List<String> leftOverArgs = Arrays.asList(
-            Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
+    final List<String> leftOverArgs =
+        Arrays.asList(Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
 
     assertEquals(
         FLAG_SHOULD_HAVE_VALUE, Arrays.asList("ab", "cd"), FlagDescTestClass.stringsListFlag.get());
@@ -79,8 +79,8 @@ public class FlagsTest {
 
   @Test
   public void getItemFromDefaultValuesListTest() {
-    final List<String> leftOverArgs = Arrays.asList(
-            Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
+    final List<String> leftOverArgs =
+        Arrays.asList(Flags.parse(new String[] {}, TESTFLAGS_PACKAGE));
 
     assertEquals(
         LIST_FLAG_SHOULD_HAVE_ELEMENT_WITH_VALUE,

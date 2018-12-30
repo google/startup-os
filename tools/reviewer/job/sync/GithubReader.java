@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Reads GitHub Pull Request using GitHub API and creates
  * `tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest`

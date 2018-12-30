@@ -28,7 +28,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-
 // TODO: Think about how to solve this issue:
 /* In a situation where a comment was created on GitHub and then removed using Reviewer,
 we do not know what exactly it is:

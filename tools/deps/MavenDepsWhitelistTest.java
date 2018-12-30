@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
-
 public class MavenDepsWhitelistTest {
   private Map<String, Map<String, Object>> dependencies;
   private Map<String, List<String>> whitelist;

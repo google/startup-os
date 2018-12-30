@@ -102,7 +102,6 @@ public interface Repo {
    * Gets patch(diff) between file in `firstReferenceCommitOrBranch` and the file in the
    * `secondReferenceCommitOrBranch`. It's possible to use branch name or commit ID. The response
    * can have one and more diff hunks
-
    */
   String getPatch(
       String firstReferenceCommitOrBranch, String secondReferenceCommitOrBranch, String filename);

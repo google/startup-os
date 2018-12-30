@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Inject;
 
-
 public class CiTask implements Task {
   // Firestore's message limit is 1MB, so we don't want to pass that.
   // Protobin gets translated to Base64, which can increase size by roughly 30%.

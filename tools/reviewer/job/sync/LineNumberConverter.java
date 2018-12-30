@@ -88,9 +88,9 @@ public class LineNumberConverter {
   }
 
   @SuppressWarnings({
-          "checkstyle:LeftCurly",
-          "checkstyle:Indentation",
-          "checkstyle:CommentsIndentation"
+    "checkstyle:LeftCurly",
+    "checkstyle:Indentation",
+    "checkstyle:CommentsIndentation"
   })
   private static LineNumberToGithubPositionCorrelation processDiffPatch(
       String patch, int number, Side side, ReturnValueFor valueFor) {

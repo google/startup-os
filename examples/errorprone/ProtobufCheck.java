@@ -37,7 +37,6 @@ import com.google.protobuf.Message;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 
-
 /** Matches on .newBuilder().build() called on proto message class. */
 @AutoService(BugChecker.class)
 @BugPattern(

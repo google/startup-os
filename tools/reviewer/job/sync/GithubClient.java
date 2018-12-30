@@ -48,7 +48,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 
-
 /**
  * Allows sending GitHub API requests and returns responses. It requires a login and a password of
  * GitHub user.

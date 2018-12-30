@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-
 public class ProtoFileAnalyzer {
   private FileUtils fileUtils;
 

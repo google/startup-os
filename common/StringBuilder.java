@@ -42,9 +42,7 @@ public class StringBuilder {
     sb = new java.lang.StringBuilder(str);
   }
 
-  /**
-   * Added methods.
-   */
+  /** Added methods. */
   public StringBuilder appendln() {
     sb = sb.append(System.lineSeparator());
     return this;
@@ -70,9 +68,7 @@ public class StringBuilder {
     return this;
   }
 
-  /**
-   * Original methods.
-   */
+  /** Original methods. */
   public StringBuilder append(boolean b) {
     sb = sb.append(b);
     return this;

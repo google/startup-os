@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import com.google.startupos.tools.reviewer.job.sync.LineNumberConverter;
 import org.junit.Test;
 
-
 public class LineNumberConverterTest {
 
   private static final String COMPLEX_CHANGES_PATCH =

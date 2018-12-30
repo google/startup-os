@@ -36,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Inject;
 import org.apache.commons.lang3.tuple.Pair;
 
-
 public class SubmitterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 

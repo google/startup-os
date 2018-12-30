@@ -37,7 +37,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-
 /** A tool for testing FirestoreProtoClient. */
 @Singleton
 public class FirestoreClientTool {

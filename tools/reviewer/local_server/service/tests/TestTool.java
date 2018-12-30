@@ -31,7 +31,6 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import java.util.concurrent.TimeUnit;
 
-
 /* Test tool for CodeReviewService.
  *
  * Alternatively, to run grpc_polyglot (curl-like tool for gRPC), use:

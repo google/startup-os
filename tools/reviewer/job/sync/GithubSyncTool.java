@@ -30,7 +30,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-
 public class GithubSyncTool {
   // TODO: Add checking input Flags
   @FlagDesc(name = "repo_paths", description = "Git repository paths")

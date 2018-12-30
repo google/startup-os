@@ -116,7 +116,7 @@ java_plugin(
 java_library(
     name = "diff_match_patch",
     srcs = ["DiffMatchPatch.java"],
-    tags = ["checkstyle_ignore"]
+    tags = ["checkstyle_ignore"],
 )
 
 java_binary(
