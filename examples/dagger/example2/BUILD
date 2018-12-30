@@ -25,10 +25,5 @@ java_binary(
     ],
     main_class = "com.google.startupos.examples.dagger.example2.App",
     runtime_deps = [":example2_lib"],
-)
-
-checkstyle_test(
-    name = "example2-checkstyle",
-    allow_failure = 1,
-    target = ":example2",
+    tags = ["checkstyle_ignore"],
 )
