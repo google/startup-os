@@ -29,7 +29,6 @@ java_plugin(
 
 checkstyle_test(
     name = "ProtobufCheckPlugin-checkstyle",
-    allow_failure = 1,
     target = ":ProtobufCheckPlugin",
 )
 
