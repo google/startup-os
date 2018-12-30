@@ -295,6 +295,3 @@ container_pull(
     #tag = "latest",
     digest = "sha256:d27494f6034ff3cd38bd2cde9bfea019f568565d2bb14d2d450a44cd891cf28c",
 )
-
-load("//tools/checkstyle:checkstyle.bzl", "checkstyle_dependencies")
-checkstyle_dependencies()

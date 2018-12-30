@@ -11,7 +11,7 @@ enforce a coding standard.
 ## Integrating with `bazel`
 
 To apply `checkstyle` check to Java code built with `bazel`, 
-a custom rule named `checkstyle_test` has been developed.
+we use the `checkstyle_test` rule.
 
 Example:
 
@@ -57,7 +57,8 @@ independently of check's result.
 can be ignored by assigning `tags = ["checkstyle_ignore"]`
 * Checkstyle test **completeness** (that is, all Java code that _needs_ checking 
 **is** being checked) is enforced via the shell script named `check-for-missing-targets.sh` 
-ran by CI. 
+ran by CI. If you omit **both** `checkstyle_test` target and `checkstyle_ignore` tag, the script
+will exit with non-zero code and print out non-covered targets.
 
 ## Configuring Checkstyle
 
