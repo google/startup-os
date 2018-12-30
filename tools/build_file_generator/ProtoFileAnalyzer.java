@@ -18,14 +18,13 @@ package com.google.startupos.tools.buildfilegenerator;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
-
-import javax.inject.Inject;
+import com.google.startupos.tools.buildfilegenerator.Protos.ProtoFile;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
-import com.google.startupos.tools.buildfilegenerator.Protos.ProtoFile;
 
 public class ProtoFileAnalyzer {
   private FileUtils fileUtils;

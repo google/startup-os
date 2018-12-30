@@ -29,7 +29,6 @@ java_library(
 
 checkstyle_test(
     name = "build_file_generator-checkstyle",
-    allow_failure = 1,
     target = ":build_file_generator",
 )
 
