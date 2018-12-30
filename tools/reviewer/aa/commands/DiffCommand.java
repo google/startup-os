@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.startupos.tools.reviewer.aa.commands;
 
 import com.google.common.collect.ImmutableList;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
@@ -29,18 +28,19 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiff
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class DiffCommand implements AaCommand {
   private final FileUtils fileUtils;
@@ -196,16 +196,17 @@ public class DiffCommand implements AaCommand {
               path -> {
                 GitRepo repo = this.gitRepoFactory.create(path);
                 if (repo.hasChanges(repo.currentBranch())) {
-                  // Example of repoURL: https://github.com/google/startup-os.git
-                  String repoURL = repo.getRemoteURL();
-                  String repoOwner = repoURL.split("/")[3];
-                  String repoName = repoURL.split("/")[4].replace(".git", "").trim();
+                  // Example of repoUrl: https://github.com/google/startup-os.git
+                  String repoUrl = repo.getRemoteURL();
+                  String repoOwner = repoUrl.split("/")[3];
+                  String repoName = repoUrl.split("/")[4].replace(".git", "").trim();
 
                   String folderName = Paths.get(path).getFileName().toString();
                   if (!repoName.equals(folderName)) {
                     System.out.println(
                         String.format(
-                            "Repository name from the URL(%s) and folder name from workspace(%s) aren't the same.",
+                            "Repository name from the URL(%s) and folder "
+                            + "name from workspace(%s) aren't the same.",
                             repoName, folderName));
                   }
 

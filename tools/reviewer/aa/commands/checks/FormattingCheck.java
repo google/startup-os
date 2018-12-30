@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.startupos.tools.reviewer.aa.commands.checks;
 
 import com.google.startupos.tools.formatter.FormatterTool;
