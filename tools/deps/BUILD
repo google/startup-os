@@ -69,6 +69,5 @@ java_test(
 
 checkstyle_test(
     name = "PackageLockWhitelistTest-checkstyle",
-    allow_failure = 1,
     target = ":PackageLockWhitelistTest",
 )
