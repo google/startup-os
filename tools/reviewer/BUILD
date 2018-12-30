@@ -79,6 +79,5 @@ java_test(
 
 checkstyle_test(
     name = "ReviewerConfigTest-checkstyle",
-    allow_failure = 1,
     target = ":ReviewerConfigTest",
 )
