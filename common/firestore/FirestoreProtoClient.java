@@ -55,7 +55,15 @@ public class FirestoreProtoClient {
       InputStream serviceAccount = new FileInputStream(serviceAccountJson);
       GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
       FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(credentials).build();
-      FirebaseApp.initializeApp(options);
+      try {
+        FirebaseApp.initializeApp(options);
+      } catch (IllegalStateException e) {
+        if (e.getMessage().contains("already exists")) {
+          // Firestore is probably already initialized - do nothing
+        } else {
+          throw e;
+        }
+      }
       client = FirestoreClient.getFirestore();
     } catch (IOException e) {
       e.printStackTrace();
@@ -68,7 +76,15 @@ public class FirestoreProtoClient {
             .setCredentials(GoogleCredentials.create(new AccessToken(token, null)))
             .setProjectId(project)
             .build();
-    FirebaseApp.initializeApp(options);
+    try {
+      FirebaseApp.initializeApp(options);
+    } catch (IllegalStateException e) {
+      if (e.getMessage().contains("already exists")) {
+        // Firestore is probably already initialized - do nothing
+      } else {
+        throw e;
+      }
+    }
     client = FirestoreClient.getFirestore();
   }
 

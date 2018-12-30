@@ -145,6 +145,19 @@ java_library(
 )
 
 java_library(
+    name = "netty_tcnative_boringssl_static",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnio/netty/netty_tcnative_boringssl_static",
+    ],
+)
+
+java_library(
     name = "netty_transport",
     licenses = [
         "permissive",
