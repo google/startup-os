@@ -16,37 +16,28 @@
 
 package com.google.startupos.common.firestore.tests;
 
+import com.google.cloud.firestore.WriteResult;
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
+import com.google.startupos.common.firestore.ProtoEventListener;
+import com.google.startupos.common.firestore.ProtoQuerySnapshot;
+import com.google.startupos.common.firestore.ProtoChange;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.startupos.common.repo.GitRepo;
-import java.io.IOException;
-import com.google.startupos.common.firestore.FirestoreProtoClient;
-import java.util.concurrent.Executors;
 import com.google.startupos.tools.localserver.service.AuthService;
-import java.util.Date;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.api.core.ApiFuture;
-import java.util.Map;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.WriteResult;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import java.util.List;
-import java.util.HashMap;
-import com.google.cloud.firestore.EventListener;
-import java.util.concurrent.ExecutionException;
-import com.google.cloud.firestore.DocumentSnapshot;
-import javax.annotation.Nullable;
-import com.google.cloud.firestore.FirestoreException;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
+import dagger.Component;
+import java.io.IOException;
+import java.util.concurrent.Executors;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-/** A tool for testing TextDifferencer. */
+/** A tool for testing FirestoreProtoClient. */
 @Singleton
 public class FirestoreClientTool {
   @FlagDesc(name = "service_account_json", description = "")
@@ -77,25 +68,27 @@ public class FirestoreClientTool {
     WriteResult result = client.setProtoDocument("test/bla", Diff.newBuilder().setId(123).build());
     System.out.println("Update time : " + result.getUpdateTime());
 
-    System.out.println(client.getProtoDocument("reviewer/data/diff/100", Diff.newBuilder()));
-
-    System.out.println(
-        client.getDocumentFromCollection("reviewer/data/diff", Diff.newBuilder(), false));
-
-    DocumentReference docRef = client.getClient().collection("users").document("alovelace");
-    docRef.addSnapshotListener(
-        new EventListener<DocumentSnapshot>() {
+    client.addCollectionListener(
+        "/reviewer/ci/requests",
+        CiRequest.newBuilder(),
+        new ProtoEventListener<ProtoQuerySnapshot<CiRequest>>() {
           @Override
-          public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirestoreException e) {
+          public void onEvent(
+              @Nullable ProtoQuerySnapshot<CiRequest> snapshot, @Nullable RuntimeException e) {
             if (e != null) {
               System.err.println("Listen failed: " + e);
               return;
             }
-
-            if (snapshot != null && snapshot.exists()) {
-              System.out.println("Current data: " + snapshot.getData());
-            } else {
-              System.out.print("Current data: null");
+            ImmutableList<CiRequest> protos = snapshot.getProtos();
+            for (CiRequest ciRequest : protos) {
+              System.out.println(ciRequest);
+            }
+            ImmutableList<ProtoChange<CiRequest>> protoChanges = snapshot.getProtoChanges();
+            for (ProtoChange<CiRequest> protoChange : protoChanges) {
+              System.out.println(protoChange.getProto());
+              System.out.println(protoChange.getType());
+              System.out.println(protoChange.getOldIndex());
+              System.out.println(protoChange.getNewIndex());
             }
           }
         });
