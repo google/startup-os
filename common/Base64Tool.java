@@ -17,15 +17,17 @@
 package com.google.startupos.common;
 
 import com.google.startupos.common.CommonModule;
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import dagger.Component;
+
 import java.io.IOException;
 import java.util.Base64;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** A tool for converting a file to base64. This is useful for encoding secrets in Kubernetes. */
 @Singleton

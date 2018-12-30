@@ -144,6 +144,5 @@ java_binary(
 
 checkstyle_test(
     name = "base64_tool-checkstyle",
-    allow_failure = 1,
     target = ":base64_tool",
 )
