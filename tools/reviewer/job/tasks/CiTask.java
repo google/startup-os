@@ -19,20 +19,20 @@ package com.google.startupos.tools.reviewer.job.tasks;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.CommandLine;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.tools.reviewer.ReviewerConstants;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
-import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.ReviewerConstants;
-
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+
 
 public class CiTask implements Task {
   // Firestore's message limit is 1MB, so we don't want to pass that.

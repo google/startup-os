@@ -107,7 +107,6 @@ java_library(
 
 checkstyle_test(
     name = "ci_task-checkstyle",
-    allow_failure = 1,
     target = ":ci_task",
 )
 
