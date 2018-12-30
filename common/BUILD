@@ -117,12 +117,7 @@ java_plugin(
 java_library(
     name = "diff_match_patch",
     srcs = ["DiffMatchPatch.java"],
-)
-
-checkstyle_test(
-    name = "diff_match_patch-checkstyle",
-    allow_failure = 1,
-    target = ":diff_match_patch",
+    tags = ["checkstyle_ignore"]
 )
 
 java_binary(
