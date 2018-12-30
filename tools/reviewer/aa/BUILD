@@ -54,7 +54,6 @@ java_binary(
 
 checkstyle_test(
     name = "aa_tool-checkstyle",
-    allow_failure = 1,
     target = ":aa_tool",
 )
 

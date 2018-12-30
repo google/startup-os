@@ -16,26 +16,26 @@
 
 package com.google.startupos.tools.reviewer.aa;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.reviewer.aa.commands.AaCommand;
 import com.google.startupos.tools.reviewer.aa.commands.AddRepoCommand;
 import com.google.startupos.tools.reviewer.aa.commands.DiffCommand;
 import com.google.startupos.tools.reviewer.aa.commands.FixCommand;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
+import com.google.startupos.tools.reviewer.aa.commands.KillServerCommand;
 import com.google.startupos.tools.reviewer.aa.commands.PatchCommand;
 import com.google.startupos.tools.reviewer.aa.commands.ReviewCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SnapshotCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SubmitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SyncCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
-import com.google.startupos.tools.reviewer.aa.commands.KillServerCommand;
 import dagger.Component;
 import dagger.Lazy;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import com.google.common.collect.ImmutableList;
 
 /** aa tool. */
 @Singleton
