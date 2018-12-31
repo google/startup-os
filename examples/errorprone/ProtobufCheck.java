@@ -49,13 +49,13 @@ import com.sun.source.tree.MethodInvocationTree;
 public class ProtobufCheck extends BugChecker implements MethodInvocationTreeMatcher {
 
   @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
-  private Matcher<ExpressionTree> NEW_BUILDER =
+  private static Matcher<ExpressionTree> NEW_BUILDER =
       staticMethod()
           .onClass(TypePredicates.isDescendantOf("com.google.protobuf.GeneratedMessageV3"))
           .named("newBuilder");
 
   @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
-  private Matcher<ExpressionTree> BUILDER_BUILD =
+  private static Matcher<ExpressionTree> BUILDER_BUILD =
       instanceMethod().onDescendantOf(Message.Builder.class.getName()).named("build");
 
   @Override

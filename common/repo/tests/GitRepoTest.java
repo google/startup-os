@@ -512,7 +512,6 @@ public class GitRepoTest {
     final String masterCommitId = gitRepo.getHeadCommitId();
 
     repo.switchBranch(TEST_BRANCH);
-    @SuppressWarnings("checkstyle:LineLength")
     String fileContentInTestBranch =
         "line1\n(CHANGED)line2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n(ADDED)line11\n";
     fileUtils.writeStringUnchecked(

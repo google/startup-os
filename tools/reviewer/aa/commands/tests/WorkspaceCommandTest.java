@@ -143,7 +143,6 @@ public class WorkspaceCommandTest {
   }
 
   @Test
-  @SuppressWarnings("checkstyle:LineLength")
   public void forcedWorkspaceCommandTestWithIgnoredNodeModulesFolderAndBaselFolders()
       throws Exception {
     fileUtils.mkdirs("/base/head/startup-os");
@@ -176,7 +175,6 @@ public class WorkspaceCommandTest {
   }
 
   @Test
-  @SuppressWarnings("checkstyle:LineLength")
   public void forcedWorkspaceCommandTestWithIgnoredTwoNodeModulesFolder() throws Exception {
     fileUtils.mkdirs("/base/head/startup-os");
     fileUtils.writeString("aaa", "/base/head/startup-os/file1.txt");
