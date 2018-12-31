@@ -28,3 +28,10 @@ message ProtoFile {
   repeated string services = 6;
   repeated string enums = 7;
 }
+
+message ThirdPartyDep {
+  string target = 1;
+  repeated string java_class = 2;
+}
+
+message ThirdPartyDeps { repeated ThirdPartyDep third_party_dep = 1; }

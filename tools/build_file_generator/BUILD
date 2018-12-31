@@ -17,6 +17,7 @@ java_library(
     srcs = [
         "JavaClassAnalyzer.java",
         "ProtoFileAnalyzer.java",
+        "ThirdPartyDepsAnalyzer.java",
     ],
     deps = [
         "build_file_generator_java_proto",
@@ -52,4 +53,25 @@ checkstyle_test(
     name = "build_file_generator_tool-checkstyle",
     allow_failure = 1,
     target = ":build_file_generator_tool",
+)
+
+java_binary(
+    name = "third_party_deps_tool",
+    srcs = ["ThirdPartyDepsTool.java"],
+    main_class = "com.google.startupos.tools.buildfilegenerator.ThirdPartyDepsTool",
+    deps = [
+        ":build_file_generator",
+        ":build_file_generator_java_proto",
+        "//common",
+        "//common:dagger_with_annotation_processor",
+        "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+checkstyle_test(
+    name = "third_party_deps_tool-checkstyle",
+    allow_failure = 1,
+    target = ":third_party_deps_tool",
 )
