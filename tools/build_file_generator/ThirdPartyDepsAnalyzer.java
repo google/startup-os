@@ -99,8 +99,6 @@ public class ThirdPartyDepsAnalyzer {
     if (workingDirectory == null || workingDirectory.isEmpty()) {
       process = Runtime.getRuntime().exec(command);
     } else {
-      // Executes the specified string command in a separate process with the specified environment
-      // and working directory.
       process = Runtime.getRuntime().exec(command, environment, new File(workingDirectory));
     }
 

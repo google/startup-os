@@ -35,10 +35,12 @@ public class ThirdPartyDepsTool {
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
-    FileUtils fileUtils =
-        DaggerThirdPartyDepsTool_ThirdPartyDepsToolComponent.create().getFileUtils();
-    ThirdPartyDeps thirdPartyDeps = new ThirdPartyDepsAnalyzer(fileUtils).getThirdPartyDeps();
+    ThirdPartyDepsToolComponent component =
+        DaggerThirdPartyDepsTool_ThirdPartyDepsToolComponent.create();
 
+    ThirdPartyDeps thirdPartyDeps = component.getThirdPartyDepsAnalyzer().getThirdPartyDeps();
+
+    FileUtils fileUtils = component.getFileUtils();
     fileUtils.writePrototxtUnchecked(
         thirdPartyDeps, fileUtils.getCurrentWorkingDirectory() + filePath.get());
   }
@@ -47,6 +49,8 @@ public class ThirdPartyDepsTool {
   @Component(modules = CommonModule.class)
   interface ThirdPartyDepsToolComponent {
     FileUtils getFileUtils();
+
+    ThirdPartyDepsAnalyzer getThirdPartyDepsAnalyzer();
   }
 }
 
