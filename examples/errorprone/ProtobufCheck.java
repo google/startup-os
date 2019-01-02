@@ -47,14 +47,10 @@ import com.sun.source.tree.MethodInvocationTree;
     linkType = CUSTOM,
     link = "github.com/google/startup-os/tree/master/examples/errorprone#ProtobufCheck")
 public class ProtobufCheck extends BugChecker implements MethodInvocationTreeMatcher {
-
-  @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private static Matcher<ExpressionTree> NEW_BUILDER =
       staticMethod()
           .onClass(TypePredicates.isDescendantOf("com.google.protobuf.GeneratedMessageV3"))
           .named("newBuilder");
-
-  @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private static Matcher<ExpressionTree> BUILDER_BUILD =
       instanceMethod().onDescendantOf(Message.Builder.class.getName()).named("build");
 

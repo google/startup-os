@@ -93,11 +93,11 @@ public interface Repo {
   String currentBranch();
 
   /** Retrieves the URLs for a remote (e.g. https://github.com/google/startup-os.git). */
-  @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-  String getRemoteURL();
+  String getRemoteUrl();
 
   /** Checks if there are commits added since master, or any uncommitted files. */
   boolean hasChanges(String branch);
+
   /**
    * Gets patch(diff) between file in `firstReferenceCommitOrBranch` and the file in the
    * `secondReferenceCommitOrBranch`. It's possible to use branch name or commit ID. The response

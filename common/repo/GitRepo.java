@@ -447,7 +447,7 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public String getRemoteURL() {
+  public String getRemoteUrl() {
     return runCommand("remote get-url origin").stdout;
   }
 

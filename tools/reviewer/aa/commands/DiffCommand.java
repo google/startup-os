@@ -197,7 +197,7 @@ public class DiffCommand implements AaCommand {
                 GitRepo repo = this.gitRepoFactory.create(path);
                 if (repo.hasChanges(repo.currentBranch())) {
                   // Example of repoUrl: https://github.com/google/startup-os.git
-                  String repoUrl = repo.getRemoteURL();
+                  String repoUrl = repo.getRemoteUrl();
                   String repoOwner = repoUrl.split("/")[3];
                   String repoName = repoUrl.split("/")[4].replace(".git", "").trim();
 

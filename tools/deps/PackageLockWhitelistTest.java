@@ -42,7 +42,6 @@ public class PackageLockWhitelistTest {
   private List<String> packageLockLines;
   private List<Dependency> parsedDependencies;
 
-  @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "checkstyle:MemberName"})
   private static String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
 
   @Before
