@@ -142,6 +142,7 @@ public class WorkspaceCommandTest {
     assertTrue(fileUtils.fileExists("/base/ws/workspace_name/repo_name/file.txt"));
   }
 
+  // TODO(vmax): fix [LineLength] at lines 167, 170
   @Test
   public void forcedWorkspaceCommandTestWithIgnoredNodeModulesFolderAndBaselFolders()
       throws Exception {
@@ -174,6 +175,7 @@ public class WorkspaceCommandTest {
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-testlogs"));
   }
 
+  // TODO(vmax): fix [LineLength] at lines 196, 199
   @Test
   public void forcedWorkspaceCommandTestWithIgnoredTwoNodeModulesFolder() throws Exception {
     fileUtils.mkdirs("/base/head/startup-os");

@@ -35,6 +35,7 @@ public class TestTool {
     this.repoFactory = repoFactory;
   }
 
+  // TODO(vmax): use if-else if statements instead of 'case' with braces
   @SuppressWarnings({"checkstyle:LeftCurly", "checkstyle:Indentation"})
   void run(String[] args) throws Exception {
     if (args.length > 0) {

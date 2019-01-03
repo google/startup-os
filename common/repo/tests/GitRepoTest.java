@@ -503,6 +503,7 @@ public class GitRepoTest {
     assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_BRANCH, TEST_FILE));
   }
 
+  // TODO(vmax): fix [LineLength] at line 517
   @Test
   public void testGetPatchWhenTwoDiffHunks() {
     String fileContentInMaster =
