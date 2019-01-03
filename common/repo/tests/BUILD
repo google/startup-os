@@ -47,6 +47,5 @@ java_test(
 
 checkstyle_test(
     name = "GitRepoTest-checkstyle",
-    allow_failure = 1,
     target = ":GitRepoTest",
 )

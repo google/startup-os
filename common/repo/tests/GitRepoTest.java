@@ -503,7 +503,6 @@ public class GitRepoTest {
     assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_BRANCH, TEST_FILE));
   }
 
-  // TODO(vmax): fix [LineLength] at line 517
   @Test
   public void testGetPatchWhenTwoDiffHunks() {
     String fileContentInMaster =
@@ -514,7 +513,8 @@ public class GitRepoTest {
 
     repo.switchBranch(TEST_BRANCH);
     String fileContentInTestBranch =
-        "line1\n(CHANGED)line2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n(ADDED)line11\n";
+        "line1\n(CHANGED)line2\nline3\nline4\nline5\nline6\n"
+            + "line7\nline8\nline9\nline10\n(ADDED)line11\n";
     fileUtils.writeStringUnchecked(
         fileContentInTestBranch, fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), "commit in the test branch");
