@@ -17,6 +17,7 @@
 package com.google.startupos.tools.buildfilegenerator;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDeps;
 import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDep;
 
 public class ThirdPartyDepsAnalyzer {
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
   private FileUtils fileUtils;
 
   @Inject
@@ -50,15 +52,16 @@ public class ThirdPartyDepsAnalyzer {
                   + String.format(
                       "/bazel-startup-os/external/%s/jar/%s.jar", folderName, folderName));
       String target = getAssociatedTarget(targets, folderName);
-      result.addThirdPartyDep(
-          ThirdPartyDep.newBuilder().setTarget(target).addAllJavaClass(jarClasses).build());
+      if (!target.isEmpty()) {
+        result.addThirdPartyDep(
+            ThirdPartyDep.newBuilder().setTarget(target).addAllJavaClass(jarClasses).build());
+      }
     }
     return result.build();
   }
 
   private List<String> getTargets() throws IOException {
-    return runCommand(
-        "bazel query \'third_party/...\'", new String[0], fileUtils.getCurrentWorkingDirectory());
+    return runCommand("bazel query \'third_party/...\'", fileUtils.getCurrentWorkingDirectory());
   }
 
   private List<String> getThirdPartyFolderNames() throws IOException {
@@ -70,7 +73,7 @@ public class ThirdPartyDepsAnalyzer {
   }
 
   private List<String> getJavaClassesFromJar(String path) throws IOException {
-    return runCommand("jar tf " + path, new String[0], "")
+    return runCommand("jar tf " + path, "")
         .stream()
         .filter(item -> item.endsWith(".class"))
         .filter(item -> !item.contains("$"))
@@ -79,8 +82,7 @@ public class ThirdPartyDepsAnalyzer {
 
   private String getAssociatedTarget(List<String> targets, String thirdPartyFolderName) {
     for (String target : targets) {
-      // we are doing replacing to have the ability to compare third_party folder names with bazel
-      // target
+      // Check if target matches thirdPartyFolderName
       if (target
           .replace("//third_party/maven/", "mvn")
           .replace("/", "_")
@@ -89,17 +91,18 @@ public class ThirdPartyDepsAnalyzer {
         return target;
       }
     }
+    log.atWarning().log("Can't find the associated target for: %s", thirdPartyFolderName);
     return "";
   }
 
-  private List<String> runCommand(String command, String[] environment, String workingDirectory)
+  private ImmutableList<String> runCommand(String command, String workingDirectory)
       throws IOException {
     ImmutableList.Builder<String> result = ImmutableList.builder();
     Process process;
     if (workingDirectory == null || workingDirectory.isEmpty()) {
       process = Runtime.getRuntime().exec(command);
     } else {
-      process = Runtime.getRuntime().exec(command, environment, new File(workingDirectory));
+      process = Runtime.getRuntime().exec(command, new String[0], new File(workingDirectory));
     }
 
     BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -110,7 +113,7 @@ public class ThirdPartyDepsAnalyzer {
 
     BufferedReader stderr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
     while ((line = stderr.readLine()) != null) {
-      System.out.println(line);
+      System.err.println(line);
     }
     return result.build();
   }

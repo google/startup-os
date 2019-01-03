@@ -25,24 +25,32 @@ import dagger.Component;
 
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDeps;
 
+/* A tool for generating prototxt file to know which classes each third_party dependency includes
+ *
+ * Note! Before using this tool, it is necessary to run `./build.sh`
+ * to have all third_party deps in `bazel-startup-os/external` folder
+ *
+ * Usage:
+ * bazel run //tools/build_file_generator:third_party_deps_tool -- --file_path </path/to/file>
+ */
 public class ThirdPartyDepsTool {
-  @FlagDesc(name = "file_path", description = "Path to file")
-  private static Flag<String> filePath =
-      Flag.create("/tools/build_file_generator/third_party_deps.prototxt");
+  @FlagDesc(name = "file_path", description = "Absolute path to file")
+  private static Flag<String> filePath = Flag.create("");
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
+    checkInputFlags();
+
     ThirdPartyDepsToolComponent component =
         DaggerThirdPartyDepsTool_ThirdPartyDepsToolComponent.create();
 
     ThirdPartyDeps thirdPartyDeps = component.getThirdPartyDepsAnalyzer().getThirdPartyDeps();
 
-    FileUtils fileUtils = component.getFileUtils();
-    fileUtils.writePrototxtUnchecked(
-        thirdPartyDeps, fileUtils.getCurrentWorkingDirectory() + filePath.get());
+    component.getFileUtils().writePrototxtUnchecked(thirdPartyDeps, filePath.get());
   }
 
   @Singleton
@@ -51,6 +59,16 @@ public class ThirdPartyDepsTool {
     FileUtils getFileUtils();
 
     ThirdPartyDepsAnalyzer getThirdPartyDepsAnalyzer();
+  }
+
+  private static void checkInputFlags() {
+    if (filePath.get().isEmpty()) {
+      throw new IllegalArgumentException(
+          "`file_path` flag should contain absolute path to file, but is empty");
+    } else if (!Paths.get(filePath.get()).isAbsolute()) {
+      throw new IllegalArgumentException(
+          "`file_path` flag should contain absolute path to file, but: " + filePath.get());
+    }
   }
 }
 

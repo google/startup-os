@@ -23,6 +23,7 @@ java_library(
         "build_file_generator_java_proto",
         "//common",
         "//common:dagger_with_annotation_processor",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
     ],
