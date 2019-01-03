@@ -31,6 +31,5 @@ java_binary(
 
 checkstyle_test(
     name = "person_tool-checkstyle",
-    allow_failure = 1,
     target = ":person_tool",
 )

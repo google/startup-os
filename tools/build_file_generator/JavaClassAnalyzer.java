@@ -16,15 +16,13 @@
 
 package com.google.startupos.tools.buildfilegenerator;
 
+import com.google.startupos.common.FileUtils;
+import com.google.startupos.tools.buildfilegenerator.Protos.Import;
+import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.google.startupos.common.FileUtils;
-import com.google.startupos.tools.buildfilegenerator.Protos.Import;
-import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
-
 import javax.inject.Inject;
 
 public class JavaClassAnalyzer {

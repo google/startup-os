@@ -35,6 +35,5 @@ java_library(
 
 checkstyle_test(
     name = "firestore-checkstyle",
-    allow_failure = 1,
     target = ":firestore",
 )

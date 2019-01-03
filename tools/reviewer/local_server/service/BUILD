@@ -42,7 +42,6 @@ java_library(
 
 checkstyle_test(
     name = "auth_service-checkstyle",
-    allow_failure = 1,
     target = ":auth_service",
 )
 
@@ -100,6 +99,5 @@ java_library(
 
 checkstyle_test(
     name = "code_review_service-checkstyle",
-    allow_failure = 1,
     target = ":code_review_service",
 )

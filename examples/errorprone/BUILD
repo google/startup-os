@@ -12,7 +12,6 @@ java_plugin(
 
 checkstyle_test(
     name = "StringFmtInPrintMethodsCheckPlugin-checkstyle",
-    allow_failure = 1,
     target = ":StringFmtInPrintMethodsCheckPlugin",
 )
 
@@ -29,7 +28,6 @@ java_plugin(
 
 checkstyle_test(
     name = "ProtobufCheckPlugin-checkstyle",
-    allow_failure = 1,
     target = ":ProtobufCheckPlugin",
 )
 
@@ -46,6 +44,5 @@ java_binary(
 
 checkstyle_test(
     name = "Hello-checkstyle",
-    allow_failure = 1,
     target = ":Hello",
 )

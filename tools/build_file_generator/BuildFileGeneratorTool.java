@@ -21,13 +21,10 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-
-import dagger.Component;
-
-import javax.inject.Singleton;
-import java.io.IOException;
-
 import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
+import dagger.Component;
+import java.io.IOException;
+import javax.inject.Singleton;
 
 public class BuildFileGeneratorTool {
   @FlagDesc(name = "file_path", description = "Path to file")

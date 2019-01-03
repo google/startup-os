@@ -16,8 +16,8 @@
 
 package com.google.startupos.examples.dagger.example2;
 
-import dagger.Module;
 import dagger.Binds;
+import dagger.Module;
 
 @Module(includes = Class1Module.class)
 abstract class Class2Module {
