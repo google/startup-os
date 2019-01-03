@@ -143,7 +143,6 @@ public final class MessageDifferencer {
     return new Builder();
   }
 
-  // TODO(vmax): conflict between tools/fix_formatting.sh and checkstyle
   /** Builder object for {@link MessageDifferencer}. */
   public static final class Builder {
     private final Set<FieldDescriptor> setFields = Sets.newHashSet();
@@ -548,7 +547,6 @@ public final class MessageDifferencer {
    * unknown fields.
    */
   public interface FieldComparator {
-    // TODO(vmax): conflict between tools/fix_formatting.sh and checkstyle
     /** Comparison result for {@link FieldComparator#compare}. */
     public enum ComparisonResult {
       /**
@@ -624,7 +622,6 @@ public final class MessageDifferencer {
         ImmutableList<SpecificField> fieldPath);
   }
 
-  // TODO(vmax): conflicts between tools/fix_formatting.sh and checkstyle
   /** The type of the reported difference. */
   public enum ReportType {
     /** A field has been added to {@code message2}. */
@@ -686,7 +683,6 @@ public final class MessageDifferencer {
     /** Floats and doubles are compared exactly. */
     EXACT,
 
-    // TODO(vmax): conflict between tools/fix_formatting.sh and checkstyle
     /** Floats and doubles are compared using an equivalent of C++ {@code MathUtil::AlmostEqual}. */
     APPROXIMATE
   }
@@ -699,7 +695,6 @@ public final class MessageDifferencer {
      * elements are reported using {@link ReportType#ADDED} or {@link ReportType#DELETED}.
      */
     AS_LIST,
-    // TODO(vmax): conflict between tools/fix_formatting.sh and checkstyle
     /** Treat all the repeated fields as sets by default. See {@link Builder#treatAsSet}. */
     AS_SET
   }
@@ -1346,7 +1341,6 @@ public final class MessageDifferencer {
     private final Appendable output;
     private final boolean reportModifiedAggregates;
 
-    // TODO(vmax): conflict between tools/fix_formatting.sh and checkstyle
     /** Equivalent to {@code new StreamReporter(output, false)}. */
     public StreamReporter(Appendable output) {
       this(output, false);
