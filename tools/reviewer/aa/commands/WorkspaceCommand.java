@@ -21,21 +21,20 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.aa.Protos.Config;
-
-import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import javax.inject.Inject;
 
 /**
  * This command is used to switch between workspaces and create new ones.
  *
- * <p>Usage: To switch to a workspace: aa workspace <workspace name>
+ * <p>Usage: To switch to a workspace: aa workspace [workspace name]
  *
- * <p>To create and then switch to a workspace: aa workspace -f <workspace name>
+ * <p>To create and then switch to a workspace: aa workspace -f [workspace name]
  *
- * <p>To remove workspace (should exist and not be active): aa workspace -r <workspace name>
+ * <p>To remove workspace (should exist and not be active): aa workspace -r [workspace name>]
  */
 // TODO: If there's only one repo in the workspace, cd should enter into it.
 // TODO: If there's multiple repos in the workspace, and I'm currently in a repo in a workspace,

@@ -18,16 +18,16 @@ package com.google.startupos.common;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/** Http utils */
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+/** Http utils. */
 // TODO: Convert existing HTTP code to use this class
 @Singleton
 public class HttpUtils {

@@ -22,6 +22,5 @@ java_test(
 
 checkstyle_test(
     name = "FlagsTest-checkstyle",
-    allow_failure = 1,
     target = ":FlagsTest",
 )

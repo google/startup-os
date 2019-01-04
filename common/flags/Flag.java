@@ -16,11 +16,11 @@
 
 package com.google.startupos.common.flags;
 
-import javax.annotation.Nonnull;
 import com.google.common.flogger.FluentLogger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /** Flag class, with implementations for various flag types. */
 public abstract class Flag<T> {

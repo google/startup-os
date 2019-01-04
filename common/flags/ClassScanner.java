@@ -30,15 +30,15 @@ import java.lang.reflect.Type;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
-import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 
 /**

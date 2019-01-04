@@ -17,17 +17,17 @@
 package com.google.startupos.tools.reviewer.job.sync;
 
 import com.google.common.flogger.FluentLogger;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 
 import java.util.List;
 
@@ -63,7 +63,8 @@ public class ReviewerClient {
 
     log.atInfo().log(
         "Diff with id *%s* is updated. "
-            + "Added the number *%s* of GitHub Pull Request to Reviewer GithubPr(owner: %s, repo: %s)",
+            + "Added the number *%s* of GitHub Pull Request "
+            + "to Reviewer GithubPr(owner: %s, repo: %s)",
         diffId, githubPullRequestNumber, owner, repo);
   }
 
@@ -112,7 +113,8 @@ public class ReviewerClient {
 
     log.atInfo().log(
         "Diff with id *%s* is updated. "
-            + "Updated Reviewer code comment(thread_id: %s, comment_id: %s, github_comment_id: %s). New content: %s",
+            + "Updated Reviewer code comment"
+            + "(thread_id: %s, comment_id: %s, github_comment_id: %s). New content: %s",
         diffId, reviewerThreadId, reviewerCommentId, githubReviewCommentId, content);
   }
 
@@ -142,7 +144,8 @@ public class ReviewerClient {
 
     log.atInfo().log(
         "Diff with id *%s* is updated. "
-            + "Deleted Reviewer thread comment(thread_id: %s, comment_id: %s, github_comment_id: %s)",
+            + "Deleted Reviewer thread comment"
+            + "(thread_id: %s, comment_id: %s, github_comment_id: %s)",
         diffId, reviewerThreadId, reviewerCommentId, githubReviewCommentId);
   }
 
@@ -177,7 +180,8 @@ public class ReviewerClient {
 
     log.atInfo().log(
         "Diff with id *%s* is updated. "
-            + "Updated Reviewer diff comment(thread_id: %s, comment_id: %s, github_comment_id: %s). New content: %s",
+            + "Updated Reviewer diff comment"
+            + "(thread_id: %s, comment_id: %s, github_comment_id: %s). New content: %s",
         diffId, reviewerThreadId, reviewerCommentId, githubIssueCommentId, content);
   }
 

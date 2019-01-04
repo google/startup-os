@@ -16,6 +16,8 @@
 
 package com.google.startupos.common;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
@@ -49,9 +51,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-/** File utils */
+/** File utils. */
 // TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
 @Singleton
 public class FileUtils {
@@ -164,17 +164,17 @@ public class FileUtils {
     }
   }
 
-  /** Joins to an absolute paths */
+  /** Joins to an absolute paths. */
   public String joinToAbsolutePath(String first, String... more) {
     return fileSystem.getPath(first, more).toAbsolutePath().toString();
   }
 
-  /** Joins paths */
+  /** Joins paths. */
   public String joinPaths(String first, String... more) {
     return fileSystem.getPath(first, more).toString();
   }
 
-  /** Get the current working directory */
+  /** Get the current working directory. */
   public String getCurrentWorkingDirectory() {
     if (System.getenv("BUILD_WORKSPACE_DIRECTORY") != null) {
       return System.getenv("BUILD_WORKSPACE_DIRECTORY");
@@ -183,7 +183,7 @@ public class FileUtils {
     }
   }
 
-  /** Get the current working directory */
+  /** Get the current working directory. */
   public String getCurrentWorkingDirectoryName() {
     return fileSystem.getPath("").toAbsolutePath().getFileName().toString();
   }
@@ -212,7 +212,7 @@ public class FileUtils {
 
   /**
    * Gets file and folder absolute paths recursively. Throws NoSuchFileException if directory
-   * doesn't exist
+   * doesn't exist.
    */
   public ImmutableList<String> listContentsRecursively(String path) throws IOException {
     try (Stream<Path> paths =

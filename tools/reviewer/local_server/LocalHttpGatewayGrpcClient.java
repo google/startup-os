@@ -16,17 +16,17 @@
 
 package com.google.startupos.tools.localserver;
 
+import com.google.startupos.tools.localserver.service.AuthServiceGrpc;
+import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
-import java.util.concurrent.TimeUnit;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
-import com.google.startupos.tools.localserver.service.AuthServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import java.util.concurrent.TimeUnit;
 
 public class LocalHttpGatewayGrpcClient {
 

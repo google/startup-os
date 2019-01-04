@@ -32,7 +32,6 @@ java_library(
 
 checkstyle_test(
     name = "reviewer_constants-checkstyle",
-    allow_failure = 1,
     target = ":reviewer_constants",
 )
 
@@ -56,7 +55,6 @@ java_test(
 
 checkstyle_test(
     name = "GlobalRegistryTest-checkstyle",
-    allow_failure = 1,
     target = ":GlobalRegistryTest",
 )
 
@@ -80,6 +78,5 @@ java_test(
 
 checkstyle_test(
     name = "ReviewerConfigTest-checkstyle",
-    allow_failure = 1,
     target = ":ReviewerConfigTest",
 )

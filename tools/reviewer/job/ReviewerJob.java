@@ -16,30 +16,28 @@
 
 package com.google.startupos.tools.reviewer.job;
 
+import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.localserver.LocalHttpGateway;
 import com.google.startupos.tools.localserver.LocalServer;
 import com.google.startupos.tools.localserver.LocalServer.HeadUpdater;
 import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
-import com.google.startupos.tools.reviewer.job.tasks.TaskExecutor;
-import com.google.startupos.common.CommonModule;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
-import com.google.startupos.common.flags.Flags;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
-import dagger.Component;
-import dagger.BindsInstance;
-
-import com.google.startupos.tools.reviewer.job.tasks.ReviewerMetadataUpdaterTask;
 import com.google.startupos.tools.reviewer.job.tasks.CiTask;
+import com.google.startupos.tools.reviewer.job.tasks.ReviewerMetadataUpdaterTask;
 import com.google.startupos.tools.reviewer.job.tasks.SubmitterTask;
-import com.google.common.collect.ImmutableList;
-import com.google.startupos.common.firestore.FirestoreProtoClient;
-
+import com.google.startupos.tools.reviewer.job.tasks.TaskExecutor;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
+import dagger.BindsInstance;
+import dagger.Component;
+import dagger.Lazy;
+import java.util.Timer;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Timer;
-import dagger.Lazy;
 
 // To run on server:
 // bazel run //tools/reviewer/job -- \
@@ -56,7 +54,8 @@ import dagger.Lazy;
  * Wants to run immediately after overlapping run ends
  * Wants to run some time after previous run ended
  * We don't have to implement that now, but those are the main scenarios I think we'll encounter.
- * It would be nice it the task would choose the strategy and parameters, and some common code would take care of it.
+ * It would be nice it the task would choose the strategy and parameters,
+ * and some common code would take care of it.
  */
 @Singleton
 public class ReviewerJob {

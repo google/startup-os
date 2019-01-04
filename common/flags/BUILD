@@ -24,7 +24,6 @@ java_library(
 
 checkstyle_test(
     name = "flags-checkstyle",
-    allow_failure = 1,
     target = ":flags",
 )
 

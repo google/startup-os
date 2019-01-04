@@ -21,15 +21,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
+import com.google.startupos.common.firestore.ProtoChange;
 import com.google.startupos.common.firestore.ProtoEventListener;
 import com.google.startupos.common.firestore.ProtoQuerySnapshot;
-import com.google.startupos.common.firestore.ProtoChange;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.localserver.service.AuthService;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import dagger.Component;
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -60,7 +60,7 @@ public class FirestoreClientTool {
     Executors.newSingleThreadExecutor().execute(() -> testFunctionality());
     try {
       Thread.sleep(100000000);
-    } catch (Exception e) {
+    } catch (Exception ignored) {
     }
   }
 

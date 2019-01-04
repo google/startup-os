@@ -13,7 +13,6 @@ java_library(
 
 checkstyle_test(
     name = "example2_lib-checkstyle",
-    allow_failure = 1,
     target = ":example2_lib",
 )
 
@@ -24,11 +23,6 @@ java_binary(
         "-Xmx128m",
     ],
     main_class = "com.google.startupos.examples.dagger.example2.App",
+    tags = ["checkstyle_ignore"],
     runtime_deps = [":example2_lib"],
-)
-
-checkstyle_test(
-    name = "example2-checkstyle",
-    allow_failure = 1,
-    target = ":example2",
 )

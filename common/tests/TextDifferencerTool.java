@@ -17,17 +17,17 @@
 package com.google.startupos.common.tests;
 
 import com.google.startupos.common.CommonModule;
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.Protos.TextDiff;
+import com.google.startupos.common.TextDifferencer;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
-import com.google.startupos.common.TextDifferencer;
+import dagger.Component;
 import java.io.IOException;
-import com.google.startupos.common.Protos.TextDiff;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** A tool for testing TextDifferencer. */
 @Singleton
