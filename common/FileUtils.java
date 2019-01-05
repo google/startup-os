@@ -424,6 +424,8 @@ public class FileUtils {
   }
 
   /** Writes a proto to zip archive. */
+  // TODO: Think over how to instead of writing the file to disk and then copying, and then
+  // deleting, write it once, directly to the Zip filesystem
   public void writePrototxtToZip(Message proto, String zipFilePath, String pathInsideZip)
       throws IOException {
     String fileContent = TextFormat.printToUnicodeString(proto);
