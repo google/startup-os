@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { MouseService } from '@/core/services';
+import { DocumentEventService } from '@/core/services';
 import { CommitInfo } from './commit-popup';
 
 // DragElement is an orange circle (or square), which can be dragged and dropped by user
@@ -53,13 +53,13 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
   @Input() commitIdList: string[];
   @Output() changeCommitIdEmitter = new EventEmitter();
 
-  constructor(private mouseService: MouseService) { }
+  constructor(private documentEventService: DocumentEventService) { }
 
   ngOnInit() {
     this.initDragElements();
 
     // When user releases left mouse button
-    this.mouseupSubscription = this.mouseService.mouseup.subscribe(() => {
+    this.mouseupSubscription = this.documentEventService.mouseup.subscribe(() => {
       this.destroyMouseMoveEventHandler();
 
       // If drag element changed its point, then change commit id of page

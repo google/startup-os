@@ -4,12 +4,24 @@ $font-size: 15px;
 $border-width: 2px;
 $border: $border-width solid #979797;
 
+.expand-button {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  background: #ebebeb;
+  border-bottom: 1px solid #d8d8d8;
+  button {
+    margin: 0 10px;
+    user-select: none;
+  }
+}
 table {
   border-top: $border;
   border-right: $border;
   border-bottom: $border;
   tr {
     >.line-number {
+      min-width: 8px;
       background: #ebebeb;
       border-left: $border;
       border-right: $border;
@@ -73,4 +85,9 @@ table {
       }
     }
   }
+}
+.overflow {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }

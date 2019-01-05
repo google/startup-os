@@ -53,7 +53,6 @@
     "prefer-for-of": false,
     "no-conditional-assignment": true,
     "no-duplicate-variable": true,
-    "no-for-in-array": true,
     "no-floating-promises": false,
     "no-invalid-template-strings": true,
     "no-misused-new": true,

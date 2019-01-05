@@ -5,11 +5,8 @@ import {
   BlockIndex,
   BlockLine,
   ChangesLine,
+  Dictionary,
 } from '../code-changes.interface';
-
-export interface Dictionary {
-  [id: number]: number;
-}
 
 // Constructors of line interfaces
 @Injectable()

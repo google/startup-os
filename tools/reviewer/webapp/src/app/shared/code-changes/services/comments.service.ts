@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
+import { randstr64 } from 'rndmjs';
 
-import { Thread } from '@/core/proto';
+import { BranchInfo, Comment, File, Thread } from '@/core/proto';
 import {
   BlockIndex,
   BlockLine,
   ChangesLine,
+  Dictionary,
 } from '../code-changes.interface';
-import { Dictionary } from './line.service';
 
 // Functions related to comments
 @Injectable()
@@ -72,5 +73,24 @@ export class CommentsService {
     openThreadsMap: Dictionary[],
   ): void {
     delete openThreadsMap[blockIndex][lineNumber];
+  }
+
+  createNewThread(
+    lineNumber: number,
+    comments: Comment[],
+    file: File,
+    branchInfo: BranchInfo,
+  ): Thread {
+    const newThread: Thread = new Thread();
+    newThread.setLineNumber(lineNumber);
+    newThread.setIsDone(false);
+    newThread.setCommentList(comments);
+    newThread.setRepoId(branchInfo.getRepoId());
+    newThread.setCommitId(file.getCommitId());
+    newThread.setFile(file);
+    newThread.setType(Thread.Type.CODE);
+    newThread.setId(randstr64(6));
+
+    return newThread;
   }
 }

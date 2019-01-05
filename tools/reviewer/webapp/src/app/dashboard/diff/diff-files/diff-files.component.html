@@ -20,15 +20,15 @@
   </div>
 
   <!-- Collapsed files -->
-  <ng-container *ngIf="!isExpanded || isCodeLoading">
+  <ng-container *ngIf="!isExpanded || !changes">
     <a class="file" [routerLink]="file.getFilenameWithRepo()" *ngFor="let file of files">
       {{ file.getFilenameWithRepo() }}
     </a>
   </ng-container>
   
   <!-- Expanded files -->
-  <ng-container *ngIf="isExpanded && !isCodeLoading">
-    <ng-container *ngFor="let change of changes">
+  <ng-container *ngIf="isExpanded && changes">
+    <ng-container *ngFor="let change of changes; let changesIndex = index">
       <a class="file" [routerLink]="change.leftFile.getFilenameWithRepo()">
         {{ change.leftFile.getFilenameWithRepo() }}
       </a>
@@ -39,6 +39,9 @@
         [threads]="change.localThreads"
         [leftFile]="change.leftFile"
         [rightFile]="change.rightFile"
+        [isShared]="true"
+        [sections]="sectionsList[changesIndex]"
+        (sectionsEmitter)="saveSections($event, changesIndex)"
       ></code-changes>
     </ng-container>
   </ng-container>

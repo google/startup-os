@@ -26,7 +26,12 @@
             </span></user-popup>
 
             <!-- Add Reviewer button -->
-            <add-user-popup class="add-button" (returnEmailEmitter)="addReviewer($event)"><img
+            <add-user-popup
+              class="add-button"
+              placeholder="Email"
+              validCheck="true"
+              (returnEmailEmitter)="addReviewer($event)"
+            ><img
               src="/assets/ic-add-person.svg"
               draggable="false"
             ></add-user-popup>
@@ -47,7 +52,12 @@
             ><span>{{ userService.getUsername(email) }}</span></user-popup>
 
             <!-- Add CC button -->
-            <add-user-popup class="add-button" (returnEmailEmitter)="addCC($event)"><img
+            <add-user-popup
+              class="add-button"
+              placeholder="Email"
+              validCheck="true"
+              (returnEmailEmitter)="addCC($event)"
+            ><img
               src="/assets/ic-add-person.svg"
               draggable="false"
             ></add-user-popup>
@@ -68,10 +78,14 @@
             ><a [href]="issue">{{ getIssueNumber(issue) }}</a></user-popup>
             
             <!-- Add Issue button -->
-            <add-issue-popup class="add-button" (returnEmailEmitter)="addIssue($event)"><img
+            <add-user-popup
+              class="add-button"
+              placeholder="URL to Github issue"
+              (returnEmailEmitter)="addIssue($event)"
+            ><img
               src="/assets/ic-add-issue.svg"
               draggable="false"
-            ></add-issue-popup>
+            ></add-user-popup>
           </div>
         </td>
       </tr>

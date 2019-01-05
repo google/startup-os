@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Diff, File, TextDiff, Thread } from '@/core/proto';
+import { Diff, File, Thread } from '@/core/proto';
 import { TextDiffReturn, TextDiffService } from '@/core/services';
+import { Section } from '@/shared/code-changes';
 
 // The component implements UI of file list of the diff
 // How it looks: https://i.imgur.com/8vZfGTc.jpg
@@ -11,26 +12,44 @@ import { TextDiffReturn, TextDiffService } from '@/core/services';
   templateUrl: './diff-files.component.html',
   styleUrls: ['./diff-files.component.scss'],
 })
-export class DiffFilesComponent {
-  textDiff: TextDiff;
-  language: string;
+export class DiffFilesComponent implements OnChanges {
   threads: Thread[];
   isExpanded: boolean = false;
   isCodeLoading: boolean = false;
   changes: TextDiffReturn[];
+  // Sections for each file
+  sectionsList: Section[][] = [];
 
   @Input() diff: Diff;
   @Input() files: File[];
-  @Input() diffId: number;
 
   constructor(private textDiffService: TextDiffService) { }
 
+  ngOnChanges(ngChanges: SimpleChanges) {
+    if (this.changes && ngChanges.diff) {
+      this.checkExpand();
+    }
+  }
+
+  // Expands or collapses all files
   toggleExpand(): void {
     if (this.isCodeLoading) {
       return;
     }
 
     this.isExpanded = !this.isExpanded;
+    if (!this.isExpanded) {
+      this.sectionsList = [];
+    }
+    this.checkExpand();
+  }
+
+  saveSections(sections: Section[], changesIndex: number): void {
+    this.sectionsList[changesIndex] = sections;
+  }
+
+  // Start changes loading, if files are expanded
+  private checkExpand(): void {
     if (this.isExpanded) {
       this.isCodeLoading = true;
       this.loadChanges().subscribe(() => {
@@ -39,6 +58,7 @@ export class DiffFilesComponent {
     }
   }
 
+  // Loads TextDiffReturn from firebase
   private loadChanges(): Observable<void> {
     return new Observable(observer => {
       const subscribers = [];
