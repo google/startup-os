@@ -20,16 +20,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 
-import javax.inject.Inject;
+import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDep;
+import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDeps;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDeps;
-import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDep;
+import javax.inject.Inject;
 
 public class ThirdPartyDepsAnalyzer {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();

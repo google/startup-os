@@ -20,8 +20,8 @@ import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import dagger.Component;
 
-import javax.inject.Singleton;
 import java.io.IOException;
+import javax.inject.Singleton;
 
 /* A tool for generating the zip-archive with prototxt file inside
  * to know which classes each third_party dependency includes.

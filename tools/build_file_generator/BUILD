@@ -122,6 +122,5 @@ java_binary(
 
 checkstyle_test(
     name = "third_party_deps_tool-checkstyle",
-    allow_failure = 1,
     target = ":third_party_deps_tool",
 )
