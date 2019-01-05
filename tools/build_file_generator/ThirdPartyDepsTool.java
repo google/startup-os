@@ -31,19 +31,19 @@ import java.io.IOException;
  * bazel run //tools/build_file_generator:third_party_deps_tool
  */
 public class ThirdPartyDepsTool {
+
+  private static final String PATH_TO_ZIP = "tools/build_file_generator/third_party_deps.zip";
+  private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
+
   public static void main(String[] args) throws IOException {
     ThirdPartyDepsToolComponent component =
         DaggerThirdPartyDepsTool_ThirdPartyDepsToolComponent.create();
 
     FileUtils fileUtils = component.getFileUtils();
-    component
-        .getFileUtils()
-        .writePrototxtToZip(
-            component.getThirdPartyDepsAnalyzer().getThirdPartyDeps(),
-            fileUtils.joinPaths(
-                fileUtils.getCurrentWorkingDirectory(),
-                "tools/build_file_generator/third_party_deps.zip"),
-            "third_party_deps.prototxt");
+    fileUtils.writePrototxtToZip(
+        component.getThirdPartyDepsAnalyzer().getThirdPartyDeps(),
+        fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), PATH_TO_ZIP),
+        PROTOTXT_FILENAME_INSIDE_ZIP);
   }
 
   @Singleton

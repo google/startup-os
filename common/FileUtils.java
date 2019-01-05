@@ -424,7 +424,7 @@ public class FileUtils {
   }
 
   /** Writes a proto to zip archive. */
-  public void writePrototxtToZip(Message proto, String absPathToZip, String prototxtFileName)
+  public void writePrototxtToZip(Message proto, String zipFilePath, String pathInsideZip)
       throws IOException {
     String fileContent = TextFormat.printToUnicodeString(proto);
     File tempPrototxt = File.createTempFile("temp_prototxt", ".prototxt");
@@ -435,11 +435,11 @@ public class FileUtils {
     Map<String, String> env = new HashMap<>();
     env.put("create", "true");
 
-    URI uri = URI.create(String.format("jar:file:%s", joinPaths(absPathToZip)));
+    URI uri = URI.create(String.format("jar:file:%s", joinPaths(zipFilePath)));
     try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
       Files.copy(
           fileSystem.getPath(expandHomeDirectory(tempPrototxt.getPath())),
-          zipfs.getPath(prototxtFileName),
+          zipfs.getPath(pathInsideZip),
           StandardCopyOption.REPLACE_EXISTING);
     } finally {
       tempPrototxt.deleteOnExit();
