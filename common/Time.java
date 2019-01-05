@@ -30,7 +30,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-/** Time utils */
+/** Time utils. */
 // TODO: Consider using JODA time and maybe simplifying some methods.
 public class Time {
 

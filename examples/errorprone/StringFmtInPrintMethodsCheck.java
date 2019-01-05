@@ -60,11 +60,10 @@ import java.util.Objects;
         "github.com/google/startup-os/tree/master/examples/errorprone#StringFmtInPrintMethodsCheck")
 public class StringFmtInPrintMethodsCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
-
-  private Matcher<ExpressionTree> PRINT_METHOD =
+  private static Matcher<ExpressionTree> PRINT_METHOD =
       instanceMethod().onDescendantOf(PrintStream.class.getName()).named("print");
 
-  private Matcher<ExpressionTree> STRING_FORMAT =
+  private static Matcher<ExpressionTree> STRING_FORMAT =
       staticMethod().onClass(String.class.getName()).named("format");
 
   @Override

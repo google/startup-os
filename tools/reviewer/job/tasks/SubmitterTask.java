@@ -18,25 +18,23 @@ package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.firestore.MessageWithId;
+import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
-import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.tasks.Task;
-import com.google.startupos.common.firestore.FirestoreProtoClient;
-
-import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import org.apache.commons.lang3.tuple.Pair;
-
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.inject.Inject;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class SubmitterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();

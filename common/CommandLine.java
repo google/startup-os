@@ -17,15 +17,15 @@
 package com.google.startupos.common;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.File;
 import java.util.Arrays;
 
-/** Class allowing to interact with system utils such as `bash` */
+/** Class allowing to interact with system utils such as `bash`. */
 public class CommandLine {
-  /** Result of command execution */
+  /** Result of command execution. */
   public static class CommandResult {
     public String command;
     public String stdout;
@@ -34,11 +34,11 @@ public class CommandLine {
   }
 
   /**
-   * Consumes lines from input stream; returns result as String
+   * Consumes lines from input stream; returns result as String.
    *
    * @param inputStream stream to consume lines from
    * @return String containing lines from stream
-   * @throws IOException
+   * @throws IOException I/O error with inputStream
    */
   private static String readLines(InputStream inputStream) throws IOException {
     StringBuffer output = new StringBuffer();
@@ -52,7 +52,7 @@ public class CommandLine {
   }
 
   /**
-   * Consumes stdout, stderr and exit code of command execution
+   * Consumes stdout, stderr and exit code of command execution.
    *
    * @param command command to run
    * @return command execution result

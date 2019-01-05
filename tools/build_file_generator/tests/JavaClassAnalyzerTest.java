@@ -16,21 +16,19 @@
 
 package com.google.startupos.tools.buildfilegenerator.tests;
 
+import static org.junit.Assert.assertEquals;
+
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.buildfilegenerator.JavaClassAnalyzer;
-import dagger.Component;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
 import com.google.startupos.tools.buildfilegenerator.Protos.Import;
-
-import javax.inject.Singleton;
+import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
+import dagger.Component;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import static org.junit.Assert.assertEquals;
+import javax.inject.Singleton;
+import org.junit.Before;
+import org.junit.Test;
 
 public class JavaClassAnalyzerTest {
   private FileUtils fileUtils;

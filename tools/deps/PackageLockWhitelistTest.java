@@ -42,7 +42,7 @@ public class PackageLockWhitelistTest {
   private List<String> packageLockLines;
   private List<Dependency> parsedDependencies;
 
-  private String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
+  private static String MAVEN_CENTRAL_URL = "https://repo.maven.apache.org/maven2/";
 
   @Before
   public void setUp() throws Exception {

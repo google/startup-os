@@ -23,9 +23,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.Strings;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.Strings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -447,7 +447,7 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public String getRemoteURL() {
+  public String getRemoteUrl() {
     return runCommand("remote get-url origin").stdout;
   }
 

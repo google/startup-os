@@ -16,6 +16,10 @@
 
 package com.google.startupos.tools.reviewer.job.sync;
 
+import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
+import static java.net.HttpURLConnection.HTTP_OK;
+
 import com.google.protobuf.util.JsonFormat;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.CommitResponse;
@@ -33,21 +37,16 @@ import com.google.startupos.tools.reviewer.job.sync.GithubProtos.EditIssueCommen
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.EditReviewCommentRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.IssueCommentsResponse;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
-import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestResponse;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestCommentsResponse;
-
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestRequest;
+import com.google.startupos.tools.reviewer.job.sync.GithubProtos.PullRequestResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
-
-import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
-import static java.net.HttpURLConnection.HTTP_CREATED;
-import static java.net.HttpURLConnection.HTTP_OK;
 
 /**
  * Allows sending GitHub API requests and returns responses. It requires a login and a password of

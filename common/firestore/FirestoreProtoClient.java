@@ -124,6 +124,17 @@ public class FirestoreProtoClient {
     return collectionRef;
   }
 
+  public CollectionReference getCollectionReference(String path) {
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
+    String[] parts = path.split("/");
+    if (parts.length % 2 != 1) {
+      throw new IllegalArgumentException("Path length should be odd but is " + parts.length);
+    }
+    return getCollectionReference(parts, parts.length);
+  }
+
   public DocumentReference getDocumentReference(String path) {
     if (path.startsWith("/")) {
       path = path.substring(1);
@@ -232,17 +243,6 @@ public class FirestoreProtoClient {
     } catch (ExecutionException | InterruptedException e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  public CollectionReference getCollectionReference(String path) {
-    if (path.startsWith("/")) {
-      path = path.substring(1);
-    }
-    String[] parts = path.split("/");
-    if (parts.length % 2 != 1) {
-      throw new IllegalArgumentException("Path length should be odd but is " + parts.length);
-    }
-    return getCollectionReference(parts, parts.length);
   }
 
   public ApiFuture<QuerySnapshot> getDocumentsAsync(String path) {

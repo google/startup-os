@@ -43,7 +43,7 @@ public class GithubWriter {
   }
 
   /**
-   * Creates GitHub PullRequest from scratch
+   * Creates GitHub PullRequest from scratch.
    *
    * @param pullRequest Proto message from which will be created GitHub PullRequest
    * @param repoOwner Owner of GirHub repository

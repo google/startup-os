@@ -22,7 +22,6 @@ java_binary(
 
 checkstyle_test(
     name = "formatter-checkstyle",
-    allow_failure = 1,
     target = ":formatter",
 )
 

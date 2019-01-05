@@ -23,10 +23,9 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.aa.Protos.Config;
-
-import javax.inject.Inject;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.inject.Inject;
 
 public class AddRepoCommand implements AaCommand {
 

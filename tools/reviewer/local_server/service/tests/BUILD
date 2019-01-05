@@ -22,7 +22,6 @@ java_binary(
 
 checkstyle_test(
     name = "test_tool-checkstyle",
-    allow_failure = 1,
     target = ":test_tool",
 )
 
@@ -60,7 +59,6 @@ java_test(
 
 checkstyle_test(
     name = "CodeReviewServiceTextDiffTest-checkstyle",
-    allow_failure = 1,
     target = ":CodeReviewServiceTextDiffTest",
 )
 
@@ -98,6 +96,5 @@ java_test(
 
 checkstyle_test(
     name = "CodeReviewServiceGetDiffFilesTest-checkstyle",
-    allow_failure = 1,
     target = ":CodeReviewServiceGetDiffFilesTest",
 )

@@ -16,18 +16,17 @@
 
 package com.google.startupos.tools.reviewer.aa;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.inject.Named;
-import java.io.IOException;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.HttpUtils;
-import com.google.common.collect.ImmutableList;
-import java.util.stream.Collectors;
-
+import dagger.Component;
 import java.io.File;
+import java.io.IOException;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /** Tool with some helpful functions for aa script (aa_tool.sh) */
 @Singleton
@@ -69,10 +68,10 @@ public class AaScriptHelper {
   private String getBashCompletions(String previousWord, String currentWord) throws IOException {
     ImmutableList<String> commands = aaTool.getCommands();
     // TODO: Get flags from commands. Perhaps AaTool can provide a get method for it.
-    ImmutableList<String> init_options =
+    ImmutableList<String> initOptions =
         ImmutableList.of("--base_path", "--startupos_repo", "--user");
-    ImmutableList<String> add_repo_options = ImmutableList.of("--url", "--name");
-    ImmutableList<String> diff_options =
+    ImmutableList<String> addRepoOptions = ImmutableList.of("--url", "--name");
+    ImmutableList<String> diffOptions =
         ImmutableList.of("--reviewers", "--description", "--buglink");
 
     if (previousWord.equals("aa")) {
@@ -83,11 +82,13 @@ public class AaScriptHelper {
       // Complete flags
       switch (previousWord) {
         case "init":
-          return getMatches(init_options, currentWord);
+          return getMatches(initOptions, currentWord);
         case "add_repo":
-          return getMatches(add_repo_options, currentWord);
+          return getMatches(addRepoOptions, currentWord);
         case "diff":
-          return getMatches(diff_options, currentWord);
+          return getMatches(diffOptions, currentWord);
+        default:
+          break;
       }
     }
     return "";

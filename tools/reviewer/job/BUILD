@@ -39,7 +39,6 @@ java_binary(
 
 checkstyle_test(
     name = "job-checkstyle",
-    allow_failure = 1,
     target = ":job",
 )
 
@@ -53,7 +52,6 @@ java_image(
 
 checkstyle_test(
     name = "job_image.binary-checkstyle",
-    allow_failure = 1,
     target = ":job_image.binary",
 )
 

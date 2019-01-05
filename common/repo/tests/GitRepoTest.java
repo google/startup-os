@@ -17,13 +17,9 @@
 package com.google.startupos.common.repo.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
@@ -34,10 +30,14 @@ import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.repo.Repo;
 import dagger.Component;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import javax.inject.Singleton;
 import org.junit.Before;
 import org.junit.Test;
-import javax.inject.Singleton;
-import static org.junit.Assert.assertNotEquals;
 
 public class GitRepoTest {
   private static final String TEST_BRANCH = "test_branch";
@@ -111,7 +111,7 @@ public class GitRepoTest {
 
   @Test
   public void testGetCommits() {
-    String initialCommitId = gitRepo.getHeadCommitId();
+    final String initialCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
@@ -134,7 +134,7 @@ public class GitRepoTest {
 
   @Test
   public void testGetMultipleCommits() {
-    String initialCommitId = gitRepo.getHeadCommitId();
+    final String initialCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
@@ -492,7 +492,7 @@ public class GitRepoTest {
   public void testGetPatchWhenOneDiffHunk() {
     fileUtils.writeStringUnchecked(TEST_FILE_CONTENTS, fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), "commit in master");
-    String masterCommitId = gitRepo.getHeadCommitId();
+    final String masterCommitId = gitRepo.getHeadCommitId();
     repo.switchBranch(TEST_BRANCH);
     fileUtils.writeStringUnchecked(
         "New file content\n", fileUtils.joinPaths(repoFolder, TEST_FILE));
@@ -503,13 +503,14 @@ public class GitRepoTest {
     assertEquals(expectedPatch, gitRepo.getPatch("master", TEST_BRANCH, TEST_FILE));
   }
 
+  // TODO(vmax): fix [LineLength] at line 517
   @Test
   public void testGetPatchWhenTwoDiffHunks() {
     String fileContentInMaster =
         "line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8\nline9\nline10\n";
     fileUtils.writeStringUnchecked(fileContentInMaster, fileUtils.joinPaths(repoFolder, TEST_FILE));
     repo.commit(repo.getUncommittedFiles(), "commit in master");
-    String masterCommitId = gitRepo.getHeadCommitId();
+    final String masterCommitId = gitRepo.getHeadCommitId();
 
     repo.switchBranch(TEST_BRANCH);
     String fileContentInTestBranch =
