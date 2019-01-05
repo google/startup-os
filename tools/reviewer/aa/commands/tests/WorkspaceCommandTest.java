@@ -142,7 +142,6 @@ public class WorkspaceCommandTest {
     assertTrue(fileUtils.fileExists("/base/ws/workspace_name/repo_name/file.txt"));
   }
 
-  // TODO(vmax): fix [LineLength] at lines 167, 170
   @Test
   public void forcedWorkspaceCommandTestWithIgnoredNodeModulesFolderAndBaselFolders()
       throws Exception {
@@ -164,10 +163,12 @@ public class WorkspaceCommandTest {
     assertTrue(fileUtils.fileExists("/base/ws/workspace_name/startup-os/file.txt"));
     assertFalse(
         fileUtils.folderExists(
-            "/base/ws/workspace_name/startup-os/tools/reviewer/local_server/web_login/node_modules"));
+            "/base/ws/workspace_name/startup-os/"
+                + "tools/reviewer/local_server/web_login/node_modules"));
     assertFalse(
         fileUtils.fileExists(
-            "/base/ws/workspace_name/startup-os/tools/reviewer/local_server/web_login/node_modules/file2.txt"));
+            "/base/ws/workspace_name/startup-os/"
+                + "tools/reviewer/local_server/web_login/node_modules/file2.txt"));
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-bin"));
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-genfiles"));
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-out"));
@@ -175,7 +176,6 @@ public class WorkspaceCommandTest {
     assertFalse(fileUtils.folderExists("/base/ws/workspace_name/startup-os/bazel-testlogs"));
   }
 
-  // TODO(vmax): fix [LineLength] at lines 196, 199
   @Test
   public void forcedWorkspaceCommandTestWithIgnoredTwoNodeModulesFolder() throws Exception {
     fileUtils.mkdirs("/base/head/startup-os");
@@ -193,10 +193,12 @@ public class WorkspaceCommandTest {
     assertTrue(fileUtils.fileExists("/base/ws/workspace_name/startup-os/file1.txt"));
     assertFalse(
         fileUtils.folderExists(
-            "/base/ws/workspace_name/startup-os/tools/reviewer/local_server/web_login/node_modules"));
+            "/base/ws/workspace_name/startup-os/"
+                + "tools/reviewer/local_server/web_login/node_modules"));
     assertFalse(
         fileUtils.fileExists(
-            "/base/ws/workspace_name/startup-os/tools/reviewer/local_server/web_login/node_modules/file2.txt"));
+            "/base/ws/workspace_name/startup-os/"
+                + "tools/reviewer/local_server/web_login/node_modules/file2.txt"));
     assertFalse(
         fileUtils.folderExists("/base/ws/workspace_name/startup-os/another/path/to/node_modules"));
     assertFalse(

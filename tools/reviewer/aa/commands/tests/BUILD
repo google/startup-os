@@ -52,6 +52,5 @@ java_test(
 
 checkstyle_test(
     name = "WorkspaceCommandTest-checkstyle",
-    allow_failure = 1,
     target = ":WorkspaceCommandTest",
 )

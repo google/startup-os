@@ -28,7 +28,6 @@ import java.util.NoSuchElementException;
  * opposite direction. `Line number` is the absolute line number in the file. `Position` is line
  * number in the diff(patch). `Position` is unique for the diff.
  */
-// TODO: Add tests to check the correctness of the converting
 public class LineNumberConverter {
   /*
   The comment can be on the left side or on the right side.
@@ -87,12 +86,6 @@ public class LineNumberConverter {
     }
   }
 
-  // TODO(vmax): use if-else if statements instead of 'case' with braces
-  @SuppressWarnings({
-    "checkstyle:LeftCurly",
-    "checkstyle:Indentation",
-    "checkstyle:CommentsIndentation"
-  })
   private static LineNumberToGithubPositionCorrelation processDiffPatch(
       String patch, int number, Side side, ReturnValueFor valueFor) {
     LineNumberToGithubPositionCorrelation result =
@@ -135,59 +128,47 @@ public class LineNumberConverter {
       int lastRightLineNumber =
           positionToLineNumberRightSide.get(positionToLineNumberRightSide.size());
 
-      switch (n) {
-          /* `\n` - the line with header of diff hunk.
-          We should increment the diffHunkIndex, get diff hunk header and
-          set correct line number in all maps.
-          */
-        case "\n":
-          {
-            if (diffHunkIndex < diffHunkHeaders.size() - 1) {
-              ++diffHunkIndex;
-            }
-            positionToLineNumberLeftSide.put(
-                positionIndex, diffHunkHeaders.get(diffHunkIndex).getLeftStartLine());
-            positionToLineNumberRightSide.put(
-                positionIndex, diffHunkHeaders.get(diffHunkIndex).getRightStartLine());
-            lineNumberToPositionLeftSide.put(
-                diffHunkHeaders.get(diffHunkIndex).getLeftStartLine(), positionIndex);
-            lineNumberToPositionRightSide.put(
-                diffHunkHeaders.get(diffHunkIndex).getRightStartLine(), positionIndex);
-            positionIndex++;
-            break;
-          }
-          // `\n ` - the line without changes. A comment on this line relates to the left side
-        case "\n ":
-          {
-            positionToLineNumberLeftSide.put(positionIndex, lastLeftLineNumber + 1);
-            positionToLineNumberRightSide.put(positionIndex, lastRightLineNumber + 1);
-            lineNumberToPositionLeftSide.put(lastLeftLineNumber + 1, positionIndex);
-            lineNumberToPositionRightSide.put(lastRightLineNumber + 1, positionIndex);
-            positionIndex++;
-            break;
-          }
-          // `\n-` - the deleted line. A comment on this line relates to the left side
-        case "\n-":
-          {
-            positionToLineNumberLeftSide.put(positionIndex, lastLeftLineNumber + 1);
-            positionToLineNumberRightSide.put(positionIndex, lastRightLineNumber);
-            lineNumberToPositionLeftSide.put(lastLeftLineNumber + 1, positionIndex);
-            lineNumberToPositionRightSide.put(lastRightLineNumber, positionIndex);
-            positionIndex++;
-            break;
-          }
-          // `\n+` - the added line. A comment on this line relates to the right side
-        case "\n+":
-          {
-            positionToLineNumberLeftSide.put(positionIndex, lastLeftLineNumber);
-            positionToLineNumberRightSide.put(positionIndex, lastRightLineNumber + 1);
-            lineNumberToPositionLeftSide.put(lastLeftLineNumber, positionIndex);
-            lineNumberToPositionRightSide.put(lastRightLineNumber + 1, positionIndex);
-            positionIndex++;
-            break;
-          }
-        default:
-          break;
+      /* `\n` - the line with header of diff hunk.
+      We should increment the diffHunkIndex, get diff hunk header and
+      set correct line number in all maps.
+      */
+      if (n.equals("\n")) {
+        if (diffHunkIndex < diffHunkHeaders.size() - 1) {
+          ++diffHunkIndex;
+        }
+        positionToLineNumberLeftSide.put(
+            positionIndex, diffHunkHeaders.get(diffHunkIndex).getLeftStartLine());
+        positionToLineNumberRightSide.put(
+            positionIndex, diffHunkHeaders.get(diffHunkIndex).getRightStartLine());
+        lineNumberToPositionLeftSide.put(
+            diffHunkHeaders.get(diffHunkIndex).getLeftStartLine(), positionIndex);
+        lineNumberToPositionRightSide.put(
+            diffHunkHeaders.get(diffHunkIndex).getRightStartLine(), positionIndex);
+        positionIndex++;
+      }
+      // `\n ` - the line without changes. A comment on this line relates to the left side
+      if (n.equals("\n ")) {
+        positionToLineNumberLeftSide.put(positionIndex, lastLeftLineNumber + 1);
+        positionToLineNumberRightSide.put(positionIndex, lastRightLineNumber + 1);
+        lineNumberToPositionLeftSide.put(lastLeftLineNumber + 1, positionIndex);
+        lineNumberToPositionRightSide.put(lastRightLineNumber + 1, positionIndex);
+        positionIndex++;
+      }
+      // `\n-` - the deleted line. A comment on this line relates to the left side
+      if (n.equals("\n-")) {
+        positionToLineNumberLeftSide.put(positionIndex, lastLeftLineNumber + 1);
+        positionToLineNumberRightSide.put(positionIndex, lastRightLineNumber);
+        lineNumberToPositionLeftSide.put(lastLeftLineNumber + 1, positionIndex);
+        lineNumberToPositionRightSide.put(lastRightLineNumber, positionIndex);
+        positionIndex++;
+      }
+      // `\n+` - the added line. A comment on this line relates to the right side
+      if (n.equals("\n+")) {
+        positionToLineNumberLeftSide.put(positionIndex, lastLeftLineNumber);
+        positionToLineNumberRightSide.put(positionIndex, lastRightLineNumber + 1);
+        lineNumberToPositionLeftSide.put(lastLeftLineNumber, positionIndex);
+        lineNumberToPositionRightSide.put(lastRightLineNumber + 1, positionIndex);
+        positionIndex++;
       }
     }
     if (valueFor.equals(ReturnValueFor.REVIEWER)) {
