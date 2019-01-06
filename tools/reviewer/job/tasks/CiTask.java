@@ -27,8 +27,14 @@ import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
+import com.google.startupos.common.firestore.ProtoEventListener;
+import com.google.startupos.common.firestore.ProtoQuerySnapshot;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.ReviewerConstants;
+import com.google.startupos.common.firestore.ProtoChange;
+import com.google.common.collect.ImmutableList;
+import java.util.ArrayList;
+import javax.annotation.Nullable;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -42,12 +48,15 @@ public class CiTask implements Task {
 
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
-  // We acquire a lock to process a single CiRequest at a time.
+  // We acquire a lock to make sure we run a single CiTask. Note that CiTask currently blocks on
+  // CiRequests, so it's all sequential.
   private final ReentrantLock lock = new ReentrantLock();
 
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
   protected FirestoreProtoClient firestoreClient;
+  private boolean listenerRegistered = false;
+  ImmutableList<CiRequest> requests = ImmutableList.of();
 
   @Inject
   public CiTask(
@@ -62,94 +71,134 @@ public class CiTask implements Task {
     return !lock.isLocked();
   }
 
+  public void tryRegisterListener() {
+    if (!listenerRegistered) {
+      firestoreClient.addCollectionListener(
+          ReviewerConstants.CI_REQUESTS_PATH,
+          CiRequest.newBuilder(),
+          new ProtoEventListener<ProtoQuerySnapshot<CiRequest>>() {
+            @Override
+            public void onEvent(
+                @Nullable ProtoQuerySnapshot<CiRequest> snapshot, @Nullable RuntimeException e) {
+              if (e != null) {
+                System.err.println("Listen failed: " + e);
+                return;
+              }
+              ArrayList<CiRequest> updatedRequests = new ArrayList(requests);
+              for (ProtoChange<CiRequest> protoChange : snapshot.getProtoChanges()) {
+                switch (protoChange.getType()) {
+                  case ADDED:
+                    updatedRequests.add(protoChange.getProto());
+                    break;
+                  case MODIFIED:
+                    // The indices are made so that this type of sequential remove & add works, see:
+                    // https://googleapis.github.io/google-cloud-java/google-cloud-clients/apidocs/com/google/cloud/firestore/DocumentChange.html#getNewIndex--
+                    updatedRequests.remove(protoChange.getOldIndex());
+                    updatedRequests.add(protoChange.getNewIndex(), protoChange.getProto());
+                    break;
+                  case REMOVED:
+                    updatedRequests.remove(protoChange.getOldIndex());
+                    break;
+                }
+              }
+              requests = ImmutableList.copyOf(updatedRequests);
+              run();
+            }
+          });
+      listenerRegistered = true;
+    }
+  }
+
   @Override
   public void run() {
-    CiResponse.Builder responseBuilder = CiResponse.newBuilder();
-    MessageWithId requestWithDiffId = null;
     if (lock.tryLock()) {
       try {
-        requestWithDiffId =
-            firestoreClient.getDocumentFromCollection(
-                ReviewerConstants.CI_REQUESTS_PATH, CiRequest.newBuilder());
-        if (requestWithDiffId == null) {
+        tryRegisterListener();
+        if (requests.isEmpty()) {
           // There is no request to process
           return;
         }
-
-        CiRequest request = (CiRequest) requestWithDiffId.message();
-        System.out.println("Processing request:\n" + request);
-
-        if (!fileUtils.folderExists("ci")) {
-          fileUtils.mkdirs("ci");
-        }
-
-        responseBuilder = CiResponse.newBuilder().setRequest(request);
-
-        for (CiRequest.Target target : request.getTargetList()) {
-          Repo repo = target.getRepo();
-
-          String repoPath =
-              fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "ci", repo.getId());
-
-          GitRepo gitRepo = this.gitRepoFactory.create(repoPath);
-          try {
-            if (fileUtils.folderEmptyOrNotExists(repoPath)) {
-              gitRepo.cloneRepo(repo.getUrl(), repoPath);
-            } else {
-              gitRepo.switchBranch("master");
-              gitRepo.pull();
-            }
-          } catch (IOException e) {
-            e.printStackTrace();
-            responseBuilder =
-                responseBuilder.addResults(
-                    CiResponse.TargetResult.newBuilder()
-                        .setTarget(target)
-                        .setStatus(Status.FAIL)
-                        .setLog(e.toString())
-                        .build());
-            return;
-          }
-          gitRepo.switchBranch(target.getCommitId());
-
-          log.atInfo().log("Running reviewer-ci.sh in %s", repoPath);
-          CommandLine.CommandResult result =
-              CommandLine.runCommandForError(
-                  "/usr/bin/env bash " + fileUtils.joinPaths(repoPath, "reviewer-ci.sh"), repoPath);
-          String log = result.stderr;
-          if (log.length() > MAX_LOG_LENGTH) {
-            log =
-                log.substring(0, MAX_LOG_LENGTH)
-                    + "[log truncated from length "
-                    + log.length()
-                    + "]\n";
-          }
-          responseBuilder.addResults(
-              CiResponse.TargetResult.newBuilder()
-                  .setTarget(target)
-                  .setStatus(result.exitValue == 0 ? Status.SUCCESS : Status.FAIL)
-                  .setLog(log)
-                  .build());
-          CiResponse ciResponse = responseBuilder.build();
-          // XXX: Tell Vadim about s/CIResponse/CiResponse
-          Diff diff =
-              (Diff)
-                  firestoreClient.getProtoDocument(
-                      ReviewerConstants.DIFF_COLLECTION,
-                      String.valueOf(request.getDiffId()),
-                      Diff.newBuilder());
-          firestoreClient.setProtoDocument(
-              ReviewerConstants.DIFF_COLLECTION,
-              String.valueOf(request.getDiffId()),
-              diff.toBuilder().addCiResponse(ciResponse).build());
-          firestoreClient.addProtoDocumentToCollection(
-              String.format(ReviewerConstants.CI_RESPONSES_PATH, requestWithDiffId.id()),
-              ciResponse);
+        for (CiRequest request : requests) {
+          processRequest(request);
         }
       } finally {
         lock.unlock();
       }
     }
+  }
+
+  private void processRequest(CiRequest request) {
+    log.atInfo().log("Processing request:\n%s", request);
+    CiResponse.Builder responseBuilder = CiResponse.newBuilder().setRequest(request);
+    if (!fileUtils.folderExists("ci")) {
+      fileUtils.mkdirs("ci");
+    }
+
+    for (CiRequest.Target target : request.getTargetList()) {
+      log.atInfo().log("Processing target:\n%s", target);
+      Repo repo = target.getRepo();
+      String repoPath =
+          fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "ci", repo.getId());
+      GitRepo gitRepo = this.gitRepoFactory.create(repoPath);
+      try {
+        if (fileUtils.folderEmptyOrNotExists(repoPath)) {
+          gitRepo.cloneRepo(repo.getUrl(), repoPath);
+        } else {
+          gitRepo.switchBranch("master");
+          gitRepo.pull();
+        }
+      } catch (Exception e) {
+        log.atSevere().withCause(e).log("Failed to process target");
+        responseBuilder =
+            responseBuilder.addResults(
+                CiResponse.TargetResult.newBuilder()
+                    .setTarget(target)
+                    .setStatus(Status.FAIL)
+                    .setLog(e.toString())
+                    .build());
+        saveCiResponse(responseBuilder.build(), request.getDiffId());
+        return;
+      }
+      gitRepo.switchBranch(target.getCommitId());
+
+      log.atInfo().log("Running reviewer-ci.sh in %s", repoPath);
+      CommandLine.CommandResult result =
+          CommandLine.runCommandForError(
+              "/usr/bin/env bash " + fileUtils.joinPaths(repoPath, "reviewer-ci.sh"), repoPath);
+      log.atInfo().log("Done running reviewer-ci.sh");
+      String ciLog = result.stderr;
+      if (ciLog.length() > MAX_LOG_LENGTH) {
+        ciLog =
+            ciLog.substring(0, MAX_LOG_LENGTH)
+                + "[log truncated from length "
+                + ciLog.length()
+                + "]\n";
+      }
+      Status status = result.exitValue == 0 ? Status.SUCCESS : Status.FAIL;
+      responseBuilder.addResults(
+          CiResponse.TargetResult.newBuilder()
+              .setTarget(target)
+              .setStatus(status)
+              .setLog(ciLog)
+              .build());
+      saveCiResponse(responseBuilder.build(), request.getDiffId());
+      firestoreClient.deleteDocument(
+          ReviewerConstants.CI_REQUESTS_PATH, Long.toString(request.getDiffId()));
+      log.atInfo().log("Done processing CiRequest. Status=" + status);
+    }
+  }
+
+  public void saveCiResponse(CiResponse ciResponse, long diffId) {
+    Diff diff =
+        (Diff)
+            firestoreClient.getProtoDocument(
+                ReviewerConstants.DIFF_COLLECTION, String.valueOf(diffId), Diff.newBuilder());
+    firestoreClient.setProtoDocument(
+        ReviewerConstants.DIFF_COLLECTION,
+        String.valueOf(diffId),
+        diff.toBuilder().addCiResponse(ciResponse).build());
+    firestoreClient.addProtoDocumentToCollection(
+        String.format(ReviewerConstants.CI_RESPONSES_PATH, diffId), ciResponse);
   }
 }
 
