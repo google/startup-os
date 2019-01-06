@@ -17,9 +17,10 @@
 package com.google.startupos.common;
 
 import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.Lists.Segment;
+import org.junit.Test;
 
 public class ListsTest {
   @Test

@@ -16,8 +16,8 @@
 
 package com.google.startupos.tools.reviewer.aa.commands;
 
-import javax.inject.Inject;
 import com.google.startupos.common.FileUtils;
+import javax.inject.Inject;
 
 public class KillServerCommand implements AaCommand {
 

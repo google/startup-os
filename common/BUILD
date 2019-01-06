@@ -31,7 +31,6 @@ java_library(
 
 checkstyle_test(
     name = "common-checkstyle",
-    allow_failure = 1,
     target = ":common",
 )
 
@@ -48,7 +47,6 @@ java_library(
 
 checkstyle_test(
     name = "lists-checkstyle",
-    allow_failure = 1,
     target = ":lists",
 )
 
@@ -69,7 +67,6 @@ java_library(
 
 checkstyle_test(
     name = "text_differencer-checkstyle",
-    allow_failure = 1,
     target = ":text_differencer",
 )
 
@@ -119,12 +116,7 @@ java_plugin(
 java_library(
     name = "diff_match_patch",
     srcs = ["DiffMatchPatch.java"],
-)
-
-checkstyle_test(
-    name = "diff_match_patch-checkstyle",
-    allow_failure = 1,
-    target = ":diff_match_patch",
+    tags = ["checkstyle_ignore"],
 )
 
 java_binary(
@@ -144,6 +136,5 @@ java_binary(
 
 checkstyle_test(
     name = "base64_tool-checkstyle",
-    allow_failure = 1,
     target = ":base64_tool",
 )

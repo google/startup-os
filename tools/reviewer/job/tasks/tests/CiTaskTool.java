@@ -16,36 +16,36 @@
 
 package com.google.startupos.tools.reviewer.job.tasks.tests;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.EventListener;
+import com.google.cloud.firestore.FirestoreException;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
 import com.google.startupos.common.CommonModule;
-import dagger.Component;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
-import java.io.IOException;
-import com.google.startupos.common.firestore.FirestoreProtoClient;
-import java.util.concurrent.Executors;
 import com.google.startupos.tools.localserver.service.AuthService;
-import java.util.Date;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.api.core.ApiFuture;
-import java.util.Map;
-import com.google.cloud.firestore.CollectionReference;
-import com.google.cloud.firestore.WriteResult;
-import com.google.cloud.firestore.QuerySnapshot;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import java.util.List;
-import java.util.HashMap;
-import com.google.cloud.firestore.EventListener;
-import java.util.concurrent.ExecutionException;
-import com.google.cloud.firestore.DocumentSnapshot;
-import javax.annotation.Nullable;
-import com.google.cloud.firestore.FirestoreException;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest.Target;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import dagger.Component;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /** A tool for testing TextDifferencer. */
 @Singleton

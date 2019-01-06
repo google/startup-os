@@ -36,7 +36,6 @@ java_library(
 
 checkstyle_test(
     name = "task_interface-checkstyle",
-    allow_failure = 1,
     target = ":task_interface",
 )
 
@@ -72,7 +71,6 @@ java_library(
 
 checkstyle_test(
     name = "task_executor-checkstyle",
-    allow_failure = 1,
     target = ":task_executor",
 )
 
@@ -109,7 +107,6 @@ java_library(
 
 checkstyle_test(
     name = "ci_task-checkstyle",
-    allow_failure = 1,
     target = ":ci_task",
 )
 
@@ -143,7 +140,6 @@ java_library(
 
 checkstyle_test(
     name = "reviewer_metadata_updater_task-checkstyle",
-    allow_failure = 1,
     target = ":reviewer_metadata_updater_task",
 )
 
@@ -179,6 +175,5 @@ java_library(
 
 checkstyle_test(
     name = "submitter_task-checkstyle",
-    allow_failure = 1,
     target = ":submitter_task",
 )

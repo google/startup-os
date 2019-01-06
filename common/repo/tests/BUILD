@@ -22,7 +22,6 @@ java_binary(
 
 checkstyle_test(
     name = "test_tool-checkstyle",
-    allow_failure = 1,
     target = ":test_tool",
 )
 
@@ -48,6 +47,5 @@ java_test(
 
 checkstyle_test(
     name = "GitRepoTest-checkstyle",
-    allow_failure = 1,
     target = ":GitRepoTest",
 )

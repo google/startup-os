@@ -18,6 +18,7 @@ package com.google.startupos.common;
 
 import static org.junit.Assert.assertEquals;
 
+import com.google.protobuf.TextFormat;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.TextDiff;
@@ -27,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import com.google.protobuf.TextFormat;
 
 /** Tests for {@link com.google.startupos.common.TextDifferencer}. */
 @RunWith(JUnit4.class)

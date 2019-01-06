@@ -29,7 +29,6 @@ java_test(
 
 checkstyle_test(
     name = "MavenDepsWhitelistTest-checkstyle",
-    allow_failure = 1,
     target = ":MavenDepsWhitelistTest",
 )
 
@@ -49,7 +48,6 @@ java_test(
 
 checkstyle_test(
     name = "WorkspaceDepsWhitelistTest-checkstyle",
-    allow_failure = 1,
     target = ":WorkspaceDepsWhitelistTest",
 )
 
@@ -70,6 +68,5 @@ java_test(
 
 checkstyle_test(
     name = "PackageLockWhitelistTest-checkstyle",
-    allow_failure = 1,
     target = ":PackageLockWhitelistTest",
 )

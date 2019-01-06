@@ -38,6 +38,5 @@ java_library(
 
 checkstyle_test(
     name = "commands-checkstyle",
-    allow_failure = 1,
     target = ":commands",
 )

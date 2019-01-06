@@ -36,7 +36,6 @@ java_test(
 
 checkstyle_test(
     name = "FileUtilsTest-checkstyle",
-    allow_failure = 1,
     target = ":FileUtilsTest",
 )
 
@@ -56,7 +55,6 @@ java_test(
 
 checkstyle_test(
     name = "ListsTest-checkstyle",
-    allow_failure = 1,
     target = ":ListsTest",
 )
 
@@ -80,7 +78,6 @@ java_test(
 
 checkstyle_test(
     name = "TextDifferencerTest-checkstyle",
-    allow_failure = 1,
     target = ":TextDifferencerTest",
 )
 
@@ -107,6 +104,5 @@ java_binary(
 
 checkstyle_test(
     name = "text_differencer_tool-checkstyle",
-    allow_failure = 1,
     target = ":text_differencer_tool",
 )

@@ -17,27 +17,27 @@
 package com.google.startupos.tools.localserver;
 
 import com.google.common.flogger.FluentLogger;
+import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.flags.FlagDesc;
-import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
 import dagger.Component;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.protobuf.services.ProtoReflectionService;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.io.PrintStream;
-import java.io.FileNotFoundException;
 
 /*
  * LocalServer is a gRPC server (definition in proto/code_review.proto)

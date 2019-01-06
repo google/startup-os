@@ -34,7 +34,6 @@ java_image(
 
 checkstyle_test(
     name = "hello_server.binary-checkstyle",
-    allow_failure = 1,
     target = ":hello_server.binary",
 )
 

@@ -27,10 +27,11 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.startupos.common.repo.Protos.Commit;
-import com.google.startupos.common.repo.Protos.File.Action;
 import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.common.repo.Protos.File.Action;
 import com.google.startupos.common.repo.Repo;
 import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.ReviewerConstants;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
@@ -51,11 +52,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.stream.Stream;
-import com.google.startupos.tools.reviewer.ReviewerConstants;
 
 /*
  * CodeReviewService is a gRPC service (definition in proto/code_review.proto)
