@@ -295,12 +295,20 @@ public class FirestoreProtoClient {
     return getDocumentReference(path).delete();
   }
 
+  public ApiFuture<WriteResult> deleteDocumentAsync(String collection, String documentId) {
+    return deleteDocumentAsync(joinPath(collection, documentId));
+  }
+
   public WriteResult deleteDocument(String path) {
     try {
       return deleteDocumentAsync(path).get();
     } catch (ExecutionException | InterruptedException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  public WriteResult deleteDocument(String collection, String documentId) {
+    return deleteDocument(joinPath(collection, documentId));
   }
 
   public void addCollectionListener(
