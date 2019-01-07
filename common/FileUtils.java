@@ -24,25 +24,32 @@ import com.google.common.io.Resources;
 import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /** File utils. */
 // TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
@@ -413,6 +420,31 @@ public class FileUtils {
       return CharStreams.toString(in);
     } catch (MalformedURLException e) {
       throw new IllegalArgumentException(e);
+    }
+  }
+
+  /** Writes a proto to zip archive. */
+  // TODO: Think over how to instead of writing the file to disk and then copying, and then
+  // deleting, write it once, directly to the Zip filesystem
+  public void writePrototxtToZip(Message proto, String zipFilePath, String pathInsideZip)
+      throws IOException {
+    String fileContent = TextFormat.printToUnicodeString(proto);
+    File tempPrototxt = File.createTempFile("temp_prototxt", ".prototxt");
+    BufferedWriter writer = new BufferedWriter(new FileWriter(tempPrototxt));
+    writer.write(fileContent);
+    writer.close();
+
+    Map<String, String> env = new HashMap<>();
+    env.put("create", "true");
+
+    URI uri = URI.create(String.format("jar:file:%s", joinPaths(zipFilePath)));
+    try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+      Files.copy(
+          fileSystem.getPath(expandHomeDirectory(tempPrototxt.getPath())),
+          zipfs.getPath(pathInsideZip),
+          StandardCopyOption.REPLACE_EXISTING);
+    } finally {
+      tempPrototxt.deleteOnExit();
     }
   }
 }
