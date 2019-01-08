@@ -22,13 +22,11 @@ import com.google.startupos.common.CommandLine;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
-import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.common.firestore.ProtoChange;
 import com.google.startupos.common.firestore.ProtoEventListener;
 import com.google.startupos.common.firestore.ProtoQuerySnapshot;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.reviewer.ReviewerConstants;
 import com.google.startupos.tools.reviewer.ReviewerConstants;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
@@ -153,7 +151,7 @@ public class CiTask implements Task {
       } catch (Exception e) {
         log.atSevere().withCause(e).log("Failed to process target");
         responseBuilder =
-            responseBuilder.addResults(
+            responseBuilder.addResult(
                 CiResponse.TargetResult.newBuilder()
                     .setTarget(target)
                     .setStatus(Status.FAIL)
@@ -178,7 +176,7 @@ public class CiTask implements Task {
                 + "]\n";
       }
       Status status = result.exitValue == 0 ? Status.SUCCESS : Status.FAIL;
-      responseBuilder.addResults(
+      responseBuilder.addResult(
           CiResponse.TargetResult.newBuilder()
               .setTarget(target)
               .setStatus(status)
