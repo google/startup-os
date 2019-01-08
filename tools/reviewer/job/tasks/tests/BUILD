@@ -66,3 +66,8 @@ checkstyle_test(
     name = "ci_task_tool-checkstyle",
     target = ":ci_task_tool",
 )
+
+checkstyle_test(
+    name = "submitter_task_tool-checkstyle",
+    target = ":submitter_task_tool",
+)
