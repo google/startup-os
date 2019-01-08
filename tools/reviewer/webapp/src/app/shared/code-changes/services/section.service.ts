@@ -16,7 +16,7 @@ export class SectionService {
   // Remembers line number of the change too.
   // Adds section with the two line numbers.
   // Repeat (or end)
-  getGroupLines(diffLines: DiffLine[], amountOfLines: number): Section[] {
+  getSections(diffLines: DiffLine[], amountOfLines: number): Section[] {
     let isGroupFound: boolean = true;
     const sections: Section[] = [];
     let sectionArray: number[] = [];

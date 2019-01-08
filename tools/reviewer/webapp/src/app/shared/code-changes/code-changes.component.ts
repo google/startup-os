@@ -35,7 +35,9 @@ const expandAmount: number = 5;
 // How it looks: https://i.imgur.com/HvoXiNC.jpg
 // code-changes don't know where changes come from and where it should be sent.
 // All the work is on file-changes.
-// TODO: add state saving
+
+// TODO: add state saving (open threads, a thread state)
+// Similar to sectionsEmitter, which is already implemented.
 @Component({
   selector: 'code-changes',
   templateUrl: './code-changes.component.html',
@@ -58,7 +60,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
   amountOfLines: number = 0;
   // Line indexes of all open threads.
   openThreadsMap: Dictionary[];
-  // A trick to be able to select code on a single line
+  // A trick to be able to select code on a single column
   clickIndex: number = -1;
 
   @Input() diff: Diff;
@@ -123,7 +125,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     if (this.isShared) {
       if (!this.sections) {
         // Find changes in code and create groups around it
-        this.sections = this.sectionService.getGroupLines(
+        this.sections = this.sectionService.getSections(
           this.textDiff.getRightDiffLineList(),
           this.amountOfLines,
         );
