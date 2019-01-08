@@ -34,6 +34,8 @@ import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.ReviewerConstants;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest.Target;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
+import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import dagger.Component;
@@ -48,34 +50,31 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/** A tool for testing CiTask. */
+/** A tool for testing SubmitterTask. */
 @Singleton
-public class CiTaskTool {
+public class SubmitterTaskTool {
   private FileUtils fileUtils;
   private AuthService authService;
   private FirestoreProtoClient client;
 
   @Inject
-  CiTaskTool(FileUtils fileUtils, AuthService authService) {
+  SubmitterTaskTool(FileUtils fileUtils, AuthService authService) {
     this.fileUtils = fileUtils;
     this.authService = authService;
   }
 
   void run() {
     client = new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
-    int id = 100;
+    int id = 1234;
     client.setProtoDocument(
-        ReviewerConstants.CI_REQUESTS_PATH + "/" + id,
-        CiRequest.newBuilder()
-            .setDiffId(id)
-            .addTarget(
-                Target.newBuilder()
-                    .setRepo(
-                        Repo.newBuilder()
-                            .setId("startup-os")
-                            .setUrl("https://github.com/google/startup-os")
-                            .build())
-                    .setCommitId("5b599dd74f58ff5716520db5f724fdf7a75ca419")
+        ReviewerConstants.DIFF_COLLECTION + "/" + id,
+        Diff.newBuilder()
+            .setId(id)
+            .setStatus(Diff.Status.SUBMITTING)
+            .addCiResponse(
+                CiResponse.newBuilder()
+                    .addResult(
+                        TargetResult.newBuilder().setStatus(TargetResult.Status.SUCCESS).build())
                     .build())
             .build());
     System.exit(0);
@@ -84,12 +83,12 @@ public class CiTaskTool {
   @Singleton
   @Component(modules = CommonModule.class)
   interface ToolComponent {
-    CiTaskTool getTool();
+    SubmitterTaskTool getTool();
   }
 
   public static void main(String[] args) throws IOException {
     Flags.parse(args, AuthService.class.getPackage());
-    DaggerCiTaskTool_ToolComponent.create().getTool().run();
+    DaggerSubmitterTaskTool_ToolComponent.create().getTool().run();
   }
 }
 

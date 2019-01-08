@@ -37,7 +37,7 @@ message CiResponse {
     Status status = 2;
     string log = 3;
   }
-  repeated TargetResult results = 2;
+  repeated TargetResult result = 2;
 }
 
 /* Config for a Reviewer instance, stored in config_repo in
