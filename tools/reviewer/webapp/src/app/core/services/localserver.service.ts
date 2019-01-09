@@ -187,7 +187,8 @@ export class LocalserverService {
     headFile.setAction(File.Action.ADD);
     fileChronoList.push(headFile);
 
-    // Add all commited files with the name
+    // Add all commited files that match the file's filenameWithRepo.
+    // There should be only one such match.
     for (const commit of branchInfo.getCommitList()) {
       for (const committedFile of commit.getFileList()) {
         if (committedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {

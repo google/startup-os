@@ -1,6 +1,6 @@
 <div class="group" *ngFor="let codeGroup of codeGroups; let groupIndex = index">
-  <div class="expand-button" *ngIf="isShared">
-    <button *ngIf="codeGroup.isExpandUpVisible" (click)="expandUp(groupIndex)">
+  <div class="expand-button" *ngIf="isShared && codeGroup.isExpandUpVisible">
+    <button (click)="expandUp(groupIndex)">
       <img src="/assets/expand-up.png">
     </button>
   </div>
@@ -95,8 +95,8 @@
       </tr>
     </table>
   </div>
-  <div class="expand-button" *ngIf="isShared">
-    <button *ngIf="codeGroup.isExpandDownVisible" (click)="expandDown(groupIndex)">
+  <div class="expand-button" *ngIf="isShared && codeGroup.isExpandDownVisible">
+    <button (click)="expandDown(groupIndex)">
       <img src="/assets/expand-down.png">
     </button>
   </div>

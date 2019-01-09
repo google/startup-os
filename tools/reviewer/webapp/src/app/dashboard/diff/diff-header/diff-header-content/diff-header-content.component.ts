@@ -76,7 +76,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
       });
   }
 
-  // Convers enum to UI status
+  // Converts enum to UI status
   getStatus(status: CiResponse.TargetResult.Status): Status {
     switch (status) {
       case CiResponse.TargetResult.Status.SUCCESS:

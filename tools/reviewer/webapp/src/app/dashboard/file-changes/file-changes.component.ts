@@ -129,7 +129,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Convers file list to commit list
+  // Converts file list to commit list
   getCommitIdList(fileChronoList: File[]): string[] {
     const commitIdList: string[] = [];
     for (const file of fileChronoList) {
