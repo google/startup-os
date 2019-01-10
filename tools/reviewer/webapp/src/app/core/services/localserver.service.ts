@@ -188,7 +188,7 @@ export class LocalserverService {
     fileChronoList.push(headFile);
 
     // Add all commited files that match the file's filenameWithRepo.
-    // There should be only one such match.
+    // There should be only one such match by commit.
     for (const commit of branchInfo.getCommitList()) {
       for (const committedFile of commit.getFileList()) {
         if (committedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
@@ -197,7 +197,8 @@ export class LocalserverService {
       }
     }
 
-    // Add uncommited files with the name
+    // Add uncommited file that matches the file's filenameWithRepo.
+    // There should be only one such match.
     for (const uncommittedFile of branchInfo.getUncommittedFileList()) {
       if (uncommittedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
         fileChronoList.push(uncommittedFile);
