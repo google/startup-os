@@ -80,8 +80,9 @@ jobs:
           key: "android_sdk"
 
       - restore_cache:
-          key: "v3-bazel_cache"
+          key: "v4-bazel_cache"
 
+      - run: sudo apt update && sudo apt -y install libstdc++6
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
       - run: './tools/get_android_sdk.sh'
