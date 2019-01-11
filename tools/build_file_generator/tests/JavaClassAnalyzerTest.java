@@ -137,20 +137,5 @@ public class JavaClassAnalyzerTest {
 
     assertEquals(expectedJavaClass, javaClassAnalyzer.getJavaClass(filePath));
   }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void tooBroadImportTest() throws IOException {
-    String fileContent =
-        "package com.test.tests;"
-            + System.lineSeparator()
-            + "import org.*;"
-            + System.lineSeparator()
-            + "public class SomeClass {"
-            + System.lineSeparator()
-            + "}";
-    String filePath = fileUtils.joinToAbsolutePath(testFolder, "SomeClass.java");
-    fileUtils.writeStringUnchecked(fileContent, filePath);
-    javaClassAnalyzer.getJavaClass(filePath);
-  }
 }
 

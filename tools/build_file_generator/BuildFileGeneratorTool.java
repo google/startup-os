@@ -24,8 +24,8 @@ import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile;
 import dagger.Component;
 
-import javax.inject.Singleton;
 import java.io.IOException;
+import javax.inject.Singleton;
 
 public class BuildFileGeneratorTool {
   @FlagDesc(name = "path", description = "Package path to generate BUILD file")
