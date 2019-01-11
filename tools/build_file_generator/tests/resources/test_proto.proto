@@ -5,6 +5,8 @@ package com.test.package;
 option java_package = "com.test.javapackage";
 option java_outer_classname = "Protos";
 
+import "tools/build_file_generator/tests/resources/another_proto.proto";
+
 service FileService { rpc getFile(FileRequest) returns (FileResponse); }
 
 message FileRequest { string filename = 1; }

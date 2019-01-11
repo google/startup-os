@@ -27,6 +27,7 @@ message ProtoFile {
   repeated string messages = 5;
   repeated string services = 6;
   repeated string enums = 7;
+  repeated string imports = 8;
 }
 
 message ThirdPartyDep {
@@ -35,3 +36,43 @@ message ThirdPartyDep {
 }
 
 message ThirdPartyDeps { repeated ThirdPartyDep third_party_dep = 1; }
+
+message BuildFile {
+  message ProtoLibrary {
+    string name = 1;
+    repeated string deps = 2;
+    repeated string srcs = 3;
+  }
+
+  message JavaProtoLibrary {
+    string name = 1;
+    repeated string deps = 2;
+  }
+
+  message JavaLibrary {
+    string name = 1;
+    repeated string srcs = 2;
+    repeated string deps = 3;
+  }
+
+  message JavaBinary {
+    string name = 1;
+    repeated string srcs = 2;
+    string main_class = 3;
+    repeated string deps = 4;
+  }
+
+  message JavaTest {
+    string name = 1;
+    repeated string srcs = 2;
+    repeated string resources = 3;
+    string test_class = 4;
+    repeated string deps = 5;
+  }
+
+  repeated ProtoLibrary proto_library = 1;
+  repeated JavaProtoLibrary java_proto_library = 2;
+  repeated JavaLibrary java_library = 3;
+  repeated JavaBinary java_binary = 4;
+  repeated JavaTest java_test = 5;
+}
