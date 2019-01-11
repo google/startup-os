@@ -1,0 +1,50 @@
+left_file_contents: "/*\n * Copyright 2018 The StartupOS Authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *    https://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * A change to demonstrate new commit menu, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n "
+right_file_contents: "/*\n * Copyright 2018 The StartupOS Authors.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *    Hi to all Reviewer testers! :D\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\n "
+left_diff_line {
+  text: " *    https://www.apache.org/licenses/LICENSE-2.0"
+  type: DELETE
+  diff_line_number: 7
+  code_line_number: 7
+  word_change {
+    text: "https://www.apache.org/licenses/LICENSE-2.0"
+    type: DELETE
+    start_index: 6
+    end_index: 49
+  }
+}
+left_diff_line {
+  text: " * A change to demonstrate new commit menu, either express or implied."
+  type: DELETE
+  diff_line_number: 11
+  code_line_number: 11
+  word_change {
+    text: "A change to demonstrate new commit menu"
+    type: DELETE
+    start_index: 3
+    end_index: 42
+  }
+}
+right_diff_line {
+  text: " *    Hi to all Reviewer testers! :D"
+  type: ADD
+  diff_line_number: 7
+  code_line_number: 7
+  word_change {
+    text: "Hi to all Reviewer testers! :D"
+    type: ADD
+    start_index: 6
+    end_index: 36
+  }
+}
+right_diff_line {
+  text: " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
+  type: ADD
+  diff_line_number: 11
+  code_line_number: 11
+  word_change {
+    text: "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND"
+    type: ADD
+    start_index: 3
+    end_index: 47
+  }
+}

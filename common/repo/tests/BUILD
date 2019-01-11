@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "test_tool",
     srcs = [
@@ -16,6 +18,11 @@ java_binary(
         "//third_party/maven/org/slf4j:slf4j_simple",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "test_tool-checkstyle",
+    target = ":test_tool",
 )
 
 java_test(
@@ -36,4 +43,9 @@ java_test(
         "//third_party/maven/org/mockito:mockito_core",
         "//third_party/maven/org/objenesis",
     ],
+)
+
+checkstyle_test(
+    name = "GitRepoTest-checkstyle",
+    target = ":GitRepoTest",
 )

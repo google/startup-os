@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "formatter",
     srcs = ["FormatterTool.java"],
@@ -7,6 +9,7 @@ java_binary(
     runtime_deps = [
         ":clang_format",
         "//tools:buildifier",
+        "//tools:shfmt",
     ],
     deps = [
         "//common/flags",
@@ -15,6 +18,11 @@ java_binary(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/org/slf4j:slf4j_simple",
     ],
+)
+
+checkstyle_test(
+    name = "formatter-checkstyle",
+    target = ":formatter",
 )
 
 sh_binary(

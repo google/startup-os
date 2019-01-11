@@ -1,0 +1,26 @@
+<div class="thread">
+  <!-- Comments -->
+  <thread-comments
+    [diff]="diff"
+    [thread]="thread"
+    [commentExpandedMap]="commentExpandedMap"
+    (saveStateEmitter)="saveStateEmitter.emit($event)"
+    (isFreezeModeEmitter)="freezeComments($event)"
+    (closeEmitter)="closeEmitter.emit()"
+  ></thread-comments>
+
+  <!-- Reply panel -->
+  <thread-reply
+    [diff]="diff"
+    [thread]="thread"
+    (isFreezeModeEmitter)="freezeReply($event)"
+    *ngIf="thread.getCommentList().length > 0"
+  ></thread-reply>
+
+  <!-- UI to create new thread -->
+  <new-thread
+    (closeEmitter)="closeEmitter.emit()"
+    (addEmitter)="addEmitter.emit($event)"
+    *ngIf="thread.getCommentList().length === 0"
+  ></new-thread>
+</div>

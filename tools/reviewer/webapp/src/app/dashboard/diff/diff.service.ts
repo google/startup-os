@@ -1,15 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 
-import { File } from '@/shared/proto';
+import { File } from '@/core/proto';
 
 @Injectable()
 export class DiffService {
   constructor(private router: Router) { }
 
-  openFile(file: File, diffId: number, commitId?: string): void {
-    this.router.navigate([
-      'diff/' + diffId + '/' + file.getFilenameWithRepo(),
-    ], { queryParams: { right: commitId } });
+  openFile(
+    isNewTab: boolean,
+    file: File,
+    diffId: number,
+    commitId?: string,
+  ): void {
+    const url: string = 'diff/' + diffId + '/' + file.getFilenameWithRepo();
+    if (isNewTab) {
+      // Open in new tab
+      let newTabUrl: string = url;
+      if (commitId) {
+        newTabUrl += '?right=' + commitId;
+      }
+      window.open(newTabUrl, '_blank');
+    } else {
+      // Navigate to
+      const queryParams: Params = { right: commitId };
+      this.router.navigate([url], { queryParams: queryParams });
+    }
   }
 }

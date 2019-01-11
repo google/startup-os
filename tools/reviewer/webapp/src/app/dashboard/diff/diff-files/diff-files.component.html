@@ -10,37 +10,40 @@
     >Expand</button>
   </div>
 </div>
-<div class="cr-header">
+<div *ngIf="files.length > 0">
   <mat-table [dataSource]="files">
-      <ng-container matColumnDef="filename">
-        <mat-header-cell *matHeaderCellDef> File </mat-header-cell>
-        <mat-cell *matCellDef="let file">
-          {{ file.getFilenameWithRepo() }}
-        </mat-cell>
-      </ng-container>
+    <ng-container matColumnDef="filename">
+      <mat-header-cell *matHeaderCellDef> File </mat-header-cell>
+      <mat-cell *matCellDef="let file">
+        {{ file.getFilenameWithRepo() }}
+      </mat-cell>
+    </ng-container>
 
-      <ng-container matColumnDef="comments">
-        <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
-        <mat-cell *matCellDef="let file"></mat-cell>
-      </ng-container>
+    <ng-container matColumnDef="comments">
+      <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
+      <mat-cell *matCellDef="let file"></mat-cell>
+    </ng-container>
 
-      <ng-container matColumnDef="modified">
-        <mat-header-cell *matHeaderCellDef> Modified </mat-header-cell>
-        <mat-cell *matCellDef="let file"></mat-cell>
-      </ng-container>
+    <ng-container matColumnDef="modified">
+      <mat-header-cell *matHeaderCellDef> Modified </mat-header-cell>
+      <mat-cell *matCellDef="let file"></mat-cell>
+    </ng-container>
 
-      <ng-container matColumnDef="delta">
-        <mat-header-cell *matHeaderCellDef> Delta </mat-header-cell>
-        <mat-cell *matCellDef="let file"></mat-cell>
-      </ng-container>
+    <ng-container matColumnDef="delta">
+      <mat-header-cell *matHeaderCellDef> Delta </mat-header-cell>
+      <mat-cell *matCellDef="let file"></mat-cell>
+    </ng-container>
 
-      <mat-header-row
-        class="cr-header"
-        *matHeaderRowDef="displayedColumns"
-      ></mat-header-row>
-      <mat-row
-        *matRowDef="let file; columns: displayedColumns;"
-        (click)="openFile(file)"
-      ></mat-row>
-    </mat-table>
+    <mat-header-row
+      class="cr-header"
+      *matHeaderRowDef="displayedColumns"
+    ></mat-header-row>
+    <mat-row
+      *matRowDef="let file; columns: displayedColumns;"
+      (mouseup)="openFile($event, file)"
+    ></mat-row>
+  </mat-table>
+</div>
+<div class="cr-table-placeholder" *ngIf="files.length === 0">
+  No Files yet
 </div>

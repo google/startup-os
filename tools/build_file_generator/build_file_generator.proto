@@ -1,0 +1,37 @@
+syntax = "proto3";
+package com.google.startupos.tools.buildfilegenerator;
+
+option java_package = "com.google.startupos.tools.buildfilegenerator";
+option java_outer_classname = "Protos";
+
+message Import {
+  string package = 1;
+  string class_name = 2;
+  bool whole_package_import = 3;
+  bool is_static = 4;
+}
+
+message JavaClass {
+  string package = 1;
+  repeated Import import = 2;
+  string class_name = 3;
+  bool has_main_method = 4;
+  bool is_test_class = 5;
+}
+
+message ProtoFile {
+  string package = 1;
+  string file_name = 2;
+  string java_package = 3;
+  string java_outer_classname = 4;
+  repeated string messages = 5;
+  repeated string services = 6;
+  repeated string enums = 7;
+}
+
+message ThirdPartyDep {
+  string target = 1;
+  repeated string java_class = 2;
+}
+
+message ThirdPartyDeps { repeated ThirdPartyDep third_party_dep = 1; }

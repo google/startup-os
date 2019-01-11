@@ -68,6 +68,13 @@ public class SyncCommand implements AaCommand {
       e.printStackTrace();
     }
     // then, do the sync for all workspaces
+    // TODO: Check this flow. It should roughly follow this flow:
+    //   pull `master` so it matches `origin/master`
+    //   `git checkout A`
+    //   `git format-patch HEAD^`
+    //   `# move .patch out of tree`
+    //   `git reset --hard master` # now `A` and `master` are the same
+    //   `git am -3 < ~/patch-file-we-moved-out`
     try {
       fileUtils
           .listContents(workspacePath)

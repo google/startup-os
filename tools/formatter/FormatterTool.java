@@ -33,10 +33,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.Scanner;
 
 public class FormatterTool {
   private static final boolean DEBUG_MODE = false;
@@ -128,9 +128,18 @@ public class FormatterTool {
       executeWithProcess(
           "/usr/bin/env",
           "bash",
-          "tools/buildtools_wrappers/buildifier.sh",
+          "tools/bazel_tools/buildifier.sh",
           "-mode=fix",
           path.toAbsolutePath().toString());
+    }
+  }
+
+  static class ShFormatter implements BaseFormatter {
+
+    @Override
+    public void format(Path path) throws IOException {
+      executeWithProcess(
+          "/usr/bin/env", "bash", "tools/bazel_tools/shfmt.sh", path.toAbsolutePath().toString());
     }
   }
 
@@ -155,8 +164,14 @@ public class FormatterTool {
   @FlagDesc(name = "build", description = "Format bazel BUILD files")
   private static final Flag<Boolean> build = Flag.create(false);
 
+  @FlagDesc(name = "sh", description = "Format shell files")
+  private static final Flag<Boolean> sh = Flag.create(false);
+
   @FlagDesc(name = "ignore_directories", description = "Ignored directories, split by comma")
   private static final Flag<String> ignoreDirectories = Flag.create("");
+
+  @FlagDesc(name = "ignore_node_modules", description = "Ignore node_modules folder")
+  private static final Flag<Boolean> ignoreNodeModules = Flag.create(true);
 
   private static boolean isJava(Path file) {
     return getExtension(file).equals(".java");
@@ -172,6 +187,10 @@ public class FormatterTool {
 
   private static boolean isCpp(Path file) {
     return getExtension(file).equals(".cc");
+  }
+
+  private static boolean isSh(Path file) {
+    return getExtension(file).equals(".sh");
   }
 
   private static boolean isBuild(Path file) {
@@ -194,7 +213,13 @@ public class FormatterTool {
             || (isProto(file) && proto.get())
             || (isPython(file) && python.get())
             || (isCpp(file) && cpp.get())
-            || (isBuild(file) && build.get()));
+            || (isBuild(file) && build.get())
+            || (isSh(file) && sh.get()));
+    if (ignoreNodeModules.get()) {
+      if (file.normalize().toString().contains("node_modules")) {
+        return false;
+      }
+    }
     boolean inIgnoredDirectory = ignoredDirectories.stream().anyMatch(file::startsWith);
     return formatByExtension && !inIgnoredDirectory;
   }
@@ -207,6 +232,7 @@ public class FormatterTool {
           .put(".cc", new ClangFormatter())
           .put(".bazel", new BuildFormatter())
           .put("", new BuildFormatter())
+          .put(".sh", new ShFormatter())
           .build();
 
   public static void main(String[] args) {

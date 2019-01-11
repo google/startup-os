@@ -547,7 +547,7 @@ public final class MessageDifferencer {
    * unknown fields.
    */
   public interface FieldComparator {
-    /** Comparison result for {@link FieldComparator#compare} */
+    /** Comparison result for {@link FieldComparator#compare}. */
     public enum ComparisonResult {
       /**
        * Compared fields are equal. In case of comparing submessages, user should not recursively
@@ -695,7 +695,6 @@ public final class MessageDifferencer {
      * elements are reported using {@link ReportType#ADDED} or {@link ReportType#DELETED}.
      */
     AS_LIST,
-
     /** Treat all the repeated fields as sets by default. See {@link Builder#treatAsSet}. */
     AS_SET
   }
@@ -1432,6 +1431,8 @@ public final class MessageDifferencer {
             output.append(" : ");
             appendValue(message1, fieldPath, true);
             break;
+          default:
+            throw new RuntimeException("Unknown ReportType");
         }
         output.append("\n" + tentativeNewline);
       } catch (IOException e) {

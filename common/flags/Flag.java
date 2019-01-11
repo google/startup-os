@@ -16,11 +16,11 @@
 
 package com.google.startupos.common.flags;
 
-import javax.annotation.Nonnull;
 import com.google.common.flogger.FluentLogger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 
 /** Flag class, with implementations for various flag types. */
 public abstract class Flag<T> {
@@ -214,10 +214,9 @@ public abstract class Flag<T> {
     }
     Flags.setFlagValue(name, value.toString());
     if ((prevValue != null) && !prevValue.equals(value)) {
-      log.atSevere()
-          .log(
-              "Flag %s value has changed between get() calls. Previous value is %s and current is %s",
-              name, prevValue, value);
+      log.atSevere().log(
+          "Flag %s value has changed between get() calls. Previous value is %s and current is %s",
+          name, prevValue, value);
     }
     if (required && value.equals(Flags.getDefaultFlagValue(name))) {
       throw new IllegalArgumentException(

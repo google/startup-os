@@ -1,11 +1,11 @@
-mat-table {
-  .mat-cell {
-    margin-top: 15px;
-    >.filename {
-      a {
-        font-weight: bold;
-        cursor: pointer;
-      }
-    }
+.cr-header {
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.threads {
+  padding: 14px 0;
+  >.thread {
+    margin-bottom: 14px;
   }
 }

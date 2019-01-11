@@ -1,0 +1,108 @@
+syntax = "proto3";
+
+package com.google.startupos.tools.reviewer.job.sync;
+
+option java_package = "com.google.startupos.tools.reviewer.job.sync";
+option java_outer_classname = "GithubPullRequestProtos";
+
+// TODO: Remove unused fields
+message PullRequest {
+
+  int64 id = 1;
+  int64 number = 2;
+  // Valid values: `open`, `closed`
+  string state = 3;
+  string title = 4;
+  // Pull Request author
+  User user = 5;
+  string body = 6;
+  // Expected format for created_at and updated_at fields:
+  // `yyyy-MM-ddTHH:mm:ssZ`
+  string created_at = 7;
+  string updated_at = 8;
+  repeated ReviewComment review_comment = 9;
+  repeated IssueComment issue_comment = 10;
+  string base_branch_name = 11;
+  string head_branch_name = 12;
+  string repo = 13;
+  repeated CommitInfo commits_info = 14;
+  string owner = 15;
+  int64 associated_reviewer_diff = 16;
+}
+
+message ReviewComment {
+  message Link {
+    message PullRequestLink { string href = 1; }
+    PullRequestLink pull_request = 1;
+  }
+
+  int64 id = 1;
+  int64 pull_request_review_id = 2;
+  string diff_hunk = 3;
+  string path = 4;
+  int32 position = 5;
+  int32 original_position = 6;
+  string commit_id = 7;
+  string original_commit_id = 8;
+  int32 in_reply_to_id = 9;
+  // Review comment author
+  User user = 10;
+  string body = 11;
+  string created_at = 12;
+  string updated_at = 13;
+  Link _links = 14;
+  string reviewer_thread_id = 15;
+  string reviewer_comment_id = 16;
+  bool is_outside_diff_comment = 17;
+  int32 reviewer_line_number = 18;
+}
+
+message IssueComment {
+  int64 id = 1;
+  string body = 2;
+  // Issue comment author. It's comment to whole pull request
+  User user = 3;
+  string created_at = 4;
+  string updated_at = 5;
+  string reviewer_thread_id = 6;
+  string reviewer_comment_id = 7;
+}
+
+message User {
+  string login = 1;
+  int64 id = 2;
+  string email = 3;
+}
+
+message CommitInfo {
+  string sha = 1;
+  Commit commit = 2;
+  User author = 3;
+  User committer = 4;
+  repeated Tree parents = 5;
+  repeated File files = 6;
+
+  message Commit {
+    User author = 1;
+    User committer = 2;
+    string message = 3;
+    Tree tree = 4;
+    int32 comment_count = 5;
+
+    message User {
+      string name = 1;
+      string email = 2;
+      string date = 3;
+    }
+  }
+  message Tree { string sha = 1; }
+
+  message File {
+    string filename = 1;
+    int32 additions = 2;
+    int32 deletions = 3;
+    int32 changes = 4;
+    string status = 5;
+    string patch = 6;
+  }
+}

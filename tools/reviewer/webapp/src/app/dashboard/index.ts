@@ -1,4 +1,3 @@
-export * from './diffs';
-export * from './diff';
-export * from './file-changes';
-export * from './diff-status';
+export * from './diff/diff.module';
+export * from './diffs/diffs.module';
+export * from './file-changes/file-changes.module';

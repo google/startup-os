@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "test_tool",
     srcs = [
@@ -18,12 +20,16 @@ java_binary(
     ],
 )
 
+checkstyle_test(
+    name = "test_tool-checkstyle",
+    target = ":test_tool",
+)
+
 java_test(
     name = "CodeReviewServiceTextDiffTest",
     srcs = [
         "CodeReviewServiceTextDiffTest.java",
     ],
-    local = 1,
     test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceTextDiffTest",
     deps = [
         "//common",
@@ -51,12 +57,16 @@ java_test(
     ],
 )
 
+checkstyle_test(
+    name = "CodeReviewServiceTextDiffTest-checkstyle",
+    target = ":CodeReviewServiceTextDiffTest",
+)
+
 java_test(
     name = "CodeReviewServiceGetDiffFilesTest",
     srcs = [
         "CodeReviewServiceGetDiffFilesTest.java",
     ],
-    local = 1,
     test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceGetDiffFilesTest",
     deps = [
         "//common",
@@ -82,4 +92,9 @@ java_test(
         "//tools/reviewer/local_server/service:code_review_java_proto",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "CodeReviewServiceGetDiffFilesTest-checkstyle",
+    target = ":CodeReviewServiceGetDiffFilesTest",
 )

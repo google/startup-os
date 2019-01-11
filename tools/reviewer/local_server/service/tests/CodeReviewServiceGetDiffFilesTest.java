@@ -16,21 +16,24 @@
 
 package com.google.startupos.tools.reviewer.localserver.service.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.TextDifferencer;
-import com.google.startupos.common.firestore.FirestoreClient;
-import com.google.startupos.common.firestore.FirestoreClientFactory;
+import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
+import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
-import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
@@ -42,25 +45,19 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public class CodeReviewServiceGetDiffFilesTest {
@@ -86,8 +83,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   // set by createAaWorkspace
   private String repoPath;
 
-  private FirestoreClientFactory firestoreClientFactory = mock(FirestoreClientFactory.class);
-  private FirestoreClient firestoreClient = mock(FirestoreClient.class);
+  private FirestoreProtoClient firestoreClient = mock(FirestoreProtoClient.class);
 
   @Before
   public void setup() throws IOException {
@@ -112,16 +108,13 @@ public class CodeReviewServiceGetDiffFilesTest {
     String initialRepoFolder = fileUtils.joinToAbsolutePath(testFolder, "initial_repo");
     aaBaseFolder = fileUtils.joinToAbsolutePath(testFolder, "base_folder");
 
-    when(firestoreClientFactory.create(any(), any())).thenReturn(firestoreClient);
-
     codeReviewService =
         new CodeReviewService(
             component.getAuthService(),
             fileUtils,
             aaBaseFolder,
             gitRepoFactory,
-            component.getTextDifferencer(),
-            firestoreClientFactory);
+            component.getTextDifferencer());
 
     createInitialRepo(initialRepoFolder);
     initAaBase(initialRepoFolder, aaBaseFolder);
@@ -169,8 +162,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   private void initAaBase(String initialRepoFolder, String aaBaseFolder) {
     InitCommand initCommand = component.getInitCommand();
     String[] args = {
-      "init", aaBaseFolder,
-      "--startupos_repo", initialRepoFolder,
+      "init", "--base_path", aaBaseFolder, "--startupos_repo", initialRepoFolder,
     };
     initCommand.run(args);
   }
@@ -208,7 +200,7 @@ public class CodeReviewServiceGetDiffFilesTest {
   }
 
   private void mockFirestoreClientMethods() {
-    when(firestoreClient.getDocument(
+    when(firestoreClient.getProtoDocument(
             "reviewer/data/diff/" + DIFF_ID, DiffFilesResponse.newBuilder()))
         .thenReturn(
             DiffFilesResponse.newBuilder()
@@ -221,7 +213,7 @@ public class CodeReviewServiceGetDiffFilesTest {
                             .build()))
                 .build());
 
-    when(firestoreClient.getDocument(
+    when(firestoreClient.getProtoDocument(
             "/reviewer/data/last_diff_id", DiffNumberResponse.newBuilder()))
         .thenReturn(DiffNumberResponse.newBuilder().setLastDiffId(1).build());
   }

@@ -16,26 +16,39 @@
 
 package com.google.startupos.tools.reviewer.localserver.service.tests;
 
+import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;
 import java.util.concurrent.TimeUnit;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
 
 /* Test tool for CodeReviewService.
  *
  * Alternatively, to run grpc_polyglot (curl-like tool for gRPC), use:
- * cat tools/reviewer/local_server/service/tests/get_diff_files_request.json | bazel run //tools:grpc_polyglot -- --command=call --endpoint=localhost:8001 --full_method=com.google.startupos.tools.reviewer.localserver.service.CodeReviewService/getDiffFiles
- * cat tools/reviewer/local_server/service/tests/get_text_diff_request.json | bazel run //tools:grpc_polyglot -- --command=call --endpoint=localhost:8001 --full_method=com.google.startupos.tools.reviewer.localserver.service.CodeReviewService/getTextDiff
- * cat tools/reviewer/local_server/service/tests/get_diff_request.json | bazel run //tools:grpc_polyglot -- --command=call --endpoint=localhost:8001 --full_method=com.google.startupos.tools.reviewer.localserver.service.CodeReviewService/getDiff
+ * cat tools/reviewer/local_server/service/tests/get_diff_files_request.json | \
+ *    CRS="com.google.startupos.tools.reviewer.localserver.service.CodeReviewService" \
+ *    bazel run //tools:grpc_polyglot -- \
+ *    --command=call --endpoint=localhost:8001 \
+ *    --full_method=$CRS/getDiffFiles
+ * cat tools/reviewer/local_server/service/tests/get_text_diff_request.json | \
+ *    CRS="com.google.startupos.tools.reviewer.localserver.service.CodeReviewService" \
+ *    bazel run //tools:grpc_polyglot -- \
+ *    --command=call --endpoint=localhost:8001 \
+ *    --full_method=$CRS/getTextDiff
+ * cat tools/reviewer/local_server/service/tests/get_diff_request.json | \
+ *    CRS="com.google.startupos.tools.reviewer.localserver.service.CodeReviewService" \
+ *    bazel run //tools:grpc_polyglot -- \
+ *    --command=call --endpoint=localhost:8001 \
+ *    --full_method=$CRS/getDiff
  */
 
 public class TestTool {
@@ -91,7 +104,7 @@ public class TestTool {
     File rightFile =
         File.newBuilder()
             .setRepoId("startup-os")
-            .setCommitId("112da27b321ed6aa2ec1bc91f3918eb41d8a938c")
+            .setCommitId("dbee600438f322e2db4085b4cd7a27212fe1ef40")
             .setFilename("WORKSPACE")
             .build();
     System.out.println(getTextDiff(leftFile, rightFile));
@@ -116,9 +129,19 @@ public class TestTool {
     System.out.println(getDiffFiles(workspace, diffNumber));
   }
 
+  public Diff getDiff(long diffNumber) {
+    DiffRequest request = DiffRequest.newBuilder().setDiffId(diffNumber).build();
+
+    return blockingStub.getDiff(request);
+  }
+
+  public void runGetDiff(long diffNumber) {
+    System.out.println(getDiff(diffNumber));
+  }
+
   public static void main(String[] args) {
     TestTool tool = new TestTool();
-    tool.runGetTextDiff();
+    tool.runGetDiffFiles("fix_diff6", 329);
   }
 }
 

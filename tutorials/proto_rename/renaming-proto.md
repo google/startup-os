@@ -20,6 +20,21 @@ We will rename some fields in next steps and see what will happen.
       </walkthrough-editor-open-file> 
 Contains main method and methods to write and read a proto file in binary format.
 
+
+## Preliminary setup
+As _most_ of our code, as well as `bazel` itself is written in Java, `bazel` needs
+to know where to find JDK. Unfortunately, it seems that Google Cloud Shell is configured to
+*run* Java programs, not to _build_ them - this is why `JAVA_HOME` is pointing to **JRE**
+which confuses `bazel`. To fix it, before running rest of the tutorial, run either of:
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+```
+to use system JDK or
+```bash
+unset JAVA_HOME
+```
+to use JDK embedded in bazel
+
 ## First launch
 - Run the command to build targets:
 ```bash

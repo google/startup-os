@@ -16,6 +16,13 @@
 
 package com.google.startupos.examples.errorprone;
 
+import static com.google.errorprone.BugPattern.Category.JDK;
+import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
+import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
+import static com.google.errorprone.matchers.Description.NO_MATCH;
+import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
+import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
+
 import com.google.auto.service.AutoService;
 import com.google.errorprone.BugPattern;
 import com.google.errorprone.VisitorState;
@@ -30,31 +37,21 @@ import com.google.protobuf.Message;
 import com.sun.source.tree.ExpressionTree;
 import com.sun.source.tree.MethodInvocationTree;
 
-import static com.google.errorprone.BugPattern.Category.JDK;
-import static com.google.errorprone.BugPattern.LinkType.CUSTOM;
-import static com.google.errorprone.BugPattern.SeverityLevel.ERROR;
-import static com.google.errorprone.matchers.Description.NO_MATCH;
-import static com.google.errorprone.matchers.method.MethodMatchers.instanceMethod;
-import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
-
 /** Matches on .newBuilder().build() called on proto message class. */
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "ProtobufCheck",
-  category = JDK,
-  summary = "Invocation of .newBuilder().build() on proto messages",
-  severity = ERROR,
-  linkType = CUSTOM,
-  link = "github.com/google/startup-os/tree/master/examples/errorprone#ProtobufCheck"
-)
+    name = "ProtobufCheck",
+    category = JDK,
+    summary = "Invocation of .newBuilder().build() on proto messages",
+    severity = ERROR,
+    linkType = CUSTOM,
+    link = "github.com/google/startup-os/tree/master/examples/errorprone#ProtobufCheck")
 public class ProtobufCheck extends BugChecker implements MethodInvocationTreeMatcher {
-
-  private Matcher<ExpressionTree> NEW_BUILDER =
+  private static Matcher<ExpressionTree> NEW_BUILDER =
       staticMethod()
           .onClass(TypePredicates.isDescendantOf("com.google.protobuf.GeneratedMessageV3"))
           .named("newBuilder");
-
-  private Matcher<ExpressionTree> BUILDER_BUILD =
+  private static Matcher<ExpressionTree> BUILDER_BUILD =
       instanceMethod().onDescendantOf(Message.Builder.class.getName()).named("build");
 
   @Override

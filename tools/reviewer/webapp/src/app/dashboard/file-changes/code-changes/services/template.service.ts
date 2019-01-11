@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { WordChange } from '@/core/proto';
+import { HighlightService } from '@/core/services';
 import {
   BlockIndex,
   BlockLine,
@@ -10,6 +12,8 @@ import {
 // So most complicated code is located here and is called by template.
 @Injectable()
 export class TemplateService {
+  constructor(private highlightService: HighlightService) { }
+
   // Get class for a line, based on its parameters
   getLineBackground(
     changesLine: ChangesLine,
@@ -28,44 +32,32 @@ export class TemplateService {
           throw new Error('Invalid block index');
       }
     } else {
-      return 'code-line';
+      return 'common-line';
     }
   }
 
-  // Replace html special chars with html entities
-  htmlSpecialChars(code: string): string {
-    const findSpecialChars: RegExp = /[&<>"'`=\/]/g;
-    return code.replace(findSpecialChars, char => {
-      switch (char) {
-        case '&': return '&amp;';
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '"': return '&quot;';
-        case "'": return '&#39;';
-        case '/': return '&#x2F;';
-        case '`': return '&#x60;';
-        case '=': return '&#x3D;';
-        default: return char;
-      }
-    });
-  }
-
   // Make line highlighted with separate chars
-  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): string {
-    const startIndex: number = blockLine.textChange.getStartIndex();
-    const endIndex: number = blockLine.textChange.getEndIndex();
+  highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): void {
+    // TODO: hightlight all word changes (not only first one)
+    let startIndex: number = 0;
+    let endIndex: number = 0;
+
+    const wordChanges: WordChange[] = blockLine.diffLine.getWordChangeList();
+    if (wordChanges.length > 0) {
+      startIndex = wordChanges[0].getStartIndex();
+      endIndex = wordChanges[0].getEndIndex();
+    }
+
     const className = (blockIndex === BlockIndex.rightFile) ?
       'hl-right' :
       'hl-left';
 
     if (
-      startIndex === endIndex ||
-      (startIndex === 0 && endIndex === blockLine.clearCode.length)
+      startIndex !== endIndex &&
+      startIndex !== 0 ||
+      endIndex !== blockLine.clearCode.length
     ) {
-      // No need to highlight chars, if whole line was changed.
-      return blockLine.clearCode;
-    } else {
-      return this.makeHighlighting(
+      blockLine.wordChanges = this.makeHighlighting(
         startIndex,
         endIndex,
         blockLine.clearCode,
@@ -99,9 +91,9 @@ export class TemplateService {
     );
 
     // Escape html special chars
-    leftPart = this.htmlSpecialChars(leftPart);
-    changedPart = this.htmlSpecialChars(changedPart);
-    rightPart = this.htmlSpecialChars(rightPart);
+    leftPart = this.highlightService.htmlSpecialChars(leftPart);
+    changedPart = this.highlightService.htmlSpecialChars(changedPart);
+    rightPart = this.highlightService.htmlSpecialChars(rightPart);
 
     // Highlight changed part
     const span: HTMLSpanElement = document.createElement('span');
@@ -113,6 +105,6 @@ export class TemplateService {
 
   // Does the block line contain no comments?
   isEmpty(blockLine: BlockLine): boolean {
-    return blockLine.threadFrames.length === 0;
+    return blockLine.threads.length === 0;
   }
 }

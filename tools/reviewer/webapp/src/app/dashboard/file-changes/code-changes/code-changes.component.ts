@@ -1,10 +1,9 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { randstr64 } from 'rndmjs';
 
-import {
-  TextDiff,
-  Thread,
-} from '@/shared/proto';
-import { CommitService } from '../services';
+import { Comment, TextDiff, Thread } from '@/core/proto';
+import { UserService } from '@/core/services';
+import { CommitService, StateService, ThreadService } from '../services';
 import {
   BlockIndex,
   BlockLine,
@@ -13,7 +12,6 @@ import {
 import {
   ChangesService,
   CommentsService,
-  HoverService,
   TemplateService,
 } from './services';
 
@@ -26,26 +24,29 @@ import {
   templateUrl: './code-changes.component.html',
   styleUrls: ['./code-changes.component.scss'],
   providers: [
-    HoverService,
     ChangesService,
     TemplateService,
+    ThreadService,
   ],
 })
 export class CodeChangesComponent implements OnInit, OnChanges {
   changesLines: ChangesLine[] = [];
   changesLinesMap: { [id: number]: number }[];
   isComponentInit: boolean = false;
+  clickIndex: number = -1;
 
   @Input() textDiff: TextDiff;
   @Input() language: string;
   @Input() threads: Thread[];
 
   constructor(
+    private userService: UserService,
     private changesService: ChangesService,
-    public hoverService: HoverService,
     public commentsService: CommentsService,
     public templateService: TemplateService,
     private commitService: CommitService,
+    public stateService: StateService,
+    private threadService: ThreadService,
   ) { }
 
   ngOnInit() {
@@ -60,7 +61,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     }
   }
 
-  // Initialize code lines
+  // Initializes code lines
   initLines(): void {
     const leftBlockLines: BlockLine[] = this.changesService.getBlockLines(
       this.textDiff.getLeftFileContents(),
@@ -85,14 +86,14 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     this.changesLinesMap = changesLinesMap;
   }
 
-  // Initialize comments
+  // Initializes comments
   initComments(threads: Thread[]): void {
     for (const thread of threads) {
       this.startThread(thread);
     }
   }
 
-  // Update comments, when data from firebase is received
+  // Updates comments, when data from firebase is received
   updateComments(threads: Thread[]): void {
     // Close open threads
     this.commentsService.openThreadsMap.forEach((lineIndexMap, blockIndex) => {
@@ -107,20 +108,61 @@ export class CodeChangesComponent implements OnInit, OnChanges {
     this.initComments(threads);
   }
 
-  // Add the thread to all threads to display it on user screen
+  // Adds the thread to all threads to displays it on user screen
   startThread(thread: Thread): void {
     const blockIndex: BlockIndex = this.commitService.getBlockIndex(thread);
     const lineIndex: number = this.changesLinesMap[blockIndex][thread.getLineNumber()];
 
     // Add the thread to all threads
-    this.commentsService.addEmptyThread(
+    this.commentsService.addThread(
       this.changesLines[lineIndex],
       blockIndex,
-    ).thread = thread;
+      thread,
+    );
 
     // Save to threads map for fast access
     this.commentsService.saveAsOpen(
       thread.getLineNumber(),
+      lineIndex,
+      blockIndex,
+    );
+  }
+
+  // Creates new thread and sends it to firebase
+  addThread(
+    value: string,
+    blockLine: BlockLine,
+    blockIndex: number,
+    lineIndex: number,
+    thread: Thread,
+  ): void {
+    if (!value) {
+      // Blank comments are not allowed.
+      return;
+    }
+
+    // Create new proto comment
+    const comment: Comment = new Comment();
+    comment.setContent(value);
+    comment.setCreatedBy(this.userService.email);
+    comment.setTimestamp(Date.now());
+    comment.setId(randstr64(5));
+
+    // Add comment and send to firebase
+    try {
+      this.threadService.addComment(
+        blockLine.lineNumber,
+        comment,
+        thread,
+        blockIndex,
+      );
+    } catch (e) {
+      // No need to reset state, if comment wasn't added
+      return;
+    }
+
+    this.commentsService.saveAsOpen(
+      blockLine.lineNumber,
       lineIndex,
       blockIndex,
     );

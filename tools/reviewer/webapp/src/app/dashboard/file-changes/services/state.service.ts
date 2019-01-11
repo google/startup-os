@@ -7,7 +7,7 @@ import {
   File,
   TextDiff,
   Thread,
-} from '@/shared/proto';
+} from '@/core/proto';
 import { BlockIndex } from '../code-changes';
 
 // The method keeps state of file-changes
@@ -24,8 +24,10 @@ export class StateService {
   isCommitFound: boolean;
   leftCommitId: string;
   rightCommitId: string;
+  // TODO: replace commit list to file list to be able to get "action" and other file fields
   commitIdList: string[] = [];
-  subscription = new Subscription();
+  onloadSubscription = new Subscription();
+  changesSubscription = new Subscription();
 
   createFile(): File {
     const file: File = new File();

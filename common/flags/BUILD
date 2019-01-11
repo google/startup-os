@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_library(
     name = "flags",
     srcs = [
@@ -18,6 +20,11 @@ java_library(
         "//third_party/maven/javax/annotation:javax_annotation_api",
         "//third_party/maven/org/javassist",
     ],
+)
+
+checkstyle_test(
+    name = "flags-checkstyle",
+    target = ":flags",
 )
 
 proto_library(

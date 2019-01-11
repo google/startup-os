@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_library(
     name = "commands",
     srcs = glob([
@@ -32,4 +34,9 @@ java_library(
         "//tools/reviewer/local_server/service:code_review_java_proto",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "commands-checkstyle",
+    target = ":commands",
 )

@@ -1,3 +1,5 @@
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 exports_files([
     "whitelist.yaml",
 ])
@@ -25,6 +27,11 @@ java_test(
     ],
 )
 
+checkstyle_test(
+    name = "MavenDepsWhitelistTest-checkstyle",
+    target = ":MavenDepsWhitelistTest",
+)
+
 java_test(
     name = "WorkspaceDepsWhitelistTest",
     srcs = ["WorkspaceDepsWhitelistTest.java"],
@@ -37,6 +44,11 @@ java_test(
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/yaml:snakeyaml",
     ],
+)
+
+checkstyle_test(
+    name = "WorkspaceDepsWhitelistTest-checkstyle",
+    target = ":WorkspaceDepsWhitelistTest",
 )
 
 java_test(
@@ -54,6 +66,11 @@ java_test(
     ],
 )
 
+checkstyle_test(
+    name = "PackageLockWhitelistTest-checkstyle",
+    target = ":PackageLockWhitelistTest",
+)
+
 java_binary(
     name = "workspace_patcher",
     srcs = ["WorkspacePatcher.java"],
@@ -62,4 +79,9 @@ java_binary(
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
     ],
+)
+
+checkstyle_test(
+    name = "workspace_patcher-checkstyle",
+    target = ":workspace_patcher",
 )

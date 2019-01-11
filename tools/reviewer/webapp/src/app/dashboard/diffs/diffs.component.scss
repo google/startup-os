@@ -1,32 +1,30 @@
-:host {
-  >.diff-groups {
-    >.diff-group {
-      >.diff-group-title {
-        >.group-name {
-          font-weight: bold;
-          margin-right: 5px;
-        }
+.dashboard {
+  >.diff-group {
+    >.diff-group-title {
+      >.group-name {
+        font-weight: bold;
+        margin-right: 5px;
       }
-      >.diff-list {
-        >.mat-row {
-          cursor: pointer;
-        }
-        
-        .mat-column-id {
-          flex: 0 0 5%;
-        }
-        .mat-column-author,
-        .mat-column-status,
-        .mat-column-action {
-          flex: 0 0 12%;
-        }
-        .mat-column-reviewers,
-        .mat-column-description {
-          flex: 0 0 20%;
-        }
+    }
+    >.diff-list {
+      >.mat-row {
+        cursor: pointer;
       }
-      >.placeholder {
-        height: 14px;
+      
+      .mat-column-id {
+        flex: 0 0 8%;
+      }
+      .mat-column-author,
+      .mat-column-status {
+        flex: 0 0 11%;
+      }
+      .mat-column-workspace,
+      .mat-column-action,
+      .mat-column-reviewers {
+        flex: 0 0 15%;
+      }
+      .mat-column-description {
+        flex: 0 0 25%;
       }
     }
   }

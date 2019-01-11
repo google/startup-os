@@ -1,0 +1,28 @@
+.title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  >div {
+    margin-bottom: 8px;
+  }
+}
+.diff-id {
+  margin-bottom: 10px;
+  >input {
+    height: 30px;
+    border-radius: 8px;
+    border: solid 1px #8d8d8d;
+    outline: none;
+    padding: 1px 5px;
+    font-size: 14px;
+  }
+  >.wrong-id {
+    border-color: red;
+    border-width: 2px;
+    padding: 0 4px;
+  }
+}
+.workspace {
+  margin-bottom: 20px;
+}

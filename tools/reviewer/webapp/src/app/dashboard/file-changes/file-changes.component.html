@@ -1,40 +1,45 @@
 <!-- Loading -->
 <page-loading [isLoading]="stateService.isLoading"></page-loading>
 
-<!-- Header -->
-<div class="file-header" *ngIf="!stateService.isLoading">
-  <div class="back-button">
-    <a routerLink="/diff/{{ stateService.diffId }}">
-      Back
-    </a>
+<div class="file-changes" *ngIf="!stateService.isLoading">
+  <!-- Titlebar -->
+  <div class="cr-titlebar titlebar">
+    <div class="title">
+      <a
+        class="diff bold"
+        routerLink="/diff/{{ stateService.diffId }}"
+      >Diff {{ stateService.diff.getId() }}</a>
+      <span>by</span>
+      <span
+        class="username"
+        [ngClass]="{ 'bold': stateService.diff.getAuthor().getNeedsAttention() }"
+      >{{ getAuthor() }}</span>
+    </div>
+    <diff-status [diff]="stateService.diff"></diff-status>
   </div>
-  <div class="filename">
-    <span>{{ stateService.file.getFilenameWithRepo() }}</span>
+
+  <div
+    class="header-menu"
+    [ngClass]="{ 'header-fixed': isHeaderFixed }"
+  >
+    <!-- Path -->
+    <div class="filename">
+      <span>{{ stateService.file.getFilenameWithRepo() }}</span>
+    </div>
+
+    <!-- Commit Menu -->
+    <div class="commit-menu">
+      <commit-menu></commit-menu>
+    </div>
   </div>
-</div>
+  <div class="header-cover" *ngIf="isHeaderFixed"></div>
 
-<!-- Commit Menu -->
-<div class="commit-menu" *ngIf="!stateService.isLoading">
-  <commit-select
-    title="Left commit id"
-    [commitId]="stateService.leftCommitId"
-    (selectChanges)="commitSelectService.leftSelectChanged($event)"
-  ></commit-select>
-  <commit-select
-    title="Right commit id"
-    [commitId]="stateService.rightCommitId"
-    (selectChanges)="commitSelectService.rightSelectChanged($event)"
-  ></commit-select>
-</div>
-
-<!-- Code changes -->
-<div
-  class="code-changes"
-  *ngIf="!stateService.isLoading && stateService.isCommitFound"
->
-  <code-changes
-    [textDiff]="stateService.textDiff"
-    [language]="stateService.language"
-    [threads]="stateService.localThreads"
-  ></code-changes>
+  <!-- Code changes -->
+  <div class="code-changes" *ngIf="stateService.isCommitFound">
+    <code-changes
+      [textDiff]="stateService.textDiff"
+      [language]="stateService.language"
+      [threads]="stateService.localThreads"
+    ></code-changes>
+  </div>
 </div>

@@ -16,12 +16,14 @@
 
 package com.google.startupos.tools.reviewer.aa;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.tools.reviewer.aa.commands.AaCommand;
 import com.google.startupos.tools.reviewer.aa.commands.AddRepoCommand;
 import com.google.startupos.tools.reviewer.aa.commands.DiffCommand;
 import com.google.startupos.tools.reviewer.aa.commands.FixCommand;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
+import com.google.startupos.tools.reviewer.aa.commands.KillServerCommand;
 import com.google.startupos.tools.reviewer.aa.commands.PatchCommand;
 import com.google.startupos.tools.reviewer.aa.commands.ReviewCommand;
 import com.google.startupos.tools.reviewer.aa.commands.SnapshotCommand;
@@ -38,7 +40,7 @@ import javax.inject.Singleton;
 /** aa tool. */
 @Singleton
 public class AaTool {
-  private Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
+  private final Map<String, Lazy<? extends AaCommand>> commands = new HashMap<>();
 
   @Inject
   AaTool(
@@ -51,7 +53,8 @@ public class AaTool {
       Lazy<SnapshotCommand> snapshotCommand,
       Lazy<SubmitCommand> submitCommand,
       Lazy<AddRepoCommand> addRepoCommand,
-      Lazy<PatchCommand> patchCommand) {
+      Lazy<PatchCommand> patchCommand,
+      Lazy<KillServerCommand> killServerCommand) {
     commands.put("init", initCommand);
     commands.put("workspace", workspaceCommand);
     commands.put("sync", syncCommand);
@@ -62,8 +65,7 @@ public class AaTool {
     commands.put("submit", submitCommand);
     commands.put("add_repo", addRepoCommand);
     commands.put("patch", patchCommand);
-    // killserver is implemented in aa_tool.sh
-    commands.put("killserver", null);
+    commands.put("killserver", killServerCommand);
   }
 
   private void printUsage() {
@@ -76,6 +78,10 @@ public class AaTool {
   @Component(modules = {CommonModule.class, AaModule.class})
   public interface AaToolComponent {
     AaTool getAaTool();
+  }
+
+  public ImmutableList<String> getCommands() {
+    return ImmutableList.sortedCopyOf(commands.keySet());
   }
 
   private boolean run(String[] args) {

@@ -79,6 +79,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       decodeJwtToken();
       setTokenRefreshScheduler();
       logger.atInfo().log("Loaded token from filesystem");
+      refreshToken();
     }
   }
 
@@ -176,6 +177,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
     return jwtToken;
   }
 
+  public long getTokenExpiration() {
+    return tokenExpiration;
+  }
+
   public String getProjectId() {
     return projectId;
   }
@@ -186,6 +191,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   public String getUserEmail() {
     return userEmail;
+  }
+
+  public String getRefreshToken() {
+    return refreshToken;
   }
 }
 

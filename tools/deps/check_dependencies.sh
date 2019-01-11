@@ -8,8 +8,7 @@ GREEN=$(tput setaf 2)
 RESET=$(tput sgr0)
 
 git diff --name-only origin/master | grep --quiet dependencies.yaml
-if [ $? -eq 0 ]
-then
+if [ $? -eq 0 ]; then
   echo "$RED[!] ""dependencies.yaml was modified, running the check$RESET"
 else
   echo "$GREEN[!] ""dependencies.yaml was not modified, exiting (code $?) $RESET"

@@ -13,16 +13,14 @@
       </td>
 
       <td
-        [ngClass]="[
-          'content',
-          templateService.getLineBackground(
-            changesLine,
-            blockIndex,
-            blockLine)
-        ]"
+        class="content"
+        [ngClass]="[templateService.getLineBackground(
+          changesLine,
+          blockIndex,
+          blockLine
+        )]"
+        (mousedown)="clickIndex = blockIndex"
         valign="top"
-        (mouseover)="hoverService.mouseOver(blockLine, blockIndex)"
-        (mouseleave)="hoverService.mouseLeave()"
       >
         <!-- "Add comment" button -->
         <div
@@ -31,10 +29,9 @@
         >
           <div
             class="icon-button"
-            *ngIf="hoverService.isHovered(blockLine, blockIndex)"
             (click)="commentsService.addEmptyThread(changesLine, blockIndex)"
           >
-            <mat-icon>add_box</mat-icon>
+            <img src="/assets/ic-add-comment.svg">
           </div>
         </div>
 
@@ -44,7 +41,7 @@
           *ngIf="blockLine.isChanged"
         >
           <pre
-            [HTML]="templateService.highlightChanges(blockLine, blockIndex)"
+            [HTML]="blockLine.wordChanges"
           ></pre>
         </div>
 
@@ -52,6 +49,7 @@
         <div
           class="code-line code"
           *ngIf="!changesLine.isCommentsLine && !blockLine.isPlaceholder"
+          [ngClass]="{ selectable: clickIndex === blockIndex }"
           (dblclick)="commentsService.addEmptyThread(changesLine, blockIndex)"
         >
           <pre [HTML]="blockLine.code"></pre>
@@ -62,14 +60,23 @@
           class="threads"
           *ngIf="changesLine.isCommentsLine && !templateService.isEmpty(blockLine)"
         >
-          <line-comments
-            [changesLine]="changesLine"
-            [blockLine]="blockLine"
-            [blockIndex]="blockIndex"
-            [lineIndex]="lineIndex"
-            [threadIndex]="threadIndex"
-            *ngFor="let threadFrame of blockLine.threadFrames; let threadIndex = index"
-          ></line-comments>
+          <div
+            class="thread"
+            *ngFor="let thread of blockLine.threads; let threadIndex = index"
+          >
+            <cr-thread
+              [diff]="stateService.diff"
+              [thread]="thread"
+              (closeEmitter)="commentsService.closeThread(blockLine, threadIndex, blockIndex)"
+              (addEmitter)="addThread(
+                $event,
+                blockLine,
+                blockIndex,
+                lineIndex,
+                thread
+              )"
+            ></cr-thread>
+          </div>
         </div>
       </td>
     </ng-container>

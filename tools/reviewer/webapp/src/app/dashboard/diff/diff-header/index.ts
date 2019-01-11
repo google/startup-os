@@ -3,10 +3,12 @@ export * from './diff-header-titlebar';
 export * from './diff-header-content';
 export * from './user-popup';
 export * from './reply-popup';
-export * from './add-user-dialog';
+export * from './add-user-popup';
+export * from './add-issue-popup';
 
 // Components
-import { AddUserDialogComponent } from './add-user-dialog';
+import { AddIssuePopupComponent } from './add-issue-popup';
+import { AddUserPopupComponent } from './add-user-popup';
 import { DiffHeaderContentComponent } from './diff-header-content';
 import { DiffHeaderTitlebarComponent } from './diff-header-titlebar';
 import { DiffHeaderComponent } from './diff-header.component';
@@ -18,5 +20,6 @@ export const DiffHeaderComponentList = [
   DiffHeaderContentComponent,
   UserPopupComponent,
   ReplyPopupComponent,
-  AddUserDialogComponent,
+  AddUserPopupComponent,
+  AddIssuePopupComponent,
 ];

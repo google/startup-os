@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { randstr64 } from 'rndmjs';
 
-import { Comment, Diff, File, Thread } from '@/shared/proto';
-import { DiffUpdateService, NotificationService } from '@/shared/services';
+import { Comment, Diff, File, Thread } from '@/core/proto';
+import { DiffUpdateService, NotificationService } from '@/core/services';
 import { BlockIndex } from '../code-changes';
 import { StateService } from './state.service';
 
@@ -75,7 +75,7 @@ export class ThreadService {
       this.stateService.diff.addCodeThread(newThread);
     }
 
-    this.diffUpdateService.addComment(this.stateService.diff);
+    this.diffUpdateService.saveComment(this.stateService.diff);
   }
 
   private createNewThread(
@@ -89,18 +89,18 @@ export class ThreadService {
     newThread.setCommentList(comments);
     newThread.setRepoId(this.stateService.branchInfo.getRepoId());
     newThread.setCommitId(commitId);
-    newThread.setFile(this.stateService.file);
+    newThread.setFile(this.createThreadFile(commitId));
     newThread.setType(Thread.Type.CODE);
     newThread.setId(randstr64(6));
 
     return newThread;
   }
 
-  deleteComment(isDeleteThread: boolean): void {
-    this.diffUpdateService.deleteComment(this.stateService.diff, isDeleteThread);
-  }
-
-  resolveThread(isDone: boolean): void {
-    this.diffUpdateService.resolveThread(this.stateService.diff, isDone);
+  private createThreadFile(commitId: string): File {
+    const file: File = this.stateService.createFile();
+    file.setFilenameWithRepo(this.stateService.file.getFilenameWithRepo());
+    file.setOriginalFilename(this.stateService.file.getOriginalFilename());
+    file.setCommitId(commitId);
+    return file;
   }
 }

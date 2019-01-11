@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 
 import {
   ChangeType,
-  TextChange,
+  DiffLine,
   TextDiff,
-} from '@/shared/proto';
-import { HighlightService } from '@/shared/services';
+} from '@/core/proto';
+import { HighlightService } from '@/core/services';
 import {
   BlockIndex, BlockLine, ChangesLine,
 } from '../code-changes.interface';
 import { LineService } from './line.service';
+import { TemplateService } from './template.service';
 
 // Main service of code-changes
 @Injectable()
@@ -17,6 +18,7 @@ export class ChangesService {
   constructor(
     private highlightService: HighlightService,
     private lineService: LineService,
+    private templateService: TemplateService,
   ) { }
 
   // Convert string file content to highlighted code lines
@@ -42,10 +44,12 @@ export class ChangesService {
         throw new Error("Highlighted and clear lines don't match");
       }
 
-      blockLines.push(
+      blockLines.push(this.lineService.createBlockLine(
+        lineCode,
+        clearLineCode,
         // index + 1 because we want 1,2,3,4,5... instead of 0,1,2,3,4...
-        this.lineService.createBlockLine(lineCode, clearLineCode, index + 1),
-      );
+        index + 1,
+      ));
     });
 
     return blockLines;
@@ -60,8 +64,8 @@ export class ChangesService {
     );
 
     // Get spans, which aren't closed on the same line, where they're opened
-    const spans: NodeListOf<HTMLSpanElement> = htmlDocument
-      .getElementsByTagName('span');
+    const spans: HTMLCollectionOf<HTMLSpanElement> = htmlDocument
+      .getElementsByTagName('span') as HTMLCollectionOf<HTMLSpanElement>;
     let multilineSpanList: HTMLSpanElement[] = [];
     Array.from(spans).forEach(span => {
       const innerLines: string[] = span.innerHTML.split('\n');
@@ -91,13 +95,13 @@ export class ChangesService {
   }
 
   // TODO: remove the method, when the issue will be fix
-  tempFixChangesLineNumber(textChanges: TextChange[]): void {
+  tempFixChangesLineNumber(diffLines: DiffLine[]): void {
     let delimiter: number = 0;
-    textChanges.forEach(textChange => {
-      switch (textChange.getType()) {
+    diffLines.forEach(diffLine => {
+      switch (diffLine.getType()) {
         case ChangeType.DELETE:
         case ChangeType.ADD:
-          textChange.setLineNumber(textChange.getLineNumber() - delimiter);
+          diffLine.setDiffLineNumber(diffLine.getDiffLineNumber() - delimiter);
           break;
         case ChangeType.LINE_PLACEHOLDER:
           delimiter++;
@@ -112,21 +116,24 @@ export class ChangesService {
     rightBlockLines: BlockLine[],
     textDiff: TextDiff,
   ): {
-      changesLines: ChangesLine[];
-      changesLinesMap: { [id: number]: number }[];
-    } {
-    this.tempFixChangesLineNumber(textDiff.getLeftChangeList());
-    this.tempFixChangesLineNumber(textDiff.getRightChangeList());
+    changesLines: ChangesLine[];
+    changesLinesMap: { [id: number]: number }[];
+  } {
+    this.tempFixChangesLineNumber(textDiff.getLeftDiffLineList());
+    this.tempFixChangesLineNumber(textDiff.getRightDiffLineList());
 
-    this.applyChanges(textDiff.getLeftChangeList(), leftBlockLines);
-    this.applyChanges(textDiff.getRightChangeList(), rightBlockLines);
+    this.applyChanges(textDiff.getLeftDiffLineList(), leftBlockLines);
+    this.applyChanges(textDiff.getRightDiffLineList(), rightBlockLines);
 
-    this.addPlaceholders(textDiff.getLeftChangeList(), leftBlockLines);
-    this.addPlaceholders(textDiff.getRightChangeList(), rightBlockLines);
+    this.addPlaceholders(textDiff.getLeftDiffLineList(), leftBlockLines);
+    this.addPlaceholders(textDiff.getRightDiffLineList(), rightBlockLines);
 
     if (leftBlockLines.length !== rightBlockLines.length) {
-      // After adding all placeholders
-      throw new Error('Blocks should have the same amount of lines');
+      throw new Error(
+        `After adding all placeholders, blocks should have the same amount of lines.
+Left lines: ${leftBlockLines.length}
+Right lines: ${rightBlockLines.length}`,
+      );
     }
     const amountOfLines: number = leftBlockLines.length;
 
@@ -139,13 +146,15 @@ export class ChangesService {
         leftBlockLines[i],
         rightBlockLines[i],
       );
+      this.templateService.highlightChanges(leftBlockLines[i], BlockIndex.leftFile);
+      this.templateService.highlightChanges(rightBlockLines[i], BlockIndex.rightFile);
 
       // Add map marker to be able for fast access
       const codeIndex: number = changesLines.length;
       changesLinesMap[BlockIndex.leftFile]
-        [leftBlockLines[i].lineNumber] = codeIndex;
+      [leftBlockLines[i].lineNumber] = codeIndex;
       changesLinesMap[BlockIndex.rightFile]
-        [rightBlockLines[i].lineNumber] = codeIndex;
+      [rightBlockLines[i].lineNumber] = codeIndex;
 
       // Create line for comments
       const commentsLine: ChangesLine = this.lineService.createCommentsLine(
@@ -164,29 +173,27 @@ export class ChangesService {
     };
   }
 
-  applyChanges(textChanges: TextChange[], blockLines: BlockLine[]): void {
-    textChanges.forEach(textChange => {
-      switch (textChange.getType()) {
+  applyChanges(diffLines: DiffLine[], blockLines: BlockLine[]): void {
+    diffLines.forEach(diffLine => {
+      switch (diffLine.getType()) {
         case ChangeType.DELETE:
         case ChangeType.ADD:
           // Highlight changes
-          blockLines[textChange.getLineNumber()].isChanged = true;
-          blockLines[textChange.getLineNumber()].textChange = textChange;
+          blockLines[diffLine.getDiffLineNumber()].isChanged = true;
+          blockLines[diffLine.getDiffLineNumber()].diffLine = diffLine;
       }
     });
   }
 
-  addPlaceholders(textChanges: TextChange[], blockLines: BlockLine[]): void {
-    textChanges.forEach(textChange => {
-      if (textChange.getType() === ChangeType.LINE_PLACEHOLDER) {
+  addPlaceholders(diffLines: DiffLine[], blockLines: BlockLine[]): void {
+    diffLines.forEach(diffLine => {
+      if (diffLine.getType() === ChangeType.LINE_PLACEHOLDER) {
         // Add placeholder
         blockLines.splice(
-          // LineNumber + 1 because we want to add placeholder after the line
-          textChange.getLineNumber() + 1,
+          diffLine.getDiffLineNumber(),
           0,
           this.lineService.createPlaceholder(),
         );
-        // TODO: to use placeholderLineCount ?
       }
     });
   }

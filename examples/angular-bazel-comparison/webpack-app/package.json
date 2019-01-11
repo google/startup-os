@@ -25,6 +25,7 @@
     "hoek": "^5.0.3",
     "request": "^2.87.0",
     "rxjs": "^6.0.0",
+    "webpack-dev-server": "^3.1.14",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {

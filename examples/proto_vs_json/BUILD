@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 proto_library(
     name = "data_proto",
     srcs = ["data.proto"],
@@ -24,4 +26,9 @@ java_binary(
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/inject:javax_inject",
     ],
+)
+
+checkstyle_test(
+    name = "proto_vs_json_tool-checkstyle",
+    target = ":proto_vs_json_tool",
 )

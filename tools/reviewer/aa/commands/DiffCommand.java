@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.google.startupos.tools.reviewer.aa.commands;
 
 import com.google.common.collect.ImmutableList;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
@@ -28,16 +28,19 @@ import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiff
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
 import com.google.startupos.tools.reviewer.localserver.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 public class DiffCommand implements AaCommand {
   private final FileUtils fileUtils;
@@ -85,6 +88,14 @@ public class DiffCommand implements AaCommand {
             .collect(Collectors.toList()));
   }
 
+  private ImmutableList<String> getIssues(String issuesInput) {
+    return ImmutableList.copyOf(
+        Arrays.stream(issuesInput.split(","))
+            .map(String::trim)
+            .filter(x -> !x.isEmpty())
+            .collect(Collectors.toList()));
+  }
+
   private Diff createDiff() {
     DiffNumberResponse response =
         codeReviewBlockingStub.getAvailableDiffNumber(Empty.getDefaultInstance());
@@ -97,7 +108,7 @@ public class DiffCommand implements AaCommand {
         Diff.newBuilder()
             .setWorkspace(workspaceName)
             .setDescription(description.get())
-            .setBug(buglink.get())
+            .addAllIssue(getIssues(buglink.get()))
             .addAllReviewer(getReviewers(reviewers.get()))
             .setId(response.getLastDiffId())
             .setCreatedTimestamp(currentTime)
@@ -119,6 +130,7 @@ public class DiffCommand implements AaCommand {
                     String.format("[%s/%s]: switching to diff branch", workspaceName, repoName));
                 repo.switchBranch(branchName);
               });
+      addGithubRepos(diffBuilder);
     } catch (Exception e) {
       repoToInitialBranch.forEach(
           (repo, initialBranch) -> {
@@ -151,9 +163,9 @@ public class DiffCommand implements AaCommand {
 
     if (!buglink.get().isEmpty()) {
       // replace buglink if specified
-      diffBuilder.setBug(buglink.get());
+      diffBuilder.addAllIssue(getIssues(buglink.get()));
     }
-
+    addGithubRepos(diffBuilder);
     diffBuilder.setModifiedTimestamp(new Long(System.currentTimeMillis()));
 
     return diffBuilder.build();
@@ -169,6 +181,44 @@ public class DiffCommand implements AaCommand {
     // TODO: Rename createDiff to createOrUpdateDiff
     codeReviewBlockingStub.createDiff(request);
     return true;
+  }
+
+  private void addGithubRepos(Diff.Builder diffBuilder) {
+    List<String> existingGithubRepoNames =
+        diffBuilder.getGithubPrList().stream().map(GithubPr::getRepo).collect(Collectors.toList());
+    try {
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
+          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
+          .filter(fileUtils::folderExists)
+          .forEach(
+              path -> {
+                GitRepo repo = this.gitRepoFactory.create(path);
+                if (repo.hasChanges(repo.currentBranch())) {
+                  // Example of repoUrl: https://github.com/google/startup-os.git
+                  String repoUrl = repo.getRemoteUrl();
+                  String repoOwner = repoUrl.split("/")[3];
+                  String repoName = repoUrl.split("/")[4].replace(".git", "").trim();
+
+                  String folderName = Paths.get(path).getFileName().toString();
+                  if (!repoName.equals(folderName)) {
+                    System.out.println(
+                        String.format(
+                            "Repository name from the URL(%s) and folder "
+                                + "name from workspace(%s) aren't the same.",
+                            repoName, folderName));
+                  }
+
+                  if (!existingGithubRepoNames.contains(repoName)) {
+                    diffBuilder.addGithubPr(
+                        GithubPr.newBuilder().setRepo(repoName).setOwner(repoOwner).build());
+                  }
+                }
+              });
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }
 

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.tools.reviewer.job.tasks;
+package com.google.startupos.tools.reviewer.job.tasks;
 
-import com.google.startupos.tools.reviewer.tools.reviewer.job.impl.ReviewerMetadataUpdaterTask;
-
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
@@ -27,14 +25,12 @@ import java.util.concurrent.Executors;
 
 public class TaskExecutor extends TimerTask {
 
-  private List<Task> tasks;
+  private ImmutableList<Task> tasks;
   private ExecutorService threadPool;
 
-  @Inject
-  public TaskExecutor(ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask) {
-    tasks = new ArrayList<>();
-    tasks.add(reviewerMetadataUpdaterTask);
-    threadPool = Executors.newFixedThreadPool(4);
+  public TaskExecutor(ImmutableList<Task> tasks) {
+    this.tasks = tasks;
+    threadPool = Executors.newFixedThreadPool(tasks.size());
   }
 
   @Override

@@ -11,6 +11,8 @@ java_library(
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/j2objc:j2objc_annotations",
         "//third_party/maven/org/apache/httpcomponents:httpclient",
     ],
 )

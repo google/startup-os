@@ -16,13 +16,14 @@
 
 package com.google.startupos.tools.workspace_patcher;
 
-import com.google.startupos.common.flags.Flags;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.IOException;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class WorkspacePatcher {
   // We need to patch WORKSPACE file to replace

@@ -1,4 +1,12 @@
-<mat-card>
+<div class="reply-popup">
+  <speech-arrow
+    [size]=15
+    [border]=2
+    color="#fff4db"
+    bordercolor="#8c8c8c"
+    [shadow]=[2,2,2,0.8]
+  ></speech-arrow>
+
   <div class="titlebar">
     <span>Reply</span>
     <mat-spinner [diameter]="20" *ngIf="isLoading"></mat-spinner>
@@ -21,7 +29,7 @@
     <!-- Hide Approved checkbox when Author is the current user -->
     <mat-checkbox
       color="primary"
-      *ngIf="authService.userEmail !== diff.getAuthor().getEmail()"
+      *ngIf="userService.email !== diff.getAuthor().getEmail()"
       [(ngModel)]="approved" 
     >Approved</mat-checkbox>
     
@@ -32,5 +40,5 @@
       [disabled]="isLoading"
     >Reply</button>
   </div>
-</mat-card>
+</div>
 <div class="reply-popup-overlay" (click)="closeReplyPopup()"></div>

@@ -7,6 +7,7 @@
   <diff-files
     [files]="files"
     [diffId]="diff.getId()"
+    [diff]="diff"
   ></diff-files>
   <diff-discussion
     [diff]="diff"
@@ -17,7 +18,7 @@
     <div class="title">
       <span class="bold">Extra actions</span>
     </div>
-    <div class="buttons" fxFlex>
+    <div class="buttons" fxFlex *ngIf="diffCanBeDeleted()">
       <button
         mat-button
         class="cr-light-button grey-button"

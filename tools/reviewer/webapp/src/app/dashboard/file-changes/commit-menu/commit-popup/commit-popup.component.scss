@@ -1,0 +1,32 @@
+:host {
+  position: absolute;
+  top: 17px;
+  >.commit-popup {
+    $left: 22px;
+    $speech-arrow: 15px;
+    margin-top: $speech-arrow;
+    min-width: 170px;
+    position: relative;
+    z-index: 2;
+    background: white;
+    padding: 20px;
+    border: solid 2px #8c8c8c;
+    box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    >.commit-id {
+      color: #232323;
+      font-size: 14px;
+    }
+    >.time {
+      color: #434343;
+      font-size: 12px;
+      margin-top: 9px;
+    }
+    >speech-arrow {
+      line-height: $speech-arrow;
+      top: -$speech-arrow;
+      left: $left;
+      position: absolute;
+    }
+  }
+}

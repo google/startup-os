@@ -1,10 +1,52 @@
-.file-header,
-.code-changes {
-  padding: 10px 30px 0 30px;
-}
+$background: #f3f3f3;
+$border: 1px solid #c1c1c1;
 
-.commit-menu {
-  margin-top: 20px;
-  margin-left: 30px;
-  display: flex;
+.file-changes {
+  background: $background;
+  >.titlebar {
+    border-bottom: $border;
+    >.title {
+      margin-right: 30px;
+      >.diff {
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        text-decoration: none;
+        color: black;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  >.header-menu {
+    display: flex;
+    padding: 10px 23px;
+    align-items: center;
+    background: $background;
+    position: relative;
+    z-index: 5;
+    >.commit-menu {
+      margin-left: 70px;
+      display: flex;
+    }
+    >.filename {
+      >span {
+        color: #5d5d5d;
+      }
+    }
+  }
+  >.header-fixed {
+    position: fixed;
+    left: 0;
+    top: 0;
+    border-bottom: 1px solid #979797;
+    width: 100%;
+  }
+  >.header-cover {
+    height: 42px;
+  }
+  >.code-changes {
+    padding-bottom: 10px;
+  }
 }

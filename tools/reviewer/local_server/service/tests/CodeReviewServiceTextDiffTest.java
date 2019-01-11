@@ -18,42 +18,40 @@ package com.google.startupos.tools.reviewer.localserver.service.tests;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.startupos.common.firestore.FirestoreClientFactory;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
-import com.google.startupos.tools.localserver.service.AuthService;
-import io.grpc.inprocess.InProcessChannelBuilder;
-import io.grpc.inprocess.InProcessServerBuilder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import dagger.Component;
-import org.junit.Before;
-import org.junit.After;
 import com.google.startupos.common.CommonModule;
-import com.google.startupos.tools.reviewer.aa.AaModule;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
-import java.io.IOException;
-import java.nio.file.Files;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.TextDifferencer;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.common.flags.Flags;
-import javax.inject.Named;
-import dagger.Provides;
-import java.nio.file.FileSystems;
+import com.google.startupos.common.repo.Protos.File.Action;
+import com.google.startupos.tools.localserver.service.AuthService;
+import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
-import com.google.startupos.common.TextDifferencer;
-import io.grpc.Server;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
+import dagger.Component;
+import dagger.Provides;
 import io.grpc.ManagedChannel;
-import java.util.concurrent.TimeUnit;
+import io.grpc.Server;
 import io.grpc.StatusRuntimeException;
-import com.google.startupos.common.repo.Protos.File.Action;
-
+import io.grpc.inprocess.InProcessChannelBuilder;
+import io.grpc.inprocess.InProcessServerBuilder;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
+import javax.inject.Named;
 import javax.inject.Singleton;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 /*
  * Unit tests for {@link CodeReviewService}.
@@ -101,7 +99,7 @@ public class CodeReviewServiceTextDiffTest {
     Flags.parse(
         new String[0], AuthService.class.getPackage(), CodeReviewService.class.getPackage());
     String testFolder = Files.createTempDirectory("temp").toAbsolutePath().toString();
-    String initialRepoFolder = joinToAbsolutePath(testFolder, "initial_repo");
+    final String initialRepoFolder = joinToAbsolutePath(testFolder, "initial_repo");
     aaBaseFolder = joinToAbsolutePath(testFolder, "base_folder");
 
     component =
@@ -125,8 +123,7 @@ public class CodeReviewServiceTextDiffTest {
             fileUtils,
             aaBaseFolder,
             gitRepoFactory,
-            component.getTextDifferencer(),
-            component.getFirestoreClientFactory());
+            component.getTextDifferencer());
 
     createInitialRepo(initialRepoFolder);
     initAaBase(initialRepoFolder, aaBaseFolder);
@@ -147,8 +144,6 @@ public class CodeReviewServiceTextDiffTest {
   @Singleton
   @Component(modules = {CommonModule.class, AaModule.class})
   interface TestComponent {
-    FirestoreClientFactory getFirestoreClientFactory();
-
     AuthService getAuthService();
 
     GitRepoFactory getGitRepoFactory();
@@ -175,8 +170,7 @@ public class CodeReviewServiceTextDiffTest {
   private void initAaBase(String initialRepoFolder, String aaBaseFolder) {
     InitCommand initCommand = component.getInitCommand();
     String[] args = {
-      "init", aaBaseFolder,
-      "--startupos_repo", initialRepoFolder,
+      "init", "--base_path", aaBaseFolder, "--startupos_repo", initialRepoFolder,
     };
     initCommand.run(args);
   }
@@ -220,7 +214,7 @@ public class CodeReviewServiceTextDiffTest {
 
   private TextDiffResponse getExpectedResponse(String contents) {
     return TextDiffResponse.newBuilder()
-        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents))
+        .setTextDiff(component.getTextDifferencer().getTextDiff(contents, contents, ""))
         .build();
   }
 
@@ -255,7 +249,7 @@ public class CodeReviewServiceTextDiffTest {
   }
 
   // Committed, workspace doesn't exist
-  @Test
+  @Test(expected = StatusRuntimeException.class)
   public void testTextDiff_committedAndWorkspaceNotExists() {
     File file =
         File.newBuilder()
@@ -264,9 +258,7 @@ public class CodeReviewServiceTextDiffTest {
             .setCommitId(testFileCommitId)
             .setFilename(TEST_FILE)
             .build();
-
-    TextDiffResponse response = getResponse(file);
-    assertEquals(getExpectedResponse(""), response);
+    getResponse(file);
   }
 
   // Committed, workspace doesn't exist (pushed)

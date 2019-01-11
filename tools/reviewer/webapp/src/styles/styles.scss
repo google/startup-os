@@ -1,9 +1,9 @@
-@import url(
-  'https://fonts.googleapis.com/css?family=Heebo:300,400,500,700,800'
-);
 @import './fonts';
 @import './colors';
 @import './material';
 @import './highlightjs';
 @import './global';
 @import './notification';
+@import './buttons';
+
+// TODO: synchronize local & global scss variables

@@ -7,7 +7,22 @@
 # Usage: tools/build_or_test.sh (build|test)
 
 RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
 RESET=$(tput sgr0)
+
+CIRCLECI_MAX_ATTEMPTS=10
+
+function bazel_build() {
+  if [[ -z "$ANDROID_HOME" ]]; then
+    # Ignore third_party, node_modules and android targets
+    bazel query '//... except //third_party/... except filter(node_modules, //...) except kind("android_.* rule", //...)' | xargs bazel $1
+    return $?
+  else
+    # Ignore just third_party and node_modules
+    bazel query '//... except //third_party/... except filter(node_modules, //...)' | xargs bazel $1
+    return $?
+  fi
+}
 
 # Warn if ANDROID_HOME is not set.
 if [[ -z "$ANDROID_HOME" ]]; then
@@ -20,12 +35,20 @@ if [[ $1 != "build" && $1 != "test" ]]; then
   exit 1
 fi
 
-if [[ -z "$ANDROID_HOME" ]]; then
-  # Ignore third_party, node_modules and android targets
-  bazel query '//... except //third_party/... except filter(node_modules, //...) except kind("android_.* rule", //...)' | xargs bazel $1
-else
-  # Ignore just third_party and node_modules 
-  bazel query '//... except //third_party/... except filter(node_modules, //...)' | xargs bazel $1
+if [[ ! -z "$CIRCLECI" ]]; then
+  echo "$RED""Due to flakiness in bazel execution on CircleCI, trying to build several times"
+  for i in $(seq 1 ${CIRCLECI_MAX_ATTEMPTS}); do
+    echo "$RED""[Attempt $i/${CIRCLECI_MAX_ATTEMPTS}]: building$RESET"
+    bazel_build $1
+    if [[ $? -eq 0 ]]; then
+      echo "$GREEN""[Attempt $i/${CIRCLECI_MAX_ATTEMPTS}]: successful$RESET"
+      exit 0
+    fi
+  done
+
+  echo "$RED""[Attempts exhausted]: Seems it's a problem with your code and not a CircleCI flake.$RESET"
+  exit 1
 fi
 
+bazel_build $1
 exit $?

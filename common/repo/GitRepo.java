@@ -21,14 +21,14 @@ import com.google.auto.factory.Provided;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.Strings;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,12 +36,21 @@ import java.util.stream.Collectors;
 
 @AutoFactory
 public class GitRepo implements Repo {
+  // Git warnings to ignore:
+  // TODO: Figure out if this warning is really harmless, as git does checkout the branch.
+  private static final String AMBIGUOUS_REFNAME = "warning: refname '.*' is ambiguous\\.\n";
+  // If we got this message, things are probably ok. Full form:
+  // Create a pull request for '<branch>' on GitHub by visiting: <url>>
+  private static final String GITHUB_PR_MESSAGE = ".*Create a pull request.*";
+
   private final List<String> gitCommandBase;
   private final List<CommandResult> commandLog = new ArrayList<>();
   private final FileUtils fileUtils;
+  private final String repoPath;
 
   GitRepo(@Provided FileUtils fileUtils, String repoPath) {
     this.fileUtils = fileUtils;
+    this.repoPath = repoPath;
     gitCommandBase =
         Arrays.asList(
             "git",
@@ -53,17 +62,6 @@ public class GitRepo implements Repo {
     private String command;
     private String stdout;
     private String stderr;
-  }
-
-  private String readLines(InputStream inputStream) throws IOException {
-    StringBuffer output = new StringBuffer();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        output.append(line).append('\n');
-      }
-    }
-    return output.toString();
   }
 
   private CommandResult runCommand(String command) {
@@ -86,12 +84,13 @@ public class GitRepo implements Repo {
       String[] fullCommandArray = fullCommand.toArray(new String[0]);
       result.command = String.join(" ", fullCommand);
       Process process = Runtime.getRuntime().exec(fullCommandArray);
-      result.stdout = readLines(process.getInputStream());
-      result.stderr = readLines(process.getErrorStream());
+      result.stdout = fileUtils.streamToString(process.getInputStream());
+      result.stderr = fileUtils.streamToString(process.getErrorStream());
     } catch (Exception e) {
       e.printStackTrace();
     }
-    if (!result.stderr.isEmpty() && throwException) {
+    if (!result.stderr.replaceAll(AMBIGUOUS_REFNAME, "").replaceAll(GITHUB_PR_MESSAGE, "").isEmpty()
+        && throwException) {
       throw new RuntimeException(formatError(result));
     }
     commandLog.add(result);
@@ -115,7 +114,7 @@ public class GitRepo implements Repo {
 
   @Override
   public void switchBranch(String branch) {
-    if (branchExists(branch)) {
+    if (branchExists(branch) || commitExists(branch)) {
       runCommand("checkout --quiet " + branch);
     } else {
       runCommand("checkout --quiet -b " + branch);
@@ -220,6 +219,8 @@ public class GitRepo implements Repo {
         return File.Action.COPY;
       case "??":
         return File.Action.ADD;
+      case "UU":
+        return File.Action.MODIFY;
       default:
         throw new IllegalStateException("Unknown change type " + changeType);
     }
@@ -269,8 +270,8 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public void push(String branch) {
-    runCommand("push -q --atomic -u origin " + branch);
+  public boolean push(String branch) {
+    return runCommand("push -q --atomic -u origin " + branch).stderr.isEmpty();
   }
 
   @Override
@@ -346,8 +347,85 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public boolean fileExists(String commitId, String path) {
+    if (!commitId.isEmpty()) {
+      return runCommand("--no-pager show " + commitId + ":" + path, false).stderr.isEmpty();
+    } else {
+      return fileUtils.fileExists(fileUtils.joinToAbsolutePath(repoPath, path));
+    }
+  }
+
+  @Override
+  public boolean fileExists(File file) {
+    return fileExists(file.getCommitId(), file.getFilename());
+  }
+
+  @Override
   public String getFileContents(String commitId, String path) {
-    return runCommand("--no-pager show " + commitId + ":" + path).stdout;
+    if (!commitId.isEmpty()) {
+      return runCommand("--no-pager show " + commitId + ":" + path).stdout;
+    } else {
+      return fileUtils.readFileUnchecked(fileUtils.joinToAbsolutePath(repoPath, path));
+    }
+  }
+
+  private static String removeDiffHeader(String diff) {
+    // Remove first 4 header lines, but leave the hunk header (e.g @@ -5,83 +5,83 @@)
+    return diff.substring(Strings.ordinalIndexOf(diff, "\n", 4) + 1);
+  }
+
+  @Override
+  public String getTextDiff(File file1, File file2) throws IOException {
+    if (!file1.getFilename().equals(file2.getFilename())
+        || !file1.getRepoId().equals(file2.getRepoId())
+        || !file1.getWorkspace().equals(file2.getWorkspace())) {
+      throw new IllegalArgumentException(
+          "Files should have the same repo and filename:\n" + file1 + file2);
+    }
+    if (!fileExists(file1)) {
+      throw new IOException("File1 should exist:\n" + file1);
+    }
+    if (!fileExists(file2)) {
+      throw new IOException("File2 should exist:\n" + file2);
+    }
+    if (file1.getCommitId().isEmpty() && !file2.getCommitId().isEmpty()) {
+      throw new UnsupportedOperationException(
+          "If file1 has no commit, file 2 should also not have a commit");
+    }
+    if (file1.getCommitId().isEmpty() && file2.getCommitId().isEmpty()) {
+      // Use the --no-index flag
+      CommandResult commandResult =
+          runCommand(
+              "diff --no-index --inter-hunk-context=1000000 "
+                  + fileUtils.joinToAbsolutePath(repoPath, file1.getFilename())
+                  + " "
+                  + fileUtils.joinToAbsolutePath(repoPath, file2.getFilename()));
+      return removeDiffHeader(commandResult.stdout);
+    } else {
+      String file1CommitIdWithSpace =
+          file1.getCommitId().isEmpty() ? "" : " " + file1.getCommitId();
+      String file2CommitIdWithSpace =
+          file2.getCommitId().isEmpty() ? "" : " " + file2.getCommitId();
+      CommandResult commandResult =
+          runCommand(
+              "diff --inter-hunk-context=1000000"
+                  + file1CommitIdWithSpace
+                  + file2CommitIdWithSpace
+                  + " -- "
+                  + file1.getFilename());
+      return removeDiffHeader(commandResult.stdout);
+    }
+  }
+
+  public static String getTextDiff(String file1, String file2) throws IOException {
+    String command = "git diff --no-index --inter-hunk-context=1000000 " + file1 + " " + file2;
+    Process process = Runtime.getRuntime().exec(command.split(" "));
+    String stdout = FileUtils.streamToString(process.getInputStream());
+    String stderr = FileUtils.streamToString(process.getErrorStream());
+    if (!stderr.isEmpty()) {
+      System.out.println(stderr);
+    }
+    return removeDiffHeader(stdout);
   }
 
   @Override
@@ -366,6 +444,43 @@ public class GitRepo implements Repo {
   public String getHeadCommitId() {
     CommandResult commandResult = runCommand("rev-parse HEAD");
     return commandResult.stdout.trim().replace("\n", "");
+  }
+
+  @Override
+  public String getRemoteUrl() {
+    return runCommand("remote get-url origin").stdout;
+  }
+
+  @Override
+  public boolean hasChanges(String branch) {
+    // `getCommits(String branch)` method gets list of commits where on the position 0 keeps the
+    // last master commit. We ignore the first element.
+    return (getCommits(branch).size() > 1) || (!getUncommittedFiles().isEmpty());
+  }
+
+  @Override
+  public String getPatch(
+      String firstReferenceCommitOrBranch, String secondReferenceCommitOrBranch, String filename) {
+    return removeDiffHeader(
+            runCommand(
+                    "diff "
+                        + firstReferenceCommitOrBranch
+                        + " "
+                        + secondReferenceCommitOrBranch
+                        + " -- "
+                        + filename)
+                .stdout)
+        .trim();
+  }
+
+  @Override
+  public String getMostRecentCommitOfBranch(String branch) {
+    return runCommand("rev-parse " + branch).stdout.trim();
+  }
+
+  @Override
+  public String getMostRecentCommitOfFile(String filename) {
+    return runCommand("log -n 1 --pretty=format:%H -- " + filename).stdout.trim();
   }
 
   private void switchToMasterBranch() {
@@ -389,6 +504,14 @@ public class GitRepo implements Repo {
     CommandResult commandResult =
         runCommand("clone -q " + url + " " + fileUtils.joinToAbsolutePath(path, ".git"));
     return commandResult.stderr.isEmpty();
+  }
+
+  public static String getOrgName(String githubUrl) {
+    return githubUrl.split("/")[3];
+  }
+
+  public static String getProjectName(String githubUrl) {
+    return githubUrl.split("/")[4];
   }
 }
 

@@ -1,0 +1,38 @@
+# Docker compose for Reviewer local server and jobs
+# TODO: Add jobs services
+#
+# docker-compose up - run all images
+# docker-compose up <image> - run <image>
+# docker-compose pull - refresh image cache. Fails if there are local images.
+
+version: "3"
+services:
+
+  helloserver:
+    image: gcr.io/startup-os/hello-server:latest
+    ports:
+      - "8000:8000"
+
+  hello_server_local:
+    image: bazel/examples/docker:hello_server
+    ports:
+      - "8000:8000"
+
+  local_server_local:
+    image: bazel/tools/reviewer/local_server:local_server
+    ports:
+      - "7000:7000"
+    environment:
+      - "BUILD_WORKSPACE_DIRECTORY=/base"
+    volumes:
+      - "/home/oferb/devel/base:/base"
+
+  local_reviewer_job:
+    image: bazel/tools/reviewer/job:job
+    environment:
+      - "BUILD_WORKSPACE_DIRECTORY=/base"
+    command:
+      - "--service_account_json=/base/local/startupos-5f279-firebase-adminsdk-v8n9e-2418a5ae73.json"
+      - "--repo_url=https://github.com/google/startup-os"
+    volumes:
+      - "/home/oferb/devel/base:/base"

@@ -16,14 +16,14 @@
 
 package com.google.startupos.examples.docker;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class HelloServer {
   public static String DOCKERENV_FILE = "/.dockerenv";

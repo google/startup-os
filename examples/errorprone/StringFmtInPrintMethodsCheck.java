@@ -51,20 +51,19 @@ import java.util.Objects;
 /** Matches on string formatting inside print methods. */
 @AutoService(BugChecker.class)
 @BugPattern(
-  name = "StringFmtInPrintMethodsCheck",
-  category = JDK,
-  summary = "String formatting inside print method",
-  severity = ERROR,
-  linkType = CUSTOM,
-  link = "github.com/google/startup-os/tree/master/examples/errorprone#StringFmtInPrintMethodsCheck"
-)
+    name = "StringFmtInPrintMethodsCheck",
+    category = JDK,
+    summary = "String formatting inside print method",
+    severity = ERROR,
+    linkType = CUSTOM,
+    link =
+        "github.com/google/startup-os/tree/master/examples/errorprone#StringFmtInPrintMethodsCheck")
 public class StringFmtInPrintMethodsCheck extends BugChecker
     implements MethodInvocationTreeMatcher {
-
-  private Matcher<ExpressionTree> PRINT_METHOD =
+  private static Matcher<ExpressionTree> PRINT_METHOD =
       instanceMethod().onDescendantOf(PrintStream.class.getName()).named("print");
 
-  private Matcher<ExpressionTree> STRING_FORMAT =
+  private static Matcher<ExpressionTree> STRING_FORMAT =
       staticMethod().onClass(String.class.getName()).named("format");
 
   @Override

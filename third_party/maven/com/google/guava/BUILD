@@ -1,4 +1,17 @@
 java_library(
+    name = "failureaccess",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/guava/failureaccess",
+    ],
+)
+
+java_library(
     name = "guava",
     licenses = [
         "permissive",
@@ -10,6 +23,8 @@ java_library(
         "//external:jar/mvncom/google/guava/guava",
     ],
     runtime_deps = [
+        ":failureaccess",
+        ":listenablefuture",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/errorprone:error_prone_annotations",
         "//third_party/maven/com/google/j2objc:j2objc_annotations",
@@ -19,7 +34,7 @@ java_library(
 )
 
 java_library(
-    name = "guava_jdk5",
+    name = "listenablefuture",
     licenses = [
         "permissive",
     ],
@@ -27,6 +42,6 @@ java_library(
         "//third_party/maven:__subpackages__",
     ],
     exports = [
-        "//external:jar/mvncom/google/guava/guava_jdk5",
+        "//external:jar/mvncom/google/guava/listenablefuture",
     ],
 )

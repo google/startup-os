@@ -1,15 +1,19 @@
 # To find the sha256 for an http_archive, run wget on the URL to download the
 # file, and use sha256sum on the file to produce the sha256.
 
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
+
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
 maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
-    sha256 = "5ba69890c9fe7bf476093d8863f26b861184c623ba43b70ef938a190cfb95bdc",
-    strip_prefix = "grpc-java-1.12.0",
-    urls = ["https://github.com/grpc/grpc-java/archive/v1.12.0.tar.gz"],
+    sha256 = "48425cd631afb117fd355fd961deb313b3ac8e43f2b95c1598f35fbfcf684fbc",
+    strip_prefix = "grpc-java-1.16.1",
+    urls = ["https://github.com/grpc/grpc-java/archive/v1.16.1.tar.gz"],
 )
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
@@ -18,12 +22,15 @@ load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
 grpc_java_repositories(
     omit_com_google_api_grpc_google_common_protos = True,
     omit_com_google_auth_google_auth_library_credentials = True,
+    omit_com_google_auth_google_auth_library_oauth2_http = True,    
     omit_com_google_code_findbugs_jsr305 = True,
     omit_com_google_code_gson = True,
     omit_com_google_errorprone_error_prone_annotations = True,
     omit_com_google_guava = True,
     omit_com_google_protobuf = True,
+    omit_com_google_protobuf_javalite = True,
     omit_com_google_protobuf_nano_protobuf_javanano = True,
+    omit_com_google_re2j = True,
     omit_com_google_truth_truth = True,
     omit_com_squareup_okhttp = True,
     omit_com_squareup_okio = True,
@@ -42,6 +49,8 @@ grpc_java_repositories(
     omit_io_opencensus_grpc_metrics = True,
     omit_junit_junit = True,
     omit_org_apache_commons_lang3 = True,
+    omit_javax_annotation = True,
+    omit_org_codehaus_mojo_animal_sniffer_annotations = True
 )
 
 # Google Maven Repository
@@ -163,13 +172,9 @@ ts_setup_workspace()
 
 http_archive(
     name = "io_bazel_rules_docker",
-    strip_prefix = "rules_docker-0.4.0",
-    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.4.0.tar.gz"],
+    strip_prefix = "rules_docker-0.5.1",
+    urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.5.1.tar.gz"],
 )
-
-load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
-
-_java_image_repos()
 
 http_jar(
     name = "grpc_polyglot",
@@ -180,15 +185,15 @@ http_jar(
 http_file(
     name = "protoc_bin",
     executable = True,
-    sha256 = "84e29b25de6896c6c4b22067fb79472dac13cf54240a7a210ef1cac623f5231d",
-    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-linux-x86_64.zip"]
+    sha256 = "6003de742ea3fcf703cfec1cd4a3380fd143081a2eb0e559065563496af27807",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-linux-x86_64.zip"]
 )
 
 http_file(
     name = "protoc_bin_osx",
     executable = True,
-    sha256 = "768a42032718accd12e056447b0d93d42ffcdc27d1b0f21fc1e30a900da94842",
-    urls = ["https://github.com/google/protobuf/releases/download/v3.6.0/protoc-3.6.0-osx-x86_64.zip"]
+    sha256 = "0decc6ce5beed07f8c20361ddeb5ac7666f09cf34572cca530e16814093f9c0c",
+    urls = ["https://github.com/google/protobuf/releases/download/v3.6.1/protoc-3.6.1-osx-x86_64.zip"]
 )
 
 # clang-format tool download, to be used by Formatter tool
@@ -232,8 +237,8 @@ bind(
 http_file(
     name = "grpc_java_plugin_linux",
     executable = True,
-    sha256 = "d9117f0a987004bee3379654871b4cfeb81e49ebba346442dac84c82c5c20887",
-    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.0/grpc_java_plugin_linux"],
+    sha256 = "cdd93cdf24d11ccd7bad6a4d55c9bbe55e776c3972ef177974512d5aa58debd7",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.02/grpc_java_plugin_linux"],
 )
 
 http_file(
@@ -258,8 +263,40 @@ http_file(
 )
 
 http_file(
-    name = "bazel_deps",
+    name = "shfmt",
     executable = True,
+    sha256 = "bdf8e832a903a80806b93a9ad80d8f95a70966fbec3258a565ed5edc2ae5bcdc",
+    urls = ["https://github.com/mvdan/sh/releases/download/v2.6.2/shfmt_v2.6.2_linux_amd64"]
+)
+
+http_file(
+    name = "shfmt_osx",
+    executable = True,
+    sha256 = "aaaa7d639acb30853e2f5008f56526c8dd54a366219ebdc5fa7f13a15277dd0b",
+    urls = ["https://github.com/mvdan/sh/releases/download/v2.6.2/shfmt_v2.6.2_darwin_amd64"]
+)
+
+http_jar(
+    name = "bazel_deps",
     sha256 = "98b05c2826f2248f70e7356dc6c78bc52395904bb932fbb409a5abf5416e4292",
     urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.01/bazel_deps.jar"],
+)
+
+# Docker rules and containers
+load("@io_bazel_rules_docker//container:container.bzl", "container_pull")
+load("@io_bazel_rules_docker//java:image.bzl", _java_image_repos = "repositories")
+_java_image_repos()
+container_pull(
+    name = "java_base",
+    registry = "gcr.io",
+    repository = "distroless/java",
+    # 'tag' is also supported, but digest is encouraged for reproducibility.
+    digest = "sha256:8c1769cb253bdecc257470f7fba05446a55b70805fa686f227a11655a90dfe9e",
+)
+container_pull(
+    name = "alpine_java_git",
+    registry = "gcr.io",
+    repository = "startup-os/alpine-java-git",
+    #tag = "latest",
+    digest = "sha256:d27494f6034ff3cd38bd2cde9bfea019f568565d2bb14d2d450a44cd891cf28c",
 )

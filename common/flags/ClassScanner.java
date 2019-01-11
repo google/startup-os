@@ -30,15 +30,15 @@ import java.lang.reflect.Type;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
+import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
-import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 
 /**
@@ -221,16 +221,15 @@ class ClassScanner {
       ParameterizedType flagType = (ParameterizedType) field.getGenericType();
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
-        log.atWarning()
-            .log(
-                "Cannot check if flag '%s' is of boolean type. It has %s inner types instead of 1.",
-                field, innerTypes.length);
+        log.atWarning().log(
+            "Cannot check if flag '%s' is of boolean type. It has %s inner types instead of 1.",
+            field, innerTypes.length);
       } else if (innerTypes[0].getTypeName().equals("java.lang.Boolean")) {
         return true;
       }
     } else {
-      log.atWarning()
-          .log("Cannot check if flag '%s' is of boolean type. It's not a ParameterizedType", field);
+      log.atWarning().log(
+          "Cannot check if flag '%s' is of boolean type. It's not a ParameterizedType", field);
     }
     return false;
   }
@@ -240,16 +239,15 @@ class ClassScanner {
       ParameterizedType flagType = (ParameterizedType) field.getGenericType();
       Type[] innerTypes = flagType.getActualTypeArguments();
       if (innerTypes.length != 1) {
-        log.atWarning()
-            .log(
-                "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
-                field, innerTypes.length);
+        log.atWarning().log(
+            "Cannot check if flag '%s' is of list type. It has %s inner types instead of 1.",
+            field, innerTypes.length);
       } else if (innerTypes[0].getTypeName().startsWith("java.util.List")) {
         return true;
       }
     } else {
-      log.atWarning()
-          .log("Cannot check if flag '%s' is of list type. It's not a ParameterizedType", field);
+      log.atWarning().log(
+          "Cannot check if flag '%s' is of list type. It's not a ParameterizedType", field);
     }
     return false;
   }

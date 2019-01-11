@@ -30,5 +30,27 @@ public class Strings {
   public static String capitalize(String string) {
     return StringUtils.capitalize(string);
   }
+
+  public static int ordinalIndexOf(String string, String searchString, int n) {
+    return StringUtils.ordinalIndexOf(string, searchString, n);
+  }
+
+  /** Unescapes escape characters (currently \n and \t). Primarily used for debugging. */
+  public static String unEscapeString(String s) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      switch (s.charAt(i)) {
+        case '\n':
+          sb.append("\\n");
+          break;
+        case '\t':
+          sb.append("\\t");
+          break;
+        default:
+          sb.append(s.charAt(i));
+      }
+    }
+    return sb.toString();
+  }
 }
 

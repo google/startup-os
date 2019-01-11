@@ -1,9 +1,9 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
-import { Diff, Thread } from '@/shared/proto';
-import { DiffUpdateService } from '@/shared/services';
+import { Diff, Thread } from '@/core/proto';
+import { CommentExpandedMap } from '@/shared/thread';
 import { DiscussionService } from '../discussion.service';
+import { ThreadStateService } from '../thread-state.service';
 
 // The component implements diff threads on diff page.
 // How it looks: https://i.imgur.com/fYZn2qn.jpg
@@ -14,52 +14,56 @@ import { DiscussionService } from '../discussion.service';
   providers: [DiscussionService],
 })
 export class DiffThreadsComponent implements OnInit, OnChanges {
-  displayedColumns: string[] = ['discussions'];
-  threadsSource: MatTableDataSource<Thread>;
+  threadList: Thread[] = [];
+  // Did firebase send any update, when freeze mode was active?
+  isQueue: boolean = false;
 
   @Input() threads: Thread[];
   @Input() diff: Diff;
+  // Tells parent that a comment was expanded (to change label of the button)
+  @Output() expandEmitter = new EventEmitter<void>();
 
   constructor(
-    private diffUpdateService: DiffUpdateService,
     public discussionService: DiscussionService,
-  ) { }
+    public threadStateService: ThreadStateService,
+  ) {
+    // Update thread, when freeze mode is ended
+    this.threadStateService.unfreezeChanges.subscribe(() => {
+      if (this.isQueue) {
+        this.initThreads();
+      }
+    });
+  }
 
   ngOnInit() {
     this.initThreads();
   }
 
   ngOnChanges() {
-   if (this.threadsSource) {
-     this.refreshThreads();
-   }
-  }
-
-  private initThreads(): void {
-    const threads: Thread[] = this.threads.slice();
-    this.discussionService.sortThreads(threads);
-    this.threadsSource = new MatTableDataSource(threads);
-  }
-
-  private refreshThreads(): void {
-    if (this.threadsSource.data.length === this.threads.length) {
-      // Links update
-      this.discussionService.refreshThreads(this.threads, Thread.Type.DIFF);
-    } else {
-      // Re-build template. Each thread component will be recreated.
-      this.initThreads();
+    if (this.threadList) {
+      this.refreshThreads();
     }
   }
 
-  addComment(): void {
-    this.diffUpdateService.addComment(this.diff);
+  saveStave(thread: Thread, commentExpandedMap: CommentExpandedMap): void {
+    this.threadStateService.saveState(thread, commentExpandedMap);
+    this.expandEmitter.emit();
   }
 
-  resolveThread(isChecked: boolean): void {
-    this.diffUpdateService.resolveThread(this.diff, isChecked);
+  private initThreads(): void {
+    this.isQueue = false;
+    this.threadList = this.threads.slice();
+    this.discussionService.sortThreads(this.threadList);
+    this.threads.forEach(thread => {
+      this.threadStateService.createLink(thread);
+    });
   }
 
-  deleteComment(isDeleteThread: boolean): void {
-    this.diffUpdateService.deleteComment(this.diff, isDeleteThread);
+  private refreshThreads(): void {
+    if (!this.threadStateService.getFreezeMode()) {
+      this.initThreads();
+    } else {
+      this.isQueue = true;
+    }
   }
 }

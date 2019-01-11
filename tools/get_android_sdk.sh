@@ -4,42 +4,40 @@ RED=$(tput setaf 1)
 RESET=$(tput sgr0)
 
 if [ -z "$ANDROID_HOME" ]; then
-	export ANDROID_HOME=$HOME/android_sdk/
+  export ANDROID_HOME=$HOME/android_sdk/
 fi
 
 DOWNLOAD_COMMAND=wget
 if [ ! -x "$(command -v $DOWNLOAD_COMMAND)" ]; then
-	DOWNLOAD_COMMAND="curl -LO"
+  DOWNLOAD_COMMAND="curl -LO"
 fi
 
 if [ ! -x "$(command -v $DOWNLOAD_COMMAND)" ]; then
-	echo "$(tput setaf 1)No wget or curl found$(tput sgr0)"
-	exit 1
+  echo "$(tput setaf 1)No wget or curl found$(tput sgr0)"
+  exit 1
 fi
 
 URL_BASE="https://dl.google.com/android/repository/"
 
 platform=$(uname)
 if [ "$platform" == "Darwin" ]; then
-    FILENAME="sdk-tools-darwin-4333796.zip"
-		PROFILE_FILE="$HOME/.bash_profile"
+  FILENAME="sdk-tools-darwin-4333796.zip"
+  PROFILE_FILE="$HOME/.bash_profile"
 elif [ "$platform" == "Linux" ]; then
-    FILENAME="sdk-tools-linux-4333796.zip"
-		PROFILE_FILE="$HOME/.bashrc"
+  FILENAME="sdk-tools-linux-4333796.zip"
+  PROFILE_FILE="$HOME/.bashrc"
 else
-    echo "Android SDK does not have an archive for $platform"
-    exit 1
+  echo "Android SDK does not have an archive for $platform"
+  exit 1
 fi
-
 
 if [ ! -d "$ANDROID_HOME" ]; then
-	$DOWNLOAD_COMMAND $URL_BASE/$FILENAME
-	unzip $FILENAME -d $ANDROID_HOME
-	(yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses) || true
-	$ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27" "build-tools;27.0.3"
-	echo "Removing $(rm -v $FILENAME)"
+  $DOWNLOAD_COMMAND $URL_BASE/$FILENAME
+  unzip $FILENAME -d $ANDROID_HOME
+  (yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses) || true
+  $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27" "build-tools;27.0.3"
+  echo "Removing $(rm -v $FILENAME)"
 fi
-
 
 echo "Android SDK at $RED$ANDROID_HOME$RESET"
 echo "Run$RED 'export ANDROID_HOME=$ANDROID_HOME'$RESET before building"

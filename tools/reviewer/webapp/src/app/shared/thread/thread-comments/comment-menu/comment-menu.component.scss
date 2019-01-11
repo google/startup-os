@@ -1,0 +1,52 @@
+$border-radius: 8px;
+$top-radius: #{$border-radius} #{$border-radius} 0px 0px;
+$bottom-radius: 0px 0px #{$border-radius} #{$border-radius};
+
+.menu {
+  position: relative;
+  >.mat-icon {
+    cursor: pointer;
+    user-select: none;
+  }
+  >.popup {
+    $right: 15px;
+    position: absolute;
+    right: -$right;
+    margin-top: 5px;
+    z-index: 2;
+    background: white;
+    border-radius: $border-radius;
+    border: solid 2px #8c8c8c;
+    box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.5);
+    >.options {
+      padding: 5px 0;
+      >.option {
+        display: flex;
+        justify-content: center;
+        width: 112px;
+        padding: 6px;
+        cursor: pointer;
+        user-select: none;
+        font-size: 14px;
+        &:hover {
+          background: #D6D6D6;
+        }
+      }
+    }
+    $speech-arrow: 15px;
+    >speech-arrow {
+      line-height: $speech-arrow;
+      top: -$speech-arrow;
+      right: $right - 4px;
+      position: absolute;
+    }
+  }
+}
+.menu-popup-overlay {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}

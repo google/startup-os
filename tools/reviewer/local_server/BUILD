@@ -1,5 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
+load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
+
 java_binary(
     name = "local_server",
     srcs = [
@@ -7,6 +9,7 @@ java_binary(
     ],
     main_class = "com.google.startupos.tools.localserver.LocalServer",
     deps = [
+        ":local_http_gateway",
         "//common",
         "//common:dagger_with_annotation_processor",
         "//common/flags",
@@ -16,6 +19,7 @@ java_binary(
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/grpc:grpc_services",
+        "//third_party/maven/io/netty:netty_tcnative_boringssl_static",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/reviewer/aa:aa_module",
@@ -23,6 +27,11 @@ java_binary(
         "//tools/reviewer/local_server/service:auth_service",
         "//tools/reviewer/local_server/service:code_review_service",
     ],
+)
+
+checkstyle_test(
+    name = "local_server-checkstyle",
+    target = ":local_server",
 )
 
 java_library(
@@ -41,12 +50,16 @@ java_library(
     ],
 )
 
-java_binary(
+checkstyle_test(
+    name = "local_http_gateway_grpc_client-checkstyle",
+    target = ":local_http_gateway_grpc_client",
+)
+
+java_library(
     name = "local_http_gateway",
     srcs = [
         "LocalHttpGateway.java",
     ],
-    main_class = "com.google.startupos.tools.localserver.LocalHttpGateway",
     deps = [
         ":local_http_gateway_grpc_client",
         "//common/flags",
@@ -57,4 +70,9 @@ java_binary(
         "//third_party/maven/org/json",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
+)
+
+checkstyle_test(
+    name = "local_http_gateway-checkstyle",
+    target = ":local_http_gateway",
 )

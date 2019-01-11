@@ -1,24 +1,15 @@
-<mat-table [dataSource]="threadsSource">
-  <ng-container matColumnDef="discussions">
-    <mat-header-cell *matHeaderCellDef>
-      General discussions {{ discussionService.getHeader(threads) }}
-    </mat-header-cell>
-    <mat-cell *matCellDef="let thread; let threadsIndex = index;">
-      <!-- Threads -->
-      <cr-thread
-        [thread]="thread"
-        (addCommentEmitter)="addComment()"
-        (resolveEmitter)="resolveThread($event)"
-        (deleteCommentEmitter)="deleteComment($event)"
-      ></cr-thread>
-    </mat-cell>
-  </ng-container>
-
-  <mat-header-row
-    class="cr-header"
-    *matHeaderRowDef="displayedColumns"
-  ></mat-header-row>
-  <mat-row
-    *matRowDef="let thread; columns: displayedColumns;"
-  ></mat-row>
-</mat-table>
+<div class="cr-header">
+  General discussions {{ discussionService.getHeader(threads) }}
+</div>
+<div class="threads">
+  <!-- Threads -->
+  <div class="thread" *ngFor="let thread of threadList; let threadsIndex = index;">
+    <cr-thread
+      [diff]="diff"
+      [thread]="thread"
+      [commentExpandedMap]="threadStateService.getState(thread)"
+      (saveStateEmitter)="saveStave(thread, $event)"
+      (isFreezeModeEmitter)="threadStateService.saveFreezeMode(thread, $event)"
+    ></cr-thread>
+  </div>
+</div>
