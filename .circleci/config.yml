@@ -59,6 +59,17 @@ jobs:
           command: ./test.sh
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
+      - run:
+          name: "Hasadna: cloning the repo"
+          command: git clone https://github.com/hasadna/hasadna /home/circleci/hasadna/
+      - run:
+          name: "Hasadna: patching"
+          command: bazel run //tools/deps:workspace_patcher -- --workspace /home/circleci/hasadna/WORKSPACE
+      - run:
+          name: "Hasadna: building"
+          command: cd /home/circleci/hasadna/ && ./compile.sh build
+          environment:
+            ANDROID_HOME: /home/circleci/android_sdk/
 
       - save_cache:
           key: "android_sdk"
@@ -70,31 +81,6 @@ jobs:
           paths:
             - "/home/circleci/.cache/bazel/"
 
-  hasadna:
-    <<: *job_defaults
-    steps:
-      - checkout:
-          <<: *post_checkout
-
-      - restore_cache:
-          key: "android_sdk"
-
-      - restore_cache:
-          key: "v4-bazel_cache"
-
-      - run: sudo apt update && sudo apt -y install libstdc++6
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel info release
-      - run: './tools/get_android_sdk.sh'
-      - run:
-          command: git clone https://github.com/hasadna/hasadna /home/circleci/hasadna/
-      - run:
-          command: bazel run //tools/deps:workspace_patcher -- --workspace /home/circleci/hasadna/WORKSPACE
-      - run:
-          command: cd /home/circleci/hasadna/ && ./compile.sh build
-          environment:
-            ANDROID_HOME: /home/circleci/android_sdk/
-
 workflows:
   version: 2
   default_workflow:
@@ -103,6 +89,3 @@ workflows:
       - build:
           requires:
             - lint
-      - hasadna:
-          requires:
-            - build
