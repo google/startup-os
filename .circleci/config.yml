@@ -28,7 +28,7 @@ jobs:
       - checkout:
           <<: *post_checkout
       - restore_cache:
-          key: "v4-bazel_cache"
+          key: "v5-bazel_cache"
       - run: './tools/pre-commit.sh'
       - run: sudo apt update && sudo apt -y install yapf3 python3-pkg-resources libstdc++6
       - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
@@ -45,18 +45,32 @@ jobs:
           key: "android_sdk"
 
       - restore_cache:
-          key: "v4-bazel_cache"
+          key: "v5-bazel_cache"
 
       - run: sudo apt update && sudo apt -y install libstdc++6
       - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
       - run: bazel info release
       - run: './tools/get_android_sdk.sh'
       - run:
+          name: "StartupOS: building"
           command: ./build.sh
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
       - run:
+          name: "StartupOS: testing"
           command: ./test.sh
+          environment:
+            ANDROID_HOME: /home/circleci/android_sdk/
+      # also test hasadna/hasadna as it depends on StartupOS's HEAD
+      - run:
+          name: "Hasadna: cloning the repo"
+          command: git clone https://github.com/hasadna/hasadna /home/circleci/hasadna/
+      - run:
+          name: "Hasadna: patching"
+          command: bazel run //tools/deps:workspace_patcher -- --workspace /home/circleci/hasadna/WORKSPACE
+      - run:
+          name: "Hasadna: building"
+          command: cd /home/circleci/hasadna/ && ./compile.sh build
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
 
@@ -66,10 +80,9 @@ jobs:
             - "/home/circleci/android_sdk"
 
       - save_cache:
-          key: "v4-bazel_cache"
+          key: "v5-bazel_cache"
           paths:
             - "/home/circleci/.cache/bazel/"
-
 
 workflows:
   version: 2

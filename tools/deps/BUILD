@@ -70,3 +70,18 @@ checkstyle_test(
     name = "PackageLockWhitelistTest-checkstyle",
     target = ":PackageLockWhitelistTest",
 )
+
+java_binary(
+    name = "workspace_patcher",
+    srcs = ["WorkspacePatcher.java"],
+    main_class = "com.google.startupos.tools.workspace_patcher.WorkspacePatcher",
+    deps = [
+        "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+    ],
+)
+
+checkstyle_test(
+    name = "workspace_patcher-checkstyle",
+    target = ":workspace_patcher",
+)
