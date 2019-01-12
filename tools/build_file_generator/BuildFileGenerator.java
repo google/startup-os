@@ -172,7 +172,8 @@ public class BuildFileGenerator {
       } else if (thirdPartyTargets.size() == 1) {
         target = thirdPartyTargets.get(0).getTarget();
       } else {
-        // If the class exists in several third party deps we choose the smallest one.
+        // If the class exists in several third party deps we choose the smallest one
+        // since the other ones probably contain it
         target =
             thirdPartyTargets
                 .stream()
