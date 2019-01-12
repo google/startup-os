@@ -27,6 +27,8 @@ import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.ProtoLibra
 import java.util.List;
 import javax.inject.Inject;
 
+/* This class saves a BuildFile proto to a BUILD file. If a BUILD file exists
+and is not auto-generated, it writes to BUILD.generated. */
 public class BuildFileWriter {
   private static final String HEADER = "# THIS FILE IS AUTO-GENERATED";
   private static final String REGULAR_FILENAME = "BUILD";

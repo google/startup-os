@@ -36,8 +36,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
+// TODO: Add `java_grpc_library` and `checkstyle_test` generation
 public class BuildFileGenerator {
-  private static final String PATH_TO_ZIP = "tools/build_file_generator/third_party_deps.zip";
+  private static final String THIRD_PARTY_ZIP_PATH =
+      "tools/build_file_generator/third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
 
   private FileUtils fileUtils;
@@ -59,7 +61,7 @@ public class BuildFileGenerator {
   private ThirdPartyDeps getThirdPartyDeps() {
     return (ThirdPartyDeps)
         fileUtils.readPrototxtFromZipUnchecked(
-            PATH_TO_ZIP, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
+            THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
   }
 
   public BuildFile generateBuildFile(String packagePath) throws IOException {
@@ -80,13 +82,10 @@ public class BuildFileGenerator {
           javaClassAnalyzer.getJavaClass(fileUtils.joinPaths(packagePath, javaClassName));
 
       if (javaClass.getHasMainMethod()) {
-        // build java_binary
         result.addJavaBinary(getJavaBinary(javaClass));
       } else if (javaClass.getIsTestClass()) {
-        // build java_test
         result.addJavaTest(getJavaTest(javaClass));
       } else {
-        // build java_library
         result.addJavaLibrary(getJavaLibrary(javaClass));
       }
     }
@@ -152,12 +151,12 @@ public class BuildFileGenerator {
   private List<String> getDeps(JavaClass javaClass) {
     List<String> result = new ArrayList<>();
 
-    for (Import imprt : javaClass.getImportList()) {
-      if (imprt.getPackage().startsWith("java") || imprt.getPackage().startsWith("javax")) {
+    for (Import importProto : javaClass.getImportList()) {
+      if (importProto.getPackage().startsWith("java")) {
         continue;
       }
       String classNameWithPackage =
-          imprt.getPackage().replace(".", "/") + "/" + imprt.getClassName() + ".class";
+          importProto.getPackage().replace(".", "/") + "/" + importProto.getClassName() + ".class";
       List<ThirdPartyDep> thirdPartyDepList = thirdPartyDeps.getThirdPartyDepList();
       List<ThirdPartyDep> thirdPartyTargets = new ArrayList<>();
       for (ThirdPartyDep thirdPartyDep : thirdPartyDepList) {
@@ -168,12 +167,12 @@ public class BuildFileGenerator {
 
       String target;
       if (thirdPartyTargets.isEmpty()) {
-        // it isn't third party dep
-        target = getInternalDep(imprt, getWholeProjectProtoFiles());
+        // It isn't third party dep.
+        target = getInternalDep(importProto, getWholeProjectProtoFiles());
       } else if (thirdPartyTargets.size() == 1) {
         target = thirdPartyTargets.get(0).getTarget();
       } else {
-        // we choose the smallest
+        // If the class exists in several third party deps we choose the smallest one.
         target =
             thirdPartyTargets
                 .stream()
@@ -189,17 +188,18 @@ public class BuildFileGenerator {
     return result.stream().sorted().collect(Collectors.toList());
   }
 
-  private String getInternalDep(Import imprt, List<ProtoFile> protoFiles) {
-    String path = imprt.getPackage().replace("com.google.startupos.", "//").replace(".", "/");
+  private String getInternalDep(Import importProto, List<ProtoFile> protoFiles) {
+    String path = importProto.getPackage().replace("com.google.startupos.", "//").replace(".", "/");
     for (ProtoFile protoFile : protoFiles) {
-      if ((imprt.getPackage() + "." + imprt.getClassName())
+      if ((importProto.getPackage() + "." + importProto.getClassName())
           .startsWith(protoFile.getJavaPackage() + "." + protoFile.getJavaOuterClassname())) {
         return path + ":" + protoFile.getFileName() + "_java_proto";
       }
     }
-    return path + ":" + imprt.getClassName();
+    return path + ":" + importProto.getClassName();
   }
 
+  // TODO: When generating multiple BUILD files, do this only once.
   private List<ProtoFile> getWholeProjectProtoFiles() {
     List<ProtoFile> result = new ArrayList<>();
     try {

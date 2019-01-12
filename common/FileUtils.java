@@ -34,7 +34,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -48,7 +47,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -456,10 +454,7 @@ public class FileUtils {
       String zipFilePath, String pathInsideZip, Message.Builder builder) throws IOException {
     ZipFile zipFile =
         new ZipFile(expandHomeDirectory(joinPaths(getCurrentWorkingDirectory(), zipFilePath)));
-    ZipEntry entry = zipFile.getEntry(pathInsideZip);
-    InputStream inputStream = zipFile.getInputStream(entry);
-    String content =
-        CharStreams.toString(new InputStreamReader(inputStream, Charset.defaultCharset()));
+    String content = streamToString(zipFile.getInputStream(zipFile.getEntry(pathInsideZip)));
     TextFormat.merge(content, builder);
     return builder.build();
   }

@@ -29,7 +29,7 @@ import javax.inject.Singleton;
 
 public class BuildFileGeneratorTool {
   @FlagDesc(name = "path", description = "Package path to generate BUILD file")
-  private static Flag<String> path = Flag.create("tools/build_file_generator");
+  private static Flag<String> path = Flag.create("");
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
