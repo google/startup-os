@@ -21,28 +21,35 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
+import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile;
 import dagger.Component;
+
 import java.io.IOException;
 import javax.inject.Singleton;
 
 public class BuildFileGeneratorTool {
-  @FlagDesc(name = "file_path", description = "Path to file")
-  private static Flag<String> filePath = Flag.create("");
+  @FlagDesc(name = "path", description = "Package path to generate BUILD file")
+  private static Flag<String> path = Flag.create("");
 
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
-    FileUtils fileUtils =
-        DaggerBuildFileGeneratorTool_BuildFileGeneratorToolComponent.create().getFileUtils();
+    BuildFileGeneratorToolComponent component =
+        DaggerBuildFileGeneratorTool_BuildFileGeneratorToolComponent.create();
 
-    JavaClass javaClass = new JavaClassAnalyzer(fileUtils).getJavaClass(filePath.get());
-    System.out.println(javaClass);
+    FileUtils fileUtils = component.getFileUtils();
+    String packagePath = fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), path.get());
+    BuildFile buildFile = component.getBuildFileGenerator().generateBuildFile(packagePath);
+    component.getBuildFileWriter().write(buildFile, packagePath);
   }
 
   @Singleton
   @Component(modules = CommonModule.class)
   interface BuildFileGeneratorToolComponent {
     FileUtils getFileUtils();
+
+    BuildFileGenerator getBuildFileGenerator();
+
+    BuildFileWriter getBuildFileWriter();
   }
 }
 

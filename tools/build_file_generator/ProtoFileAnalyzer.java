@@ -46,14 +46,14 @@ public class ProtoFileAnalyzer {
         .addAllMessages(getMessages(fileContent))
         .addAllServices(getServices(fileContent))
         .addAllEnums(getEnums(fileContent))
+        .addAllImports(getImports(fileContent))
         .build();
   }
 
   private static String getPackage(String fileContent) {
     List<String> packageLines = getLinesStartWith(fileContent, "package", "");
     if (packageLines.isEmpty()) {
-      throw new IllegalArgumentException(
-          String.format("Can't find package for the file: %s", fileContent));
+      return "";
     }
     if (packageLines.size() > 1) {
       throw new IllegalArgumentException(
@@ -99,19 +99,28 @@ public class ProtoFileAnalyzer {
     return javaPackageLineParts[javaPackageLineParts.length - 1].replace(";", "").replace("\"", "");
   }
 
-  private static List<String> getMessages(String fileContent) {
+  private static ImmutableList<String> getMessages(String fileContent) {
     return getProtoObjectValue(fileContent, ProtoObjectType.MESSAGE);
   }
 
-  private static List<String> getServices(String fileContent) {
+  private static ImmutableList<String> getServices(String fileContent) {
     return getProtoObjectValue(fileContent, ProtoObjectType.SERVICE);
   }
 
-  private static List<String> getEnums(String fileContent) {
+  private static ImmutableList<String> getEnums(String fileContent) {
     return getProtoObjectValue(fileContent, ProtoObjectType.ENUM);
   }
 
-  private static List<String> getProtoObjectValue(String fileContent, ProtoObjectType type) {
+  private ImmutableList<String> getImports(String fileContent) {
+    return ImmutableList.copyOf(
+        getLinesStartWith(fileContent, "import", "")
+            .stream()
+            .map(line -> line.replace("import ", "").replace("\"", "").replace(";", ""))
+            .collect(Collectors.toList()));
+  }
+
+  private static ImmutableList<String> getProtoObjectValue(
+      String fileContent, ProtoObjectType type) {
     ImmutableList.Builder<String> result = ImmutableList.builder();
     List<String> lines = getLinesStartWith(fileContent, type.value, "");
     for (String line : lines) {

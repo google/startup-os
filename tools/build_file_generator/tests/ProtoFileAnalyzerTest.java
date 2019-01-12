@@ -65,6 +65,8 @@ public class ProtoFileAnalyzerTest {
             .addAllMessages(Arrays.asList("FileRequest", "FileResponse"))
             .addAllServices(Arrays.asList("FileService"))
             .addAllEnums(Arrays.asList("BooleanEnum"))
+            .addAllImports(
+                Arrays.asList("tools/build_file_generator/tests/resources/another_proto.proto"))
             .build();
 
     assertEquals(expectedProtoFile, protoFileAnalyzer.getProtoFile(filePath));

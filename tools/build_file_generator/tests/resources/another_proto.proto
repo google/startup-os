@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package com.test.another_package;
+
+option java_package = "com.test.another.javapackage";
+option java_outer_classname = "Protos";
+
+message TestMessage {
+  int32 id = 1;
+  string content = 2;
+}

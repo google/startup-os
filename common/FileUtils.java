@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.zip.ZipFile;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -445,6 +446,26 @@ public class FileUtils {
           StandardCopyOption.REPLACE_EXISTING);
     } finally {
       tempPrototxt.deleteOnExit();
+    }
+  }
+
+  /** Reads a prototxt file into a proto from zip archive. */
+  public Message readPrototxtFromZip(
+      String zipFilePath, String pathInsideZip, Message.Builder builder) throws IOException {
+    ZipFile zipFile =
+        new ZipFile(expandHomeDirectory(joinPaths(getCurrentWorkingDirectory(), zipFilePath)));
+    String content = streamToString(zipFile.getInputStream(zipFile.getEntry(pathInsideZip)));
+    TextFormat.merge(content, builder);
+    return builder.build();
+  }
+
+  /** Reads a prototxt file into a proto from zip archive, rethrows exceptions as unchecked. */
+  public Message readPrototxtFromZipUnchecked(
+      String zipFilePath, String pathInsideZip, Message.Builder builder) {
+    try {
+      return readPrototxtFromZip(zipFilePath, pathInsideZip, builder);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 }

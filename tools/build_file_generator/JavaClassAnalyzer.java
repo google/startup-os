@@ -96,9 +96,6 @@ public class JavaClassAnalyzer {
 
     String[] importBodyParts =
         isStaticImport ? importLineParts[1].split("\\.") : importLineParts[0].split("\\.");
-    if (importBodyParts.length < 3) {
-      throw new IllegalArgumentException("Package must have at least 2 part: " + importLine);
-    }
     if (!isStaticImport) {
       result.setWholePackageImport(
           (importBodyParts[importBodyParts.length - 1].equals("*"))
@@ -118,17 +115,27 @@ public class JavaClassAnalyzer {
   }
 
   private static boolean isTestClass(String fileContent) {
-    return fileContent.contains("@Test")
-        || fileContent.contains("@Before")
-        || fileContent.contains("@BeforeClass")
-        || fileContent.contains("@After")
-        || fileContent.contains("@AfterClass");
+    for (String line : fileContent.split(System.lineSeparator())) {
+      if (line.trim().startsWith("@Test")
+          || line.startsWith("@Before")
+          || line.startsWith("@BeforeClass")
+          || line.startsWith("@After")
+          || line.startsWith("@AfterClass")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static boolean hasMainMethod(String fileContent) {
-    return fileContent.contains("public static void main(String[] args)")
-        || fileContent.contains("public static void main(String... args)")
-        || fileContent.contains("public static void main(String args[])");
+    for (String line : fileContent.split(System.lineSeparator())) {
+      if (line.trim().startsWith("public static void main(String[] args)")
+          || line.startsWith("public static void main(String... args)")
+          || line.startsWith("public static void main(String args[])")) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
