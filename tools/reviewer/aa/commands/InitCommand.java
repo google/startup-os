@@ -44,8 +44,7 @@ public class InitCommand implements AaCommand {
   public static Flag<String> startuposRepo =
       Flag.create("https://github.com/google/startup-os.git");
 
-  @FlagDesc(name = "global_registry_config", description = "Path to global_registry.prototxt")
-  public static Flag<String> globalRegistryConfig = Flag.create("");
+  private static final String GLOBAL_REGISTRY_CONFIG = "tools/reviewer/global_registry.prototxt";
 
   private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
@@ -58,10 +57,10 @@ public class InitCommand implements AaCommand {
   }
 
   private void cloneRepoIntoHead(String dirName, String repoUrl) {
-    String startupOsPath = fileUtils.joinToAbsolutePath(basePath.get(), "head", dirName);
-    System.out.println("Cloning StartupOS into " + startupOsPath);
-    GitRepo repo = this.gitRepoFactory.create(startupOsPath);
-    repo.cloneRepo(repoUrl, startupOsPath);
+    String repoPath = fileUtils.joinToAbsolutePath(basePath.get(), "head", dirName);
+    System.out.printf("Cloning %s into %s\n", dirName, repoPath);
+    GitRepo repo = this.gitRepoFactory.create(repoPath);
+    repo.cloneRepo(repoUrl, repoPath);
     System.out.println("Completed Cloning");
   }
 
@@ -91,12 +90,12 @@ public class InitCommand implements AaCommand {
         System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");
       }
 
-      if (!globalRegistryConfig.get().isEmpty()) {
+      if (!GLOBAL_REGISTRY_CONFIG.isEmpty()) {
         ReviewerRegistry registry =
             (ReviewerRegistry)
                 fileUtils.readPrototxtUnchecked(
                     fileUtils.joinToAbsolutePath(
-                        fileUtils.getCurrentWorkingDirectory(), globalRegistryConfig.get()),
+                        fileUtils.getCurrentWorkingDirectory(), GLOBAL_REGISTRY_CONFIG),
                     ReviewerRegistry.newBuilder());
         for (ReviewerRegistryConfig config : registry.getReviewerConfigList()) {
           if (config.getConfigRepo().equals(startuposRepo)) {
