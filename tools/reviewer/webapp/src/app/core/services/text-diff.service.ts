@@ -8,7 +8,7 @@ export interface TextDiffReturn {
   branchInfo: BranchInfo;
   leftFile: File;
   rightFile: File;
-  fileChronoList: File[];
+  filesSortedByCommits: File[];
   textDiff: TextDiff;
   localThreads: Thread[];
 }
@@ -43,7 +43,7 @@ export class TextDiffService {
             const {
               leftFile,
               rightFile,
-              fileChronoList,
+              filesSortedByCommits,
             } = this.getFiles(
               file,
               branchInfo,
@@ -69,7 +69,7 @@ export class TextDiffService {
                   branchInfo: branchInfo,
                   leftFile: leftFile,
                   rightFile: rightFile,
-                  fileChronoList: fileChronoList,
+                  filesSortedByCommits: filesSortedByCommits,
                   textDiff: textDiff,
                   localThreads: localThread,
                 });
@@ -81,7 +81,7 @@ export class TextDiffService {
     });
   }
 
-  // Gets file list and left & right selected files
+  // Returns sorted file list and left & right selected files
   private getFiles(
     file: File,
     branchInfo: BranchInfo,
@@ -90,19 +90,21 @@ export class TextDiffService {
   ): {
     leftFile: File;
     rightFile: File;
-    fileChronoList: File[];
+    filesSortedByCommits: File[];
   } {
-    const fileChronoList: File[] = this.localserverService.getFileChronoList(
+    const filesSortedByCommits: File[] = this.localserverService.getFilesSortedByCommits(
       file,
       branchInfo,
     );
-    const headCommitId: string = fileChronoList[0].getCommitId();
-    const lastCommitId: string = fileChronoList[fileChronoList.length - 1].getCommitId();
+    const firstIndex: number = 0;
+    const lastIndex: number = filesSortedByCommits.length - 1;
+    const headCommitId: string = filesSortedByCommits[firstIndex].getCommitId();
+    const lastCommitId: string = filesSortedByCommits[lastIndex].getCommitId();
     leftCommitId = leftCommitId || headCommitId;
     rightCommitId = rightCommitId || lastCommitId;
 
-    let leftIndex: number = this.addCommitId(leftCommitId, fileChronoList);
-    let rightIndex: number = this.addCommitId(rightCommitId, fileChronoList);
+    let leftIndex: number = this.addCommitId(leftCommitId, filesSortedByCommits);
+    let rightIndex: number = this.addCommitId(rightCommitId, filesSortedByCommits);
 
     if (leftIndex === -1 || rightIndex === -1) {
       throw new Error('Commit not found');
@@ -115,30 +117,30 @@ export class TextDiffService {
     }
 
     return {
-      leftFile: this.getFile(leftIndex, fileChronoList),
-      rightFile: this.getFile(rightIndex, fileChronoList),
-      fileChronoList: fileChronoList,
+      leftFile: this.getFile(leftIndex, filesSortedByCommits),
+      rightFile: this.getFile(rightIndex, filesSortedByCommits),
+      filesSortedByCommits: filesSortedByCommits,
     };
   }
 
   // Add commit to commit list, if the commit isn't present already in the list.
-  private addCommitId(commitId: string, fileChronoList: File[]): number {
-    const fileIndex: number = this.getFileChronoIndex(commitId, fileChronoList);
+  private addCommitId(commitId: string, filesSortedByCommits: File[]): number {
+    const fileIndex: number = this.getFileIndex(commitId, filesSortedByCommits);
     if (fileIndex === -1) {
       const uncommitedFile = new File();
       uncommitedFile.setCommitId(commitId);
-      fileChronoList.push(uncommitedFile);
+      filesSortedByCommits.push(uncommitedFile);
     }
     return fileIndex;
   }
 
-  private getFile(fileIndex: number, fileChronoList: File[]): File {
-    return (fileIndex !== -1) ? fileChronoList[fileIndex] : new File();
+  private getFile(fileIndex: number, filesSortedByCommits: File[]): File {
+    return (fileIndex !== -1) ? filesSortedByCommits[fileIndex] : new File();
   }
 
-  private getFileChronoIndex(commitId: string, fileChronoList: File[]): number {
+  private getFileIndex(commitId: string, filesSortedByCommits: File[]): number {
     let fileIndex: number = -1;
-    fileChronoList.some((file, index) => {
+    filesSortedByCommits.some((file, index) => {
       if (file.getCommitId() === commitId) {
         fileIndex = index;
         return true; // break

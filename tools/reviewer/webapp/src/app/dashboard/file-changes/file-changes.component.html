@@ -32,7 +32,7 @@
       <commit-menu
         [leftCommitId]="leftFile.getCommitId()"
         [rightCommitId]="rightFile.getCommitId()"
-        [commitIdList]="getCommitIdList(fileChronoList)"
+        [commitIdList]="getCommitIdList(filesSortedByCommits)"
         (changeCommitIdEmitter)="changeCommitId($event)"
       ></commit-menu>
     </div>

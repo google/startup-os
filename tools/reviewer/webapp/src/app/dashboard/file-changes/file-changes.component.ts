@@ -37,7 +37,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   filenameWithRepo: string;
   leftFile = new File();
   rightFile = new File();
-  fileChronoList: File[] = [];
+  filesSortedByCommits: File[] = [];
   onloadSubscription = new Subscription();
   changesSubscription = new Subscription();
 
@@ -119,7 +119,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
       this.branchInfo = textDiffBundle.branchInfo;
       this.leftFile = textDiffBundle.leftFile;
       this.rightFile = textDiffBundle.rightFile;
-      this.fileChronoList = textDiffBundle.fileChronoList;
+      this.filesSortedByCommits = textDiffBundle.filesSortedByCommits;
       this.textDiff = textDiffBundle.textDiff;
       this.localThreads = textDiffBundle.localThreads;
 
@@ -130,9 +130,9 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   }
 
   // Converts file list to commit list
-  getCommitIdList(fileChronoList: File[]): string[] {
+  getCommitIdList(filesSortedByCommits: File[]): string[] {
     const commitIdList: string[] = [];
-    for (const file of fileChronoList) {
+    for (const file of filesSortedByCommits) {
       commitIdList.push(file.getCommitId());
     }
     return commitIdList;

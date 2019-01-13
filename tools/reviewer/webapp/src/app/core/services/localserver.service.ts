@@ -177,22 +177,26 @@ export class LocalserverService {
     throw new Error('File not found');
   }
 
-  getFileChronoList(file: File, branchInfo: BranchInfo): File[] {
-    const fileChronoList: File[] = [];
+  // Returns files, which sorted by commits.
+  // E.g. we have commits: Head Commit, C1, C2, C3, ... , CN
+  // Then we get those files: Head File, F1, F2, F3, F4, ..., FN, Uncommitted File
+  // Basically all the files have same filename, difference is just in commit id and action.
+  getFilesSortedByCommits(file: File, branchInfo: BranchInfo): File[] {
+    const filesSortedByCommits: File[] = [];
 
     // Add HEAD file
     const headCommitId: string = branchInfo.getCommitList()[0].getId();
     const headFile = File.deserializeBinary(file.serializeBinary()); // Copy proto object
     headFile.setCommitId(headCommitId);
     headFile.setAction(File.Action.ADD);
-    fileChronoList.push(headFile);
+    filesSortedByCommits.push(headFile);
 
     // Add all commited files that match the file's filenameWithRepo.
     // There should be only one such match by commit.
     for (const commit of branchInfo.getCommitList()) {
       for (const committedFile of commit.getFileList()) {
         if (committedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
-          fileChronoList.push(committedFile);
+          filesSortedByCommits.push(committedFile);
         }
       }
     }
@@ -201,10 +205,10 @@ export class LocalserverService {
     // There should be only one such match.
     for (const uncommittedFile of branchInfo.getUncommittedFileList()) {
       if (uncommittedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
-        fileChronoList.push(uncommittedFile);
+        filesSortedByCommits.push(uncommittedFile);
       }
     }
 
-    return fileChronoList;
+    return filesSortedByCommits;
   }
 }
