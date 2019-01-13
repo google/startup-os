@@ -1,23 +1,17 @@
 import { Injectable } from '@angular/core';
+import { randstr64 } from 'rndmjs';
 
-import { Thread } from '@/core/proto';
+import { BranchInfo, Comment, File, Thread } from '@/core/proto';
 import {
   BlockIndex,
   BlockLine,
   ChangesLine,
+  Dictionary,
 } from '../code-changes.interface';
-import { LineService } from './line.service';
 
 // Functions related to comments
 @Injectable()
 export class CommentsService {
-  // Line indexes of all open threads.
-  openThreadsMap: { [id: number]: number }[];
-
-  constructor(private lineService: LineService) {
-    this.openThreadsMap = this.lineService.createSplitDictionary();
-  }
-
   // Add a thread to the line
   addThread(changesLine: ChangesLine, blockIndex: BlockIndex, thread: Thread): void {
     changesLine.commentsLine.blocks[blockIndex].threads.push(thread);
@@ -32,7 +26,11 @@ export class CommentsService {
   }
 
   // Remove all threads with comments from the line
-  closeThreads(changesLine: ChangesLine, blockIndex: BlockIndex): void {
+  closeThreads(
+    changesLine: ChangesLine,
+    blockIndex: BlockIndex,
+    openThreadsMap: Dictionary[],
+  ): void {
     const blockLine: BlockLine = changesLine.blocks[blockIndex];
     const threads: Thread[] = blockLine.threads;
     blockLine.threads = threads.filter(thread => {
@@ -40,16 +38,21 @@ export class CommentsService {
     });
 
     if (blockLine.threads.length === 0) {
-      this.saveAsClosed(blockLine.lineNumber, blockIndex);
+      this.saveAsClosed(blockLine.lineNumber, blockIndex, openThreadsMap);
     }
   }
 
   // Remove thread by thread index
-  closeThread(blockLine: BlockLine, threadIndex: number, blockIndex: BlockIndex): void {
+  closeThread(
+    blockLine: BlockLine,
+    threadIndex: number,
+    blockIndex: BlockIndex,
+    openThreadsMap: Dictionary[],
+  ): void {
     blockLine.threads.splice(threadIndex, 1);
 
     if (blockLine.threads.length === 0) {
-      this.saveAsClosed(blockLine.lineNumber, blockIndex);
+      this.saveAsClosed(blockLine.lineNumber, blockIndex, openThreadsMap);
     }
   }
 
@@ -58,12 +61,36 @@ export class CommentsService {
     lineNumber: number,
     lineIndex: number,
     blockIndex: BlockIndex,
+    openThreadsMap: Dictionary[],
   ): void {
-    this.openThreadsMap[blockIndex][lineNumber] = lineIndex;
+    openThreadsMap[blockIndex][lineNumber] = lineIndex;
   }
 
   // Remove from open threads map
-  saveAsClosed(lineNumber: number, blockIndex: BlockIndex): void {
-    delete this.openThreadsMap[blockIndex][lineNumber];
+  saveAsClosed(
+    lineNumber: number,
+    blockIndex: BlockIndex,
+    openThreadsMap: Dictionary[],
+  ): void {
+    delete openThreadsMap[blockIndex][lineNumber];
+  }
+
+  createNewThread(
+    lineNumber: number,
+    comments: Comment[],
+    file: File,
+    branchInfo: BranchInfo,
+  ): Thread {
+    const newThread: Thread = new Thread();
+    newThread.setLineNumber(lineNumber);
+    newThread.setIsDone(false);
+    newThread.setCommentList(comments);
+    newThread.setRepoId(branchInfo.getRepoId());
+    newThread.setCommitId(file.getCommitId());
+    newThread.setFile(file);
+    newThread.setType(Thread.Type.CODE);
+    newThread.setId(randstr64(6));
+
+    return newThread;
   }
 }

@@ -1,8 +1,7 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { MouseService } from '@/core/services';
-import { CommitService, LoadService, StateService } from '../services';
+import { DocumentEventService } from '@/core/services';
 import { CommitInfo } from './commit-popup';
 
 // DragElement is an orange circle (or square), which can be dragged and dropped by user
@@ -34,7 +33,7 @@ const magnetField: number = 12;
   templateUrl: './commit-menu.component.html',
   styleUrls: ['./commit-menu.component.scss'],
 })
-export class CommitMenuComponent implements OnDestroy {
+export class CommitMenuComponent implements OnInit, OnDestroy {
   menuOffset: number;
   leftDrag: DragElement;
   rightDrag: DragElement;
@@ -49,31 +48,39 @@ export class CommitMenuComponent implements OnDestroy {
   mousemoveSubscription = new Subscription();
   mouseupSubscription = new Subscription();
 
-  constructor(
-    private mouseService: MouseService,
-    public stateService: StateService,
-    private commitService: CommitService,
-    private loadService: LoadService,
-  ) {
+  @Input() leftCommitId: string;
+  @Input() rightCommitId: string;
+  @Input() commitIdList: string[];
+  @Output() changeCommitIdEmitter = new EventEmitter();
+
+  constructor(private documentEventService: DocumentEventService) { }
+
+  ngOnInit() {
     this.initDragElements();
 
     // When user releases left mouse button
-    this.mouseupSubscription = this.mouseService.mouseup.subscribe(() => {
+    this.mouseupSubscription = this.documentEventService.mouseup.subscribe(() => {
       this.destroyMouseMoveEventHandler();
 
       // If drag element changed its point, then change commit id of page
       if (this.leftDrag.isClicked) {
         const commitId: string = this.getCommitId(this.leftDrag, this.rightDrag, -1);
-        if (this.stateService.leftCommitId !== commitId) {
-          this.stateService.leftCommitId = commitId;
-          this.loadService.changeCommitId();
+        if (this.leftCommitId !== commitId) {
+          this.leftCommitId = commitId;
+          this.changeCommitIdEmitter.emit({
+            leftCommitId: this.leftCommitId,
+            rightCommitId: this.rightCommitId,
+          });
         }
       }
       if (this.rightDrag.isClicked) {
         const commitId: string = this.getCommitId(this.rightDrag, this.leftDrag, 1);
-        if (this.stateService.rightCommitId !== commitId) {
-          this.stateService.rightCommitId = commitId;
-          this.loadService.changeCommitId();
+        if (this.rightCommitId !== commitId) {
+          this.rightCommitId = commitId;
+          this.changeCommitIdEmitter.emit({
+            leftCommitId: this.leftCommitId,
+            rightCommitId: this.rightCommitId,
+          });
         }
       }
       this.leftDrag.isClicked = false;
@@ -101,14 +108,14 @@ export class CommitMenuComponent implements OnDestroy {
 
   // Creates drag elements and bridge on the stage
   initDragElements(): void {
-    const leftIndex: number = this.commitService.getCommitIndex(this.stateService.leftCommitId);
-    const rightIndex: number = this.commitService.getCommitIndex(this.stateService.rightCommitId);
+    const leftIndex: number = this.getCommitIndex(this.leftCommitId);
+    const rightIndex: number = this.getCommitIndex(this.rightCommitId);
     this.leftDrag = {
       x: leftIndex * distanceBetweenPoints,
       offset: 0,
       isClicked: false,
       index: leftIndex,
-      isExist: !!this.stateService.leftCommitId,
+      isExist: !!this.leftCommitId,
       isSelected: true,
     };
     this.rightDrag = {
@@ -149,14 +156,14 @@ export class CommitMenuComponent implements OnDestroy {
     dragElement.index = index;
     dragElement.x = distanceBetweenPoints * index;
     this.moveBridge();
-    return this.stateService.commitIdList[index];
+    return this.commitIdList[index];
   }
 
   // Converts mouse X to X of drag element
   getX(mouseX: number, dragElement: DragElement): number {
     let x: number = mouseX - this.menuOffset - dragElement.offset;
     x = Math.max(x, 0);
-    x = Math.min(x, (this.stateService.commitIdList.length - 1) * distanceBetweenPoints);
+    x = Math.min(x, (this.commitIdList.length - 1) * distanceBetweenPoints);
     return x;
   }
 
@@ -204,7 +211,7 @@ export class CommitMenuComponent implements OnDestroy {
   }
 
   setPopupData(commitIndex: number): void {
-    this.commitInfo.id = this.stateService.commitIdList[commitIndex];
+    this.commitInfo.id = this.commitIdList[commitIndex];
     // TODO: Display real time of a commit
     this.commitInfo.timestamp = 1543122301000;
     this.commitInfo.offset = commitIndex * distanceBetweenPoints;
@@ -222,6 +229,10 @@ export class CommitMenuComponent implements OnDestroy {
     const isLeft: boolean = this.leftDrag.x === index * distanceBetweenPoints;
     const isRight: boolean = this.rightDrag.x === index * distanceBetweenPoints;
     return isLeft || isRight;
+  }
+
+  getCommitIndex(commitId: string): number {
+    return this.commitIdList.indexOf(commitId);
   }
 
   ngOnDestroy() {

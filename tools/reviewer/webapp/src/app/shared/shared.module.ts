@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 
 import { MaterialModule } from '@/import';
 
+import { CodeChangesComponent } from './code-changes';
 import { DiffStatusComponent } from './diff-status';
 import { DirectiveList } from './directives';
 import { PageLoadingComponent } from './page-loading';
@@ -22,6 +23,7 @@ const Declarations = [
   ToolbarComponent,
   SpeechArrowComponent,
   SelectDashboardComponent,
+  CodeChangesComponent,
   ...ThreadComponentComponentList,
   ...PipeList,
   ...DirectiveList,

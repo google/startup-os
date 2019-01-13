@@ -4,17 +4,11 @@
 <!-- Diff-->
 <ng-container *ngIf="!isLoading">
   <diff-header [diff]="diff"></diff-header>
-  <diff-files
-    [files]="files"
-    [diffId]="diff.getId()"
-    [diff]="diff"
-  ></diff-files>
-  <diff-discussion
-    [diff]="diff"
-  ></diff-discussion>
+  <diff-files [diff]="diff" [files]="files"></diff-files>
+  <diff-discussion [diff]="diff"></diff-discussion>
 
   <!-- Button to delete the diff -->
-  <div class="cr-titlebar">
+  <div class="cr-panel cr-titlebar">
     <div class="title">
       <span class="bold">Extra actions</span>
     </div>

@@ -5,6 +5,7 @@ import {
   BlockIndex,
   BlockLine,
   ChangesLine,
+  Dictionary,
 } from '../code-changes.interface';
 
 // Constructors of line interfaces
@@ -76,8 +77,8 @@ export class LineService {
   // first key is index of block (left or right)
   // second key is line number of block.
   // By the second key you can get fast access to lineIndex (line number of code changes)
-  createSplitDictionary(): { [id: number]: number }[] {
-    const splitDictionary: { [id: number]: number }[] = [];
+  createSplitDictionary(): Dictionary[] {
+    const splitDictionary: Dictionary[] = [];
     splitDictionary[BlockIndex.leftFile] = {};
     splitDictionary[BlockIndex.rightFile] = {};
 

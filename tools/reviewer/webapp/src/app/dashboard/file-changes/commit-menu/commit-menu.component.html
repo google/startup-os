@@ -16,7 +16,7 @@
           uncommited: !commitId,
           selected: isDotSelected(commitIndex)
         }"
-        *ngFor="let commitId of stateService.commitIdList; let commitIndex = index"
+        *ngFor="let commitId of commitIdList; let commitIndex = index"
         (mouseenter)="setPopupData(commitIndex)"
         (mouseleave)="commitInfo.isInit = false"
       ></div>

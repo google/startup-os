@@ -177,29 +177,38 @@ export class LocalserverService {
     throw new Error('File not found');
   }
 
-  getCommitIdList(filenameWithRepo: string, branchInfo: BranchInfo): string[] {
-    const commitIdList: string[] = [];
+  // Returns files, which sorted by commits.
+  // E.g. we have commits: Head Commit, C1, C2, C3, ... , CN
+  // Then we get those files: Head File, F1, F2, F3, F4, ..., FN, Uncommitted File
+  // Basically all the files have same filename, difference is just in commit id and action.
+  getFilesSortedByCommits(file: File, branchInfo: BranchInfo): File[] {
+    const filesSortedByCommits: File[] = [];
 
-    // Add HEAD commit id
+    // Add HEAD file
     const headCommitId: string = branchInfo.getCommitList()[0].getId();
-    commitIdList.push(headCommitId);
+    const headFile = File.deserializeBinary(file.serializeBinary()); // Copy proto object
+    headFile.setCommitId(headCommitId);
+    headFile.setAction(File.Action.ADD);
+    filesSortedByCommits.push(headFile);
 
-    // Add all commit ids, where the file is present
+    // Add all commited files that match the file's filenameWithRepo.
+    // There should be only one such match by commit.
     for (const commit of branchInfo.getCommitList()) {
-      for (const file of commit.getFileList()) {
-        if (file.getFilenameWithRepo() === filenameWithRepo) {
-          commitIdList.push(commit.getId());
+      for (const committedFile of commit.getFileList()) {
+        if (committedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
+          filesSortedByCommits.push(committedFile);
         }
       }
     }
 
-    // Add uncommited point too
-    for (const commit of branchInfo.getUncommittedFileList()) {
-      if (commit.getFilenameWithRepo() === filenameWithRepo) {
-        commitIdList.push('');
+    // Add uncommited file that matches the file's filenameWithRepo.
+    // There should be only one such match.
+    for (const uncommittedFile of branchInfo.getUncommittedFileList()) {
+      if (uncommittedFile.getFilenameWithRepo() === file.getFilenameWithRepo()) {
+        filesSortedByCommits.push(uncommittedFile);
       }
     }
 
-    return commitIdList;
+    return filesSortedByCommits;
   }
 }

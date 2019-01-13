@@ -43,8 +43,9 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     // If CI exists then convert it to UI status
-    if (this.diff.getCi()) {
-      const results: CiResponse.TargetResult[] = this.diff.getCi().getResultsList();
+    const ci: CiResponse = this.diff.getCiResponseList()[0];
+    if (ci) {
+      const results: CiResponse.TargetResult[] = ci.getResultsList();
       this.setStatus(results[results.length - 1]);
     }
   }
@@ -67,7 +68,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
 
             // Set status from the result,
             // or set outdated status if result with the commit not found.
-            this.status = (commitId === result.getTarget().getCommitid()) ?
+            this.status = (commitId === result.getTarget().getCommitId()) ?
               this.getStatus(result.getStatus()) :
               this.getStatus(CiResponse.TargetResult.Status.OUTDATED);
           }
@@ -75,7 +76,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
       });
   }
 
-  // Convers enum to UI status
+  // Converts enum to UI status
   getStatus(status: CiResponse.TargetResult.Status): Status {
     switch (status) {
       case CiResponse.TargetResult.Status.SUCCESS:

@@ -27,3 +27,20 @@ export interface ChangesLine {
   isCommentsLine: boolean;
   commentsLine: ChangesLine;
 }
+
+export interface Dictionary {
+  [id: number]: number;
+}
+
+export interface CodeGroup {
+  changes: ChangesLine[];
+  // To get index by line number
+  map: Dictionary[];
+  isExpandUpVisible: boolean;
+  isExpandDownVisible: boolean;
+}
+
+export interface Section {
+  startLineNumber: number;
+  endLineNumber: number;
+}

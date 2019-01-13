@@ -1,14 +1,21 @@
+import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-import { UserService } from '@/core/services';
 import {
-  CommitService,
-  ExtensionService,
-  LoadService,
-  StateService,
-  ThreadService,
-} from './services';
+  BranchInfo,
+  Diff,
+  File,
+  TextDiff,
+  Thread,
+} from '@/core/proto';
+import {
+  ExceptionService,
+  FirebaseStateService,
+  TextDiffService,
+  UserService,
+} from '@/core/services';
 
 const headerTopStart: number = 98;
 
@@ -18,26 +25,32 @@ const headerTopStart: number = 98;
   selector: 'file-changes',
   templateUrl: './file-changes.component.html',
   styleUrls: ['./file-changes.component.scss'],
-  providers: [
-    LoadService,
-    ExtensionService,
-    ThreadService,
-    CommitService,
-  ],
 })
 export class FileChangesComponent implements OnInit, OnDestroy {
   isHeaderFixed: boolean = false;
+  isLoading: boolean;
+  diff: Diff;
+  localThreads: Thread[];
+  branchInfo: BranchInfo;
+  textDiff: TextDiff;
+  diffId: string;
+  filenameWithRepo: string;
+  leftFile = new File();
+  rightFile = new File();
+  filesSortedByCommits: File[] = [];
+  onloadSubscription = new Subscription();
+  changesSubscription = new Subscription();
+
   constructor(
+    private firebaseStateService: FirebaseStateService,
+    private exceptionService: ExceptionService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    public stateService: StateService,
-    private loadService: LoadService,
-    private extensionService: ExtensionService,
-    public commitService: CommitService,
-    public userService: UserService,
+    private location: Location,
+    private textDiffService: TextDiffService,
+    private userService: UserService,
   ) {
-    this.stateService.isLoading = true;
-    this.stateService.isCommitFound = true;
+    this.isLoading = true;
     document.body.style.width = 'auto';
     document.body.style.minWidth = '100%';
 
@@ -52,35 +65,121 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   }
 
   // Gets parameters from url
-  parseUrlParam(): void {
+  private parseUrlParam(): void {
     // '/diff/33/path/to/file.java?left=abc' -> [url, 33, 'path/to/file.java', param]
     const url: RegExpMatchArray = this.router.url.match(/\/diff\/([\d]+)\/([\w\d\.\/-]+)(\?.+?)?/);
-    this.stateService.diffId = url[1];
+    this.diffId = url[1];
     const filename: string = url[2];
 
-    this.stateService.file.setFilenameWithRepo(filename);
-    this.stateService.language = this.extensionService.getLanguage(filename);
+    this.filenameWithRepo = filename;
 
     // Get left and right commit ids from url if they present
     this.activatedRoute.queryParams.subscribe(params => {
-      this.stateService.leftCommitId = params.left;
-      this.stateService.rightCommitId = params.right;
+      this.leftFile.setCommitId(params.left);
+      this.rightFile.setCommitId(params.right);
 
-      // Load changes from local server
-      this.loadService.loadDiff(this.stateService.diffId);
+      this.loadDiff(this.diffId);
     });
   }
 
+  // Loads diff from firebase
+  private loadDiff(diffId: string): void {
+    this.onloadSubscription = this.firebaseStateService
+      .getDiff(diffId)
+      .subscribe(diff => {
+        this.setDiff(diff);
+        this.subscribeOnChanges();
+      });
+  }
+
+  // Each time when diff is changed in firebase, we receive new diff here.
+  private subscribeOnChanges(): void {
+    this.changesSubscription = this.firebaseStateService
+      .diffChanges
+      .subscribe(diff => {
+        this.setDiff(diff);
+      });
+  }
+
+  // When diff is received from firebase
+  private setDiff(diff: Diff): void {
+    if (diff === undefined) {
+      this.exceptionService.diffNotFound();
+      return;
+    }
+    this.diff = diff;
+
+    // Load changes from local server
+    this.textDiffService.load(
+      this.diff,
+      this.filenameWithRepo,
+      this.leftFile.getCommitId(),
+      this.rightFile.getCommitId(),
+    ).subscribe(textDiffBundle => {
+      this.branchInfo = textDiffBundle.branchInfo;
+      this.leftFile = textDiffBundle.leftFile;
+      this.rightFile = textDiffBundle.rightFile;
+      this.filesSortedByCommits = textDiffBundle.filesSortedByCommits;
+      this.textDiff = textDiffBundle.textDiff;
+      this.localThreads = textDiffBundle.localThreads;
+
+      this.isLoading = false;
+    }, (error: Error) => {
+      this.exceptionService.fileNotFound(this.diff.getId());
+    });
+  }
+
+  // Converts file list to commit list
+  getCommitIdList(filesSortedByCommits: File[]): string[] {
+    const commitIdList: string[] = [];
+    for (const file of filesSortedByCommits) {
+      commitIdList.push(file.getCommitId());
+    }
+    return commitIdList;
+  }
+
   getAuthor(): string {
-    return this.userService.getUsername(this.stateService.diff.getAuthor().getEmail());
+    return this.userService.getUsername(this.diff.getAuthor().getEmail());
+  }
+
+  changeCommitId(param): void {
+    this.isLoading = true;
+
+    this.leftFile.setCommitId(param.leftCommitId);
+    this.rightFile.setCommitId(param.rightCommitId);
+
+    // Convert local variables to url with query params
+    const paramList: string[][] = [
+      ['left', this.leftFile.getCommitId()],
+      ['right', this.rightFile.getCommitId()],
+    ];
+    const queryParams: string = paramList
+      .filter(commit => commit[1])
+      .map(commit => commit.join('='))
+      .join('&');
+    const currentState: string = [
+      'diff',
+      this.diffId,
+      this.filenameWithRepo,
+    ].join('/');
+
+    // Update url
+    this.location.replaceState(currentState, queryParams);
+
+    // Update changes
+    this.unsubscribe();
+    this.loadDiff(this.diffId);
+  }
+
+  unsubscribe(): void {
+    this.onloadSubscription.unsubscribe();
+    this.changesSubscription.unsubscribe();
   }
 
   ngOnDestroy() {
-    delete this.stateService.rightCommitId;
-    delete this.stateService.leftCommitId;
     document.body.style.width = '100%';
     document.body.style.minWidth = 'auto';
     document.onscroll = null;
-    this.loadService.destroy();
+    this.unsubscribe();
   }
 }

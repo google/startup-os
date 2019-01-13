@@ -1,21 +1,21 @@
 <!-- Loading -->
-<page-loading [isLoading]="stateService.isLoading"></page-loading>
+<page-loading [isLoading]="isLoading"></page-loading>
 
-<div class="file-changes" *ngIf="!stateService.isLoading">
+<div class="file-changes" *ngIf="!isLoading">
   <!-- Titlebar -->
   <div class="cr-titlebar titlebar">
     <div class="title">
       <a
         class="diff bold"
-        routerLink="/diff/{{ stateService.diffId }}"
-      >Diff {{ stateService.diff.getId() }}</a>
+        routerLink="/diff/{{ diffId }}"
+      >Diff {{ diff.getId() }}</a>
       <span>by</span>
       <span
         class="username"
-        [ngClass]="{ 'bold': stateService.diff.getAuthor().getNeedsAttention() }"
+        [ngClass]="{ 'bold': diff.getAuthor().getNeedsAttention() }"
       >{{ getAuthor() }}</span>
     </div>
-    <diff-status [diff]="stateService.diff"></diff-status>
+    <diff-status [diff]="diff"></diff-status>
   </div>
 
   <div
@@ -24,22 +24,30 @@
   >
     <!-- Path -->
     <div class="filename">
-      <span>{{ stateService.file.getFilenameWithRepo() }}</span>
+      <span>{{ filenameWithRepo }}</span>
     </div>
 
     <!-- Commit Menu -->
     <div class="commit-menu">
-      <commit-menu></commit-menu>
+      <commit-menu
+        [leftCommitId]="leftFile.getCommitId()"
+        [rightCommitId]="rightFile.getCommitId()"
+        [commitIdList]="getCommitIdList(filesSortedByCommits)"
+        (changeCommitIdEmitter)="changeCommitId($event)"
+      ></commit-menu>
     </div>
   </div>
   <div class="header-cover" *ngIf="isHeaderFixed"></div>
 
   <!-- Code changes -->
-  <div class="code-changes" *ngIf="stateService.isCommitFound">
+  <div class="code-changes">
     <code-changes
-      [textDiff]="stateService.textDiff"
-      [language]="stateService.language"
-      [threads]="stateService.localThreads"
+      [diff]="diff"
+      [branchInfo]="branchInfo"
+      [textDiff]="textDiff"
+      [threads]="localThreads"
+      [leftFile]="leftFile"
+      [rightFile]="rightFile"
     ></code-changes>
   </div>
 </div>

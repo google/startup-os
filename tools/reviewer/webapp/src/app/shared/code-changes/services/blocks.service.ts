@@ -1,20 +1,13 @@
 import { Injectable } from '@angular/core';
 
-import {
-  ChangeType,
-  DiffLine,
-  TextDiff,
-} from '@/core/proto';
 import { HighlightService } from '@/core/services';
-import {
-  BlockIndex, BlockLine, ChangesLine,
-} from '../code-changes.interface';
+import { BlockIndex, BlockLine, ChangesLine, Dictionary } from '../code-changes.interface';
 import { LineService } from './line.service';
 import { TemplateService } from './template.service';
 
-// Main service of code-changes
+// Functions related to left and right blocks
 @Injectable()
-export class ChangesService {
+export class BlocksService {
   constructor(
     private highlightService: HighlightService,
     private lineService: LineService,
@@ -94,53 +87,25 @@ export class ChangesService {
     return htmlDocument.getElementsByTagName('body')[0].innerHTML;
   }
 
-  // TODO: remove the method, when the issue will be fix
-  tempFixChangesLineNumber(diffLines: DiffLine[]): void {
-    let delimiter: number = 0;
-    diffLines.forEach(diffLine => {
-      switch (diffLine.getType()) {
-        case ChangeType.DELETE:
-        case ChangeType.ADD:
-          diffLine.setDiffLineNumber(diffLine.getDiffLineNumber() - delimiter);
-          break;
-        case ChangeType.LINE_PLACEHOLDER:
-          delimiter++;
-      }
-    });
-  }
-
   // Convert two lists with code (left and right)
   // to one list with code changes
   synchronizeBlockLines(
     leftBlockLines: BlockLine[],
     rightBlockLines: BlockLine[],
-    textDiff: TextDiff,
+    startLineNumber?: number,
+    endLineNumber?: number,
   ): {
     changesLines: ChangesLine[];
-    changesLinesMap: { [id: number]: number }[];
+    changesLinesMap: Dictionary[];
   } {
-    this.tempFixChangesLineNumber(textDiff.getLeftDiffLineList());
-    this.tempFixChangesLineNumber(textDiff.getRightDiffLineList());
-
-    this.applyChanges(textDiff.getLeftDiffLineList(), leftBlockLines);
-    this.applyChanges(textDiff.getRightDiffLineList(), rightBlockLines);
-
-    this.addPlaceholders(textDiff.getLeftDiffLineList(), leftBlockLines);
-    this.addPlaceholders(textDiff.getRightDiffLineList(), rightBlockLines);
-
-    if (leftBlockLines.length !== rightBlockLines.length) {
-      throw new Error(
-        `After adding all placeholders, blocks should have the same amount of lines.
-Left lines: ${leftBlockLines.length}
-Right lines: ${rightBlockLines.length}`,
-      );
-    }
-    const amountOfLines: number = leftBlockLines.length;
+    const amountOfLines: number = rightBlockLines.length;
 
     const changesLines: ChangesLine[] = [];
-    const changesLinesMap: { [id: number]: number }[] = this.lineService
-      .createSplitDictionary();
-    for (let i = 0; i < amountOfLines; i++) {
+    const changesLinesMap: Dictionary[] = this.lineService.createSplitDictionary();
+
+    startLineNumber = startLineNumber || 0;
+    endLineNumber = endLineNumber || amountOfLines;
+    for (let i = startLineNumber; i < endLineNumber; i++) {
       // Create line for code
       const codeLine: ChangesLine = this.lineService.createChangesLine(
         leftBlockLines[i],
@@ -171,30 +136,5 @@ Right lines: ${rightBlockLines.length}`,
       changesLines: changesLines,
       changesLinesMap: changesLinesMap,
     };
-  }
-
-  applyChanges(diffLines: DiffLine[], blockLines: BlockLine[]): void {
-    diffLines.forEach(diffLine => {
-      switch (diffLine.getType()) {
-        case ChangeType.DELETE:
-        case ChangeType.ADD:
-          // Highlight changes
-          blockLines[diffLine.getDiffLineNumber()].isChanged = true;
-          blockLines[diffLine.getDiffLineNumber()].diffLine = diffLine;
-      }
-    });
-  }
-
-  addPlaceholders(diffLines: DiffLine[], blockLines: BlockLine[]): void {
-    diffLines.forEach(diffLine => {
-      if (diffLine.getType() === ChangeType.LINE_PLACEHOLDER) {
-        // Add placeholder
-        blockLines.splice(
-          diffLine.getDiffLineNumber(),
-          0,
-          this.lineService.createPlaceholder(),
-        );
-      }
-    });
   }
 }
