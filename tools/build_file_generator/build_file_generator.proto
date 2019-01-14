@@ -38,6 +38,11 @@ message ThirdPartyDep {
 message ThirdPartyDeps { repeated ThirdPartyDep third_party_dep = 1; }
 
 message BuildFile {
+  message LoadExtensionStatement {
+    string path = 1;
+    string symbol = 2;
+  }
+
   message ProtoLibrary {
     string name = 1;
     repeated string deps = 2;
@@ -70,9 +75,24 @@ message BuildFile {
     repeated string deps = 5;
   }
 
+  message CheckstyleTestExtension {
+    string name = 1;
+    string target = 2;
+  }
+
+  message JavaGrpcLibrary {
+    string name = 1;
+    repeated string srcs = 2;
+    repeated string tags = 3;
+    repeated string deps = 4;
+  }
+
   repeated ProtoLibrary proto_library = 1;
   repeated JavaProtoLibrary java_proto_library = 2;
   repeated JavaLibrary java_library = 3;
   repeated JavaBinary java_binary = 4;
   repeated JavaTest java_test = 5;
+  repeated LoadExtensionStatement extension = 6;
+  repeated CheckstyleTestExtension checkstyle_test = 7;
+  repeated JavaGrpcLibrary java_grpc_library = 8;
 }
