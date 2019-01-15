@@ -32,7 +32,7 @@ Since Reviewer instances run a local server that holds a port, to try to avoid c
 define a default port for each Reviewer instance in the global registry.
 
 ## How to install aa tool
-* Clone `startup-os` repo to some location on your PC using `git clone https://github.com/google/startup-os.git` command.
+* Clone `startup-os` repo to some location on your PC using `git clone https://github.com/google/startup-os.git`.
 * Go to `/path/to/startup-os-folder/startup-os` and run `./test.sh` script to make sure that everything works.
 * Run `bazel run //tools/reviewer/aa:aa_tool -- init --base_path </path/to/base/folder>` command to init a base folder.
 * Go to `/path/to/base/folder/head/startup-os` and run `source tools/reviewer/aa/aa_tool.sh` script
