@@ -39,6 +39,14 @@ define a default port for each Reviewer instance in the global registry.
 * Run `./build.sh` script and after that `./test.sh` script
 * Delete repo that was cloned in the first step (`/path/to/startup-os-folder/startup-os`)
 
+## Get a Firebase token to your local machine
+After completing the steps in  [How to install aa tool](#how-to-install-aa-tool) do the following:
+* Go to `/path/to/base/folder/head/startup-os`
+* Run `bazel build //tools/reviewer/local_server:local_server`
+* Run `bazel-bin/tools/reviewer/local_server/local_server`
+* Visit `https://web-login-startupos.firebaseapp.com` and sign in
+* Check that you have a file at `~/.aa_token`
+
 ## Current status:
 The tool is WIP. The video is up-to-date as of Sep 6th 2018. If you want to use the alpha version please contact oferb@google.com.
 If you want to help, these are the areas we need most help in:
