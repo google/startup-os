@@ -25,6 +25,7 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistryConfig;
 
+import java.io.IOException;
 import javax.inject.Inject;
 
 /* A command to init a base folder.
@@ -91,16 +92,21 @@ public class InitCommand implements AaCommand {
         // Clone StartupOS repo into head:
         cloneRepoIntoHead("startup-os", startuposRepo);
 
-        ReviewerRegistry registry =
-            (ReviewerRegistry)
-                fileUtils.readPrototxtUnchecked(
-                    fileUtils.joinToAbsolutePath(getRepoPath("startup-os"), GLOBAL_REGISTRY_CONFIG),
-                    ReviewerRegistry.newBuilder());
-        for (ReviewerRegistryConfig config : registry.getReviewerConfigList()) {
-          // should not clone StartupOS twice
-          if (!config.getConfigRepo().equals(startuposRepo)) {
-            cloneRepoIntoHead(config.getId(), config.getConfigRepo());
+        try {
+          ReviewerRegistry registry =
+              (ReviewerRegistry)
+                  fileUtils.readPrototxt(
+                      fileUtils.joinToAbsolutePath(
+                          getRepoPath("startup-os"), GLOBAL_REGISTRY_CONFIG),
+                      ReviewerRegistry.newBuilder());
+          for (ReviewerRegistryConfig config : registry.getReviewerConfigList()) {
+            // should not clone StartupOS twice
+            if (!config.getConfigRepo().equals(startuposRepo)) {
+              cloneRepoIntoHead(config.getId(), config.getConfigRepo());
+            }
           }
+        } catch (IOException e) {
+          System.err.println("Error: Did not find global registry config");
         }
 
       } else {
