@@ -18,10 +18,13 @@ package com.google.startupos.tools.buildfilegenerator;
 
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile;
+import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.CheckstyleTestExtension;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaBinary;
+import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaGrpcLibrary;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaLibrary;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaProtoLibrary;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaTest;
+import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.LoadExtensionStatement;
 import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.ProtoLibrary;
 import com.google.startupos.tools.buildfilegenerator.Protos.Import;
 import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
@@ -36,11 +39,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-// TODO: Add `java_grpc_library` and `checkstyle_test` generation
 public class BuildFileGenerator {
   private static final String THIRD_PARTY_ZIP_PATH =
       "tools/build_file_generator/third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
+  private static final String CHECKSTYLE_BZL_FILE_PATH = "//tools/checkstyle:checkstyle.bzl";
+  private static final String CHECKSTYLE_SYMBOL = "checkstyle_test";
+  private static final String JAVA_GRPC_LIBRARY_BZL_FILE_PATH =
+      "//third_party:java_grpc_library.bzl";
+  private static final String JAVA_GRPC_LIBRARY_SYMBOL = "java_grpc_library";
 
   private FileUtils fileUtils;
   private ProtoFileAnalyzer protoFileAnalyzer;
@@ -64,7 +71,7 @@ public class BuildFileGenerator {
             THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
   }
 
-  public BuildFile generateBuildFile(String packagePath) throws IOException {
+  BuildFile generateBuildFile(String packagePath) throws IOException {
     BuildFile.Builder result = BuildFile.newBuilder();
 
     List<String> protoFiles = getFilesByExtension(packagePath, ".proto");
@@ -74,19 +81,39 @@ public class BuildFileGenerator {
       ProtoLibrary protoLibrary = getProtoLibrary(protoFile);
       result.addProtoLibrary(protoLibrary);
       result.addJavaProtoLibrary(getJavaProtoLibrary(protoLibrary.getName()));
+      if (!protoFile.getServicesList().isEmpty()) {
+        result.addJavaGrpcLibrary(getJavaGrpcLibrary(protoFile));
+
+        LoadExtensionStatement javaGrpcLibrary =
+            getLoadExtensionStatement(JAVA_GRPC_LIBRARY_BZL_FILE_PATH, JAVA_GRPC_LIBRARY_SYMBOL);
+        if (!result.getExtensionList().contains(javaGrpcLibrary)) {
+          result.addExtension(javaGrpcLibrary);
+        }
+      }
     }
 
     List<String> javaClasses = getFilesByExtension(packagePath, ".java");
-    for (String javaClassName : javaClasses) {
-      JavaClass javaClass =
-          javaClassAnalyzer.getJavaClass(fileUtils.joinPaths(packagePath, javaClassName));
+    if (!javaClasses.isEmpty()) {
+      result.addExtension(getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
+      for (String javaClassName : javaClasses) {
+        JavaClass javaClass =
+            javaClassAnalyzer.getJavaClass(fileUtils.joinPaths(packagePath, javaClassName));
 
-      if (javaClass.getHasMainMethod()) {
-        result.addJavaBinary(getJavaBinary(javaClass));
-      } else if (javaClass.getIsTestClass()) {
-        result.addJavaTest(getJavaTest(javaClass));
-      } else {
-        result.addJavaLibrary(getJavaLibrary(javaClass));
+        String targetName;
+        if (javaClass.getHasMainMethod()) {
+          JavaBinary javaBinary = getJavaBinary(javaClass);
+          targetName = javaBinary.getName();
+          result.addJavaBinary(javaBinary);
+        } else if (javaClass.getIsTestClass()) {
+          JavaTest javaTest = getJavaTest(javaClass, packagePath);
+          targetName = javaTest.getName();
+          result.addJavaTest(javaTest);
+        } else {
+          JavaLibrary javaLibrary = getJavaLibrary(javaClass);
+          targetName = javaLibrary.getName();
+          result.addJavaLibrary(getJavaLibrary(javaClass));
+        }
+        result.addCheckstyleTest(getCheckstyleTest(targetName));
       }
     }
     return result.build();
@@ -116,6 +143,19 @@ public class BuildFileGenerator {
         .build();
   }
 
+  private JavaGrpcLibrary getJavaGrpcLibrary(ProtoFile protoFile) {
+    return JavaGrpcLibrary.newBuilder()
+        .setName(protoFile.getFileName() + "_java_grpc")
+        .addSrcs(":" + protoFile.getFileName() + "_proto")
+        .addTags("checkstyle_ignore")
+        .addDeps(":" + protoFile.getFileName() + "_java_proto")
+        .build();
+  }
+
+  private LoadExtensionStatement getLoadExtensionStatement(String path, String symbol) {
+    return LoadExtensionStatement.newBuilder().setPath(path).setSymbol(symbol).build();
+  }
+
   private JavaLibrary getJavaLibrary(JavaClass javaClass) {
     return JavaLibrary.newBuilder()
         .setName(javaClass.getClassName())
@@ -133,18 +173,39 @@ public class BuildFileGenerator {
         .build();
   }
 
-  private JavaTest getJavaTest(JavaClass javaClass) {
+  private JavaTest getJavaTest(JavaClass javaClass, String packagePath) {
     return JavaTest.newBuilder()
         .setName(javaClass.getClassName())
         .addSrcs(javaClass.getClassName() + ".java")
         .setTestClass(javaClass.getPackage() + "." + javaClass.getClassName())
         .addAllDeps(getDeps(javaClass))
-        .addAllResources(getResources())
+        .addAllResources(getResources(packagePath))
+        .build();
+  }
+
+  private CheckstyleTestExtension getCheckstyleTest(String target) {
+    return CheckstyleTestExtension.newBuilder()
+        .setName(target + "-checkstyle")
+        .setTarget(":" + target)
         .build();
   }
 
   // TODO: Implement method
-  private List<String> getResources() {
+  private List<String> getResources(String packagePath) {
+    String resourcesPath = fileUtils.joinPaths(packagePath, "resources");
+    System.out.println(resourcesPath);
+    if (fileUtils.fileOrFolderExists(resourcesPath)) {
+      System.out.println("1234567890");
+      try {
+        return fileUtils
+            .listContents(resourcesPath)
+            .stream()
+            .map(resource -> "resources/" + resource)
+            .collect(Collectors.toList());
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
     return new ArrayList<>();
   }
 
