@@ -56,8 +56,12 @@ public class InitCommand implements AaCommand {
     this.gitRepoFactory = gitRepoFactory;
   }
 
+  private String getRepoPath(String dirName) {
+    return fileUtils.joinToAbsolutePath(basePath.get(), "head", dirName);
+  }
+
   private void cloneRepoIntoHead(String dirName, String repoUrl) {
-    String repoPath = fileUtils.joinToAbsolutePath(basePath.get(), "head", dirName);
+    String repoPath = getRepoPath(dirName);
     System.out.printf("Cloning %s into %s\n", dirName, repoPath);
     GitRepo repo = this.gitRepoFactory.create(repoPath);
     repo.cloneRepo(repoUrl, repoPath);
@@ -86,24 +90,21 @@ public class InitCommand implements AaCommand {
       if (!startuposRepo.isEmpty()) {
         // Clone StartupOS repo into head:
         cloneRepoIntoHead("startup-os", startuposRepo);
-      } else {
-        System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");
-      }
 
-      if (!GLOBAL_REGISTRY_CONFIG.isEmpty()) {
         ReviewerRegistry registry =
             (ReviewerRegistry)
                 fileUtils.readPrototxtUnchecked(
-                    fileUtils.joinToAbsolutePath(
-                        fileUtils.getCurrentWorkingDirectory(), GLOBAL_REGISTRY_CONFIG),
+                    fileUtils.joinToAbsolutePath(getRepoPath("startup-os"), GLOBAL_REGISTRY_CONFIG),
                     ReviewerRegistry.newBuilder());
         for (ReviewerRegistryConfig config : registry.getReviewerConfigList()) {
-          if (config.getConfigRepo().equals(startuposRepo)) {
-            // should not clone StartupOS twice
-          } else {
+          // should not clone StartupOS twice
+          if (!config.getConfigRepo().equals(startuposRepo)) {
             cloneRepoIntoHead(config.getId(), config.getConfigRepo());
           }
         }
+
+      } else {
+        System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");
       }
 
     } catch (IllegalArgumentException e) {
