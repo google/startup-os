@@ -22,7 +22,10 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
+import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
+import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistryConfig;
 
+import java.io.IOException;
 import javax.inject.Inject;
 
 /* A command to init a base folder.
@@ -42,6 +45,8 @@ public class InitCommand implements AaCommand {
   public static Flag<String> startuposRepo =
       Flag.create("https://github.com/google/startup-os.git");
 
+  private static final String GLOBAL_REGISTRY_CONFIG = "tools/reviewer/global_registry.prototxt";
+
   private final GitRepoFactory gitRepoFactory;
   private FileUtils fileUtils;
   private boolean baseFolderExistedBefore = true;
@@ -50,6 +55,18 @@ public class InitCommand implements AaCommand {
   public InitCommand(FileUtils fileUtils, GitRepoFactory gitRepoFactory) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
+  }
+
+  private String getRepoPath(String dirName) {
+    return fileUtils.joinToAbsolutePath(basePath.get(), "head", dirName);
+  }
+
+  private void cloneRepoIntoHead(String dirName, String repoUrl) {
+    String repoPath = getRepoPath(dirName);
+    System.out.printf("Cloning %s into %s\n", dirName, repoPath);
+    GitRepo repo = this.gitRepoFactory.create(repoPath);
+    repo.cloneRepo(repoUrl, repoPath);
+    System.out.println("Completed Cloning");
   }
 
   public boolean run(String basePath, String startuposRepo) {
@@ -73,11 +90,25 @@ public class InitCommand implements AaCommand {
 
       if (!startuposRepo.isEmpty()) {
         // Clone StartupOS repo into head:
-        String startupOsPath = fileUtils.joinToAbsolutePath(basePath, "head", "startup-os");
-        System.out.println("Cloning StartupOS into " + startupOsPath);
-        GitRepo repo = this.gitRepoFactory.create(startupOsPath);
-        repo.cloneRepo(startuposRepo, startupOsPath);
-        System.out.println("Completed Cloning");
+        cloneRepoIntoHead("startup-os", startuposRepo);
+
+        try {
+          ReviewerRegistry registry =
+              (ReviewerRegistry)
+                  fileUtils.readPrototxt(
+                      fileUtils.joinToAbsolutePath(
+                          getRepoPath("startup-os"), GLOBAL_REGISTRY_CONFIG),
+                      ReviewerRegistry.newBuilder());
+          for (ReviewerRegistryConfig config : registry.getReviewerConfigList()) {
+            // should not clone StartupOS twice
+            if (!config.getConfigRepo().equals(startuposRepo)) {
+              cloneRepoIntoHead(config.getId(), config.getConfigRepo());
+            }
+          }
+        } catch (IOException e) {
+          System.err.println("Error: Did not find global registry config");
+        }
+
       } else {
         System.out.println("Warning: StartupOS repo url is empty. Cloning skipped.");
       }

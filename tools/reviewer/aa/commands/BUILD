@@ -27,6 +27,7 @@ java_library(
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/formatter",
+        "//tools/reviewer:reviewer_registry_java_proto",
         "//tools/reviewer/aa:config_java_proto",
         "//tools/reviewer/local_server/service:auth_service_java_grpc",
         "//tools/reviewer/local_server/service:auth_service_java_proto",
