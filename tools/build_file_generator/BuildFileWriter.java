@@ -217,8 +217,6 @@ public class BuildFileWriter {
     return result.toString();
   }
 
-  //  resources = ["resources/test_proto.proto"],
-
   private String getCheckstyleTest(List<CheckstyleTestExtension> checkstyleTests, String target) {
     StringBuilder result = new StringBuilder();
     for (CheckstyleTestExtension checkstyleTest : checkstyleTests) {
