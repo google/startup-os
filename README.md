@@ -57,7 +57,8 @@ You can either:
 * Treat it as a dependency to your own repo. An example for that is here: https://github.com/oferb/startup-os-example
 
 ## Installation
-Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's it!
+* Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's the recommended way!
+* Use `./bazelisk` instead of `bazel`, this way correct version of `bazel` will be downloaded and used automatically.
 
 ## Build & Test
 * Build everything: `./build.sh`

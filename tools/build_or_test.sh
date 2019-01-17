@@ -12,14 +12,26 @@ RESET=$(tput sgr0)
 
 CIRCLECI_MAX_ATTEMPTS=10
 
+function run_bazel() {
+  if hash bazel 2>/dev/null; then
+    # bazel is available in PATH
+    bazel "$@"
+  else
+    # bazelisk is used to download it
+    ./bazelisk "$@"
+  fi
+}
+
+export -f run_bazel
+
 function bazel_build() {
   if [[ -z "$ANDROID_HOME" ]]; then
     # Ignore third_party, node_modules and android targets
-    bazel query '//... except //third_party/... except filter(node_modules, //...) except kind("android_.* rule", //...)' | xargs bazel $1
+    run_bazel $1 $(run_bazel query '//... except //third_party/... except filter(node_modules, //...) except kind("android_.* rule", //...)')
     return $?
   else
     # Ignore just third_party and node_modules
-    bazel query '//... except //third_party/... except filter(node_modules, //...)' | xargs bazel $1
+    run_bazel $1 $(run_bazel query '//... except //third_party/... except filter(node_modules, //...)')
     return $?
   fi
 }
