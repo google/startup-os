@@ -38,28 +38,22 @@ export class TemplateService {
 
   // Make line highlighted with separate chars
   highlightChanges(blockLine: BlockLine, blockIndex: BlockIndex): void {
-    // TODO: hightlight all word changes (not only first one)
-    let startIndex: number = 0;
-    let endIndex: number = 0;
-
     const wordChanges: WordChange[] = blockLine.diffLine.getWordChangeList();
-    if (wordChanges.length > 0) {
-      startIndex = wordChanges[0].getStartIndex();
-      endIndex = wordChanges[0].getEndIndex();
-    }
 
     const className = (blockIndex === BlockIndex.rightFile) ?
       'hl-right' :
       'hl-left';
 
+    // If word changes exist and it's not whole line, then show it
     if (
-      startIndex !== endIndex &&
-      startIndex !== 0 ||
-      endIndex !== blockLine.clearCode.length
+      wordChanges.length > 1 ||
+      wordChanges.length > 0 && (
+        wordChanges[0].getStartIndex() !== 0 ||
+        wordChanges[0].getEndIndex() !== blockLine.clearCode.length
+      )
     ) {
       blockLine.wordChanges = this.makeHighlighting(
-        startIndex,
-        endIndex,
+        wordChanges,
         blockLine.clearCode,
         className,
       );
@@ -71,36 +65,54 @@ export class TemplateService {
   // 'I think x > y here' -> 'I <span>think</span> x &gt; y here'
   // word 'think' is highlighted part
   private makeHighlighting(
-    startIndex: number,
-    endIndex: number,
+    wordChanges: WordChange[],
     code: string,
     className: string,
   ): string {
-    // If the line contains chars changes
-    let leftPart: string = code.substr(
-      0,
-      startIndex,
-    );
-    let changedPart: string = code.substr(
-      startIndex,
-      endIndex - startIndex,
-    );
-    let rightPart: string = code.substr(
-      endIndex,
-      code.length - endIndex,
-    );
+    let highlighting: string = '';
+    let previousEndIndex: number = 0;
 
-    // Escape html special chars
-    leftPart = this.highlightService.htmlSpecialChars(leftPart);
-    changedPart = this.highlightService.htmlSpecialChars(changedPart);
-    rightPart = this.highlightService.htmlSpecialChars(rightPart);
+    // Highlight word changes
+    wordChanges.forEach(wordChange => {
+      // Cut code by indexes
+      let codeBeforeWordChange: string = code.substr(
+        previousEndIndex,
+        wordChange.getStartIndex() - previousEndIndex,
+      );
+      let codeWithWordChange: string = code.substr(
+        wordChange.getStartIndex(),
+        wordChange.getEndIndex() - wordChange.getStartIndex(),
+      );
 
-    // Highlight changed part
-    const span: HTMLSpanElement = document.createElement('span');
-    span.className = className;
-    span.innerHTML = changedPart;
+      // Escape html special chars
+      codeBeforeWordChange = this.highlightService.htmlSpecialChars(codeBeforeWordChange);
+      codeWithWordChange = this.highlightService.htmlSpecialChars(codeWithWordChange);
 
-    return leftPart + span.outerHTML + rightPart;
+      // Highlight changed part
+      const span: HTMLSpanElement = document.createElement('span');
+      span.className = className; // Apply color. Red or green.
+      span.innerHTML = codeWithWordChange;
+      codeWithWordChange = span.outerHTML;
+
+      highlighting += codeBeforeWordChange + codeWithWordChange;
+      previousEndIndex = wordChange.getEndIndex();
+    });
+
+    // Add code after all word changes
+    if (previousEndIndex !== code.length) {
+      // Cut code by indexes
+      let codeAfterAllChanges: string = code.substr(
+        previousEndIndex,
+        code.length - previousEndIndex,
+      );
+
+      // Escape html special chars
+      codeAfterAllChanges = this.highlightService.htmlSpecialChars(codeAfterAllChanges);
+
+      highlighting += codeAfterAllChanges;
+    }
+
+    return highlighting;
   }
 
   // Does the block line contain no comments?

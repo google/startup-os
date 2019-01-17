@@ -45,7 +45,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
     // If CI exists then convert it to UI status
     const ci: CiResponse = this.diff.getCiResponseList()[0];
     if (ci) {
-      const results: CiResponse.TargetResult[] = ci.getResultsList();
+      const results: CiResponse.TargetResult[] = ci.getResultList();
       this.setStatus(results[results.length - 1]);
     }
   }
