@@ -57,7 +57,7 @@ You can either:
 * Treat it as a dependency to your own repo. An example for that is here: https://github.com/oferb/startup-os-example
 
 ## Installation
-Install [Bazel](https://docs.bazel.build/versions/master/install.html). That's it!
+Install [Python](https://www.python.org/downloads/) and [Bazel](https://docs.bazel.build/versions/master/install.html). That's it!
 
 ## Build & Test
 * Build everything: `./build.sh`
