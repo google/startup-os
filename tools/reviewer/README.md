@@ -31,21 +31,16 @@ pointed at from the global registry.
 Since Reviewer instances run a local server that holds a port, to try to avoid collisions, we also
 define a default port for each Reviewer instance in the global registry.
 
-## How to install aa tool
-* Clone `startup-os` repo to some location on your PC using `git clone https://github.com/google/startup-os.git`.
-* Go to `/path/to/startup-os-folder/startup-os` and run `./test.sh` script to make sure that everything works.
+## How to install aa tool and sign-in to get a token on your machine
+* In a temp folder, clone StartupOS using `git clone https://github.com/google/startup-os.git`.
+* cd into `startup-os`
 * Run `bazel run //tools/reviewer/aa:aa_tool -- init --base_path </path/to/base/folder>` command to init a base folder.
-* Go to `/path/to/base/folder/head/startup-os` and run `source tools/reviewer/aa/aa_tool.sh` script
-* Run `./build.sh` script and after that `./test.sh` script
-* Delete repo that was cloned in the first step (`/path/to/startup-os-folder/startup-os`)
-
-## Get a Firebase token to your local machine
-After completing the steps in  [How to install aa tool](#how-to-install-aa-tool) do the following:
-* Go to `/path/to/base/folder/head/startup-os`
-* Run `bazel build //tools/reviewer/local_server:local_server`
-* Run `bazel-bin/tools/reviewer/local_server/local_server`
-* Visit `https://web-login-startupos.firebaseapp.com` and sign in
+* cd into `/path/to/base/folder/head/startup-os` and run `./test.sh` to make sure that everything works.
+* From the same folder, run: `echo "source $PWD/tools/reviewer/aa/aa_tool.sh" >> ~/.bashrc`
+* Run `source ~/.bashrc`
+* Run `aa`. You will be prompted to visit https://web-login-startupos.firebaseapp.com to log in. Do so :)
 * Check that you have a file at `~/.aa_token`
+* Delete the repo that was cloned in the first step (`/path/to/startup-os-folder/startup-os`)
 
 ## Current status:
 The tool is WIP. The video is up-to-date as of Sep 6th 2018. If you want to use the alpha version please contact oferb@google.com.
