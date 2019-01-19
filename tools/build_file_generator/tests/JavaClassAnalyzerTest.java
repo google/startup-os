@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator.tests;
+package com.google.startupos.tools.build_file_generator.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tools.buildfilegenerator.JavaClassAnalyzer;
-import com.google.startupos.tools.buildfilegenerator.Protos.Import;
-import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
+import com.google.startupos.tools.build_file_generator.JavaClassAnalyzer;
+import com.google.startupos.tools.build_file_generator.Protos.Import;
+import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import dagger.Component;
 import java.io.IOException;
 import java.nio.file.Files;

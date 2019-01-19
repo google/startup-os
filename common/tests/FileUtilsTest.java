@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.common;
+package com.google.startupos.common.tests;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static junit.framework.TestCase.assertEquals;
@@ -24,6 +24,10 @@ import static org.junit.Assert.assertFalse;
 import com.google.common.collect.ImmutableList;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import com.google.startupos.common.CommonComponent;
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.DaggerCommonComponent;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.tests.Protos.TestMessage;
 import dagger.Provides;
 import java.io.IOException;

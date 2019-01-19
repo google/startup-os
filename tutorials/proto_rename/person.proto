@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package com.google.startupos.tutorials.protorename;
 
-option java_package = "com.google.startupos.tutorials.protorename";
+option java_package = "com.google.startupos.tutorials.proto_rename";
 option java_outer_classname = "Protos";
 
 message Person {

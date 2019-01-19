@@ -7,7 +7,7 @@ java_test(
     srcs = [
         "JavaClassAnalyzerTest.java",
     ],
-    test_class = "com.google.startupos.tools.buildfilegenerator.tests.JavaClassAnalyzerTest",
+    test_class = "com.google.startupos.tools.build_file_generator.tests.JavaClassAnalyzerTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
@@ -28,7 +28,7 @@ java_test(
         "ProtoFileAnalyzerTest.java",
     ],
     resources = ["resources/test_proto.proto"],
-    test_class = "com.google.startupos.tools.buildfilegenerator.tests.ProtoFileAnalyzerTest",
+    test_class = "com.google.startupos.tools.build_file_generator.tests.ProtoFileAnalyzerTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

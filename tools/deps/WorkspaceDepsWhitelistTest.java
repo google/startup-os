@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.dep_whitelist;
+package com.google.startupos.tools.deps;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

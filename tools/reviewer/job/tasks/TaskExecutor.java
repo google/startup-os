@@ -17,8 +17,6 @@
 package com.google.startupos.tools.reviewer.job.tasks;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -39,7 +39,7 @@ checkstyle_test(
 java_binary(
     name = "build_file_generator_tool",
     srcs = ["BuildFileGeneratorTool.java"],
-    main_class = "com.google.startupos.tools.buildfilegenerator.BuildFileGeneratorTool",
+    main_class = "com.google.startupos.tools.build_file_generator.BuildFileGeneratorTool",
     deps = [
         ":build_file_generator",
         ":build_file_generator_java_proto",
@@ -59,7 +59,7 @@ checkstyle_test(
 java_binary(
     name = "third_party_deps_tool",
     srcs = ["ThirdPartyDepsTool.java"],
-    main_class = "com.google.startupos.tools.buildfilegenerator.ThirdPartyDepsTool",
+    main_class = "com.google.startupos.tools.build_file_generator.ThirdPartyDepsTool",
     deps = [
         ":build_file_generator",
         ":build_file_generator_java_proto",

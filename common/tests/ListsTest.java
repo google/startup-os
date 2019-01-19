@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.startupos.common;
+package com.google.startupos.common.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableList;
+import com.google.startupos.common.Lists;
 import com.google.startupos.common.Lists.Segment;
 import org.junit.Test;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;

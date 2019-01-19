@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.localserver;
+package com.google.startupos.tools.local_server;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.CommonModule;
@@ -23,9 +23,9 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.common.repo.GitRepoFactory;
-import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.aa.AaModule;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.local_server.service.AuthService;
+import com.google.startupos.tools.reviewer.local_server.service.CodeReviewService;
 import dagger.Component;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;

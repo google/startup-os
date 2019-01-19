@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 
-import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDep;
-import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDeps;
+import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDep;
+import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDeps;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;

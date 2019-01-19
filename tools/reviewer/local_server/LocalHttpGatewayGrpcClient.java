@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.localserver;
+package com.google.startupos.tools.local_server;
 
-import com.google.startupos.tools.localserver.service.AuthServiceGrpc;
-import com.google.startupos.tools.localserver.service.Protos.AuthDataRequest;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.local_server.service.AuthProtos.AuthDataRequest;
+import com.google.startupos.tools.reviewer.local_server.service.AuthServiceGrpc;
+import com.google.startupos.tools.reviewer.local_server.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.FileRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.StatusRuntimeException;

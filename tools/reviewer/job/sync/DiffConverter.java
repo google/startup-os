@@ -23,10 +23,10 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Issu
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Comment;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.GithubPr;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Thread;
 
 import java.time.Instant;
 import java.util.List;

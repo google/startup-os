@@ -21,7 +21,7 @@ java_test(
         "//:dependencies.yaml",
         "//tools/deps:whitelist.yaml",
     ],
-    test_class = "com.google.startupos.tools.dep_whitelist.MavenDepsWhitelistTest",
+    test_class = "com.google.startupos.tools.deps.MavenDepsWhitelistTest",
     deps = [
         "//third_party/maven/org/yaml:snakeyaml",
     ],
@@ -39,7 +39,7 @@ java_test(
         "//:WORKSPACE",
         "//tools/deps:whitelist.yaml",
     ],
-    test_class = "com.google.startupos.tools.dep_whitelist.WorkspaceDepsWhitelistTest",
+    test_class = "com.google.startupos.tools.deps.WorkspaceDepsWhitelistTest",
     deps = [
         "//third_party/maven/org/apache/commons:commons_lang3",
         "//third_party/maven/org/yaml:snakeyaml",
@@ -74,7 +74,7 @@ checkstyle_test(
 java_binary(
     name = "workspace_patcher",
     srcs = ["WorkspacePatcher.java"],
-    main_class = "com.google.startupos.tools.workspace_patcher.WorkspacePatcher",
+    main_class = "com.google.startupos.tools.deps.WorkspacePatcher",
     deps = [
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",

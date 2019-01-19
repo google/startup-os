@@ -1,7 +1,7 @@
 syntax = "proto3";
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
-option java_package = "com.google.startupos.tools.buildfilegenerator";
+option java_package = "com.google.startupos.tools.build_file_generator";
 option java_outer_classname = "Protos";
 
 message Import {

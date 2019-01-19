@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.localserver.service.tests;
+package com.google.startupos.tools.reviewer.local_server.service.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -30,15 +30,15 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
+import com.google.startupos.tools.reviewer.local_server.service.AuthService;
+import com.google.startupos.tools.reviewer.local_server.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.local_server.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffFilesResponse;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffNumberResponse;
 import dagger.Component;
 import dagger.Provides;
 import io.grpc.ManagedChannel;
