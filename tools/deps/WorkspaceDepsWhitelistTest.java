@@ -70,7 +70,7 @@ public class WorkspaceDepsWhitelistTest {
   }
 
   @Test
-  public void urlsMatchWhitelist() throws Exception {
+  public void urlsMatchWhitelist() {
     List<String> validUrls = whitelist.get("workspace_dependencies");
 
     for (String line : workspace) {
