@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
-import com.google.startupos.common.firestore.MessageWithId;
 import com.google.startupos.common.firestore.ProtoChange;
 import com.google.startupos.common.firestore.ProtoEventListener;
 import com.google.startupos.common.firestore.ProtoQuerySnapshot;
@@ -31,16 +30,13 @@ import com.google.startupos.tools.reviewer.ReviewerProtos.CiRequest;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse;
 import com.google.startupos.tools.reviewer.ReviewerProtos.CiResponse.TargetResult.Status;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
-import com.google.startupos.tools.reviewer.job.tasks.Task;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import java.io.IOException;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Diff;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class SubmitterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();

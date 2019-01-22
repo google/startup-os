@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tutorials.protorename;
+package com.google.startupos.tutorials.proto_rename;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tutorials.protorename.Protos.Person;
+import com.google.startupos.tutorials.proto_rename.Protos.Person;
 import dagger.Component;
 
 import javax.inject.Singleton;

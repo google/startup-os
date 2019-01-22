@@ -7,7 +7,7 @@ java_binary(
     srcs = [
         "TestTool.java",
     ],
-    main_class = "com.google.startupos.tools.reviewer.localserver.service.tests.TestTool",
+    main_class = "com.google.startupos.tools.reviewer.local_server.service.tests.TestTool",
     deps = [
         "//common",
         "//common/repo:repo_java_proto",
@@ -30,7 +30,7 @@ java_test(
     srcs = [
         "CodeReviewServiceTextDiffTest.java",
     ],
-    test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceTextDiffTest",
+    test_class = "com.google.startupos.tools.reviewer.local_server.service.tests.CodeReviewServiceTextDiffTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
@@ -67,7 +67,7 @@ java_test(
     srcs = [
         "CodeReviewServiceGetDiffFilesTest.java",
     ],
-    test_class = "com.google.startupos.tools.reviewer.localserver.service.tests.CodeReviewServiceGetDiffFilesTest",
+    test_class = "com.google.startupos.tools.reviewer.local_server.service.tests.CodeReviewServiceGetDiffFilesTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

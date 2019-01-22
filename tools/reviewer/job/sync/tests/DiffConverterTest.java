@@ -29,11 +29,11 @@ import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.Pull
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.User;
 import com.google.startupos.tools.reviewer.job.sync.ReviewerClient;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Comment;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.GithubPr;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Thread;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Author;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Comment;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.GithubPr;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Thread;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;

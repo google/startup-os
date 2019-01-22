@@ -9,7 +9,7 @@ java_test(
         "FlagTestClass.java",
         "FlagsTest.java",
     ],
-    test_class = "com.google.startupos.common.flags.testpackage.FlagsTest",
+    test_class = "com.google.startupos.common.flags.tests.FlagsTest",
     deps = [
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",

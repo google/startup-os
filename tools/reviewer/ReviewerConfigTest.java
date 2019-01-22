@@ -18,16 +18,12 @@ package com.google.startupos.tools.reviewer;
 
 import static org.junit.Assert.assertEquals;
 
-import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 import com.google.startupos.tools.reviewer.ReviewerProtos.User;
 import dagger.Component;
-import dagger.Provides;
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.util.List;
 import javax.inject.Singleton;
 import org.junit.Before;

@@ -15,7 +15,7 @@ java_proto_library(
 java_binary(
     name = "proto_vs_json_tool",
     srcs = ["ProtoVsJsonTool.java"],
-    main_class = "com.google.startupos.proto_vs_json.ProtoVsJsonTool",
+    main_class = "com.google.startupos.examples.proto_vs_json.ProtoVsJsonTool",
     deps = [
         ":data_java_proto",
         "//common",

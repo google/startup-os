@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.localserver.service;
+package com.google.startupos.tools.reviewer.local_server.service;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
@@ -22,30 +22,27 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.Protos.TextDiff;
 import com.google.startupos.common.TextDifferencer;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.BranchInfo;
 import com.google.startupos.common.repo.Protos.Commit;
 import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.repo.Protos.File.Action;
 import com.google.startupos.common.repo.Repo;
-import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.ReviewerConstants;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Author;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.CreateDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffNumberResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Empty;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.FileResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.PongResponse;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.RemoveWorkspaceRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Author;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.CreateDiffRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffFilesResponse;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffNumberResponse;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Empty;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.FileRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.FileResponse;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.PongResponse;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.RemoveWorkspaceRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.TextDiffResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;

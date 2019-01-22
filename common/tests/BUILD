@@ -6,7 +6,7 @@ load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
 proto_library(
     name = "test_proto",
-    srcs = ["resources/file_utils_test.proto"],
+    srcs = ["file_utils_test.proto"],
 )
 
 java_proto_library(
@@ -17,7 +17,7 @@ java_proto_library(
 java_test(
     name = "FileUtilsTest",
     srcs = ["FileUtilsTest.java"],
-    test_class = "com.google.startupos.common.FileUtilsTest",
+    test_class = "com.google.startupos.common.tests.FileUtilsTest",
     deps = [
         ":test_java_proto",
         ":test_proto",
@@ -42,7 +42,7 @@ checkstyle_test(
 java_test(
     name = "ListsTest",
     srcs = ["ListsTest.java"],
-    test_class = "com.google.startupos.common.ListsTest",
+    test_class = "com.google.startupos.common.tests.ListsTest",
     deps = [
         "//common:lists",
         "//third_party/maven/com/google/dagger",
@@ -62,7 +62,7 @@ java_test(
     name = "TextDifferencerTest",
     srcs = ["TextDifferencerTest.java"],
     resources = glob(["resources/*.txt"]),
-    test_class = "com.google.startupos.common.TextDifferencerTest",
+    test_class = "com.google.startupos.common.tests.TextDifferencerTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",

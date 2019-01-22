@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import dagger.Component;
 
 import java.io.IOException;

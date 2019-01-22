@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.dep_whitelist;
+package com.google.startupos.tools.deps;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +38,7 @@ public class MavenDepsWhitelistTest {
   }
 
   @Test
-  public void dependenciesList() throws Exception {
+  public void dependenciesList() {
     Set<String> packageGroups = dependencies.get("dependencies").keySet();
     List<String> validPackageGroups = whitelist.get("maven_dependencies");
 

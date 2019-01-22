@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.dep_whitelist;
+package com.google.startupos.tools.deps;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -70,7 +70,7 @@ public class WorkspaceDepsWhitelistTest {
   }
 
   @Test
-  public void urlsMatchWhitelist() throws Exception {
+  public void urlsMatchWhitelist() {
     List<String> validUrls = whitelist.get("workspace_dependencies");
 
     for (String line : workspace) {
