@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.local_server;
+package com.google.startupos.tools.reviewer.local_server;
 
 import com.google.startupos.tools.reviewer.local_server.service.AuthProtos.AuthDataRequest;
 import com.google.startupos.tools.reviewer.local_server.service.AuthServiceGrpc;

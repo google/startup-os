@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.local_server;
+package com.google.startupos.tools.reviewer.local_server;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

@@ -7,7 +7,7 @@ java_binary(
     srcs = [
         "LocalServer.java",
     ],
-    main_class = "com.google.startupos.tools.local_server.LocalServer",
+    main_class = "com.google.startupos.tools.reviewer.local_server.LocalServer",
     deps = [
         ":local_http_gateway",
         "//common",

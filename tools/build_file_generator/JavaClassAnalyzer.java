@@ -67,7 +67,7 @@ public class JavaClassAnalyzer {
   }
 
   private static String getPackage(String fileContent, String className) {
-    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package", "");
+    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package ", "");
     if (packageLines.isEmpty()) {
       throw new IllegalArgumentException(
           String.format("Can't find package for the file: %s", className));

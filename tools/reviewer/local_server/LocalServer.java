@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.local_server;
+package com.google.startupos.tools.reviewer.local_server;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.CommonModule;
