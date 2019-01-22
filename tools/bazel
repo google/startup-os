@@ -23,4 +23,5 @@ if [[ ! -x ${BAZEL_BINARY} ]]; then
   chmod +x ${BAZEL_BINARY}
 fi
 
-${BAZEL_BINARY} $@
+${BAZEL_BINARY} "$@"
+exit $?
