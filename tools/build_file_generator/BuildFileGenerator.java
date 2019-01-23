@@ -36,7 +36,9 @@ import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDeps;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -54,6 +56,7 @@ public class BuildFileGenerator {
   private ProtoFileAnalyzer protoFileAnalyzer;
   private JavaClassAnalyzer javaClassAnalyzer;
   private ThirdPartyDeps thirdPartyDeps;
+  private List<String> pathsToGenerateBuildFiles;
 
   @Inject
   public BuildFileGenerator(
@@ -64,6 +67,7 @@ public class BuildFileGenerator {
     this.protoFileAnalyzer = protoFileAnalyzer;
     this.javaClassAnalyzer = javaClassAnalyzer;
     thirdPartyDeps = getThirdPartyDeps();
+    pathsToGenerateBuildFiles = getPathsToGenerateBuildFiles();
   }
 
   private ThirdPartyDeps getThirdPartyDeps() {
@@ -72,52 +76,78 @@ public class BuildFileGenerator {
             THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
   }
 
-  BuildFile generateBuildFile(String packagePath) throws IOException {
-    BuildFile.Builder result = BuildFile.newBuilder();
-
-    List<String> protoFiles = getFilesByExtension(packagePath, ".proto");
-    for (String protoFileName : protoFiles) {
-      ProtoFile protoFile =
-          protoFileAnalyzer.getProtoFile(fileUtils.joinPaths(packagePath, protoFileName));
-      ProtoLibrary protoLibrary = getProtoLibrary(protoFile);
-      result.addProtoLibrary(protoLibrary);
-      result.addJavaProtoLibrary(getJavaProtoLibrary(protoLibrary.getName()));
-      if (!protoFile.getServicesList().isEmpty()) {
-        result.addJavaGrpcLibrary(getJavaGrpcLibrary(protoFile));
-
-        LoadExtensionStatement javaGrpcLibrary =
-            getLoadExtensionStatement(JAVA_GRPC_LIBRARY_BZL_FILE_PATH, JAVA_GRPC_LIBRARY_SYMBOL);
-        if (!result.getExtensionList().contains(javaGrpcLibrary)) {
-          result.addExtension(javaGrpcLibrary);
+  private List<String> getPathsToGenerateBuildFiles() {
+    List<String> result = new ArrayList<>();
+    try {
+      for (String item :
+          fileUtils.listContentsRecursively(fileUtils.getCurrentWorkingDirectory())) {
+        if (fileUtils.folderExists(item)) {
+          List<String> folderContent = fileUtils.listContents(item);
+          for (String fileName : folderContent) {
+            if (fileName.endsWith(".java") || fileName.endsWith(".proto")) {
+              result.add(item);
+            }
+          }
         }
       }
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+    return result;
+  }
 
-    List<String> javaClasses = getFilesByExtension(packagePath, ".java");
-    if (!javaClasses.isEmpty()) {
-      result.addExtension(getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
-      for (String javaClassName : javaClasses) {
-        JavaClass javaClass =
-            javaClassAnalyzer.getJavaClass(fileUtils.joinPaths(packagePath, javaClassName));
+  Map<String, BuildFile> generateBuildFiles() throws IOException {
+    Map<String, BuildFile> result = new HashMap<>();
 
-        String targetName;
-        if (javaClass.getHasMainMethod()) {
-          JavaBinary javaBinary = getJavaBinary(javaClass);
-          targetName = javaBinary.getName();
-          result.addJavaBinary(javaBinary);
-        } else if (javaClass.getIsTestClass()) {
-          JavaTest javaTest = getJavaTest(javaClass, packagePath);
-          targetName = javaTest.getName();
-          result.addJavaTest(javaTest);
-        } else {
-          JavaLibrary javaLibrary = getJavaLibrary(javaClass);
-          targetName = javaLibrary.getName();
-          result.addJavaLibrary(getJavaLibrary(javaClass));
+    for (String packagePath : pathsToGenerateBuildFiles) {
+      BuildFile.Builder buildFile = BuildFile.newBuilder();
+
+      List<String> protoFiles = getFilesByExtension(packagePath, ".proto");
+      for (String protoFileName : protoFiles) {
+        ProtoFile protoFile =
+            protoFileAnalyzer.getProtoFile(fileUtils.joinPaths(packagePath, protoFileName));
+        ProtoLibrary protoLibrary = getProtoLibrary(protoFile);
+        buildFile.addProtoLibrary(protoLibrary);
+        buildFile.addJavaProtoLibrary(getJavaProtoLibrary(protoLibrary.getName()));
+        if (!protoFile.getServicesList().isEmpty()) {
+          buildFile.addJavaGrpcLibrary(getJavaGrpcLibrary(protoFile));
+
+          LoadExtensionStatement javaGrpcLibrary =
+              getLoadExtensionStatement(JAVA_GRPC_LIBRARY_BZL_FILE_PATH, JAVA_GRPC_LIBRARY_SYMBOL);
+          if (!buildFile.getExtensionList().contains(javaGrpcLibrary)) {
+            buildFile.addExtension(javaGrpcLibrary);
+          }
         }
-        result.addCheckstyleTest(getCheckstyleTest(targetName));
       }
+
+      List<String> javaClasses = getFilesByExtension(packagePath, ".java");
+      if (!javaClasses.isEmpty()) {
+        buildFile.addExtension(
+            getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
+        for (String javaClassName : javaClasses) {
+          JavaClass javaClass =
+              javaClassAnalyzer.getJavaClass(fileUtils.joinPaths(packagePath, javaClassName));
+
+          String targetName;
+          if (javaClass.getHasMainMethod()) {
+            JavaBinary javaBinary = getJavaBinary(javaClass);
+            targetName = javaBinary.getName();
+            buildFile.addJavaBinary(javaBinary);
+          } else if (javaClass.getIsTestClass()) {
+            JavaTest javaTest = getJavaTest(javaClass, packagePath);
+            targetName = javaTest.getName();
+            buildFile.addJavaTest(javaTest);
+          } else {
+            JavaLibrary javaLibrary = getJavaLibrary(javaClass);
+            targetName = javaLibrary.getName();
+            buildFile.addJavaLibrary(getJavaLibrary(javaClass));
+          }
+          buildFile.addCheckstyleTest(getCheckstyleTest(targetName));
+        }
+      }
+      result.put(packagePath, buildFile.build());
     }
-    return result.build();
+    return result;
   }
 
   private List<String> getFilesByExtension(String packagePath, String fileExtension)
@@ -194,9 +224,7 @@ public class BuildFileGenerator {
   // TODO: Implement method
   private List<String> getResources(String packagePath) {
     String resourcesPath = fileUtils.joinPaths(packagePath, "resources");
-    System.out.println(resourcesPath);
     if (fileUtils.fileOrFolderExists(resourcesPath)) {
-      System.out.println("1234567890");
       try {
         return fileUtils
             .listContents(resourcesPath)
@@ -214,7 +242,7 @@ public class BuildFileGenerator {
     List<String> result = new ArrayList<>();
 
     for (Import importProto : javaClass.getImportList()) {
-      if (importProto.getPackage().startsWith("java")) {
+      if (importProto.getPackage().startsWith("java.")) {
         continue;
       }
       String classNameWithPackage =

@@ -45,7 +45,6 @@ java_binary(
         ":build_file_generator_java_proto",
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
     ],
