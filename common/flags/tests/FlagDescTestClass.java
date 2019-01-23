@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.common.flags.testpackage;
+package com.google.startupos.common.flags.tests;
 
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;

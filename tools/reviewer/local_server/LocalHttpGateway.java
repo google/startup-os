@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.localserver;
+package com.google.startupos.tools.reviewer.local_server;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.flogger.FluentLogger;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
-import com.google.startupos.common.flags.Flags;
-import com.google.startupos.common.repo.Protos.File;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.DiffFilesRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.DiffFilesRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.TextDiffRequest;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;

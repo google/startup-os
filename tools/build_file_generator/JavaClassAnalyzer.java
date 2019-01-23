@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tools.buildfilegenerator.Protos.Import;
-import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
+import com.google.startupos.tools.build_file_generator.Protos.Import;
+import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -67,7 +67,7 @@ public class JavaClassAnalyzer {
   }
 
   private static String getPackage(String fileContent, String className) {
-    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package", "");
+    List<String> packageLines = getLinesStartWithKeyword(fileContent, "package ", "");
     if (packageLines.isEmpty()) {
       throw new IllegalArgumentException(
           String.format("Can't find package for the file: %s", className));

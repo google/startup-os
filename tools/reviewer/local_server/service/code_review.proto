@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package com.google.startupos.tools.reviewer.localserver.service;
+package com.google.startupos.tools.reviewer.local_server.service;
 
-option java_package = "com.google.startupos.tools.reviewer.localserver.service";
+option java_package = "com.google.startupos.tools.reviewer.local_server.service";
 option java_outer_classname = "Protos";
 
 import "common/repo/repo.proto";

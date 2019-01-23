@@ -16,8 +16,6 @@
 
 package com.google.startupos.common;
 
-import com.google.startupos.common.CommonModule;
-import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;

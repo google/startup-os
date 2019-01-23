@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.CheckstyleTestExtension;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaBinary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaGrpcLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaProtoLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaTest;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.LoadExtensionStatement;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.ProtoLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.Import;
-import com.google.startupos.tools.buildfilegenerator.Protos.JavaClass;
-import com.google.startupos.tools.buildfilegenerator.Protos.ProtoFile;
-import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDep;
-import com.google.startupos.tools.buildfilegenerator.Protos.ThirdPartyDeps;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaBinary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaGrpcLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaProtoLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaTest;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.LoadExtensionStatement;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.ProtoLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.Import;
+import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
+import com.google.startupos.tools.build_file_generator.Protos.ProtoFile;
+import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDep;
+import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDeps;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.startupos.common;
+package com.google.startupos.common.tests;
 
 import static org.junit.Assert.assertEquals;
 
 import com.google.protobuf.TextFormat;
+import com.google.startupos.common.CommonModule;
+import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.Protos.ChangeType;
 import com.google.startupos.common.Protos.DiffLine;
 import com.google.startupos.common.Protos.TextDiff;
+import com.google.startupos.common.TextDifferencer;
 import dagger.Component;
 import javax.inject.Singleton;
 import org.junit.Before;

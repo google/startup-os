@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.buildfilegenerator;
+package com.google.startupos.tools.build_file_generator;
 
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.CheckstyleTestExtension;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaBinary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaGrpcLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaProtoLibrary;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.JavaTest;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.LoadExtensionStatement;
-import com.google.startupos.tools.buildfilegenerator.Protos.BuildFile.ProtoLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaBinary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaGrpcLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaProtoLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaTest;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.LoadExtensionStatement;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile.ProtoLibrary;
 
 import java.util.List;
 import javax.inject.Inject;

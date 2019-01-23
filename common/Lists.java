@@ -63,11 +63,11 @@ public class Lists {
   @AutoValue
   public abstract static class Segment {
     // end index is inclusive
-    static Segment create(int startIndex, int startValue, int endIndex, int endValue) {
+    public static Segment create(int startIndex, int startValue, int endIndex, int endValue) {
       return new AutoValue_Lists_Segment(startIndex, startValue, endIndex, endValue);
     }
 
-    static Segment create(int index, int value) {
+    public static Segment create(int index, int value) {
       return new AutoValue_Lists_Segment(index, value, index, value);
     }
 

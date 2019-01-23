@@ -7,7 +7,7 @@ java_binary(
     srcs = [
         "LocalServer.java",
     ],
-    main_class = "com.google.startupos.tools.localserver.LocalServer",
+    main_class = "com.google.startupos.tools.reviewer.local_server.LocalServer",
     deps = [
         ":local_http_gateway",
         "//common",
@@ -62,7 +62,6 @@ java_library(
     ],
     deps = [
         ":local_http_gateway_grpc_client",
-        "//common/flags",
         "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/flogger:flogger_system_backend",

@@ -1,9 +1,10 @@
 syntax = "proto3";
 
-option java_package = "com.google.startupos.tools.localserver.service";
-option java_outer_classname = "Protos";
+option java_package = "com.google.startupos.tools.reviewer.local_server.service";
 
-package com.google.startupos.tools.localserver.service;
+option java_outer_classname = "AuthProtos";
+
+package com.google.startupos.tools.reviewer.local_server.service;
 
 service AuthService {
   rpc postAuthData(AuthDataRequest) returns (AuthDataResponse);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.reviewer.localserver.service.tests;
+package com.google.startupos.tools.reviewer.local_server.service.tests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,14 +26,14 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.common.repo.Protos.File;
 import com.google.startupos.common.repo.Protos.File.Action;
-import com.google.startupos.tools.localserver.service.AuthService;
 import com.google.startupos.tools.reviewer.aa.AaModule;
 import com.google.startupos.tools.reviewer.aa.commands.InitCommand;
 import com.google.startupos.tools.reviewer.aa.commands.WorkspaceCommand;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewService;
-import com.google.startupos.tools.reviewer.localserver.service.CodeReviewServiceGrpc;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffRequest;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.TextDiffResponse;
+import com.google.startupos.tools.reviewer.local_server.service.AuthService;
+import com.google.startupos.tools.reviewer.local_server.service.CodeReviewService;
+import com.google.startupos.tools.reviewer.local_server.service.CodeReviewServiceGrpc;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.TextDiffRequest;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.TextDiffResponse;
 import dagger.Component;
 import dagger.Provides;
 import io.grpc.ManagedChannel;

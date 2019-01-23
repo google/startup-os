@@ -22,7 +22,7 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.IssueComment;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
-import com.google.startupos.tools.reviewer.localserver.service.Protos.Diff;
+import com.google.startupos.tools.reviewer.local_server.service.Protos.Diff;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
