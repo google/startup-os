@@ -7,5 +7,6 @@
 # To do this, execute, from repo root
 # ln -s $(pwd)/tools/pre-commit.sh $(pwd)/.git/hooks/pre-commit
 
+bazel version
 tools/checkstyle/check-for-missing-targets.sh
 exit $?

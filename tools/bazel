@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Wrapper script for downloading and running specific bazel version
+
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+RESET=$(tput sgr0)
+
+BAZEL_VERSION=$(cat .bazelversion)
+PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
+BAZEL_BINARY_URL="https://releases.bazel.build/$BAZEL_VERSION/release/bazel-$BAZEL_VERSION-$PLATFORM-x86_64"
+BAZEL_BINARY="$HOME/.startupos/bazel"
+
+if [[ "$PLATFORM" != "darwin" ]] && [[ "$PLATFORM" != "linux" ]]; then
+  echo "$RED[!] bazel wrapper cannot download a binary for $PLATFORM""$RESET"
+  exit 1
+fi
+
+if [[ ! -x ${BAZEL_BINARY} ]]; then
+  echo "$GREEN""Downloading bazel binary""$RESET"
+  mkdir -p $(dirname ${BAZEL_BINARY})
+  wget ${BAZEL_BINARY_URL} --output-document ${BAZEL_BINARY}
+  chmod +x ${BAZEL_BINARY}
+fi
+
+${BAZEL_BINARY} "$@"
+exit $?

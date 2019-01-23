@@ -3,3 +3,4 @@ bazel-*
 *.iml
 .project
 .ijwb
+.cache
