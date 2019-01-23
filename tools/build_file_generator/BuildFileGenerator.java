@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.build_file_generator;
 
+import com.google.common.base.CaseFormat;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
@@ -145,7 +146,7 @@ public class BuildFileGenerator {
 
   private JavaGrpcLibrary getJavaGrpcLibrary(ProtoFile protoFile) {
     return JavaGrpcLibrary.newBuilder()
-        .setName(protoFile.getFileName() + "_java_grpc")
+        .setName(convertUpperCamelToLowerUnderscore(protoFile.getFileName()) + "_java_grpc")
         .addSrcs(":" + protoFile.getFileName() + "_proto")
         .addTags("checkstyle_ignore")
         .addDeps(":" + protoFile.getFileName() + "_java_proto")
@@ -158,7 +159,7 @@ public class BuildFileGenerator {
 
   private JavaLibrary getJavaLibrary(JavaClass javaClass) {
     return JavaLibrary.newBuilder()
-        .setName(javaClass.getClassName())
+        .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
         .addAllDeps(getDeps(javaClass))
         .build();
@@ -166,7 +167,7 @@ public class BuildFileGenerator {
 
   private JavaBinary getJavaBinary(JavaClass javaClass) {
     return JavaBinary.newBuilder()
-        .setName(javaClass.getClassName())
+        .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .setMainClass(javaClass.getPackage() + "." + javaClass.getClassName())
         .addSrcs(javaClass.getClassName() + ".java")
         .addAllDeps(getDeps(javaClass))
@@ -175,7 +176,7 @@ public class BuildFileGenerator {
 
   private JavaTest getJavaTest(JavaClass javaClass, String packagePath) {
     return JavaTest.newBuilder()
-        .setName(javaClass.getClassName())
+        .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
         .setTestClass(javaClass.getPackage() + "." + javaClass.getClassName())
         .addAllDeps(getDeps(javaClass))
@@ -258,7 +259,7 @@ public class BuildFileGenerator {
         return path + ":" + protoFile.getFileName() + "_java_proto";
       }
     }
-    return path + ":" + importProto.getClassName();
+    return path + ":" + convertUpperCamelToLowerUnderscore(importProto.getClassName());
   }
 
   // TODO: When generating multiple BUILD files, do this only once.
@@ -278,6 +279,10 @@ public class BuildFileGenerator {
       e.printStackTrace();
     }
     return result;
+  }
+
+  private String convertUpperCamelToLowerUnderscore(String string) {
+    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, string);
   }
 }
 
