@@ -9,7 +9,7 @@ RESET=$(tput sgr0)
 BAZEL_VERSION=$(cat .bazelversion)
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 BAZEL_BINARY_URL="https://releases.bazel.build/$BAZEL_VERSION/release/bazel-$BAZEL_VERSION-$PLATFORM-x86_64"
-BAZEL_BINARY=".cache/bazel"
+BAZEL_BINARY="$HOME/.startupos/bazel"
 
 if [[ "$PLATFORM" != "darwin" ]] && [[ "$PLATFORM" != "linux" ]]; then
   echo "$RED[!] bazel wrapper cannot download a binary for $PLATFORM""$RESET"
