@@ -15,10 +15,10 @@ export class LoginWithGoogleComponent {
   constructor(
     public firebaseService: FirebaseService,
     private http: Http,
-  ) {}
+  ) { }
 
   login(): void {
-    this.firebaseService.login(result => {
+    this.firebaseService.login().subscribe(result => {
       this.getJwtToken(result.user.refreshToken);
     });
   }
@@ -39,6 +39,6 @@ export class LoginWithGoogleComponent {
       apiKey: config.apiKey,
       jwtToken: jwtToken,
       refreshToken: refreshToken,
-    }).subscribe(() => { });
+    }).subscribe();
   }
 }
