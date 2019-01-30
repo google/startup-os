@@ -18,28 +18,20 @@ package com.google.startupos.tools.build_file_generator;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
-import com.google.startupos.common.flags.Flags;
-import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import dagger.Component;
 
 import java.io.IOException;
 import javax.inject.Singleton;
 
 public class BuildFileGeneratorTool {
-  @FlagDesc(name = "path", description = "Package path to generate BUILD file")
-  private static Flag<String> path = Flag.create("");
-
   public static void main(String[] args) throws IOException {
-    Flags.parseCurrentPackage(args);
     BuildFileGeneratorToolComponent component =
         DaggerBuildFileGeneratorTool_BuildFileGeneratorToolComponent.create();
 
-    FileUtils fileUtils = component.getFileUtils();
-    String packagePath = fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), path.get());
-    BuildFile buildFile = component.getBuildFileGenerator().generateBuildFile(packagePath);
-    component.getBuildFileWriter().write(buildFile, packagePath);
+    component
+        .getBuildFileGenerator()
+        .generateBuildFiles()
+        .forEach((path, buildFile) -> component.getBuildFileWriter().write(buildFile, path));
   }
 
   @Singleton

@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.build_file_generator;
 
+import com.google.common.base.CaseFormat;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
@@ -35,7 +36,9 @@ import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDeps;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
@@ -52,7 +55,6 @@ public class BuildFileGenerator {
   private FileUtils fileUtils;
   private ProtoFileAnalyzer protoFileAnalyzer;
   private JavaClassAnalyzer javaClassAnalyzer;
-  private ThirdPartyDeps thirdPartyDeps;
 
   @Inject
   public BuildFileGenerator(
@@ -62,7 +64,6 @@ public class BuildFileGenerator {
     this.fileUtils = fileUtils;
     this.protoFileAnalyzer = protoFileAnalyzer;
     this.javaClassAnalyzer = javaClassAnalyzer;
-    thirdPartyDeps = getThirdPartyDeps();
   }
 
   private ThirdPartyDeps getThirdPartyDeps() {
@@ -71,52 +72,86 @@ public class BuildFileGenerator {
             THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
   }
 
-  BuildFile generateBuildFile(String packagePath) throws IOException {
-    BuildFile.Builder result = BuildFile.newBuilder();
+  private List<String> getCodeFilePaths() {
+    List<String> result = new ArrayList<>();
+    try {
+      for (String item :
+          fileUtils.listContentsRecursively(fileUtils.getCurrentWorkingDirectory())) {
+        if (fileUtils.folderExists(item)) {
+          List<String> folderContent = fileUtils.listContents(item);
+          for (String fileName : folderContent) {
+            if (fileName.endsWith(".java") || fileName.endsWith(".proto")) {
+              result.add(item);
+            }
+          }
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return result;
+  }
+
+  /* Returns Map<String, BuildFile> where
+  String key is an absolute path to a folder where BUILD file should be created,
+  BuildFile is the proto message. */
+  Map<String, BuildFile> generateBuildFiles() throws IOException {
+    Map<String, BuildFile> result = new HashMap<>();
+    for (String packagePath : getCodeFilePaths()) {
+      result.put(packagePath, generateBuildFile(packagePath));
+    }
+    return result;
+  }
+
+  private BuildFile generateBuildFile(String packagePath) throws IOException {
+    BuildFile.Builder buildFile = BuildFile.newBuilder();
 
     List<String> protoFiles = getFilesByExtension(packagePath, ".proto");
     for (String protoFileName : protoFiles) {
       ProtoFile protoFile =
           protoFileAnalyzer.getProtoFile(fileUtils.joinPaths(packagePath, protoFileName));
       ProtoLibrary protoLibrary = getProtoLibrary(protoFile);
-      result.addProtoLibrary(protoLibrary);
-      result.addJavaProtoLibrary(getJavaProtoLibrary(protoLibrary.getName()));
+      buildFile.addProtoLibrary(protoLibrary);
+      buildFile.addJavaProtoLibrary(getJavaProtoLibrary(protoLibrary.getName()));
       if (!protoFile.getServicesList().isEmpty()) {
-        result.addJavaGrpcLibrary(getJavaGrpcLibrary(protoFile));
+        buildFile.addJavaGrpcLibrary(getJavaGrpcLibrary(protoFile));
 
         LoadExtensionStatement javaGrpcLibrary =
             getLoadExtensionStatement(JAVA_GRPC_LIBRARY_BZL_FILE_PATH, JAVA_GRPC_LIBRARY_SYMBOL);
-        if (!result.getExtensionList().contains(javaGrpcLibrary)) {
-          result.addExtension(javaGrpcLibrary);
+        if (!buildFile.getExtensionList().contains(javaGrpcLibrary)) {
+          buildFile.addExtension(javaGrpcLibrary);
         }
       }
     }
 
     List<String> javaClasses = getFilesByExtension(packagePath, ".java");
+    List<ThirdPartyDep> thirdPartyDeps = getThirdPartyDeps().getThirdPartyDepList();
     if (!javaClasses.isEmpty()) {
-      result.addExtension(getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
+      buildFile.addExtension(
+          getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
+
       for (String javaClassName : javaClasses) {
         JavaClass javaClass =
             javaClassAnalyzer.getJavaClass(fileUtils.joinPaths(packagePath, javaClassName));
 
         String targetName;
         if (javaClass.getHasMainMethod()) {
-          JavaBinary javaBinary = getJavaBinary(javaClass);
+          JavaBinary javaBinary = getJavaBinary(javaClass, thirdPartyDeps);
           targetName = javaBinary.getName();
-          result.addJavaBinary(javaBinary);
+          buildFile.addJavaBinary(javaBinary);
         } else if (javaClass.getIsTestClass()) {
-          JavaTest javaTest = getJavaTest(javaClass, packagePath);
+          JavaTest javaTest = getJavaTest(javaClass, packagePath, thirdPartyDeps);
           targetName = javaTest.getName();
-          result.addJavaTest(javaTest);
+          buildFile.addJavaTest(javaTest);
         } else {
-          JavaLibrary javaLibrary = getJavaLibrary(javaClass);
+          JavaLibrary javaLibrary = getJavaLibrary(javaClass, thirdPartyDeps);
           targetName = javaLibrary.getName();
-          result.addJavaLibrary(getJavaLibrary(javaClass));
+          buildFile.addJavaLibrary(javaLibrary);
         }
-        result.addCheckstyleTest(getCheckstyleTest(targetName));
+        buildFile.addCheckstyleTest(getCheckstyleTest(targetName));
       }
     }
-    return result.build();
+    return buildFile.build();
   }
 
   private List<String> getFilesByExtension(String packagePath, String fileExtension)
@@ -145,7 +180,7 @@ public class BuildFileGenerator {
 
   private JavaGrpcLibrary getJavaGrpcLibrary(ProtoFile protoFile) {
     return JavaGrpcLibrary.newBuilder()
-        .setName(protoFile.getFileName() + "_java_grpc")
+        .setName(convertUpperCamelToLowerUnderscore(protoFile.getFileName()) + "_java_grpc")
         .addSrcs(":" + protoFile.getFileName() + "_proto")
         .addTags("checkstyle_ignore")
         .addDeps(":" + protoFile.getFileName() + "_java_proto")
@@ -156,29 +191,30 @@ public class BuildFileGenerator {
     return LoadExtensionStatement.newBuilder().setPath(path).setSymbol(symbol).build();
   }
 
-  private JavaLibrary getJavaLibrary(JavaClass javaClass) {
+  private JavaLibrary getJavaLibrary(JavaClass javaClass, List<ThirdPartyDep> thirdPartyDeps) {
     return JavaLibrary.newBuilder()
-        .setName(javaClass.getClassName())
+        .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
-        .addAllDeps(getDeps(javaClass))
+        .addAllDeps(getDeps(javaClass, thirdPartyDeps))
         .build();
   }
 
-  private JavaBinary getJavaBinary(JavaClass javaClass) {
+  private JavaBinary getJavaBinary(JavaClass javaClass, List<ThirdPartyDep> thirdPartyDeps) {
     return JavaBinary.newBuilder()
-        .setName(javaClass.getClassName())
+        .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .setMainClass(javaClass.getPackage() + "." + javaClass.getClassName())
         .addSrcs(javaClass.getClassName() + ".java")
-        .addAllDeps(getDeps(javaClass))
+        .addAllDeps(getDeps(javaClass, thirdPartyDeps))
         .build();
   }
 
-  private JavaTest getJavaTest(JavaClass javaClass, String packagePath) {
+  private JavaTest getJavaTest(
+      JavaClass javaClass, String packagePath, List<ThirdPartyDep> thirdPartyDeps) {
     return JavaTest.newBuilder()
-        .setName(javaClass.getClassName())
+        .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
         .setTestClass(javaClass.getPackage() + "." + javaClass.getClassName())
-        .addAllDeps(getDeps(javaClass))
+        .addAllDeps(getDeps(javaClass, thirdPartyDeps))
         .addAllResources(getResources(packagePath))
         .build();
   }
@@ -193,9 +229,7 @@ public class BuildFileGenerator {
   // TODO: Implement method
   private List<String> getResources(String packagePath) {
     String resourcesPath = fileUtils.joinPaths(packagePath, "resources");
-    System.out.println(resourcesPath);
     if (fileUtils.fileOrFolderExists(resourcesPath)) {
-      System.out.println("1234567890");
       try {
         return fileUtils
             .listContents(resourcesPath)
@@ -209,18 +243,17 @@ public class BuildFileGenerator {
     return new ArrayList<>();
   }
 
-  private List<String> getDeps(JavaClass javaClass) {
+  private List<String> getDeps(JavaClass javaClass, List<ThirdPartyDep> thirdPartyDeps) {
     List<String> result = new ArrayList<>();
 
     for (Import importProto : javaClass.getImportList()) {
-      if (importProto.getPackage().startsWith("java")) {
+      if (importProto.getPackage().startsWith("java.")) {
         continue;
       }
       String classNameWithPackage =
           importProto.getPackage().replace(".", "/") + "/" + importProto.getClassName() + ".class";
-      List<ThirdPartyDep> thirdPartyDepList = thirdPartyDeps.getThirdPartyDepList();
       List<ThirdPartyDep> thirdPartyTargets = new ArrayList<>();
-      for (ThirdPartyDep thirdPartyDep : thirdPartyDepList) {
+      for (ThirdPartyDep thirdPartyDep : thirdPartyDeps) {
         if (thirdPartyDep.getJavaClassList().contains(classNameWithPackage)) {
           thirdPartyTargets.add(thirdPartyDep);
         }
@@ -258,7 +291,7 @@ public class BuildFileGenerator {
         return path + ":" + protoFile.getFileName() + "_java_proto";
       }
     }
-    return path + ":" + importProto.getClassName();
+    return path + ":" + convertUpperCamelToLowerUnderscore(importProto.getClassName());
   }
 
   // TODO: When generating multiple BUILD files, do this only once.
@@ -278,6 +311,10 @@ public class BuildFileGenerator {
       e.printStackTrace();
     }
     return result;
+  }
+
+  private String convertUpperCamelToLowerUnderscore(String string) {
+    return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, string);
   }
 }
 
