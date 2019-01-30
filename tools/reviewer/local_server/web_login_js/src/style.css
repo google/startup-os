@@ -1,0 +1,12 @@
+.google {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.gbutton {
+  cursor: pointer;
+  display: none;
+}
+button {
+  padding: 5px 10px;
+}
