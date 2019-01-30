@@ -93,7 +93,7 @@ public class BuildFileGenerator {
   }
 
   /* Returns Map<String, BuildFile> where
-  String kay is an absolute path to a folder where BUILD file should be created,
+  String key is an absolute path to a folder where BUILD file should be created,
   BuildFile is the proto message. */
   Map<String, BuildFile> generateBuildFiles() throws IOException {
     Map<String, BuildFile> result = new HashMap<>();
