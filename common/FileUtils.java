@@ -468,5 +468,9 @@ public class FileUtils {
       throw new RuntimeException(e);
     }
   }
+
+  public File getFile(String path) {
+    return new File(expandHomeDirectory(path));
+  }
 }
 
