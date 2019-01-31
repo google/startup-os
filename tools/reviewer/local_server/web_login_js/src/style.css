@@ -1,7 +1,8 @@
 .google {
   width: 100%;
   display: flex;
-  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 .gbutton {
   cursor: pointer;
@@ -9,4 +10,11 @@
 }
 button {
   padding: 5px 10px;
+}
+.chrome {
+  display: none;
+  font-family: Arial;
+  font-size: 18px;
+  color: #7e7e7e;
+  margin-top: 10px;
 }

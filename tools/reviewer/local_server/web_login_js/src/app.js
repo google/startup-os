@@ -11,6 +11,12 @@ class App {
     });
   }
 
+  init() {
+    if (!this.isChrome()) {
+      this.pleaseOpenChrome();
+    }
+  }
+
   login() {
     const provider = new firebase.auth.GoogleAuthProvider();
     this.firebaseApp.auth()
@@ -51,5 +57,17 @@ class App {
     loginElement.style.display = login ? 'block' : 'none';
     logoutElement.style.display = logout ? 'block' : 'none';
   }
+
+  isChrome() {
+    return /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+  }
+
+  pleaseOpenChrome() {
+    document.getElementById('chrome').style.display = 'block';
+  }
 }
 const app = new App();
+
+window.onload = () => {
+  app.init();
+};
