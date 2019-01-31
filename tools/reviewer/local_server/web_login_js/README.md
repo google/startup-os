@@ -1,7 +1,7 @@
 # Firestore web login for StartupOS local server
 
 ### Setting
-Port and config: `./src/app.js`
+Port and config: `./src/config.js`
 
 ### Development
 ```
