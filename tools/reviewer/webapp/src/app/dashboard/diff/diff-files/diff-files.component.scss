@@ -1,11 +1,25 @@
 .files {
+  $file-border: 2px solid #6b6b6b;
   >.file {
     padding: 12px 23px;
-    font-size: 14px;
-    text-decoration: none;
-    color: #1a1a1a;
     display: flex;
-    border-bottom: 1px solid #d8d8d8;
+    background: #ecf8ff;
+    border-top: $file-border;
+    border-left: $file-border;
+    border-right: $file-border;
+    >a {
+      text-decoration: none;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-weight: 600;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  >.bottom-border,
+  >.file:last-child {
+    border-bottom: $file-border;
   }
   .column-file { width: 50%; }
   .column-comments,

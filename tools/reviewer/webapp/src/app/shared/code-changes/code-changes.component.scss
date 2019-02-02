@@ -8,7 +8,7 @@ $border: $border-width solid #979797;
   display: flex;
   align-items: center;
   height: 30px;
-  background: #ebebeb;
+  background: white;
   border-bottom: 1px solid #d8d8d8;
   button {
     margin: 0 10px;
@@ -28,6 +28,8 @@ table {
       font-size: 12px;
       user-select: none;
       padding: 0 3px;
+      min-width: 35px;
+      max-width: 35px;
       >span {
         font-family: monospace;
         float: right;
@@ -36,7 +38,8 @@ table {
     }
     >.content {
       $add-comment-button-width: 24px;
-      min-width: 650px;
+      min-width: 800px;
+      max-width: 800px;
       position: relative;
       >.add-comment-button {
         position: absolute;
@@ -74,7 +77,6 @@ table {
       >.threads {
         padding-top: 13px;
         >.thread {
-          width: 762px;
           margin-bottom: 17px;
         }
       }
@@ -82,6 +84,10 @@ table {
         >.add-comment-button {
           display: block;
         }
+      }
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
       }
     }
   }
