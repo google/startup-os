@@ -3,12 +3,7 @@
 ### Setting
 Port and config: `./src/config.js`
 
-### Development
-```
-npm start
-```
-
 ### Deploy
 ```
-npm run deploy
+firebase deploy
 ```

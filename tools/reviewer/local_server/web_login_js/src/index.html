@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Log-in with Google</title>
-  <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="/style.css">
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
@@ -13,14 +12,16 @@
 <body>
   <div class="google">
     <div class="gbutton" id="login">
-      <img onclick="app.login()" src="/login-with-google.png">
+      <button onclick="app.login()">
+        Log-in with google
+      </button>
     </div>
     <div class="gbutton" id="logout">
       <button onclick="app.logout()">
         Log Out
       </button>
     </div>
-    <div class="chrome" id="chrome">For best support please open chrome</div>
+    <div class="chrome" id="chrome">For best support please open Chrome</div>
   </div>
 </body>
 </html>
