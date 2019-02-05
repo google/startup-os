@@ -7,7 +7,7 @@
       mat-button
       class="cr-light-button sky-button"
       (click)="toggleExpand()"
-      [disabled]="isCodeLoading"
+      [disabled]="isLoading"
     >{{ isExpanded ? 'Collapse' : 'Expand' }}</button>
   </div>
 </div>
@@ -19,31 +19,28 @@
     <div class="column column-delta">Delta</div>
   </div>
 
-  <!-- Collapsed files -->
-  <ng-container *ngIf="!isExpanded || !changes">
-    <a class="file" [routerLink]="file.getFilenameWithRepo()" *ngFor="let file of files">
-      {{ file.getFilenameWithRepo() }}
-    </a>
-  </ng-container>
-  
-  <!-- Expanded files -->
-  <ng-container *ngIf="isExpanded && changes">
-    <ng-container *ngFor="let change of changes; let changesIndex = index">
-      <a class="file" [routerLink]="change.leftFile.getFilenameWithRepo()">
-        {{ change.leftFile.getFilenameWithRepo() }}
+  <ng-container *ngFor="let changeFile of getChangeFiles()">
+    <div
+      class="file"
+      [ngClass]="{ 'expanded': changeFile.isExpanded }"
+      (click)="toggleFileExpand(changeFile)"
+    >
+      <a [routerLink]="changeFile.filename">
+        {{ changeFile.filename }}
       </a>
-      <code-changes
-        [diff]="diff"
-        [branchInfo]="change.branchInfo"
-        [textDiff]="change.textDiff"
-        [threads]="change.localThreads"
-        [leftFile]="change.leftFile"
-        [rightFile]="change.rightFile"
-        [isShared]="true"
-        [sections]="sectionsList[changesIndex]"
-        (sectionsEmitter)="saveSections($event, changesIndex)"
-      ></code-changes>
-    </ng-container>
+    </div>
+    <code-changes
+      *ngIf="changeFile.isExpanded"
+      [diff]="diff"
+      [branchInfo]="changeFile.data.branchInfo"
+      [textDiff]="changeFile.data.textDiff"
+      [threads]="changeFile.data.localThreads"
+      [leftFile]="changeFile.data.leftFile"
+      [rightFile]="changeFile.data.rightFile"
+      [isShared]="true"
+      [sections]="changeFile.sections"
+      (sectionsEmitter)="saveSections($event, changeFile)"
+    ></code-changes>
   </ng-container>
 </div>
 <div class="cr-table-placeholder" *ngIf="files.length === 0">
