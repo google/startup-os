@@ -1,12 +1,9 @@
 .files {
-  $file-border: 2px solid #6b6b6b;
   >.file {
     padding: 12px 23px;
     display: flex;
     background: #ecf8ff;
-    border-top: $file-border;
-    border-left: $file-border;
-    border-right: $file-border;
+    border-top: 1px solid #808080;
     >a {
       text-decoration: none;
       color: #1a1a1a;
@@ -17,9 +14,12 @@
       }
     }
   }
-  >.bottom-border,
   >.file:last-child {
-    border-bottom: $file-border;
+    border-bottom: 1px solid #808080;
+  }
+  >.expanded {
+    border-top: 2px solid #808080;
+    border-bottom: 2px solid #808080;
   }
   .column-file { width: 50%; }
   .column-comments,

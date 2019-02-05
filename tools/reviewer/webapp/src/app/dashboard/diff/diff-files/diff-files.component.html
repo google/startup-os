@@ -22,7 +22,7 @@
   <ng-container *ngFor="let changeFile of getChangeFiles()">
     <div
       class="file"
-      [ngClass]="{ 'bottom-border': changeFile.isExpanded }"
+      [ngClass]="{ 'expanded': changeFile.isExpanded }"
       (click)="toggleFileExpand(changeFile)"
     >
       <a [routerLink]="changeFile.filename">
