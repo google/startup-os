@@ -1,18 +1,14 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
-import { CiResponse, Commit, Diff, Reviewer } from '@/core/proto';
+import { Diff, Reviewer } from '@/core/proto';
 import {
+  CiService,
   DiffUpdateService,
   HighlightService,
-  LocalserverService,
+  Status,
   UserService,
 } from '@/core/services';
 import { DiffHeaderService } from '../diff-header.service';
-
-interface Status {
-  message: string;
-  color: string;
-}
 
 // The component implements content of the header
 // How it looks: https://i.imgur.com/TgqzvTW.jpg
@@ -25,7 +21,7 @@ interface Status {
 export class DiffHeaderContentComponent implements OnChanges, OnInit {
   description: string = '';
   isDescriptionEditMode: boolean = false;
-  status: Status = this.getStatus(CiResponse.TargetResult.Status.NONE);
+  ciStatusList: Status[] = [];
 
   @Input() diff: Diff;
 
@@ -34,7 +30,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
     public diffUpdateService: DiffUpdateService,
     public diffHeaderService: DiffHeaderService,
     public highlightService: HighlightService,
-    public localserverService: LocalserverService,
+    public ciService: CiService,
   ) { }
 
   ngOnChanges() {
@@ -42,53 +38,11 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
   }
 
   ngOnInit() {
-    // If CI exists then convert it to UI status
-    const ci: CiResponse = this.diff.getCiResponseList()[0];
-    if (ci) {
-      const results: CiResponse.TargetResult[] = ci.getResultList();
-      this.setStatus(results[results.length - 1]);
-    }
-  }
-
-  // Loads commits list from localserver to compare it with CI result
-  private setStatus(result: CiResponse.TargetResult): void {
-    // Get branchInfoList from localserver
-    this.localserverService
-      .getBranchInfoList(
-        this.diff.getId(),
-        this.diff.getWorkspace(),
-      )
-      .subscribe(branchInfoList => {
-        // Find branchInfo by repo id
-        for (const branchInfo of branchInfoList) {
-          if (branchInfo.getRepoId() === result.getTarget().getRepo().getId()) {
-            const commits: Commit[] = branchInfo.getCommitList();
-            // Take last commit (newest change)
-            const commitId: string = commits[commits.length - 1].getId();
-
-            // Set status from the result,
-            // or set outdated status if result with the commit not found.
-            this.status = (commitId === result.getTarget().getCommitId()) ?
-              this.getStatus(result.getStatus()) :
-              this.getStatus(CiResponse.TargetResult.Status.OUTDATED);
-          }
-        }
+    // If CI exists then load status list from localserver
+    if (this.diff.getCiResponseList()[0]) {
+      this.ciService.loadStatusList(this.diff).subscribe(statusList => {
+        this.ciStatusList = statusList;
       });
-  }
-
-  // Converts enum to UI status
-  getStatus(status: CiResponse.TargetResult.Status): Status {
-    switch (status) {
-      case CiResponse.TargetResult.Status.SUCCESS:
-        return { message: 'Passed', color: '#12a736' };
-      case CiResponse.TargetResult.Status.FAIL:
-        return { message: 'Failed', color: '#db4040' };
-      case CiResponse.TargetResult.Status.RUNNING:
-        return { message: 'Running', color: '#1545bd' };
-      case CiResponse.TargetResult.Status.OUTDATED:
-        return { message: 'Outdated', color: '#808080' };
-      default:
-        return { message: '', color: '' };
     }
   }
 

@@ -105,10 +105,15 @@
       </tr>
       <tr>
         <td>CI</td>
-        <td
-          class="ci-status"
-          [style.color]="status.color"
-        >{{ status.message }}</td>
+        <td>
+          <a
+            class="ci-status"
+            *ngFor="let status of ciStatusList"
+            [style.color]="status.color"
+            [matTooltip]="status.message"
+            [routerLink]="'/log/65/' + status.projectId"
+          >{{ status.projectId }}</a>
+        </td>
       </tr>
     </table>
   </div>

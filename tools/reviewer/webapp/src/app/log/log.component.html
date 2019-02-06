@@ -1,0 +1,31 @@
+<!-- Loading -->
+<page-loading [isLoading]="isLoading"></page-loading>
+
+<div class="log-page" *ngIf="!isLoading">
+  <!-- Diff -->
+  <div class="cr-titlebar titlebar">
+    <div class="title">
+      <a
+        class="diff bold"
+        routerLink="/diff/{{ diff.getId() }}"
+      >Diff {{ diff.getId() }}</a>
+      <span>by</span>
+      <span
+        class="username"
+        [ngClass]="{ 'bold': diff.getAuthor().getNeedsAttention() }"
+      >{{ getAuthor() }}</span>
+    </div>
+    <diff-status [diff]="diff"></diff-status>
+  </div>
+  
+  <!-- CI status -->
+  <div class="header-menu">
+    <div class="ci-status">
+      <span>{{ projectId }}: </span>
+      <span *ngIf="status" [style.color]="status.color">{{ status.message }}</span>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <pre class="log">{{ log }}</pre>
+</div>

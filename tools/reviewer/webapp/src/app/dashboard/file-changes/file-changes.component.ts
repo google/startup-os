@@ -66,8 +66,13 @@ export class FileChangesComponent implements OnInit, OnDestroy {
 
   // Gets parameters from url
   private parseUrlParam(): void {
-    // '/diff/33/path/to/file.java?left=abc' -> [url, 33, 'path/to/file.java', param]
+    // '/diff/33/path/to/file.java?left=abc' -> [url, '33', 'path/to/file.java', param]
     const url: RegExpMatchArray = this.router.url.match(/\/diff\/([\d]+)\/([\w\d\.\/-]+)(\?.+?)?/);
+    if (!url) {
+      // User is trying to open '/diff'
+      this.router.navigate(['/']);
+      return;
+    }
     this.diffId = url[1];
     const filename: string = url[2];
 

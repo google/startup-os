@@ -27,10 +27,10 @@ $transparent-grey: rgba(0,0,0,0.54);
           }
         }
       }
-      >.ci-status {
+      .ci-status {
         font-size: 14px;
         font-weight: 600;
-        text-decoration: underline;
+        margin-right: 10px;
       }
     }
     user-popup {
@@ -57,7 +57,6 @@ $transparent-grey: rgba(0,0,0,0.54);
     >.read-mode {
       cursor: text;
       user-select: none;
-      user-drag: none;
       >pre {
         font-family: opensans;
         margin: 0;
