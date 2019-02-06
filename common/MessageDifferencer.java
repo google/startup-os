@@ -34,7 +34,6 @@ import com.google.protobuf.Message;
 import com.google.protobuf.TextFormat;
 import com.google.protobuf.UnknownFieldSet;
 import com.google.protobuf.WireFormat;
-import com.google.startupos.common.MessageDifferencer.FieldComparator.ComparisonResult;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1078,10 +1077,10 @@ public final class MessageDifferencer {
       int index2,
       @Nullable Reporter reporter,
       List<SpecificField> stack) {
-    ComparisonResult result =
+    FieldComparator.ComparisonResult result =
         fieldComparator.compare(
             message1, message2, field, index1, index2, ImmutableList.copyOf(stack));
-    if (result == ComparisonResult.RECURSE) {
+    if (result == FieldComparator.ComparisonResult.RECURSE) {
       Preconditions.checkArgument(
           field.getJavaType() == JavaType.MESSAGE,
           "FieldComparator should not return RECURSE for fields not being submessages!");
@@ -1105,7 +1104,7 @@ public final class MessageDifferencer {
       return isSame;
     }
 
-    return result == ComparisonResult.SAME;
+    return result == FieldComparator.ComparisonResult.SAME;
   }
 
   private void report(
