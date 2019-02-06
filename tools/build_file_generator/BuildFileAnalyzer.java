@@ -17,6 +17,7 @@
 package com.google.startupos.tools.build_file_generator;
 
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaBinary;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaGrpcLibrary;
@@ -24,7 +25,6 @@ import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaLibr
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaProtoLibrary;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaTest;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.ProtoLibrary;
-import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -88,6 +88,9 @@ public class BuildFileAnalyzer {
         break;
       case checkstyle_test:
         builder.addCheckstyleTest(getCheckstyleTestExtension(getRuleAttributes(ruleContent)));
+        break;
+      default:
+        System.out.println(String.format("%s rule isn't supported.", rule));
     }
   }
 
@@ -161,6 +164,9 @@ public class BuildFileAnalyzer {
         case "srcs":
           result.addAllSrcs(values);
           break;
+        default:
+          System.out.println(
+              String.format("%s attribute isn't supported java_library.", entry.getKey()));
       }
     }
     return result.build();
@@ -180,6 +186,9 @@ public class BuildFileAnalyzer {
         case "srcs":
           result.addAllSrcs(values);
           break;
+        default:
+          System.out.println(
+              String.format("%s attribute isn't supported proto_library.", entry.getKey()));
       }
     }
     return result.build();
@@ -202,6 +211,9 @@ public class BuildFileAnalyzer {
         case "main_class":
           result.setMainClass(values.get(0));
           break;
+        default:
+          System.out.println(
+              String.format("%s attribute isn't supported for java_binary.", entry.getKey()));
       }
     }
     return result.build();
@@ -226,6 +238,10 @@ public class BuildFileAnalyzer {
           break;
         case "resources":
           result.addAllResources(values);
+          break;
+        default:
+          System.out.println(
+              String.format("%s attribute isn't supported for java_test.", entry.getKey()));
       }
     }
     return result.build();
@@ -242,6 +258,9 @@ public class BuildFileAnalyzer {
         case "deps":
           result.addAllDeps(values);
           break;
+        default:
+          System.out.println(
+              String.format("%s attribute isn't supported java_proto_library.", entry.getKey()));
       }
     }
     return result.build();
@@ -263,6 +282,10 @@ public class BuildFileAnalyzer {
           break;
         case "tags":
           result.addAllTags(values);
+          break;
+        default:
+          System.out.println(
+              String.format("%s attribute isn't supported for java_grpc_library.", entry.getKey()));
       }
     }
     return result.build();
@@ -278,6 +301,11 @@ public class BuildFileAnalyzer {
           break;
         case "target":
           result.setTarget(values.get(0));
+          break;
+        default:
+          System.out.println(
+              String.format(
+                  "%s attribute isn't supported for checkstyle_test rule.", entry.getKey()));
       }
     }
     return result.build();
