@@ -74,7 +74,6 @@ export class LogComponent implements OnInit, OnDestroy {
     }
     this.diff = diff;
     this.getLog(this.diff, this.projectId);
-    this.isLoading = false;
   }
 
   getLog(diff: Diff, projectId: string): void {
@@ -83,6 +82,7 @@ export class LogComponent implements OnInit, OnDestroy {
       this.ciService.loadCiLog(diff, projectId).subscribe(ciLog => {
         this.status = ciLog.status;
         this.log = ciLog.log;
+        this.isLoading = false;
       });
     }
   }

@@ -113,6 +113,7 @@
             [matTooltip]="status.message"
             [routerLink]="'/log/65/' + status.projectId"
           >{{ status.projectId }}</a>
+          <mat-spinner [diameter]="20" *ngIf="isCiLoading"></mat-spinner>
         </td>
       </tr>
     </table>

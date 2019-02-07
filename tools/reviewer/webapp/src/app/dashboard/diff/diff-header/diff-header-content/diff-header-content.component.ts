@@ -22,6 +22,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
   description: string = '';
   isDescriptionEditMode: boolean = false;
   ciStatusList: Status[] = [];
+  isCiLoading: boolean = true;
 
   @Input() diff: Diff;
 
@@ -42,7 +43,10 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
     if (this.diff.getCiResponseList()[0]) {
       this.ciService.loadStatusList(this.diff).subscribe(statusList => {
         this.ciStatusList = statusList;
+        this.isCiLoading = false;
       });
+    } else {
+      this.isCiLoading = false;
     }
   }
 
