@@ -111,8 +111,8 @@
             *ngFor="let status of ciStatusList"
             [style.color]="status.color"
             [matTooltip]="status.message"
-            [routerLink]="'/log/65/' + status.projectId"
-          >{{ status.projectId }}</a>
+            [routerLink]="'/log/65/' + status.repoId"
+          >{{ status.repoId }}</a>
           <mat-spinner [diameter]="20" *ngIf="isCiLoading"></mat-spinner>
         </td>
       </tr>

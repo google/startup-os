@@ -15,7 +15,7 @@ import {
 export class LogComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   diff: Diff;
-  projectId: string;
+  repoId: string;
   log: string;
   status: Status;
   onloadSubscription = new Subscription();
@@ -43,7 +43,7 @@ export class LogComponent implements OnInit, OnDestroy {
       return;
     }
     const diffId: string = url[1];
-    this.projectId = url[2];
+    this.repoId = url[2];
     this.loadDiff(diffId);
   }
 
@@ -73,17 +73,20 @@ export class LogComponent implements OnInit, OnDestroy {
       return;
     }
     this.diff = diff;
-    this.getLog(this.diff, this.projectId);
+    this.getLog(this.diff, this.repoId);
   }
 
-  getLog(diff: Diff, projectId: string): void {
+  getLog(diff: Diff, repoId: string): void {
     // If CI exists then load status from localserver
     if (this.diff.getCiResponseList()[0]) {
-      this.ciService.loadCiLog(diff, projectId).subscribe(ciLog => {
+      this.ciService.loadCiLog(diff, repoId).subscribe(ciLog => {
         this.status = ciLog.status;
         this.log = ciLog.log;
         this.isLoading = false;
       });
+    } else {
+      // CI not found. Open diff
+      this.router.navigate(['diff', this.diff.getId()]);
     }
   }
 

@@ -5,7 +5,7 @@ import { BranchInfo, CiResponse, Commit, Diff } from '@/core/proto';
 import { LocalserverService } from './localserver.service';
 
 export interface Status {
-  projectId: string;
+  repoId: string;
   message: string;
   color: string;
 }
@@ -43,7 +43,7 @@ export class CiService {
   }
 
   // Gets status and log for specific repo on log page
-  loadCiLog(diff: Diff, projectId: string): Observable<CiLog> {
+  loadCiLog(diff: Diff, repoId: string): Observable<CiLog> {
     return new Observable(observer => {
       // Get branchInfoList from localserver
       this.localserverService
@@ -53,7 +53,7 @@ export class CiService {
             // Find status that match repo id and last commit id
             const lastCiResponse: CiResponse = diff.getCiResponseList()[0];
             for (const targetResult of lastCiResponse.getResultList()) {
-              if (targetResult.getTarget().getRepo().getId() === projectId) {
+              if (targetResult.getTarget().getRepo().getId() === repoId) {
                 const status: Status = this.getStatus(branchInfo, targetResult);
                 if (status) {
                   const ciLog: CiLog = {
@@ -85,7 +85,7 @@ export class CiService {
         this.convertTargetResult(targetResult.getStatus()) :
         this.convertTargetResult(CiResponse.TargetResult.Status.OUTDATED);
 
-      status.projectId = targetResult.getTarget().getRepo().getId();
+      status.repoId = targetResult.getTarget().getRepo().getId();
       return status;
     }
   }
@@ -94,13 +94,13 @@ export class CiService {
   private convertTargetResult(status: CiResponse.TargetResult.Status): Status {
     switch (status) {
       case CiResponse.TargetResult.Status.SUCCESS:
-        return { message: 'Passed', color: '#12a736', projectId: '' };
+        return { message: 'Passed', color: '#12a736', repoId: '' };
       case CiResponse.TargetResult.Status.FAIL:
-        return { message: 'Failed', color: '#db4040', projectId: '' };
+        return { message: 'Failed', color: '#db4040', repoId: '' };
       case CiResponse.TargetResult.Status.RUNNING:
-        return { message: 'Running', color: '#1545bd', projectId: '' };
+        return { message: 'Running', color: '#1545bd', repoId: '' };
       case CiResponse.TargetResult.Status.OUTDATED:
-        return { message: 'Outdated', color: '#808080', projectId: '' };
+        return { message: 'Outdated', color: '#808080', repoId: '' };
     }
   }
 }
