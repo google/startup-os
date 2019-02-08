@@ -35,11 +35,22 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-public class BuildFileAnalyzer {
+// TODO: Figure out if there's a standard parser we can use to replace this one.
+public class BuildFileParser {
+  private enum Rule {
+    proto_library,
+    java_library,
+    java_binary,
+    java_test,
+    java_proto_library,
+    java_grpc_library,
+    checkstyle_test
+  }
+
   private FileUtils fileUtils;
 
   @Inject
-  public BuildFileAnalyzer(FileUtils fileUtils) {
+  public BuildFileParser(FileUtils fileUtils) {
     this.fileUtils = fileUtils;
   }
 
@@ -56,9 +67,10 @@ public class BuildFileAnalyzer {
       for (int i = 0; i < lines.size(); i++) {
         List<String> ruleContent = new ArrayList<>();
         if (lines.get(i).startsWith(rule.name())) {
-          do {
-            ruleContent.add(lines.get(++i));
-          } while (!lines.get(i + 1).equals(")"));
+          while (!lines.get(i).equals(")")) {
+            ruleContent.add(lines.get(i));
+            i++;
+          }
           addRule(result, rule, ruleContent);
         }
       }
@@ -94,36 +106,29 @@ public class BuildFileAnalyzer {
     }
   }
 
-  // Returns map with attribute name as key and  list of attribute values as the value
+  // Returns map with attribute name as key and list of attribute values as the value
   private Map<String, List<String>> getRuleAttributes(List<String> ruleContent) {
     Map<String, List<String>> result = new HashMap<>();
 
     List<String> ruleAttributes =
         Arrays.asList(
             "name", "srcs", "deps", "main_class", "test_class", "resources", "target", "tags");
-    for (int i = 0; i < ruleContent.size(); ) {
-      String currentAttribute = ruleContent.get(i).split(" ")[0];
-      if (ruleAttributes.contains(currentAttribute)) {
-        String textBetweenDoubleQuotesRegex = "\"(.*?)\"";
-
-        do {
-          String line = ruleContent.get(i);
-          if (line.endsWith("[") || line.startsWith("]") || line.startsWith("#")) {
-            i++;
-            continue;
-          }
-          if (!result.containsKey(currentAttribute)) {
-            result.put(currentAttribute, new ArrayList<>());
-          }
-          String attributeValue = getSubstringByRegex(line, textBetweenDoubleQuotesRegex);
-          if (!attributeValue.isEmpty()) {
-            result
-                .get(currentAttribute)
-                .add(getSubstringByRegex(line, textBetweenDoubleQuotesRegex).replace("\"", ""));
-          }
-          i++;
-        } while (i != ruleContent.size()
-            && !ruleAttributes.contains(ruleContent.get(i).split(" ")[0]));
+    String currentAttribute = "";
+    for (String line : ruleContent) {
+      String firstWordInLine = line.split(" ")[0];
+      String textBetweenDoubleQuotesRegex = "\"(.*?)\"";
+      if (ruleAttributes.contains(firstWordInLine) && !result.containsKey(firstWordInLine)) {
+        result.put(firstWordInLine, new ArrayList<>());
+        currentAttribute = firstWordInLine;
+      }
+      if (line.endsWith("[") || line.startsWith("]") || line.startsWith("#")) {
+        continue;
+      }
+      String attributeValue = getSubstringByRegex(line, textBetweenDoubleQuotesRegex);
+      if (!attributeValue.isEmpty()) {
+        result
+            .get(currentAttribute)
+            .add(getSubstringByRegex(line, textBetweenDoubleQuotesRegex).replace("\"", ""));
       }
     }
     return result;
@@ -309,16 +314,6 @@ public class BuildFileAnalyzer {
       }
     }
     return result.build();
-  }
-
-  private enum Rule {
-    proto_library,
-    java_library,
-    java_binary,
-    java_test,
-    java_proto_library,
-    java_grpc_library,
-    checkstyle_test
   }
 }
 

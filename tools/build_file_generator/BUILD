@@ -15,8 +15,8 @@ java_proto_library(
 java_library(
     name = "build_file_generator",
     srcs = [
-        "BuildFileAnalyzer.java",
         "BuildFileGenerator.java",
+        "BuildFileParser.java",
         "BuildFileWriter.java",
         "JavaClassAnalyzer.java",
         "ProtoFileAnalyzer.java",
