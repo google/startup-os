@@ -49,25 +49,37 @@ export class CiService {
       this.localserverService
         .getBranchInfoList(diff.getId(), diff.getWorkspace())
         .subscribe(branchInfoList => {
-          for (const branchInfo of branchInfoList) {
-            // Find status that match repo id and last commit id
-            const lastCiResponse: CiResponse = diff.getCiResponseList()[0];
-            for (const targetResult of lastCiResponse.getResultList()) {
-              if (targetResult.getTarget().getRepo().getId() === repoId) {
-                const status: Status = this.getStatus(branchInfo, targetResult);
-                if (status) {
-                  const ciLog: CiLog = {
-                    status: status,
-                    log: targetResult.getLog(),
-                  };
-                  observer.next(ciLog);
-                  break;
-                }
-              }
-            }
+          const ciLog: CiLog = this.getCiLog(diff, repoId, branchInfoList);
+          if (ciLog) {
+            observer.next(ciLog);
+          } else {
+            observer.error();
           }
         });
     });
+  }
+
+  private getCiLog(
+    diff: Diff,
+    repoId: string,
+    branchInfoList: BranchInfo[],
+  ): CiLog {
+    for (const branchInfo of branchInfoList) {
+      // Find status that match repo id and last commit id
+      const lastCiResponse: CiResponse = diff.getCiResponseList()[0];
+      for (const targetResult of lastCiResponse.getResultList()) {
+        if (targetResult.getTarget().getRepo().getId() === repoId) {
+          const status: Status = this.getStatus(branchInfo, targetResult);
+          if (status) {
+            const ciLog: CiLog = {
+              status: status,
+              log: targetResult.getLog(),
+            };
+            return ciLog;
+          }
+        }
+      }
+    }
   }
 
   private getStatus(

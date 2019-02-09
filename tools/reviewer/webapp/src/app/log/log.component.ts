@@ -1,10 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Diff } from '@/core/proto';
 import {
-  CiService, ExceptionService, FirebaseStateService, Status, UserService,
+  CiService,
+  ExceptionService,
+  FirebaseStateService,
+  NotificationService,
+  Status,
+  UserService,
 } from '@/core/services';
 
 @Component({
@@ -23,10 +28,12 @@ export class LogComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private firebaseStateService: FirebaseStateService,
     private exceptionService: ExceptionService,
     private ciService: CiService,
     private userService: UserService,
+    private notificationService: NotificationService,
   ) { }
 
   ngOnInit() {
@@ -35,15 +42,8 @@ export class LogComponent implements OnInit, OnDestroy {
 
   // Gets parameters from url
   private parseUrlParam(): void {
-    // '/log/33/my-project' -> [url, '33', 'my-project']
-    const url: RegExpMatchArray = this.router.url.match(/\/log\/([\d]+)\/([\w\d\.\/-]+)?/);
-    if (!url) {
-      // User is trying to open '/log'
-      this.router.navigate(['/']);
-      return;
-    }
-    const diffId: string = url[1];
-    this.repoId = url[2];
+    const diffId: string = this.activatedRoute.snapshot.params['diffId'];
+    this.repoId = this.activatedRoute.snapshot.params['repoId'];
     this.loadDiff(diffId);
   }
 
@@ -83,11 +83,20 @@ export class LogComponent implements OnInit, OnDestroy {
         this.status = ciLog.status;
         this.log = ciLog.log;
         this.isLoading = false;
+      }, () => {
+        // Repo id not found
+        this.notificationService.error('Repo not found');
+        this.openParentDiff();
       });
     } else {
-      // CI not found. Open diff
-      this.router.navigate(['diff', this.diff.getId()]);
+      // Diff doesn't contain any CI tests
+      this.notificationService.error('CI not found');
+      this.openParentDiff();
     }
+  }
+
+  openParentDiff(): void {
+    this.router.navigate(['diff', this.diff.getId()]);
   }
 
   getAuthor(): string {

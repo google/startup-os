@@ -16,20 +16,15 @@ const routes: Routes = [
       { path: 'diffs', loadChildren: DiffsModuleFactory },
       { path: 'diff/:id', loadChildren: DiffModuleFactory },
       {
-        path: 'diff', children: [{
-          path: '**',
-          loadChildren: FileChangesModuleFactory,
-        }],
+        path: 'diff', children: [
+          { path: '', component: PageNotFoundComponent },
+          { path: '**', loadChildren: FileChangesModuleFactory },
+        ],
       },
     ],
   },
   { path: 'login', component: LoginComponent },
-  {
-    path: 'log', children: [{
-      path: '**',
-      component: LogComponent,
-    }],
-  },
+  { path: 'log/:diffId/:repoId', component: LogComponent },
   { path: '**', component: PageNotFoundComponent },
 ];
 
