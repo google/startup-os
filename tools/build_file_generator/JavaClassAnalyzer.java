@@ -20,13 +20,124 @@ import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.Import;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 public class JavaClassAnalyzer {
   private FileUtils fileUtils;
+
+  // TODO: Come up with a better way to get this list
+  private List<String> javaLangClasses =
+      Arrays.asList(
+          "Appendable",
+          "AutoCloseable",
+          "CharSequence",
+          "Cloneable",
+          "Comparable",
+          "Iterable",
+          "Readable",
+          "Runnable",
+          "Thread.UncaughtExceptionHandler",
+          "Boolean",
+          "Byte",
+          "Character",
+          "Character.Subset",
+          "Character.UnicodeBlock",
+          "Class",
+          "ClassLoader",
+          "ClassValue",
+          "Compiler",
+          "Double",
+          "Enum",
+          "Float",
+          "InheritableThreadLocal",
+          "Integer",
+          "Long",
+          "Math",
+          "Number",
+          "Object",
+          "Package",
+          "Process",
+          "ProcessBuilder",
+          "ProcessBuilder.Redirect",
+          "Runtime",
+          "RuntimePermission",
+          "SecurityManager",
+          "Short",
+          "StackTraceElement",
+          "StrictMath",
+          "String",
+          "StringBuffer",
+          "StringBuilder",
+          "System",
+          "Thread",
+          "ThreadGroup",
+          "ThreadLocal",
+          "Throwable",
+          "Void",
+          "Character.UnicodeScript",
+          "ProcessBuilder.Redirect.Type",
+          "Thread.State",
+          "ArithmeticException",
+          "ArrayIndexOutOfBoundsException",
+          "ArrayStoreException",
+          "ClassCastException",
+          "ClassNotFoundException",
+          "CloneNotSupportedException",
+          "EnumConstantNotPresentException",
+          "Exception",
+          "IllegalAccessException",
+          "IllegalArgumentException",
+          "IllegalMonitorStateException",
+          "IllegalStateException",
+          "IllegalThreadStateException",
+          "IndexOutOfBoundsException",
+          "InstantiationException",
+          "InterruptedException",
+          "NegativeArraySizeException",
+          "NoSuchFieldException",
+          "NoSuchMethodException",
+          "NullPointerException",
+          "NumberFormatException",
+          "ReflectiveOperationException",
+          "RuntimeException",
+          "SecurityException",
+          "StringIndexOutOfBoundsException",
+          "TypeNotPresentException",
+          "UnsupportedOperationException",
+          "AbstractMethodError",
+          "AssertionError",
+          "BootstrapMethodError",
+          "ClassCircularityError",
+          "ClassFormatError",
+          "Error",
+          "ExceptionInInitializerError",
+          "IllegalAccessError",
+          "IncompatibleClassChangeError",
+          "InstantiationError",
+          "InternalError",
+          "LinkageError",
+          "NoClassDefFoundError",
+          "NoSuchFieldError",
+          "NoSuchMethodError",
+          "OutOfMemoryError",
+          "StackOverflowError",
+          "ThreadDeath",
+          "UnknownError",
+          "UnsatisfiedLinkError",
+          "UnsupportedClassVersionError",
+          "VerifyError",
+          "VirtualMachineError",
+          "Deprecated",
+          "FunctionalInterface",
+          "Override",
+          "SafeVarargs",
+          "SuppressWarnings");
 
   @Inject
   public JavaClassAnalyzer(FileUtils fileUtils) {
@@ -42,6 +153,14 @@ public class JavaClassAnalyzer {
 
     getImportLines(fileContent).forEach(line -> result.addImport(getImport(line)));
     result.setIsTestClass(isTestClass(fileContent)).setHasMainMethod(hasMainMethod(fileContent));
+
+    List<String> importedClasses =
+        result.getImportList().stream().map(Import::getClassName).collect(Collectors.toList());
+    for (String classname : getUsedClassnamesInCode(fileContent)) {
+      if (!result.getClassName().equals(classname) && !importedClasses.contains(classname)) {
+        result.addUsedClassesFromTheSamePackage(classname);
+      }
+    }
 
     return result.build();
   }
@@ -112,6 +231,53 @@ public class JavaClassAnalyzer {
       }
     }
     return result.build();
+  }
+
+  private List<String> getUsedClassnamesInCode(String fileContent) {
+    final String multilineCommentRegex = "/\\*(?:.|[\\n\\r])*?\\*/";
+    final String stringValueRegex = "\"(.*?)\"";
+
+    List<String> javaCodeLines =
+        Arrays.stream(
+                fileContent
+                    .replaceAll(multilineCommentRegex, "")
+                    .replaceAll(stringValueRegex, "")
+                    .split(System.lineSeparator()))
+            .filter(line -> !line.trim().startsWith("//") && !line.trim().startsWith("import "))
+            .collect(Collectors.toList());
+
+    List<String> innerClasses =
+        getJavaClassnames(
+            javaCodeLines
+                .stream()
+                .filter(
+                    line ->
+                        line.contains(" class ")
+                            || line.contains(" interface ")
+                            || line.contains(" enum "))
+                .collect(Collectors.toList()));
+
+    return getJavaClassnames(javaCodeLines)
+        .stream()
+        .filter(classname -> !innerClasses.contains(classname))
+        .collect(Collectors.toList());
+  }
+
+  private List<String> getJavaClassnames(List<String> javaCodeLines) {
+    List<String> result = new ArrayList<>();
+    final String classnameRegex = "\\s([A-Z][a-z0-9|A-Z]+)+[\\s|.]";
+
+    for (String line : javaCodeLines) {
+      Pattern pattern = Pattern.compile(classnameRegex);
+      Matcher matcher = pattern.matcher(line);
+      while (matcher.find()) {
+        String classname = matcher.group().trim().replace(".", "");
+        if (!javaLangClasses.contains(classname) && !result.contains(classname)) {
+          result.add(classname);
+        }
+      }
+    }
+    return result;
   }
 
   private static boolean isTestClass(String fileContent) {

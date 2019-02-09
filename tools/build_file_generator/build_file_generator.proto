@@ -17,6 +17,7 @@ message JavaClass {
   string class_name = 3;
   bool has_main_method = 4;
   bool is_test_class = 5;
+  repeated string used_classes_from_the_same_package = 6;
 }
 
 message ProtoFile {
