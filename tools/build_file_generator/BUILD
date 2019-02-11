@@ -16,6 +16,7 @@ java_library(
     name = "build_file_generator",
     srcs = [
         "BuildFileGenerator.java",
+        "BuildFileParser.java",
         "BuildFileWriter.java",
         "JavaClassAnalyzer.java",
         "ProtoFileAnalyzer.java",
