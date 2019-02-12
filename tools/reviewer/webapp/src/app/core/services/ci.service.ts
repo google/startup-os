@@ -71,11 +71,10 @@ export class CiService {
         if (targetResult.getTarget().getRepo().getId() === repoId) {
           const status: Status = this.getStatus(branchInfo, targetResult);
           if (status) {
-            const ciLog: CiLog = {
+            return {
               status: status,
               log: targetResult.getLog(),
             };
-            return ciLog;
           }
         }
       }
