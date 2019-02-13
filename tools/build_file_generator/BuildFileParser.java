@@ -143,13 +143,7 @@ public class BuildFileParser {
       result = matcher.group();
       count++;
     }
-    if (count == 0) {
-      System.out.println(
-          String.format("Can't find any substrings for line: %s. Regex: %s", line, regex));
-    }
-    if (count > 1) {
-      System.out.println(
-          String.format("Found more than two substring for line: %s. Regex: %s", line, regex));
+    if (count != 1) {
       result = "";
     }
     return result;
@@ -170,8 +164,7 @@ public class BuildFileParser {
           result.addAllSrcs(values);
           break;
         default:
-          System.out.println(
-              String.format("%s attribute isn't supported java_library.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
@@ -192,8 +185,7 @@ public class BuildFileParser {
           result.addAllSrcs(values);
           break;
         default:
-          System.out.println(
-              String.format("%s attribute isn't supported proto_library.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
@@ -217,8 +209,7 @@ public class BuildFileParser {
           result.setMainClass(values.get(0));
           break;
         default:
-          System.out.println(
-              String.format("%s attribute isn't supported for java_binary.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
@@ -245,8 +236,7 @@ public class BuildFileParser {
           result.addAllResources(values);
           break;
         default:
-          System.out.println(
-              String.format("%s attribute isn't supported for java_test.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
@@ -264,8 +254,7 @@ public class BuildFileParser {
           result.addAllDeps(values);
           break;
         default:
-          System.out.println(
-              String.format("%s attribute isn't supported java_proto_library.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
@@ -289,8 +278,7 @@ public class BuildFileParser {
           result.addAllTags(values);
           break;
         default:
-          System.out.println(
-              String.format("%s attribute isn't supported for java_grpc_library.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
@@ -308,9 +296,7 @@ public class BuildFileParser {
           result.setTarget(values.get(0));
           break;
         default:
-          System.out.println(
-              String.format(
-                  "%s attribute isn't supported for checkstyle_test rule.", entry.getKey()));
+          // Do nothing
       }
     }
     return result.build();
