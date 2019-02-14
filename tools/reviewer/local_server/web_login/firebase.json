@@ -1,14 +1,14 @@
 {
   "hosting": {
-    "public": "dist",
+    "public": "./",
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/*.md"
     ],
     "headers": [
       {
-        "source": "/dist/*",
+        "source": "/*",
         "headers": [
           {
             "key": "Cache-Control",
@@ -20,7 +20,7 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/bootstrap/index.html"
+        "destination": "/index.html"
       }
     ]
   }
