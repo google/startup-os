@@ -3,7 +3,7 @@ options:
   licenses: [ "permissive" ]
   namePrefix: "mvn"
   resolverType: "coursier"
-  resolvers:
+  resolvers: 
     - id: "mavencentral"
       type: "default"
       url: https://repo.maven.apache.org/maven2/
@@ -16,29 +16,29 @@ dependencies:
     api-common:
       lang: java
       version: "1.7.0"
-
+  
   com.google.auth:
     google:
       lang: java
       modules: [ "auth-library-credentials", "auth-library-oauth2-http" ]
       version: "0.12.0"
-
+  
   com.google.auto:
     auto-common:
       lang: java
       version: "0.10"
-
+  
   com.google.auto.factory:
     auto-factory:
       lang: java
       version: "1.0-beta6"
-
+  
   com.google.auto.service:
     auto-service:
       lang: java
       processorClasses: [ "com.google.auto.service.processor.AutoServiceProcessor" ]
       version: "1.0-rc4"
-
+  
   com.google.auto.value:
     auto-value:
       lang: java
@@ -47,7 +47,7 @@ dependencies:
     auto-value-annotations:
       lang: java
       version: "1.6.3"
-
+  
   com.google.cloud:
     google:
       lang: java
@@ -55,91 +55,94 @@ dependencies:
     google-cloud-firestore:
       lang: java
       version: "0.74.0-beta"
-
+    google-cloud-storage:
+      lang: java
+      version: "1.62.0"
+  
   com.google.code.findbugs:
     jsr305:
       lang: java
       version: "3.0.2"
-
+  
   com.google.code.gson:
     gson:
       lang: java
       version: "2.8.5"
-
+  
   com.google.dagger:
     dagger:
       lang: java
       modules: [ "", "compiler" ]
       version: "2.20"
-
+  
   com.google.errorprone:
     error_prone_ant:
       lang: java
       version: "2.3.1"
-
+  
   com.google.firebase:
     firebase-admin:
       lang: java
       version: "6.6.0"
-
+  
   com.google.flogger:
     flogger:
       lang: java
       modules: [ "", "system-backend" ]
       version: "0.3.1"
-
+  
   com.google.googlejavaformat:
     google-java-format:
       lang: java
       version: "1.6"
-
+  
   com.google.guava:
     guava:
       lang: java
       version: "27.0.1-jre"
-
+  
   com.google.jimfs:
     jimfs:
       lang: java
       version: "1.1"
-
+  
   com.google.protobuf:
     protobuf:
       lang: java
       modules: [ "java", "java-util" ]
       version: "3.6.1"
-
+  
   com.jcraft:
     jsch:
       lang: java
       version: "0.1.55"
-
+  
   com.puppycrawl.tools:
     checkstyle:
       lang: java
       version: "8.15"
-
+  
   com.squareup.okhttp:
     okhttp:
       lang: java
       version: "2.7.5"
-
+  
   com.squareup.okio:
     okio:
       lang: java
       version: "1.16.0"
-
+  
   commons-logging:
     commons-logging:
       lang: java
       version: "1.2"
-
+  
   io.grpc:
     grpc:
       lang: java
       modules: [ "core", "netty", "protobuf", "services", "stub" ]
       version: "1.16.1"
-
+  
   io.netty:
     netty-codec-http2:
       lang: java
@@ -147,27 +150,27 @@ dependencies:
     netty-tcnative-boringssl-static:
       lang: java
       version: "2.0.20.Final"
-
+  
   io.opencensus:
     opencensus-contrib-grpc-metrics:
       lang: java
       version: "0.18.0"
-
+  
   javax.annotation:
     javax.annotation-api:
       lang: java
       version: "1.3.2"
-
+  
   javax.inject:
     javax.inject:
       lang: java
       version: "1"
-
+  
   junit:
     junit:
       lang: java
       version: "4.12"
-
+  
   org.apache.commons:
     commons-csv:
       lang: java
@@ -175,12 +178,12 @@ dependencies:
     commons-lang3:
       lang: java
       version: "3.8.1"
-
+  
   org.apache.httpcomponents:
     fluent-hc:
       lang: java
       version: "4.5.6"
-
+  
   org.apache.pdfbox:
     fontbox:
       lang: java
@@ -188,37 +191,37 @@ dependencies:
     pdfbox:
       lang: java
       version: "2.0.13"
-
+  
   org.javassist:
     javassist:
       lang: java
       version: "3.24.1-GA"
-
+  
   org.json:
     json:
       lang: java
       version: "20180813"
-
+  
   org.jsoup:
     jsoup:
       lang: java
       version: "1.11.3"
-
+  
   org.mockito:
     mockito-core:
       lang: java
       version: "2.23.4"
-
+  
   org.objenesis:
     objenesis:
       lang: java
       version: "3.0.1"
-
+  
   org.slf4j:
     slf4j-simple:
       lang: java
       version: "1.7.25"
-
+  
   org.yaml:
     snakeyaml:
       lang: java

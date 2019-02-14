@@ -43,6 +43,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nullable;
+import com.google.firebase.cloud.StorageClient;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage.BlobSourceOption;
+import java.io.File;
+import java.nio.file.Path;
+import com.google.cloud.storage.BlobInfo;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import com.google.cloud.storage.StorageClass;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.BucketInfo;
 
 /** A proto wrapper for Firestore's client, that uses protos' binary format. */
 public class FirestoreProtoClient {
@@ -54,7 +68,8 @@ public class FirestoreProtoClient {
     try {
       InputStream serviceAccount = new FileInputStream(serviceAccountJson);
       GoogleCredentials credentials = GoogleCredentials.fromStream(serviceAccount);
-      FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(credentials).build();
+      FirebaseOptions options = new FirebaseOptions.Builder().setCredentials(credentials)
+          .setStorageBucket("startupos-5f279.appspot.com").build();
       try {
         FirebaseApp.initializeApp(options);
       } catch (IllegalStateException e) {
@@ -65,17 +80,42 @@ public class FirestoreProtoClient {
         }
       }
       client = FirestoreClient.getFirestore();
+
+      Storage storage = StorageOptions.getDefaultInstance().getService();
+
+      Bucket testBucket1 = storage.create(BucketInfo.newBuilder("test_bucket1")
+          // See here for possible values: http://g.co/cloud/storage/docs/storage-classes
+          .setStorageClass(StorageClass.COLDLINE)
+          // Possible values: http://g.co/cloud/storage/docs/bucket-locations#location-mr
+          .setLocation("asia").build());
+
+      // Bucket bucket = StorageClient.getInstance().bucket();
+
+      // BlobId blobId = BlobId.of("startupos-5f279.appspot.com", "aaaa.txt");
+      // BlobInfo blobInfo =
+      // BlobInfo.newBuilder(blobId).setContentType("text/plain").build();
+      // Blob blob = storage.create(blobInfo, "Hello, Cloud
+      // Storage!".getBytes(UTF_8));
+
+      // Get specific file from specified bucket
+      // Blob blob = storage.get(BlobId.of("startupos-5f279.appspot.com",
+      // "ClustXXXerToLine.zip"));
+      // File file = new
+      // File("/home/oferb/devel/base/ws/firebase_storage/startup-os");
+
+      // Path path = file.toPath();
+      // // Download file to specified path
+      // blob.downloadTo(path, null);// BlobSourceOption.generationMatch());
+
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   public FirestoreProtoClient(String project, String token) {
-    FirebaseOptions options =
-        new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.create(new AccessToken(token, null)))
-            .setProjectId(project)
-            .build();
+    FirebaseOptions options = new FirebaseOptions.Builder()
+        .setCredentials(GoogleCredentials.create(new AccessToken(token, null)))
+        .setStorageBucket("startupos-5f279.appspot.com").setProjectId(project).build();
     try {
       FirebaseApp.initializeApp(options);
     } catch (IllegalStateException e) {
@@ -86,6 +126,7 @@ public class FirestoreProtoClient {
       }
     }
     client = FirestoreClient.getFirestore();
+    Bucket bucket = StorageClient.getInstance().bucket();
   }
 
   public Firestore getClient() {
@@ -101,14 +142,10 @@ public class FirestoreProtoClient {
 
   public static Message parseProto(DocumentSnapshot document, Message.Builder builder)
       throws InvalidProtocolBufferException {
-    return builder
-        .build()
-        .getParserForType()
-        .parseFrom(Base64.getDecoder().decode(document.getString(PROTO_FIELD)));
+    return builder.build().getParserForType().parseFrom(Base64.getDecoder().decode(document.getString(PROTO_FIELD)));
   }
 
-  private ImmutableMap<String, String> encodeProto(Message proto)
-      throws InvalidProtocolBufferException {
+  private ImmutableMap<String, String> encodeProto(Message proto) throws InvalidProtocolBufferException {
     byte[] protoBytes = proto.toByteArray();
     String base64BinaryString = Base64.getEncoder().encodeToString(protoBytes);
     return ImmutableMap.of(PROTO_FIELD, base64BinaryString);
@@ -186,8 +223,7 @@ public class FirestoreProtoClient {
     return getDocumentReference(path).set(map);
   }
 
-  public ApiFuture<WriteResult> setDocumentAsync(
-      String collection, String documentId, Map<String, ?> map) {
+  public ApiFuture<WriteResult> setDocumentAsync(String collection, String documentId, Map<String, ?> map) {
     return setDocumentAsync(joinPath(collection, documentId), map);
   }
 
@@ -211,8 +247,7 @@ public class FirestoreProtoClient {
     }
   }
 
-  public ApiFuture<WriteResult> setProtoDocumentAsync(
-      String collection, String documentId, Message proto) {
+  public ApiFuture<WriteResult> setProtoDocumentAsync(String collection, String documentId, Message proto) {
     return setProtoDocumentAsync(joinPath(collection, documentId), proto);
   }
 
@@ -228,8 +263,7 @@ public class FirestoreProtoClient {
     return setProtoDocument(joinPath(collection, documentId), proto);
   }
 
-  public ApiFuture<DocumentReference> addProtoDocumentToCollectionAsync(
-      String path, Message proto) {
+  public ApiFuture<DocumentReference> addProtoDocumentToCollectionAsync(String path, Message proto) {
     try {
       return getCollectionReference(path).add(encodeProto(proto));
     } catch (InvalidProtocolBufferException e) {
@@ -263,17 +297,15 @@ public class FirestoreProtoClient {
     }
   }
 
-  public MessageWithId getDocumentFromCollection(
-      String path, Message.Builder builder, boolean shouldRemove) {
+  public MessageWithId getDocumentFromCollection(String path, Message.Builder builder, boolean shouldRemove) {
     try {
       QuerySnapshot querySnapshot = getCollectionReference(path).limit(1).get().get();
       if (querySnapshot.isEmpty()) {
         return null;
       }
       QueryDocumentSnapshot queryDocumentSnapshot = querySnapshot.getDocuments().get(0);
-      MessageWithId result =
-          MessageWithId.create(
-              queryDocumentSnapshot.getId(), parseProto(queryDocumentSnapshot, builder));
+      MessageWithId result = MessageWithId.create(queryDocumentSnapshot.getId(),
+          parseProto(queryDocumentSnapshot, builder));
       if (shouldRemove) {
         deleteDocument(path + "/" + queryDocumentSnapshot.getId());
       }
@@ -311,25 +343,20 @@ public class FirestoreProtoClient {
     return deleteDocument(joinPath(collection, documentId));
   }
 
-  public void addCollectionListener(
-      String path, Message.Builder builder, ProtoEventListener listener) {
-    getCollectionReference(path)
-        .addSnapshotListener(
-            new EventListener<QuerySnapshot>() {
-              @Override
-              public void onEvent(
-                  @Nullable QuerySnapshot querySnapshot, @Nullable FirestoreException e) {
-                if (e != null) {
-                  listener.onEvent(null, e);
-                  return;
-                }
-                try {
-                  listener.onEvent(new ProtoQuerySnapshot(querySnapshot, builder), null);
-                } catch (InvalidProtocolBufferException e2) {
-                  listener.onEvent(null, new IllegalArgumentException(e2));
-                }
-              }
-            });
+  public void addCollectionListener(String path, Message.Builder builder, ProtoEventListener listener) {
+    getCollectionReference(path).addSnapshotListener(new EventListener<QuerySnapshot>() {
+      @Override
+      public void onEvent(@Nullable QuerySnapshot querySnapshot, @Nullable FirestoreException e) {
+        if (e != null) {
+          listener.onEvent(null, e);
+          return;
+        }
+        try {
+          listener.onEvent(new ProtoQuerySnapshot(querySnapshot, builder), null);
+        } catch (InvalidProtocolBufferException e2) {
+          listener.onEvent(null, new IllegalArgumentException(e2));
+        }
+      }
+    });
   }
 }
-

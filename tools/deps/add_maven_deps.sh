@@ -3,8 +3,8 @@
 # Script for adding a new Maven dependency.
 
 # Usage format: tools/deps/add_maven_dep.sh <maven_artifact(s)>
-# Example: tools/deps/add_maven_dep.sh junit:junit:4.12
-# Example: tools/deps/add_maven_dep.sh junit:junit:4.12 org.json:json:20180130
+# Example: tools/deps/add_maven_deps.sh junit:junit:4.12
+# Example: tools/deps/add_maven_deps.sh junit:junit:4.12 org.json:json:20180130
 
 # Add dependencies to dependencies.yaml:
 for MAVEN_ARTIFACT in "$@"; do

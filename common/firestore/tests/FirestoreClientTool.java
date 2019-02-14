@@ -54,8 +54,11 @@ public class FirestoreClientTool {
   }
 
   void run() {
+    System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     authService.refreshToken();
-    client = new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
+    System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+    System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX " + authService.getTokenExpiration());
+    client = new FirestoreProtoClient(serviceAccountJson.get());
 
     Executors.newSingleThreadExecutor().execute(() -> testFunctionality());
     try {
@@ -68,13 +71,10 @@ public class FirestoreClientTool {
     WriteResult result = client.setProtoDocument("test/bla", Diff.newBuilder().setId(123).build());
     System.out.println("Update time : " + result.getUpdateTime());
 
-    client.addCollectionListener(
-        "/reviewer/ci/requests",
-        CiRequest.newBuilder(),
+    client.addCollectionListener("/reviewer/ci/requests", CiRequest.newBuilder(),
         new ProtoEventListener<ProtoQuerySnapshot<CiRequest>>() {
           @Override
-          public void onEvent(
-              @Nullable ProtoQuerySnapshot<CiRequest> snapshot, @Nullable RuntimeException e) {
+          public void onEvent(@Nullable ProtoQuerySnapshot<CiRequest> snapshot, @Nullable RuntimeException e) {
             if (e != null) {
               System.err.println("Listen failed: " + e);
               return;
@@ -102,7 +102,7 @@ public class FirestoreClientTool {
 
   public static void main(String[] args) throws IOException {
     Flags.parse(args, FirestoreClientTool.class.getPackage(), AuthService.class.getPackage());
+    System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     DaggerFirestoreClientTool_ToolComponent.create().getTool().run();
   }
 }
-

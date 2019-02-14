@@ -53,7 +53,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /** File utils. */
-// TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the injected FileSystem.
+// TODO Disallow `java.nio.file.Paths` using error_prone, since it bypasses the
+// injected FileSystem.
 @Singleton
 public class FileUtils {
   private final String userHome;
@@ -81,8 +82,7 @@ public class FileUtils {
   }
 
   /** Reads a prototxt from a string into a proto. */
-  public Message readPrototxtFromString(String prototxt, Message.Builder builder)
-      throws IOException {
+  public Message readPrototxtFromString(String prototxt, Message.Builder builder) throws IOException {
     TextFormat.merge(prototxt, builder);
     return builder.build();
   }
@@ -192,35 +192,30 @@ public class FileUtils {
   /** Gets file and folder names in path. */
   public ImmutableList<String> listContents(String path) throws IOException {
     try (Stream<Path> paths = Files.list(fileSystem.getPath(expandHomeDirectory(path)))) {
-      return ImmutableList.sortedCopyOf(
-          paths
-              .map(absolutePath -> absolutePath.getFileName().toString())
-              .collect(Collectors.toList()));
+      return ImmutableList
+          .sortedCopyOf(paths.map(absolutePath -> absolutePath.getFileName().toString()).collect(Collectors.toList()));
     }
   }
 
-  /** Gets subfolder names in path. Throws IllegalStateException if path is not a folder. */
+  /**
+   * Gets subfolder names in path. Throws IllegalStateException if path is not a
+   * folder.
+   */
   public ImmutableList<String> listSubfolders(String path) throws IOException {
     if (!folderExists(path)) {
       throw new IllegalStateException("Folder does not exist");
     }
     return ImmutableList.sortedCopyOf(
-        listContents(path)
-            .stream()
-            .filter(x -> folderExists(joinPaths(path, x)))
-            .collect(Collectors.toList()));
+        listContents(path).stream().filter(x -> folderExists(joinPaths(path, x))).collect(Collectors.toList()));
   }
 
   /**
-   * Gets file and folder absolute paths recursively. Throws NoSuchFileException if directory
-   * doesn't exist.
+   * Gets file and folder absolute paths recursively. Throws NoSuchFileException
+   * if directory doesn't exist.
    */
   public ImmutableList<String> listContentsRecursively(String path) throws IOException {
-    try (Stream<Path> paths =
-        Files.find(
-            fileSystem.getPath(expandHomeDirectory(path)),
-            100000, // Folder depth
-            (unused, unused2) -> true)) {
+    try (Stream<Path> paths = Files.find(fileSystem.getPath(expandHomeDirectory(path)), 100000, // Folder depth
+        (unused, unused2) -> true)) {
       return ImmutableList.sortedCopyOf(paths.map(Path::toString).collect(Collectors.toList()));
     }
   }
@@ -282,52 +277,47 @@ public class FileUtils {
   }
 
   /**
-   * Copies a directory to another directory. Creates target directory if needed and doesn't copy
-   * symlinks.
+   * Copies a directory to another directory. Creates target directory if needed
+   * and doesn't copy symlinks.
    */
-  public void copyDirectoryToDirectory(String source, String destination, String... ignored)
-      throws IOException {
+  public void copyDirectoryToDirectory(String source, String destination, String... ignored) throws IOException {
     final Path sourcePath = fileSystem.getPath(source);
     final Path targetPath = fileSystem.getPath(destination);
 
-    Files.walkFileTree(
-        sourcePath,
-        new SimpleFileVisitor<Path>() {
-          @Override
-          public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-              throws IOException {
-            final String dirPath = dir.toAbsolutePath().toString();
-            if (ignored.length != 0) {
-              for (String item : ignored) {
-                if (dirPath.contains(item)) {
-                  return FileVisitResult.SKIP_SUBTREE;
-                }
-                if (Pattern.matches(item, dir.getFileName().toString())) {
-                  return FileVisitResult.SKIP_SUBTREE;
-                }
-              }
+    Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+        final String dirPath = dir.toAbsolutePath().toString();
+        if (ignored.length != 0) {
+          for (String item : ignored) {
+            if (dirPath.contains(item)) {
+              return FileVisitResult.SKIP_SUBTREE;
             }
-            Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
-            return FileVisitResult.CONTINUE;
+            if (Pattern.matches(item, dir.getFileName().toString())) {
+              return FileVisitResult.SKIP_SUBTREE;
+            }
           }
+        }
+        Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+        return FileVisitResult.CONTINUE;
+      }
 
-          @Override
-          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-              throws IOException {
-            if (ignored.length != 0) {
-              for (String itemForIgnore : ignored) {
-                if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
-                  return FileVisitResult.CONTINUE;
-                }
-              }
-            }
-            if (Files.isSymbolicLink(file)) {
+      @Override
+      public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+        if (ignored.length != 0) {
+          for (String itemForIgnore : ignored) {
+            if (Pattern.matches(itemForIgnore, file.getFileName().toString())) {
               return FileVisitResult.CONTINUE;
             }
-            Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
-            return FileVisitResult.CONTINUE;
           }
-        });
+        }
+        if (Files.isSymbolicLink(file)) {
+          return FileVisitResult.CONTINUE;
+        }
+        Files.copy(file, targetPath.resolve(sourcePath.relativize(file)));
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 
   public void copyDirectoryToDirectory(String source, String destination) throws IOException {
@@ -340,8 +330,8 @@ public class FileUtils {
   }
 
   /**
-   * Deletes all files and folders in directory. Target directory is deleted. Rethrows exceptions as
-   * unchecked.
+   * Deletes all files and folders in directory. Target directory is deleted.
+   * Rethrows exceptions as unchecked.
    */
   public void deleteDirectoryUnchecked(String path) {
     try {
@@ -365,14 +355,17 @@ public class FileUtils {
     }
   }
 
-  /** Deletes all files and folders inside directory. Target directory is not deleted. */
+  /**
+   * Deletes all files and folders inside directory. Target directory is not
+   * deleted.
+   */
   public void clearDirectory(String path) throws IOException {
     deleteDirectoryContents(path, false);
   }
 
   /**
-   * Deletes all files and folders inside directory. Target directory is not deleted. Rethrows
-   * exceptions as unchecked.
+   * Deletes all files and folders inside directory. Target directory is not
+   * deleted. Rethrows exceptions as unchecked.
    */
   public void clearDirectoryUnchecked(String path) {
     try {
@@ -382,34 +375,29 @@ public class FileUtils {
     }
   }
 
-  private void deleteDirectoryContents(String path, boolean deleteTargetDirectory)
-      throws IOException {
+  private void deleteDirectoryContents(String path, boolean deleteTargetDirectory) throws IOException {
     final Path targetDirectory = fileSystem.getPath(expandHomeDirectory(path));
-    Files.walkFileTree(
-        targetDirectory,
-        new SimpleFileVisitor<Path>() {
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-              throws IOException {
-            Files.delete(file);
-            return FileVisitResult.CONTINUE;
-          }
+    Files.walkFileTree(targetDirectory, new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Files.delete(file);
+        return FileVisitResult.CONTINUE;
+      }
 
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exception)
-              throws IOException {
-            if (exception == null) {
-              if (!deleteTargetDirectory && (targetDirectory == dir)) {
-                // Do nothing
-              } else {
-                Files.delete(dir);
-              }
-              return FileVisitResult.CONTINUE;
-            } else {
-              throw exception;
-            }
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exception) throws IOException {
+        if (exception == null) {
+          if (!deleteTargetDirectory && (targetDirectory == dir)) {
+            // Do nothing
+          } else {
+            Files.delete(dir);
           }
-        });
+          return FileVisitResult.CONTINUE;
+        } else {
+          throw exception;
+        }
+      }
+    });
   }
 
   public static String streamToString(InputStream inputStream) throws IOException {
@@ -425,10 +413,10 @@ public class FileUtils {
   }
 
   /** Writes a proto to zip archive. */
-  // TODO: Think over how to instead of writing the file to disk and then copying, and then
+  // TODO: Think over how to instead of writing the file to disk and then copying,
+  // and then
   // deleting, write it once, directly to the Zip filesystem
-  public void writePrototxtToZip(Message proto, String zipFilePath, String pathInsideZip)
-      throws IOException {
+  public void writePrototxtToZip(Message proto, String zipFilePath, String pathInsideZip) throws IOException {
     String fileContent = TextFormat.printToUnicodeString(proto);
     File tempPrototxt = File.createTempFile("temp_prototxt", ".prototxt");
     BufferedWriter writer = new BufferedWriter(new FileWriter(tempPrototxt));
@@ -440,9 +428,7 @@ public class FileUtils {
 
     URI uri = URI.create(String.format("jar:file:%s", joinPaths(zipFilePath)));
     try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
-      Files.copy(
-          fileSystem.getPath(expandHomeDirectory(tempPrototxt.getPath())),
-          zipfs.getPath(pathInsideZip),
+      Files.copy(fileSystem.getPath(expandHomeDirectory(tempPrototxt.getPath())), zipfs.getPath(pathInsideZip),
           StandardCopyOption.REPLACE_EXISTING);
     } finally {
       tempPrototxt.deleteOnExit();
@@ -450,18 +436,19 @@ public class FileUtils {
   }
 
   /** Reads a prototxt file into a proto from zip archive. */
-  public Message readPrototxtFromZip(
-      String zipFilePath, String pathInsideZip, Message.Builder builder) throws IOException {
-    ZipFile zipFile =
-        new ZipFile(expandHomeDirectory(joinPaths(getCurrentWorkingDirectory(), zipFilePath)));
+  public Message readPrototxtFromZip(String zipFilePath, String pathInsideZip, Message.Builder builder)
+      throws IOException {
+    ZipFile zipFile = new ZipFile(expandHomeDirectory(joinPaths(getCurrentWorkingDirectory(), zipFilePath)));
     String content = streamToString(zipFile.getInputStream(zipFile.getEntry(pathInsideZip)));
     TextFormat.merge(content, builder);
     return builder.build();
   }
 
-  /** Reads a prototxt file into a proto from zip archive, rethrows exceptions as unchecked. */
-  public Message readPrototxtFromZipUnchecked(
-      String zipFilePath, String pathInsideZip, Message.Builder builder) {
+  /**
+   * Reads a prototxt file into a proto from zip archive, rethrows exceptions as
+   * unchecked.
+   */
+  public Message readPrototxtFromZipUnchecked(String zipFilePath, String pathInsideZip, Message.Builder builder) {
     try {
       return readPrototxtFromZip(zipFilePath, pathInsideZip, builder);
     } catch (Exception e) {
@@ -473,4 +460,3 @@ public class FileUtils {
     return new File(expandHomeDirectory(path));
   }
 }
-
