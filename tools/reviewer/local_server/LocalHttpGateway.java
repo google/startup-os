@@ -150,7 +150,7 @@ public class LocalHttpGateway {
     public void handle(HttpExchange httpExchange) throws IOException {
       byte[] response =
           Files.readAllBytes(
-              Paths.get("tools", "reviewer", "local_server", "web_login_js", "index.html"));
+              Paths.get("tools", "reviewer", "local_server", "web_login", "index.html"));
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);
