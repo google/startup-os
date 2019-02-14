@@ -8,7 +8,7 @@ java_binary(
         "LocalServer.java",
     ],
     data = [
-        "web_login_js/index.html",
+        "web_login/index.html",
     ],
     main_class = "com.google.startupos.tools.reviewer.local_server.LocalServer",
     deps = [
