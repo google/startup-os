@@ -9,6 +9,7 @@ export * from './localserver.service';
 export * from './exception.service';
 export * from './diff-update.service';
 export * from './user.service';
+export * from './ci.service';
 export * from './document-event.service';
 export * from './text-diff.service';
 export * from './select-dashboard.service';
@@ -16,6 +17,7 @@ export * from './select-dashboard.service';
 // Services
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { CiService } from './ci.service';
 import { DiffUpdateService } from './diff-update.service';
 import { DocumentEventService } from './document-event.service';
 import { EncodingService } from './encoding.service';
@@ -43,4 +45,5 @@ export const ServiceList = [
   SelectDashboardService,
   DocumentEventService,
   TextDiffService,
+  CiService,
 ];

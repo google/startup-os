@@ -1,0 +1,42 @@
+$border: 1px solid #c1c1c1;
+
+.log-page {
+  >.titlebar {
+    border-bottom: $border;
+    >.title {
+      margin-right: 30px;
+      >.diff {
+        outline: none;
+        cursor: pointer;
+        user-select: none;
+        text-decoration: none;
+        color: black;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+  >.header-menu {
+    display: flex;
+    padding: 10px 23px;
+    align-items: center;
+    background: #f3f3f3;
+    border-bottom: $border;
+    >.ci-status {
+      >span {
+        color: #808080;
+      }
+    }
+  }
+  >.log {
+    background: #212121;
+    color: white;
+    margin: 10px 23px;
+    padding: 10px 23px;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    width: 900px;
+  }
+}

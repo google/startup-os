@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 import { Observable } from 'rxjs';
 
 import { Diff, File, Thread } from '@/core/proto';
-import { TextDiffReturn, TextDiffService } from '@/core/services';
+import { NotificationService, TextDiffReturn, TextDiffService } from '@/core/services';
 import { Section } from '@/shared/code-changes';
 
 interface ChangeFile {
@@ -32,7 +32,10 @@ export class DiffFilesComponent implements OnInit, OnChanges {
   @Input() diff: Diff;
   @Input() files: File[];
 
-  constructor(private textDiffService: TextDiffService) { }
+  constructor(
+    private textDiffService: TextDiffService,
+    private notificationService: NotificationService,
+  ) { }
 
   ngOnInit() {
     this.createChangeFileMap();
@@ -47,6 +50,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
 
   // Creates collapsed file list
   private createChangeFileMap(): void {
+    this.changeFileMap = {};
     for (const file of this.files) {
       const filename: string = file.getFilenameWithRepo();
       this.changeFileMap[filename] = {
@@ -88,11 +92,22 @@ export class DiffFilesComponent implements OnInit, OnChanges {
   // Expands or collapses specific file
   toggleFileExpand(changeFile: ChangeFile): void {
     if (!changeFile.isExpanded) {
+      if (this.isLoading) {
+        return;
+      }
+
+      this.isLoading = true;
       this.textDiffService.load(this.diff, changeFile.filename)
         .subscribe(textDiffReturn => {
           changeFile.data = textDiffReturn;
           changeFile.isExpanded = true;
           this.isExpanded = true;
+          this.isLoading = false;
+        }, error => {
+          if (error.message === 'File not found') {
+            this.notificationService.error('Fallback server does not contain the file');
+          }
+          this.isLoading = false;
         });
     } else {
       changeFile.sections = undefined;
@@ -138,6 +153,13 @@ export class DiffFilesComponent implements OnInit, OnChanges {
           };
         }
         this.isExpanded = true;
+        this.isLoading = false;
+      }, error => {
+        if (error.message === 'File not found') {
+          this.notificationService.error(
+            'Fallback server does not contain some files from the list',
+          );
+        }
         this.isLoading = false;
       });
   }
