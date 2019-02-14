@@ -16,128 +16,129 @@
 
 package com.google.startupos.tools.build_file_generator;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.Import;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 public class JavaClassAnalyzer {
-  private FileUtils fileUtils;
-
-  // TODO: Come up with a better way to get this list
-  private List<String> javaLangClasses =
+  private static final List<String> JAVA_LANG_CLASSES =
       Arrays.asList(
+          "AbstractMethodError",
           "Appendable",
-          "AutoCloseable",
-          "CharSequence",
-          "Cloneable",
-          "Comparable",
-          "Iterable",
-          "Readable",
-          "Runnable",
-          "Thread.UncaughtExceptionHandler",
-          "Boolean",
-          "Byte",
-          "Character",
-          "Character.Subset",
-          "Character.UnicodeBlock",
-          "Class",
-          "ClassLoader",
-          "ClassValue",
-          "Compiler",
-          "Double",
-          "Enum",
-          "Float",
-          "InheritableThreadLocal",
-          "Integer",
-          "Long",
-          "Math",
-          "Number",
-          "Object",
-          "Package",
-          "Process",
-          "ProcessBuilder",
-          "ProcessBuilder.Redirect",
-          "Runtime",
-          "RuntimePermission",
-          "SecurityManager",
-          "Short",
-          "StackTraceElement",
-          "StrictMath",
-          "String",
-          "StringBuffer",
-          "StringBuilder",
-          "System",
-          "Thread",
-          "ThreadGroup",
-          "ThreadLocal",
-          "Throwable",
-          "Void",
-          "Character.UnicodeScript",
-          "ProcessBuilder.Redirect.Type",
-          "Thread.State",
           "ArithmeticException",
           "ArrayIndexOutOfBoundsException",
           "ArrayStoreException",
+          "AssertionError",
+          "AutoCloseable",
+          "Boolean",
+          "BootstrapMethodError",
+          "Byte",
+          "CharSequence",
+          "Character",
+          "Character.Subset",
+          "Character.UnicodeBlock",
+          "Character.UnicodeScript",
+          "Class",
           "ClassCastException",
+          "ClassCircularityError",
+          "ClassFormatError",
+          "ClassLoader",
           "ClassNotFoundException",
+          "ClassValue",
           "CloneNotSupportedException",
+          "Cloneable",
+          "Comparable",
+          "Compiler",
+          "Deprecated",
+          "Double",
+          "Enum",
           "EnumConstantNotPresentException",
+          "Error",
           "Exception",
+          "ExceptionInInitializerError",
+          "Float",
+          "FunctionalInterface",
+          "IllegalAccessError",
           "IllegalAccessException",
           "IllegalArgumentException",
           "IllegalMonitorStateException",
           "IllegalStateException",
           "IllegalThreadStateException",
-          "IndexOutOfBoundsException",
-          "InstantiationException",
-          "InterruptedException",
-          "NegativeArraySizeException",
-          "NoSuchFieldException",
-          "NoSuchMethodException",
-          "NullPointerException",
-          "NumberFormatException",
-          "ReflectiveOperationException",
-          "RuntimeException",
-          "SecurityException",
-          "StringIndexOutOfBoundsException",
-          "TypeNotPresentException",
-          "UnsupportedOperationException",
-          "AbstractMethodError",
-          "AssertionError",
-          "BootstrapMethodError",
-          "ClassCircularityError",
-          "ClassFormatError",
-          "Error",
-          "ExceptionInInitializerError",
-          "IllegalAccessError",
           "IncompatibleClassChangeError",
+          "IndexOutOfBoundsException",
+          "InheritableThreadLocal",
           "InstantiationError",
+          "InstantiationException",
+          "Integer",
           "InternalError",
+          "InterruptedException",
+          "Iterable",
           "LinkageError",
+          "Long",
+          "Math",
+          "NegativeArraySizeException",
           "NoClassDefFoundError",
           "NoSuchFieldError",
+          "NoSuchFieldException",
           "NoSuchMethodError",
+          "NoSuchMethodException",
+          "NullPointerException",
+          "Number",
+          "NumberFormatException",
+          "Object",
           "OutOfMemoryError",
+          "Override",
+          "Package",
+          "Process",
+          "ProcessBuilder",
+          "ProcessBuilder.Redirect",
+          "ProcessBuilder.Redirect.Type",
+          "Readable",
+          "ReflectiveOperationException",
+          "Runnable",
+          "Runtime",
+          "RuntimeException",
+          "RuntimePermission",
+          "SafeVarargs",
+          "SecurityException",
+          "SecurityManager",
+          "Short",
           "StackOverflowError",
+          "StackTraceElement",
+          "StrictMath",
+          "String",
+          "StringBuffer",
+          "StringBuilder",
+          "StringIndexOutOfBoundsException",
+          "SuppressWarnings",
+          "System",
+          "Thread",
+          "Thread.State",
+          "Thread.UncaughtExceptionHandler",
           "ThreadDeath",
+          "ThreadGroup",
+          "ThreadLocal",
+          "Throwable",
+          "TypeNotPresentException",
           "UnknownError",
           "UnsatisfiedLinkError",
           "UnsupportedClassVersionError",
+          "UnsupportedOperationException",
           "VerifyError",
           "VirtualMachineError",
-          "Deprecated",
-          "FunctionalInterface",
-          "Override",
-          "SafeVarargs",
-          "SuppressWarnings");
+          "Void");
+
+  private FileUtils fileUtils;
 
   @Inject
   public JavaClassAnalyzer(FileUtils fileUtils) {
@@ -234,7 +235,9 @@ public class JavaClassAnalyzer {
   }
 
   private List<String> getUsedClassnamesInCode(String fileContent) {
+    // Finds all multiline and javadoc comments which are between `/*` and `*/` or `/**` and `*/`
     final String multilineCommentRegex = "/\\*(?:.|[\\n\\r])*?\\*/";
+    // Finds string values in the code which are between double quotes.
     final String stringValueRegex = "\"(.*?)\"";
 
     List<String> javaCodeLines =
@@ -264,7 +267,9 @@ public class JavaClassAnalyzer {
   }
 
   private List<String> getJavaClassnames(List<String> javaCodeLines) {
-    List<String> result = new ArrayList<>();
+    Set<String> result = new HashSet<>();
+    // Finds all words in CamelCase. We suppose that these words are
+    // names of Java classes in the code.
     final String classnameRegex = "\\s([A-Z][a-z0-9|A-Z]+)+[\\s|.]";
 
     for (String line : javaCodeLines) {
@@ -272,12 +277,12 @@ public class JavaClassAnalyzer {
       Matcher matcher = pattern.matcher(line);
       while (matcher.find()) {
         String classname = matcher.group().trim().replace(".", "");
-        if (!javaLangClasses.contains(classname) && !result.contains(classname)) {
+        if (!JAVA_LANG_CLASSES.contains(classname)) {
           result.add(classname);
         }
       }
     }
-    return result;
+    return ImmutableList.copyOf(result);
   }
 
   private static boolean isTestClass(String fileContent) {

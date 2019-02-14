@@ -75,7 +75,8 @@ public class BuildFileGenerator {
             THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
   }
 
-  // Returns absolute paths where exists java classes and/or proto files
+  // Returns absolute paths where exists java classes and/or proto files.
+  // These are places where we should create BUILD files.
   private List<String> getPathsToCreateBuildFiles() {
     List<String> result = new ArrayList<>();
     try {
