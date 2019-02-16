@@ -6,7 +6,9 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 RESET=$(tput sgr0)
 
-BAZEL_VERSION=$(cat .bazelversion)
+REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
+
+BAZEL_VERSION=$(cat $REPOSITORY_ROOT/.bazelversion)
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 BAZEL_BINARY_URL="https://releases.bazel.build/$BAZEL_VERSION/release/bazel-$BAZEL_VERSION-$PLATFORM-x86_64"
 BAZEL_BINARY="$HOME/.startupos/bazel-$BAZEL_VERSION"
