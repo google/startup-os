@@ -9,4 +9,7 @@ java_library(
     exports = [
         "//external:jar/mvncom/google/apis/google_api_services_storage",
     ],
+    runtime_deps = [
+        "//third_party/maven/com/google/api_client:google_api_client",
+    ],
 )

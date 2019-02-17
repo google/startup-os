@@ -19,7 +19,6 @@ java_library(
         "//third_party/maven/com/google/http_client:google_http_client",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/annotation:javax_annotation_api",
-        "//third_party/maven/joda_time",
     ],
 )
 
@@ -70,11 +69,9 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/http_client:google_http_client",
         "//third_party/maven/com/google/http_client:google_http_client_appengine",
-        "//third_party/maven/com/google/http_client:google_http_client_jackson",
-        "//third_party/maven/com/google/http_client:google_http_client_jackson2",
-        "//third_party/maven/com/google/oauth_client:google_oauth_client",
         "//third_party/maven/io/opencensus:opencensus_api",
         "//third_party/maven/io/opencensus:opencensus_contrib_http_util",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
     ],
 )
 
@@ -111,7 +108,7 @@ java_library(
         "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
+        "//visibility:public",
     ],
     exports = [
         "//external:jar/mvncom/google/cloud/google_cloud_storage",
@@ -120,5 +117,6 @@ java_library(
         ":google_cloud_core",
         ":google_cloud_core_http",
         "//third_party/maven/com/google/apis:google_api_services_storage",
+        "//third_party/maven/javax/annotation:javax_annotation_api",
     ],
 )

@@ -23,6 +23,7 @@ java_library(
         "//third_party/maven/com/google/cloud:google_cloud_core",
         "//third_party/maven/com/google/cloud:google_cloud_core_grpc",
         "//third_party/maven/com/google/cloud:google_cloud_firestore",
+        "//third_party/maven/com/google/cloud:google_cloud_storage",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/code/gson",
         "//third_party/maven/com/google/firebase:firebase_admin",
