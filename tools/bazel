@@ -6,10 +6,12 @@ RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 RESET=$(tput sgr0)
 
-BAZEL_VERSION=$(cat .bazelversion)
+REPOSITORY_ROOT=$(git rev-parse --show-toplevel)
+
+BAZEL_VERSION=$(cat $REPOSITORY_ROOT/.bazelversion)
 PLATFORM=$(uname | tr '[:upper:]' '[:lower:]')
 BAZEL_BINARY_URL="https://releases.bazel.build/$BAZEL_VERSION/release/bazel-$BAZEL_VERSION-$PLATFORM-x86_64"
-BAZEL_BINARY="$HOME/.startupos/bazel"
+BAZEL_BINARY="$HOME/.startupos/bazel-$BAZEL_VERSION"
 
 if [[ "$PLATFORM" != "darwin" ]] && [[ "$PLATFORM" != "linux" ]]; then
   echo "$RED[!] bazel wrapper cannot download a binary for $PLATFORM""$RESET"
@@ -18,6 +20,7 @@ fi
 
 if [[ ! -x ${BAZEL_BINARY} ]]; then
   echo "$GREEN""Downloading bazel binary""$RESET"
+  rm -f $(dirname ${BAZEL_BINARY})/bazel*
   mkdir -p $(dirname ${BAZEL_BINARY})
   wget ${BAZEL_BINARY_URL} --output-document ${BAZEL_BINARY}
   chmod +x ${BAZEL_BINARY}
