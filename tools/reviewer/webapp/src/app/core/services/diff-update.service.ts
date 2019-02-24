@@ -62,6 +62,11 @@ export class DiffUpdateService {
     this.customUpdate(diff, 'Description is saved');
   }
 
+  reviewFile(diff: Diff, isReviewed: boolean): void {
+    const message: string = isReviewed ? 'reviewed' : 'unreviewed';
+    this.customUpdate(diff, 'File is ' + message);
+  }
+
   customUpdate(diff: Diff, message: string): void {
     this.firebaseService.updateDiff(diff).subscribe(() => {
       this.notificationService.success(message);
