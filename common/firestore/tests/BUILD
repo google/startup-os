@@ -21,6 +21,7 @@ java_binary(
         "//third_party/maven/com/google/cloud:google_cloud_firestore",
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/firebase:firebase_admin",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",

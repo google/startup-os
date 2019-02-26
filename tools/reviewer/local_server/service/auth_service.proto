@@ -15,6 +15,7 @@ message AuthDataRequest {
   string apiKey = 2;
   string jwtToken = 3;
   string refreshToken = 4;
+  string accessToken = 5;
 }
 
 // TODO: Use Empty:

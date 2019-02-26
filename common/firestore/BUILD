@@ -15,6 +15,7 @@ java_library(
         "//common:auto_factory",
         "//common:auto_factory_plugin",
         "//common:dagger_with_annotation_processor",
+        "//tools/reviewer/local_server/service:auth_service",
         "//third_party/maven/com/google/api:api_common",
         "//third_party/maven/com/google/auth:google_auth_library_credentials",
         "//third_party/maven/com/google/auth:google_auth_library_oauth2_http",

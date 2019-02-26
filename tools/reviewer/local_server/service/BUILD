@@ -26,6 +26,7 @@ java_library(
     name = "auth_service",
     srcs = [
         "AuthService.java",
+        "AuthServiceCredentials.java"
     ],
     deps = [
         ":auth_service_java_grpc",
@@ -37,6 +38,8 @@ java_library(
         "//third_party/maven/io/grpc:grpc_stub",
         "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/org/json",
+        "//third_party/maven/com/google/auth:google_auth_library_credentials",
+        "//third_party/maven/com/google/auth:google_auth_library_oauth2_http",
     ],
 )
 

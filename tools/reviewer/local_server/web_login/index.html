@@ -58,10 +58,13 @@
 
       login() {
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('https://www.googleapis.com/auth/cloud-platform');
+        provider.setCustomParameters({"access_type": "offline"});
         this.firebaseApp.auth()
           .signInWithPopup(provider)
           .then(result => {
-            this.getJwtToken(result.user.refreshToken);
+            console.log("GoogleCredential is " + JSON.stringify(result.credential));
+            this.getJwtToken(result.user.refreshToken, result.credential.accessToken);
           })
       }
 
@@ -69,20 +72,21 @@
         this.firebaseApp.auth().signOut();
       }
 
-      getJwtToken(refreshToken) {
+      getJwtToken(refreshToken, accessToken) {
         this.firebaseApp.auth().currentUser.getIdToken(true)
           .then(jwtToken => {
-            this.sendToServer(jwtToken, refreshToken);
+            this.sendToServer(jwtToken, refreshToken, accessToken);
           });
       }
 
-      sendToServer(jwtToken, refreshToken) {
+      sendToServer(jwtToken, refreshToken, accessToken) {
         const url = `http://localhost:${port}/token`;
         const data = {
           projectId: config.projectId,
           apiKey: config.apiKey,
           jwtToken: jwtToken,
           refreshToken: refreshToken,
+          accessToken: accessToken
         };
         const http = new XMLHttpRequest();
         http.open('POST', url, true);

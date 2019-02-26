@@ -18,6 +18,7 @@ package com.google.startupos.common.firestore.tests;
 
 import com.google.cloud.firestore.WriteResult;
 import com.google.common.collect.ImmutableList;
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
@@ -40,6 +41,7 @@ import javax.inject.Singleton;
 /** A tool for testing FirestoreProtoClient. */
 @Singleton
 public class FirestoreClientTool {
+  FluentLogger log = FluentLogger.forEnclosingClass();
   @FlagDesc(name = "service_account_json", description = "")
   public static Flag<String> serviceAccountJson = Flag.create("");
 
@@ -53,16 +55,26 @@ public class FirestoreClientTool {
     this.authService = authService;
   }
 
-  void run() {
+  void run() throws IOException {
+    log.atInfo().log("{before} Project id [%s] token [%s]", authService.getProjectId(), authService.getToken());
     authService.refreshToken();
-    client = new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
+    log.atInfo().log("{after} Project id [%s] token [%s]", authService.getProjectId(), authService.getToken());
+    log.atInfo().log("{after} user: [%s]", authService.getUserEmail());
 
-    Executors.newSingleThreadExecutor().execute(() -> testFunctionality());
-    try {
-      Thread.sleep(100000000);
-    } catch (Exception ignored) {
-    }
+    client = new FirestoreProtoClient(authService.asCredentials());
+
+    client.uploadTo("test-bucket-x-2",
+            "/Users/vmax/work/AppStory/startup-os/dependencies.yaml",
+            "startup_os_dependencies.yaml");
+
+//    Executors.newSingleThreadExecutor().execute(() -> testFunctionality());
+//    try {
+//      Thread.sleep(100000000);
+//    } catch (Exception ignored) {
+//    }
   }
+
+
 
   public void testFunctionality() {
     WriteResult result = client.setProtoDocument("test/bla", Diff.newBuilder().setId(123).build());

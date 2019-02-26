@@ -19,6 +19,7 @@ package com.google.startupos.common.firestore;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.auth.oauth2.UserCredentials;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -41,6 +42,8 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import com.google.startupos.tools.reviewer.local_server.service.AuthServiceCredentials;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -94,7 +97,25 @@ public class FirestoreProtoClient {
       }
     }
     client = FirestoreClient.getFirestore();
-    storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+  }
+
+  public FirestoreProtoClient(AuthServiceCredentials authServiceCredentials) {
+    GoogleCredentials credentials = GoogleCredentials.create(
+            new AccessToken(authServiceCredentials.token(), null));
+    FirebaseOptions options =
+            new FirebaseOptions.Builder().setCredentials(credentials).setProjectId(
+                    authServiceCredentials.projectId()).build();
+    try {
+      FirebaseApp.initializeApp(options);
+    } catch (IllegalStateException e) {
+      if (e.getMessage().contains("already exists")) {
+        // Firestore is probably already initialized - do nothing
+      } else {
+        throw e;
+      }
+    }
+    client = FirestoreClient.getFirestore();
+    storage = StorageOptions.newBuilder().setCredentials(authServiceCredentials).build().getService();
   }
 
   public Firestore getClient() {
@@ -346,7 +367,7 @@ public class FirestoreProtoClient {
     BlobInfo blobInfo =
         storage.create(
             BlobInfo.newBuilder(bucketName, fileName)
-                .setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)))
+                //.setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)))
                 .build(),
             Files.toByteArray(Paths.get(filePath).toFile()));
     return blobInfo.getMediaLink();

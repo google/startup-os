@@ -16,6 +16,7 @@
 
 package com.google.startupos.tools.reviewer.local_server.service;
 
+import com.google.auth.Credentials;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.common.flags.Flag;
@@ -61,6 +62,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
   // Expiration time in seconds
   private long tokenExpiration;
   private String refreshToken;
+  private String accessToken;
   private String userName;
   private String userEmail;
 
@@ -76,11 +78,16 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       apiKey = req.getApiKey();
       jwtToken = req.getJwtToken();
       refreshToken = req.getRefreshToken();
+      accessToken = req.getAccessToken();
       decodeJwtToken();
       setTokenRefreshScheduler();
       logger.atInfo().log("Loaded token from filesystem");
       refreshToken();
     }
+  }
+
+  public AuthServiceCredentials asCredentials() {
+    return new AuthServiceCredentials(this);
   }
 
   @Override
@@ -90,6 +97,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
       apiKey = req.getApiKey();
       jwtToken = req.getJwtToken();
       refreshToken = req.getRefreshToken();
+      accessToken = req.getAccessToken();
       decodeJwtToken();
       setTokenRefreshScheduler();
       responseObserver.onNext(AuthDataResponse.getDefaultInstance());
@@ -175,6 +183,10 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
   public String getToken() {
     return jwtToken;
+  }
+
+  public String getAccessToken() {
+    return accessToken;
   }
 
   public long getTokenExpiration() {
