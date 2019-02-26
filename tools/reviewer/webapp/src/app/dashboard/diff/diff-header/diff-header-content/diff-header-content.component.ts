@@ -8,7 +8,6 @@ import {
   Status,
   UserService,
 } from '@/core/services';
-import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements content of the header
 // How it looks: https://i.imgur.com/TgqzvTW.jpg
@@ -16,7 +15,6 @@ import { DiffHeaderService } from '../diff-header.service';
   selector: 'diff-header-content',
   templateUrl: './diff-header-content.component.html',
   styleUrls: ['./diff-header-content.component.scss'],
-  providers: [DiffHeaderService],
 })
 export class DiffHeaderContentComponent implements OnChanges, OnInit {
   description: string = '';
@@ -29,7 +27,6 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
   constructor(
     public userService: UserService,
     public diffUpdateService: DiffUpdateService,
-    public diffHeaderService: DiffHeaderService,
     public highlightService: HighlightService,
     public ciService: CiService,
   ) { }
@@ -52,7 +49,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
 
   changeAttention(email: string): void {
     // Get reviewer
-    const reviewer: Reviewer = this.diffHeaderService.getReviewer(
+    const reviewer: Reviewer = this.userService.getReviewer(
       this.diff,
       email,
     );
@@ -61,7 +58,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
     }
 
     // Change attention of the reviewer
-    this.diffHeaderService.changeAttention(reviewer);
+    this.userService.changeAttention(reviewer);
 
     // Send changes to firebase
     const username: string = this.userService.getUsername(reviewer.getEmail());
@@ -79,7 +76,7 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
   }
 
   addReviewer(email: string): void {
-    if (email && !this.diffHeaderService.getReviewer(this.diff, email)) {
+    if (email && !this.userService.getReviewer(this.diff, email)) {
       const reviewer = new Reviewer();
       reviewer.setEmail(email);
       reviewer.setNeedsAttention(true);
@@ -118,12 +115,12 @@ export class DiffHeaderContentComponent implements OnChanges, OnInit {
   }
 
   removeFromReviewerList(email: string): void {
-    this.diffHeaderService.removeFromReviewerList(this.diff, email);
+    this.userService.removeFromReviewerList(this.diff, email);
     this.removeUserFromFirebase(email);
   }
 
   removeFromCcList(email: string): void {
-    this.diffHeaderService.removeFromCcList(this.diff, email);
+    this.userService.removeFromCcList(this.diff, email);
     this.removeUserFromFirebase(email);
   }
 

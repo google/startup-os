@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -7,10 +8,12 @@ import {
   BranchInfo,
   Diff,
   File,
+  Reviewer,
   TextDiff,
   Thread,
 } from '@/core/proto';
 import {
+  DiffUpdateService,
   ExceptionService,
   FirebaseStateService,
   TextDiffService,
@@ -38,6 +41,8 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   leftFile = new File();
   rightFile = new File();
   filesSortedByCommits: File[] = [];
+  fileReviewedCheckbox = new FormControl();
+  reviewer: Reviewer;
   onloadSubscription = new Subscription();
   changesSubscription = new Subscription();
 
@@ -49,6 +54,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
     private location: Location,
     private textDiffService: TextDiffService,
     private userService: UserService,
+    private diffUpdateService: DiffUpdateService,
   ) {
     this.isLoading = true;
     document.body.style.width = 'auto';
@@ -58,6 +64,28 @@ export class FileChangesComponent implements OnInit, OnDestroy {
       const scrollTop: number = document.documentElement.scrollTop || document.body.scrollTop;
       this.isHeaderFixed = scrollTop >= headerTopStart;
     };
+
+    // When "review file" checkbox is clicked
+    this.fileReviewedCheckbox.valueChanges.subscribe(checkboxReviewed => {
+      const isFileReviewed: boolean = this.userService.isFileReviewed(
+        this.reviewer,
+        this.rightFile,
+      );
+      if (checkboxReviewed && !isFileReviewed) {
+        // Add current file to reviewed files
+        this.reviewer.addReviewed(this.rightFile);
+        this.reviewFile(checkboxReviewed);
+      } else if (isFileReviewed) {
+        // Add current file from reviewed files
+        let reviewedFiles: File[] = this.reviewer.getReviewedList();
+        reviewedFiles = reviewedFiles.filter(file => (
+          file.getFilenameWithRepo() !== this.rightFile.getFilenameWithRepo() ||
+          file.getCommitId() !== this.rightFile.getCommitId()
+        ));
+        this.reviewer.setReviewedList(reviewedFiles);
+        this.reviewFile(checkboxReviewed);
+      }
+    });
   }
 
   ngOnInit() {
@@ -122,11 +150,25 @@ export class FileChangesComponent implements OnInit, OnDestroy {
       this.filesSortedByCommits = textDiffBundle.filesSortedByCommits;
       this.textDiff = textDiffBundle.textDiff;
       this.localThreads = textDiffBundle.localThreads;
+      this.setReviewedCheckbox(this.diff, this.rightFile);
 
       this.isLoading = false;
     }, (error: Error) => {
       this.exceptionService.fileNotFound(this.diff.getId());
     });
+  }
+
+  private setReviewedCheckbox(diff: Diff, file: File): void {
+    this.reviewer = this.userService.getReviewer(diff, this.userService.email);
+    if (this.reviewer) {
+      const isFileReviewed: boolean = this.userService.isFileReviewed(this.reviewer, file);
+      this.fileReviewedCheckbox.setValue(isFileReviewed, { emitEvent: false });
+    }
+  }
+
+  private reviewFile(fileReviewed: boolean): void {
+    this.diffUpdateService.reviewFile(this.diff, fileReviewed);
+    this.reviewer = this.userService.getReviewer(this.diff, this.userService.email);
   }
 
   // Converts file list to commit list

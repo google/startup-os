@@ -105,6 +105,7 @@ message Reviewer {
   string email = 1;
   bool needs_attention = 2;
   bool approved = 3;
+  repeated com.google.startupos.common.repo.File reviewed = 4;
 }
 
 message Author {

@@ -15,7 +15,15 @@
         [ngClass]="{ 'bold': diff.getAuthor().getNeedsAttention() }"
       >{{ getAuthor() }}</span>
     </div>
-    <diff-status [diff]="diff"></diff-status>
+
+    <diff-status [diff]="diff" fxFlex></diff-status>
+
+    <div class="file-reviewed" *ngIf="reviewer">
+      <mat-checkbox
+        color="primary"
+        [formControl]="fileReviewedCheckbox"
+      >Reviewed</mat-checkbox>
+    </div>
   </div>
 
   <div
