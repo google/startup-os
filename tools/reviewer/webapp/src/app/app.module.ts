@@ -6,6 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core';
 import { FirebaseModule } from './import';
+import { LogComponent } from './log';
 import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
 import { SharedModule } from './shared';
@@ -15,6 +16,7 @@ import { SharedModule } from './shared';
     AppComponent,
     PageNotFoundComponent,
     LoginComponent,
+    LogComponent,
   ],
   imports: [
     BrowserModule,

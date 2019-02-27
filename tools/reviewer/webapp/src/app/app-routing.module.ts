@@ -3,6 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from '@/core';
 import { DiffModuleFactory, DiffsModuleFactory, FileChangesModuleFactory } from '@/dashboard';
+import { LogComponent } from './log';
 import { LoginComponent } from './login';
 import { PageNotFoundComponent } from './page-not-found';
 
@@ -15,14 +16,15 @@ const routes: Routes = [
       { path: 'diffs', loadChildren: DiffsModuleFactory },
       { path: 'diff/:id', loadChildren: DiffModuleFactory },
       {
-        path: 'diff', children: [{
-          path: '**',
-          loadChildren: FileChangesModuleFactory,
-        }],
+        path: 'diff', children: [
+          { path: '', component: PageNotFoundComponent },
+          { path: '**', loadChildren: FileChangesModuleFactory },
+        ],
       },
     ],
   },
   { path: 'login', component: LoginComponent },
+  { path: 'log/:diffId/:repoId', component: LogComponent },
   { path: '**', component: PageNotFoundComponent },
 ];
 

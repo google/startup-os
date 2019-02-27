@@ -28,16 +28,24 @@ import com.google.cloud.firestore.FirestoreException;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
+import com.google.cloud.storage.Acl;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.Files;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +57,7 @@ public class FirestoreProtoClient {
   private static final String PROTO_FIELD = "proto";
 
   Firestore client;
+  Storage storage;
 
   public FirestoreProtoClient(String serviceAccountJson) {
     try {
@@ -65,17 +74,16 @@ public class FirestoreProtoClient {
         }
       }
       client = FirestoreClient.getFirestore();
+      storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
   public FirestoreProtoClient(String project, String token) {
+    GoogleCredentials credentials = GoogleCredentials.create(new AccessToken(token, null));
     FirebaseOptions options =
-        new FirebaseOptions.Builder()
-            .setCredentials(GoogleCredentials.create(new AccessToken(token, null)))
-            .setProjectId(project)
-            .build();
+        new FirebaseOptions.Builder().setCredentials(credentials).setProjectId(project).build();
     try {
       FirebaseApp.initializeApp(options);
     } catch (IllegalStateException e) {
@@ -86,6 +94,7 @@ public class FirestoreProtoClient {
       }
     }
     client = FirestoreClient.getFirestore();
+    storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
   }
 
   public Firestore getClient() {
@@ -330,6 +339,29 @@ public class FirestoreProtoClient {
                 }
               }
             });
+  }
+
+  public String uploadTo(String bucketName, String filePath, String fileName) throws IOException {
+
+    BlobInfo blobInfo =
+        storage.create(
+            BlobInfo.newBuilder(bucketName, fileName)
+                .setAcl(ImmutableList.of(Acl.of(Acl.User.ofAllUsers(), Acl.Role.READER)))
+                .build(),
+            Files.toByteArray(Paths.get(filePath).toFile()));
+    return blobInfo.getMediaLink();
+  }
+
+  public String downloadFrom(String bucketName, String fileName) throws IOException {
+    String[] parts = fileName.split("[.]");
+    String name = parts[0];
+    String extension = ".tmp";
+    if (parts.length > 1) {
+      extension = "." + parts[parts.length - 1];
+    }
+    File tempFile = File.createTempFile(name, extension);
+    storage.get(BlobId.of(bucketName, fileName)).downloadTo(Paths.get(tempFile.getAbsolutePath()));
+    return tempFile.getAbsolutePath();
   }
 }
 

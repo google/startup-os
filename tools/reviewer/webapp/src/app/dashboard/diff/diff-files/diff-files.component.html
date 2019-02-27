@@ -9,6 +9,7 @@
       (click)="toggleExpand()"
       [disabled]="isLoading"
     >{{ isExpanded ? 'Collapse' : 'Expand' }}</button>
+    <mat-spinner [diameter]="20" *ngIf="isLoading"></mat-spinner>
   </div>
 </div>
 <div class="files" *ngIf="files.length > 0">

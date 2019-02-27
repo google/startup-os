@@ -5,7 +5,6 @@ $border: 2px;
   align-items: center;
   position: relative;
   user-select: none;
-  user-drag: none;
   >.bridge {
     position: absolute;
     background: #ffc84b;
@@ -18,7 +17,6 @@ $border: 2px;
     align-items: center;
     position: relative;
     user-select: none;
-    user-drag: none;
     z-index: 5;
     >.dots {
       display: flex;

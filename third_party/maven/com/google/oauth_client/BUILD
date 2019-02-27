@@ -11,6 +11,7 @@ java_library(
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/http_client:google_http_client",
     ],
 )

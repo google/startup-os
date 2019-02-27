@@ -14,6 +14,7 @@ import {
   MatSnackBarModule,
   MatTableModule,
   MatToolbarModule,
+  MatTooltipModule,
 } from '@angular/material';
 
 const MaterialImports = [
@@ -31,6 +32,7 @@ const MaterialImports = [
   MatDialogModule,
   MatCheckboxModule,
   MatSelectModule,
+  MatTooltipModule,
 ];
 
 @NgModule({

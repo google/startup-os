@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { Diff } from '@/core/proto';
 import { DiffUpdateService, NotificationService, UserService } from '@/core/services';
-import { DiffHeaderService } from '../diff-header.service';
 
 // The component implements titlebar of the header
 // How it looks: https://i.imgur.com/vVmTgnq.jpg
@@ -10,7 +9,6 @@ import { DiffHeaderService } from '../diff-header.service';
   selector: 'diff-header-titlebar',
   templateUrl: './diff-header-titlebar.component.html',
   styleUrls: ['./diff-header-titlebar.component.scss'],
-  providers: [DiffHeaderService],
 })
 export class DiffHeaderTitlebarComponent {
   @Input() diff: Diff;
@@ -20,7 +18,6 @@ export class DiffHeaderTitlebarComponent {
   constructor(
     public userService: UserService,
     public diffUpdateService: DiffUpdateService,
-    public diffHeaderService: DiffHeaderService,
     public notificationService: NotificationService,
   ) { }
 
@@ -38,7 +35,7 @@ export class DiffHeaderTitlebarComponent {
   }
 
   changeAttention(): void {
-    this.diffHeaderService.changeAttention(this.diff.getAuthor());
+    this.userService.changeAttention(this.diff.getAuthor());
     this.diffUpdateService.updateAttention(this.diff, 'author');
   }
 

@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.stream.Collectors;
 import org.json.JSONObject;
@@ -48,6 +50,7 @@ public class LocalHttpGateway {
   private static final String TOKEN_PATH = "/token";
   private static final String GET_TEXT_DIFF_PATH = "/get_text_diff";
   private static final String GET_DIFF_FILES_PATH = "/get_diff_files";
+  private static final String LOGIN_PATH = "/login";
   private static final int HTTP_STATUS_CODE_OK = 200;
   private static final int HTTP_STATUS_CODE_NOT_FOUND = 404;
 
@@ -63,6 +66,7 @@ public class LocalHttpGateway {
     httpServer.createContext(TOKEN_PATH, new FirestoreTokenHandler(client));
     httpServer.createContext(GET_TEXT_DIFF_PATH, new GetTextDiffHandler(client));
     httpServer.createContext(GET_DIFF_FILES_PATH, new GetDiffFilesHandler(client));
+    httpServer.createContext(LOGIN_PATH, new LoginHandler());
     httpServer.setExecutor(null); // Creates a default executor
   }
 
@@ -133,6 +137,20 @@ public class LocalHttpGateway {
       logger.atInfo().log("Handling " + GET_TEXT_DIFF_PATH + " request:\n" + request);
       byte[] response =
           Base64.getEncoder().encode(client.getCodeReviewStub().getTextDiff(request).toByteArray());
+      httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
+      try (OutputStream stream = httpExchange.getResponseBody()) {
+        stream.write(response);
+      }
+    }
+  }
+
+  static class LoginHandler implements HttpHandler {
+
+    @Override
+    public void handle(HttpExchange httpExchange) throws IOException {
+      byte[] response =
+          Files.readAllBytes(
+              Paths.get("tools", "reviewer", "local_server", "web_login", "index.html"));
       httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, response.length);
       try (OutputStream stream = httpExchange.getResponseBody()) {
         stream.write(response);

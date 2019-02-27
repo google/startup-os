@@ -8,7 +8,6 @@ import {
   Thread,
 } from '@/core/proto';
 import { DiffUpdateService, UserService } from '@/core/services';
-import { DiffHeaderService } from '../diff-header.service';
 
 // The popup appears when "Reply" button is pushed.
 // How it looks: https://i.imgur.com/C8nXqyU.jpg
@@ -16,7 +15,6 @@ import { DiffHeaderService } from '../diff-header.service';
   selector: 'reply-popup',
   templateUrl: './reply-popup.component.html',
   styleUrls: ['./reply-popup.component.scss'],
-  providers: [DiffHeaderService],
 })
 export class ReplyPopupComponent implements OnInit {
   isLoading: boolean = false;
@@ -30,12 +28,11 @@ export class ReplyPopupComponent implements OnInit {
   constructor(
     public userService: UserService,
     private diffUpdateService: DiffUpdateService,
-    private diffHeaderService: DiffHeaderService,
   ) { }
 
   ngOnInit() {
     // Set "Approved" checkbox to current approve value
-    this.reviewer = this.diffHeaderService.getReviewer(
+    this.reviewer = this.userService.getReviewer(
       this.diff,
       this.userService.email,
     );

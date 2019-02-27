@@ -33,6 +33,8 @@ body {
       }
     }
     >.buttons {
+      display: flex;
+      align-items: center;
       user-select: none;
       direction: rtl;
       padding-bottom: 2px;
