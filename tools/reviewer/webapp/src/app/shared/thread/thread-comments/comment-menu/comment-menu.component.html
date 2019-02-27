@@ -1,10 +1,10 @@
 <div
   class="menu-popup-overlay"
   *ngIf="isMenuVisible"
-  (click)="toggle()"
+  (click)="$event.stopPropagation(); toggle($event)"
 ></div>
 <div class="menu">
-  <mat-icon (click)="toggle()">more_horiz</mat-icon>
+  <mat-icon (click)="$event.stopPropagation(); toggle()">more_horiz</mat-icon>
   <div class="popup" *ngIf="isMenuVisible">
     <speech-arrow
       [size]=15

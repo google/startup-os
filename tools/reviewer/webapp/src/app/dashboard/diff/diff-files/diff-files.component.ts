@@ -1,13 +1,21 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 
-import { Diff, File, Thread } from '@/core/proto';
-import { NotificationService, TextDiffReturn, TextDiffService } from '@/core/services';
+import { Diff, File, Reviewer, Thread } from '@/core/proto';
+import {
+  DiffUpdateService,
+  NotificationService,
+  TextDiffReturn,
+  TextDiffService,
+  UserService,
+} from '@/core/services';
 import { Section } from '@/shared/code-changes';
 
 interface ChangeFile {
-  filename: string;
+  file: File;
   isExpanded: boolean;
+  checkbox?: FormControl;
   data?: TextDiffReturn;
   sections?: Section[];
 }
@@ -27,6 +35,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
   threads: Thread[];
   isExpanded: boolean = false;
   isLoading: boolean = false;
+  reviewer: Reviewer;
   changeFileMap: ChangeFileMap = {};
 
   @Input() diff: Diff;
@@ -35,16 +44,19 @@ export class DiffFilesComponent implements OnInit, OnChanges {
   constructor(
     private textDiffService: TextDiffService,
     private notificationService: NotificationService,
+    private userService: UserService,
+    private diffUpdateService: DiffUpdateService,
   ) { }
 
   ngOnInit() {
+    this.reviewer = this.userService.getReviewer(this.diff, this.userService.email);
     this.createChangeFileMap();
   }
 
   ngOnChanges(ngChanges: SimpleChanges) {
     // Update changes when new diff is received from firebase
     if (this.isExpanded && ngChanges.diff) {
-      this.loadAndExpandAllFiles();
+      this.loadAllFiles(false);
     }
   }
 
@@ -54,9 +66,26 @@ export class DiffFilesComponent implements OnInit, OnChanges {
     for (const file of this.files) {
       const filename: string = file.getFilenameWithRepo();
       this.changeFileMap[filename] = {
-        filename: filename,
+        file: file,
         isExpanded: false,
+        checkbox: this.getReviewCheckbox(file),
       };
+    }
+  }
+
+  private getReviewCheckbox(file: File): FormControl {
+    if (this.reviewer) {
+      const isFileReviewed: boolean = this.userService.isFileReviewed(this.reviewer, file);
+      const checkbox = new FormControl();
+      checkbox.setValue(isFileReviewed, { emitEvent: false });
+
+      // When checkbox is clicked
+      checkbox.valueChanges.subscribe(checkboxReviewed => {
+        this.userService.toogleFileReview(checkboxReviewed, this.reviewer, file);
+        this.diffUpdateService.reviewFile(this.diff, checkboxReviewed);
+      });
+
+      return checkbox;
     }
   }
 
@@ -85,7 +114,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
       }
       this.isExpanded = false;
     } else {
-      this.loadAndExpandAllFiles();
+      this.loadAllFiles(true);
     }
   }
 
@@ -97,7 +126,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
       }
 
       this.isLoading = true;
-      this.textDiffService.load(this.diff, changeFile.filename)
+      this.textDiffService.load(this.diff, changeFile.file.getFilenameWithRepo())
         .subscribe(textDiffReturn => {
           changeFile.data = textDiffReturn;
           changeFile.isExpanded = true;
@@ -122,7 +151,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
     changeFile.sections = sections;
   }
 
-  private loadAndExpandAllFiles(): void {
+  private loadAllFiles(expand: boolean): void {
     if (this.isLoading) {
       return;
     }
@@ -146,10 +175,11 @@ export class DiffFilesComponent implements OnInit, OnChanges {
         for (const textDiffReturn of textDiffReturns) {
           const filename: string = textDiffReturn.leftFile.getFilenameWithRepo();
           this.changeFileMap[filename] = {
-            filename: filename,
+            file: textDiffReturn.rightFile,
             data: textDiffReturn,
             sections: this.changeFileMap[filename].sections,
-            isExpanded: true,
+            isExpanded: expand ? true : this.changeFileMap[filename].isExpanded,
+            checkbox: this.getReviewCheckbox(textDiffReturn.rightFile),
           };
         }
         this.isExpanded = true;
