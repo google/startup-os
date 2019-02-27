@@ -20,7 +20,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.Import;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -214,32 +216,48 @@ public class JavaClassAnalyzer {
         importLineParts.length > 1 && importLineParts[0].trim().equals("static");
     result.setIsStatic(isStaticImport);
 
-    String[] importBodyParts =
-        isStaticImport ? importLineParts[1].split("\\.") : importLineParts[0].split("\\.");
+    List<String> importBodyParts;
+    if (isStaticImport) {
+      importBodyParts = (Arrays.asList(importLineParts[1].split("\\.")));
+    } else {
+      importBodyParts = Arrays.asList(importLineParts[0].split("\\."));
+    }
+
     if (!isStaticImport) {
       result.setWholePackageImport(
-          (importBodyParts[importBodyParts.length - 1].equals("*"))
-              && (!Character.isUpperCase(importBodyParts[importBodyParts.length - 2].charAt(0))));
+          (importBodyParts.get(importBodyParts.size() - 1).equals("*"))
+              && (!Character.isUpperCase(
+                  importBodyParts.get(importBodyParts.size() - 2).charAt(0))));
     }
-    for (String current : importBodyParts) {
+    for (int i = 0; i < importBodyParts.size(); i++) {
+      String current = importBodyParts.get(i);
       if (!current.equals("*")) {
         if (Character.isUpperCase(current.charAt(0))) {
+          if (result.getRootClass().isEmpty()) {
+            result.setRootClass(current);
+          }
           result.setClassName(current);
-          break;
+          if (isStaticImport || importBodyParts.size() - 1 == i) {
+            break;
+          }
         }
-        result.setPackage(
-            result.getPackage().isEmpty() ? current : result.getPackage() + "." + current);
+        if (result.getPackage().isEmpty()) {
+          result.setPackage(current);
+        } else if (Character.isLowerCase(current.charAt(0))) {
+          result.setPackage(result.getPackage() + "." + current);
+        }
       }
     }
+
     return result.build();
   }
 
   private List<String> getUsedClassnamesInCode(String fileContent) {
     // Finds all multiline and javadoc comments which are between `/*` and `*/` or `/**` and `*/`
-    final String multilineCommentRegex = "/\\*(?:.|[\\n\\r])*?\\*/";
+    final String multilineCommentRegex =
+        "((['\"])(?:(?!\\2|\\\\).|\\\\.)*\\2)|\\/\\/[^\\n]*|\\/\\*(?:[^*]|\\*(?!\\/))*\\*\\/";
     // Finds string values in the code which are between double quotes.
     final String stringValueRegex = "\"(.*?)\"";
-
     List<String> javaCodeLines =
         Arrays.stream(
                 fileContent
@@ -248,18 +266,16 @@ public class JavaClassAnalyzer {
                     .split(System.lineSeparator()))
             .filter(line -> !line.trim().startsWith("//") && !line.trim().startsWith("import "))
             .collect(Collectors.toList());
-
-    List<String> innerClasses =
-        getJavaClassnames(
-            javaCodeLines
-                .stream()
-                .filter(
-                    line ->
-                        line.contains(" class ")
-                            || line.contains(" interface ")
-                            || line.contains(" enum "))
-                .collect(Collectors.toList()));
-
+    List<String> innerClasses = new ArrayList<>();
+    for (String line : javaCodeLines) {
+      for (String classname : getJavaClassnames(line)) {
+        if (line.contains(" class " + classname)
+            || line.contains(" interface " + classname)
+            || line.contains(" enum " + classname)) {
+          innerClasses.add(classname);
+        }
+      }
+    }
     return getJavaClassnames(javaCodeLines)
         .stream()
         .filter(classname -> !innerClasses.contains(classname))
@@ -268,18 +284,23 @@ public class JavaClassAnalyzer {
 
   private List<String> getJavaClassnames(List<String> javaCodeLines) {
     Set<String> result = new HashSet<>();
+    for (String line : javaCodeLines) {
+      result.addAll(getJavaClassnames(line));
+    }
+    return ImmutableList.copyOf(result);
+  }
+
+  private List<String> getJavaClassnames(String javaCodeLine) {
+    Set<String> result = new HashSet<>();
     // Finds all words in CamelCase. We suppose that these words are
     // names of Java classes in the code.
-    final String classnameRegex = "\\s([A-Z][a-z0-9|A-Z]+)+[\\s|.]";
-
-    for (String line : javaCodeLines) {
-      Pattern pattern = Pattern.compile(classnameRegex);
-      Matcher matcher = pattern.matcher(line);
-      while (matcher.find()) {
-        String classname = matcher.group().trim().replace(".", "");
-        if (!JAVA_LANG_CLASSES.contains(classname)) {
-          result.add(classname);
-        }
+    final String classnameRegex = "\\s([A-Z][a-z0-9]+[a-z0-9A-Z]+)+[\\s|.|[\\(]]";
+    Pattern pattern = Pattern.compile(classnameRegex);
+    Matcher matcher = pattern.matcher(javaCodeLine.replace("(", "  "));
+    while (matcher.find()) {
+      String classname = matcher.group().trim().replace(".", "").replace("(", "");
+      if (!JAVA_LANG_CLASSES.contains(classname)) {
+        result.add(classname);
       }
     }
     return ImmutableList.copyOf(result);

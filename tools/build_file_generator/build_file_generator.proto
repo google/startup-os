@@ -9,6 +9,7 @@ message Import {
   string class_name = 2;
   bool whole_package_import = 3;
   bool is_static = 4;
+  string root_class = 5;
 }
 
 message JavaClass {
