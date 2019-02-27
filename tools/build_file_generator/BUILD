@@ -14,19 +14,13 @@ java_proto_library(
 
 java_library(
     name = "build_file_generator",
-    srcs = [
-        "BuildFileGenerator.java",
-        "BuildFileParser.java",
-        "BuildFileWriter.java",
-        "JavaClassAnalyzer.java",
-        "ProtoFileAnalyzer.java",
-        "ThirdPartyDepsAnalyzer.java",
-    ],
+    srcs = ["BuildFileGenerator.java"],
     deps = [
-        "build_file_generator_java_proto",
+        ":build_file_generator_java_proto",
+        ":build_file_parser",
+        ":java_class_analyzer",
+        ":proto_file_analyzer",
         "//common",
-        "//common:dagger_with_annotation_processor",
-        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
     ],
@@ -37,13 +31,93 @@ checkstyle_test(
     target = ":build_file_generator",
 )
 
+java_library(
+    name = "build_file_parser",
+    srcs = ["BuildFileParser.java"],
+    deps = [
+        ":build_file_generator_java_proto",
+        "//common",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+checkstyle_test(
+    name = "build_file_parser-checkstyle",
+    target = ":build_file_parser",
+)
+
+java_library(
+    name = "build_file_writer",
+    srcs = ["BuildFileWriter.java"],
+    deps = [
+        ":build_file_generator_java_proto",
+        "//common",
+        "//third_party/maven/com/google/flogger",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+checkstyle_test(
+    name = "build_file_writer-checkstyle",
+    target = ":build_file_writer",
+)
+
+java_library(
+    name = "java_class_analyzer",
+    srcs = ["JavaClassAnalyzer.java"],
+    deps = [
+        ":build_file_generator_java_proto",
+        "//common",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+checkstyle_test(
+    name = "java_class_analyzer-checkstyle",
+    target = ":java_class_analyzer",
+)
+
+java_library(
+    name = "proto_file_analyzer",
+    srcs = ["ProtoFileAnalyzer.java"],
+    deps = [
+        ":build_file_generator_java_proto",
+        "//common",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+checkstyle_test(
+    name = "proto_file_analyzer-checkstyle",
+    target = ":proto_file_analyzer",
+)
+
+java_library(
+    name = "third_party_deps_analyzer",
+    srcs = ["ThirdPartyDepsAnalyzer.java"],
+    deps = [
+        ":build_file_generator_java_proto",
+        "//common",
+        "//third_party/maven/com/google/flogger",
+        "//third_party/maven/com/google/guava",
+        "//third_party/maven/javax/inject:javax_inject",
+    ],
+)
+
+checkstyle_test(
+    name = "third_party_deps_analyzer-checkstyle",
+    target = ":third_party_deps_analyzer",
+)
+
 java_binary(
     name = "build_file_generator_tool",
     srcs = ["BuildFileGeneratorTool.java"],
     main_class = "com.google.startupos.tools.build_file_generator.BuildFileGeneratorTool",
     deps = [
         ":build_file_generator",
-        ":build_file_generator_java_proto",
+        ":build_file_writer",
         "//common",
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
@@ -61,8 +135,7 @@ java_binary(
     srcs = ["ThirdPartyDepsTool.java"],
     main_class = "com.google.startupos.tools.build_file_generator.ThirdPartyDepsTool",
     deps = [
-        ":build_file_generator",
-        ":build_file_generator_java_proto",
+        ":third_party_deps_analyzer",
         "//common",
         "//common:dagger_with_annotation_processor",
         "//third_party/maven/com/google/api:api_common",

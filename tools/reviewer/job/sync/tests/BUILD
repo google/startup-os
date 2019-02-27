@@ -12,6 +12,7 @@ java_test(
         "//common",
         "//third_party/maven/junit",
         "//tools/reviewer/job/sync:github_sync",
+        "//tools/reviewer/job/sync:line_number_converter",
     ],
 )
 
@@ -32,8 +33,10 @@ java_test(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/junit",
         "//third_party/maven/org/mockito:mockito_core",
+        "//tools/reviewer/job/sync:diff_converter",
         "//tools/reviewer/job/sync:full_github_pr_java_proto",
         "//tools/reviewer/job/sync:github_sync",
+        "//tools/reviewer/job/sync:reviewer_client",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
 )
