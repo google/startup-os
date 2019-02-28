@@ -1,12 +1,12 @@
+# THIS FILE IS AUTO-GENERATED
+
 package(default_visibility = ["//visibility:public"])
 
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
 java_binary(
     name = "test_tool",
-    srcs = [
-        "TestTool.java",
-    ],
+    srcs = ["TestTool.java"],
     main_class = "com.google.startupos.common.repo.tests.TestTool",
     deps = [
         "//common",
@@ -15,8 +15,6 @@ java_binary(
         "//common/repo:repo_java_proto",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
-        "//third_party/maven/org/slf4j:slf4j_simple",
-        "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
 )
 
@@ -26,26 +24,22 @@ checkstyle_test(
 )
 
 java_test(
-    name = "GitRepoTest",
-    srcs = [
-        "GitRepoTest.java",
-    ],
+    name = "git_repo_test",
+    srcs = ["GitRepoTest.java"],
     test_class = "com.google.startupos.common.repo.tests.GitRepoTest",
     deps = [
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//common/flags",
         "//common/repo",
         "//common/repo:repo_java_proto",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/guava",
-        "//third_party/maven/com/google/jimfs",
+        "//third_party/maven/javax/inject:javax_inject",
         "//third_party/maven/junit",
-        "//third_party/maven/org/mockito:mockito_core",
-        "//third_party/maven/org/objenesis",
     ],
 )
 
 checkstyle_test(
-    name = "GitRepoTest-checkstyle",
-    target = ":GitRepoTest",
+    name = "git_repo_test-checkstyle",
+    target = ":git_repo_test",
 )
