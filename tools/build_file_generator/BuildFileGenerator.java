@@ -316,7 +316,7 @@ public class BuildFileGenerator {
             .contains(
                 importProto.getPackage().replace(".", "/")
                     + "/"
-                    + importProto.getClassName()
+                    + importProto.getRootClass()
                     + ".class")) {
           thirdPartyTargets.add(thirdPartyDep);
         }
