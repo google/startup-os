@@ -1,3 +1,5 @@
+# THIS FILE IS AUTO-GENERATED
+
 package(default_visibility = ["//visibility:public"])
 
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
@@ -22,7 +24,6 @@ java_binary(
         "//common:dagger_with_annotation_processor",
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
-        "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",
         "//third_party/maven/javax/inject:javax_inject",
     ],
