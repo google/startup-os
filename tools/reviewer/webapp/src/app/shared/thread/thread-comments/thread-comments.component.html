@@ -6,8 +6,9 @@
     'edit-comment': isCommentEditingMap[commentIndex]
   }"
   *ngFor="let comment of thread.getCommentList(); let commentIndex = index;"
+  (click)="expandComment(comment)"
 >
-  <div class="header" (click)="expandComment(comment)">
+  <div class="header">
     <!-- Username and date of the comment -->
     <div class="username ellipsis">
       <span>{{ getUsername(comment) }}</span>
@@ -27,7 +28,6 @@
         [ngClass]="{
           'ellipsis': !commentExpandedMap[comment.getId()]
         }"
-        (click)="expandComment(comment)"
         fxFlex
       >
         <span>{{ comment.getContent() }}</span>

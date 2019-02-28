@@ -17,7 +17,7 @@ export class AuthService {
     private userService: UserService,
   ) {
     this.angularFireAuth.authState.subscribe(userData => {
-      this.isOnline = !!userData;
+      this.isOnline = !!userData && !!userData.email;
       if (this.isOnline) {
         this.userService.email = userData.email;
         this.firebaseStateService.connectDiffs();

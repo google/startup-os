@@ -67,24 +67,8 @@ export class FileChangesComponent implements OnInit, OnDestroy {
 
     // When "review file" checkbox is clicked
     this.fileReviewedCheckbox.valueChanges.subscribe(checkboxReviewed => {
-      const isFileReviewed: boolean = this.userService.isFileReviewed(
-        this.reviewer,
-        this.rightFile,
-      );
-      if (checkboxReviewed && !isFileReviewed) {
-        // Add current file to reviewed files
-        this.reviewer.addReviewed(this.rightFile);
-        this.reviewFile(checkboxReviewed);
-      } else if (isFileReviewed) {
-        // Add current file from reviewed files
-        let reviewedFiles: File[] = this.reviewer.getReviewedList();
-        reviewedFiles = reviewedFiles.filter(file => (
-          file.getFilenameWithRepo() !== this.rightFile.getFilenameWithRepo() ||
-          file.getCommitId() !== this.rightFile.getCommitId()
-        ));
-        this.reviewer.setReviewedList(reviewedFiles);
-        this.reviewFile(checkboxReviewed);
-      }
+      this.userService.toogleFileReview(checkboxReviewed, this.reviewer, this.rightFile);
+      this.diffUpdateService.reviewFile(this.diff, checkboxReviewed);
     });
   }
 
@@ -136,6 +120,7 @@ export class FileChangesComponent implements OnInit, OnDestroy {
       return;
     }
     this.diff = diff;
+    this.reviewer = this.userService.getReviewer(diff, this.userService.email);
 
     // Load changes from local server
     this.textDiffService.load(
@@ -159,16 +144,10 @@ export class FileChangesComponent implements OnInit, OnDestroy {
   }
 
   private setReviewedCheckbox(diff: Diff, file: File): void {
-    this.reviewer = this.userService.getReviewer(diff, this.userService.email);
     if (this.reviewer) {
       const isFileReviewed: boolean = this.userService.isFileReviewed(this.reviewer, file);
       this.fileReviewedCheckbox.setValue(isFileReviewed, { emitEvent: false });
     }
-  }
-
-  private reviewFile(fileReviewed: boolean): void {
-    this.diffUpdateService.reviewFile(this.diff, fileReviewed);
-    this.reviewer = this.userService.getReviewer(this.diff, this.userService.email);
   }
 
   // Converts file list to commit list

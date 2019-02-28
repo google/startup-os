@@ -8,7 +8,9 @@ export class UserService {
 
   // bob@mail.com -> bob
   getUsername(email: string): string {
-    return email.split('@')[0];
+    if (email) {
+      return email.split('@')[0];
+    }
   }
 
   // Request attention of the user, if it's not requested,
@@ -48,6 +50,27 @@ export class UserService {
       ) {
         return true;
       }
+    }
+  }
+
+  // Makes file reviewed or unreviewed depends on checkbox
+  toogleFileReview(
+    checkboxReviewed: boolean,
+    reviewer: Reviewer,
+    file: File,
+  ) {
+    const isFileReviewed: boolean = this.isFileReviewed(reviewer, file);
+    if (checkboxReviewed && !isFileReviewed) {
+      // Add current file to reviewed files
+      reviewer.addReviewed(file);
+    } else if (isFileReviewed) {
+      // Remove current file from reviewed files
+      let reviewedFiles: File[] = reviewer.getReviewedList();
+      reviewedFiles = reviewedFiles.filter(reviewedFile => (
+        reviewedFile.getFilenameWithRepo() !== file.getFilenameWithRepo() ||
+        reviewedFile.getCommitId() !== file.getCommitId()
+      ));
+      reviewer.setReviewedList(reviewedFiles);
     }
   }
 }
