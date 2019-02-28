@@ -17,6 +17,7 @@
 package com.google.startupos.tools.build_file_generator;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
@@ -56,6 +57,16 @@ public class BuildFileGenerator {
       "//third_party:java_grpc_library.bzl";
   private static final String JAVA_GRPC_LIBRARY_SYMBOL = "java_grpc_library";
 
+  private static final ImmutableList<String> BUILD_FILE_GENERATION_BLACKLIST =
+      ImmutableList.of(
+          // A `resources` folder can contain proto files. If the `resources` folder contains a
+          // BUILD file, it impossible to use proto files as a label in a `resources` argument.
+          "resources",
+          // It's a subfolder. BUILD file from them is in the parent folder.
+          "/tools/reviewer/aa/commands/checks",
+          // Currently, we don't support auto-generating BUIlD files for android projects
+          "/examples/android/activities");
+
   private FileUtils fileUtils;
   private ProtoFileAnalyzer protoFileAnalyzer;
   private JavaClassAnalyzer javaClassAnalyzer;
@@ -81,16 +92,24 @@ public class BuildFileGenerator {
 
   // Returns absolute paths where exists java classes and/or proto files.
   // These are places where we should create BUILD files.
-  private List<String> getPathsToCreateBuildFiles() {
-    List<String> result = new ArrayList<>();
+  private ImmutableList<String> getPathsToCreateBuildFiles() {
+    ImmutableList.Builder<String> result = ImmutableList.builder();
     try {
-      for (String item :
+      for (String path :
           fileUtils.listContentsRecursively(fileUtils.getCurrentWorkingDirectory())) {
-        if (fileUtils.folderExists(item)) {
-          List<String> folderContent = fileUtils.listContents(item);
+        if (fileUtils.folderExists(path)) {
+          List<String> folderContent = fileUtils.listContents(path);
           for (String fileName : folderContent) {
             if (fileName.endsWith(".java") || fileName.endsWith(".proto")) {
-              result.add(item);
+              boolean isPathToGenerationBuildFile = true;
+              for (String item : BUILD_FILE_GENERATION_BLACKLIST) {
+                if (path.endsWith(item)) {
+                  isPathToGenerationBuildFile = false;
+                }
+              }
+              if (isPathToGenerationBuildFile) {
+                result.add(path);
+              }
             }
           }
         }
@@ -98,14 +117,7 @@ public class BuildFileGenerator {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return result
-        .stream()
-        .filter(
-            path ->
-                !path.endsWith("resources")
-                    && !path.endsWith("/tools/reviewer/aa/commands/checks")
-                    && !path.endsWith("/examples/android/activities"))
-        .collect(Collectors.toList());
+    return result.build();
   }
 
   /* Returns Map<String, BuildFile> where
@@ -195,16 +207,18 @@ public class BuildFileGenerator {
             protoFile
                 .getImportsList()
                 .stream()
-                .map(
-                    protoImport ->
-                        "//"
-                            + protoImport.substring(0, protoImport.lastIndexOf('/'))
-                            + ":"
-                            + protoImport
-                                .substring(protoImport.lastIndexOf('/') + 1)
-                                .replace(".", "_"))
+                .map(this::getProtoLibraryNameFromProtoImportStatement)
                 .collect(Collectors.toList()))
         .build();
+  }
+
+  // Converts import proto statement to proto library name. E.g. `tools/reviewer/reviewer.proto`
+  // converts to `//tools/reviewer:reviewer_proto`
+  private String getProtoLibraryNameFromProtoImportStatement(String protoImport) {
+    return "//"
+        + protoImport.substring(0, protoImport.lastIndexOf('/'))
+        + ":"
+        + protoImport.substring(protoImport.lastIndexOf('/') + 1).replace(".", "_");
   }
 
   private JavaProtoLibrary getJavaProtoLibrary(String protoLibraryName) {
@@ -216,7 +230,7 @@ public class BuildFileGenerator {
 
   private JavaGrpcLibrary getJavaGrpcLibrary(ProtoFile protoFile) {
     return JavaGrpcLibrary.newBuilder()
-        .setName(convertUpperCamelToLowerUnderscore(protoFile.getFileName()) + "_java_grpc")
+        .setName(convertUpperCamelToLowerUnderscore(protoFile.getFileName()) + "_grpc")
         .addSrcs(":" + protoFile.getFileName() + "_proto")
         .addTags("checkstyle_ignore")
         .addDeps(":" + protoFile.getFileName() + "_java_proto")
@@ -349,22 +363,21 @@ public class BuildFileGenerator {
           || target.equals("//common:dagger_common_component")) {
         target = "//common:dagger_with_annotation_processor";
       }
+      // TODO: After //common/repo/BUILD file will be generated automatically change this. If
+      // `//common/repo:git_repo` exists then we could generalize to remove `_factory`.
       if (target.equals("//common/repo:git_repo_factory")) {
         target = "//common/repo:repo";
       }
-      if (target.contains("auth_service_grpc")) {
-        target = target.replace("auth_service_grpc", "auth_service_java_grpc");
-      }
       if (target.contains("code_review_service_grpc")) {
-        target = target.replace("code_review_service_grpc", "code_review_java_grpc");
+        target = target.replace("code_review_service_grpc", "code_review_grpc");
       }
       if (target.equals(":code_review_java_proto")
           && javaClass.getClassName().endsWith("Service")) {
-        result.add(":code_review_java_grpc");
+        result.add(":code_review_grpc");
       }
       if (target.equals(":auth_service_java_proto")
           && javaClass.getClassName().endsWith("Service")) {
-        result.add(":auth_service_java_grpc");
+        result.add(":auth_service_grpc");
       }
       if (!target.isEmpty()) {
         result.add(target);
@@ -372,7 +385,6 @@ public class BuildFileGenerator {
     }
     return result
         .stream()
-        .filter(item -> !item.endsWith("auth_service_grpc"))
         .filter(item -> !item.endsWith("code_review_service_grpc"))
         .sorted()
         .collect(Collectors.toList());
@@ -452,8 +464,8 @@ public class BuildFileGenerator {
     return result;
   }
 
-  private List<ProtoFile> getWholeProjectProtoFiles() {
-    List<ProtoFile> result = new ArrayList<>();
+  private ImmutableList<ProtoFile> getWholeProjectProtoFiles() {
+    ImmutableList.Builder<ProtoFile> result = ImmutableList.builder();
     try {
       List<String> protoPaths =
           fileUtils
@@ -467,7 +479,7 @@ public class BuildFileGenerator {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return result;
+    return result.build();
   }
 
   private String convertUpperCamelToLowerUnderscore(String string) {
