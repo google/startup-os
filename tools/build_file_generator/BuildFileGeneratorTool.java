@@ -23,6 +23,8 @@ import dagger.Component;
 import java.io.IOException;
 import javax.inject.Singleton;
 
+// TODO: Create rules that are not specific to StartupOS, and that we don't need to change if the
+// code will be changed.
 public class BuildFileGeneratorTool {
   public static void main(String[] args) throws IOException {
     BuildFileGeneratorToolComponent component =
