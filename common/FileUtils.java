@@ -227,7 +227,7 @@ public class FileUtils {
 
   /** Reads a text file. */
   public String readFile(String path) throws IOException {
-    return new String(Files.readAllBytes(fileSystem.getPath(expandHomeDirectory(path))));
+    return new String(Files.readAllBytes(fileSystem.getPath(expandHomeDirectory(path))), UTF_8);
   }
 
   /** Reads a text file, rethrows exceptions as unchecked. */
