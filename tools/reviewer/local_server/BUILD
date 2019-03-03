@@ -46,9 +46,9 @@ java_library(
         "//third_party/maven/io/grpc:grpc_core",
         "//third_party/maven/io/grpc:grpc_netty",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
-        "//tools/reviewer/local_server/service:auth_service_grpc",
+        "//tools/reviewer/local_server/service:auth_service_java_grpc",
         "//tools/reviewer/local_server/service:auth_service_java_proto",
-        "//tools/reviewer/local_server/service:code_review_grpc",
+        "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
 )

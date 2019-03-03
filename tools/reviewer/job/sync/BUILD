@@ -137,7 +137,7 @@ java_library(
         ":full_github_pr_java_proto",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/io/grpc:grpc_core",
-        "//tools/reviewer/local_server/service:code_review_grpc",
+        "//tools/reviewer/local_server/service:code_review_java_grpc",
         "//tools/reviewer/local_server/service:code_review_java_proto",
     ],
 )

@@ -31,14 +31,14 @@ java_proto_library(
 )
 
 java_grpc_library(
-    name = "auth_service_grpc",
+    name = "auth_service_java_grpc",
     srcs = [":auth_service_proto"],
     tags = ["checkstyle_ignore"],
     deps = [":auth_service_java_proto"],
 )
 
 java_grpc_library(
-    name = "code_review_grpc",
+    name = "code_review_java_grpc",
     srcs = [":code_review_proto"],
     tags = ["checkstyle_ignore"],
     deps = [":code_review_java_proto"],
@@ -48,7 +48,7 @@ java_library(
     name = "auth_service",
     srcs = ["AuthService.java"],
     deps = [
-        ":auth_service_grpc",
+        ":auth_service_java_grpc",
         ":auth_service_java_proto",
         "//common",
         "//common/flags",
@@ -70,7 +70,7 @@ java_library(
     srcs = ["CodeReviewService.java"],
     deps = [
         ":auth_service",
-        ":code_review_grpc",
+        ":code_review_java_grpc",
         ":code_review_java_proto",
         "//common",
         "//common:text_difference_java_proto",

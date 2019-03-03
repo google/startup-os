@@ -230,7 +230,7 @@ public class BuildFileGenerator {
 
   private JavaGrpcLibrary getJavaGrpcLibrary(ProtoFile protoFile) {
     return JavaGrpcLibrary.newBuilder()
-        .setName(convertUpperCamelToLowerUnderscore(protoFile.getFileName()) + "_grpc")
+        .setName(convertUpperCamelToLowerUnderscore(protoFile.getFileName()) + "_java_grpc")
         .addSrcs(":" + protoFile.getFileName() + "_proto")
         .addTags("checkstyle_ignore")
         .addDeps(":" + protoFile.getFileName() + "_java_proto")
@@ -369,15 +369,12 @@ public class BuildFileGenerator {
         target = "//common/repo:repo";
       }
       if (target.contains("code_review_service_grpc")) {
-        target = target.replace("code_review_service_grpc", "code_review_grpc");
+        target = target.replace("_service_grpc", "_java_grpc");
       }
-      if (target.equals(":code_review_java_proto")
-          && javaClass.getClassName().endsWith("Service")) {
-        result.add(":code_review_grpc");
-      }
-      if (target.equals(":auth_service_java_proto")
-          && javaClass.getClassName().endsWith("Service")) {
-        result.add(":auth_service_grpc");
+      if (target.endsWith("_java_proto")
+          && javaClass.getClassName().endsWith("Service")
+          && isProtoFileContainService(target, protoFiles)) {
+        result.add(target.replace("_proto", "_grpc"));
       }
       if (!target.isEmpty()) {
         result.add(target);
@@ -386,6 +383,7 @@ public class BuildFileGenerator {
     return result
         .stream()
         .filter(item -> !item.endsWith("code_review_service_grpc"))
+        .filter(item -> !item.endsWith("auth_service_grpc"))
         .sorted()
         .collect(Collectors.toList());
   }
@@ -435,6 +433,16 @@ public class BuildFileGenerator {
       result.add(dep);
     }
     return result.stream().distinct().collect(Collectors.toList());
+  }
+
+  private boolean isProtoFileContainService(String target, List<ProtoFile> protoFiles) {
+    String protoFileName = target.replace(":", "").replace("_java_proto", "");
+    for (ProtoFile protoFile : protoFiles) {
+      if (protoFile.getFileName().equals(protoFileName) && protoFile.getServicesCount() != 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // TODO: Add supporting glob function
