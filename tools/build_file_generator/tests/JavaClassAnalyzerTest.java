@@ -75,12 +75,18 @@ public class JavaClassAnalyzerTest {
     JavaClass expectedJavaClass =
         JavaClass.newBuilder()
             .setPackage("com.test.tests")
-            .addImport(Import.newBuilder().setPackage("org.junit").setClassName("Test").build())
+            .addImport(
+                Import.newBuilder()
+                    .setPackage("org.junit")
+                    .setClassName("Test")
+                    .setRootClass("Test")
+                    .build())
             .addImport(
                 Import.newBuilder()
                     .setPackage("org.junit")
                     .setClassName("Assert")
                     .setIsStatic(true)
+                    .setRootClass("Assert")
                     .build())
             .setClassName("TestClass")
             .setIsTestClass(true)

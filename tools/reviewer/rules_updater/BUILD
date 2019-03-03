@@ -1,3 +1,7 @@
+# THIS FILE IS AUTO-GENERATED
+
+package(default_visibility = ["//visibility:public"])
+
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
 java_binary(

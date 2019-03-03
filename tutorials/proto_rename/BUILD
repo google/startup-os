@@ -1,4 +1,6 @@
-package(default_visibility = ["//visibility:private"])
+# THIS FILE IS AUTO-GENERATED
+
+package(default_visibility = ["//visibility:public"])
 
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
@@ -14,17 +16,13 @@ java_proto_library(
 
 java_binary(
     name = "person_tool",
-    srcs = [
-        "PersonTool.java",
-    ],
-    main_class = "com.google.startupos.tutorials.protorename.PersonTool",
+    srcs = ["PersonTool.java"],
+    main_class = "com.google.startupos.tutorials.proto_rename.PersonTool",
     deps = [
         ":person_java_proto",
-        ":person_proto",
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//third_party/maven/com/google/guava",
-        "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
     ],
 )

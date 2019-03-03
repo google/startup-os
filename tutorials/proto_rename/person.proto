@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.google.startupos.tutorials.protorename;
+package com.google.startupos.tutorials.proto_rename;
 
 option java_package = "com.google.startupos.tutorials.proto_rename";
 option java_outer_classname = "Protos";
