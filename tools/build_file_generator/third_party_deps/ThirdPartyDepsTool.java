@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.build_file_generator;
+package com.google.startupos.tools.build_file_generator.third_party_deps;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
@@ -32,7 +32,8 @@ import javax.inject.Singleton;
  */
 public class ThirdPartyDepsTool {
 
-  private static final String PATH_TO_ZIP = "tools/build_file_generator/third_party_deps.zip";
+  private static final String PATH_TO_ZIP =
+      "tools/build_file_generator/third_party_deps/third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
 
   public static void main(String[] args) throws IOException {

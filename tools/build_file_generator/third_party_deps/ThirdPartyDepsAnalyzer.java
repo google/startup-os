@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.startupos.tools.build_file_generator;
+package com.google.startupos.tools.build_file_generator.third_party_deps;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
