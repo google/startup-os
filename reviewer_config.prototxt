@@ -79,7 +79,7 @@ user {
   first_name: "Valerii"
   last_name: "Fedorenko"
   email: "valerii.fedorenko.ua@gmail.com"
-  image_url: "https://ibb.co/LCNRWTK"
+  image_url: "https://i.ibb.co/MRBS4zd/foto.png"
   social_network {
     type: LINKEDIN
     url: "https://www.linkedin.com/in/valerii-fedorenko-616541146/"
