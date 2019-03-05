@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option java_package = "com.google.startupos.tools.reviewer.proxy";
+
+option java_outer_classname = "AuthProtos";
+
+package com.google.startupos.tools.reviewer.proxy;
+
+service CASProxyService {
+  rpc downloadFile(FileDownloadRequest) returns (stream FileDownloadResponse);
+  rpc uploadFile(stream FileUploadRequest) returns (FileUploadResponse);
+}
+
+message FileDownloadRequest {
+  string idToken = 1;
+  string sha256 = 2;
+}
+
+message FileDownloadResponse { bytes content = 1; }
+
+message FileUploadRequest {
+  string idToken = 1;
+  bytes content = 2;
+}
+
+message FileUploadResponse { string sha256 = 1; }
