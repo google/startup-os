@@ -14,14 +14,11 @@ export class ChangesService {
     rightBlockLines: BlockLine[],
     textDiff: TextDiff,
   ): void {
-    this.tempFixChangesLineNumber(textDiff.getLeftDiffLineList());
-    this.tempFixChangesLineNumber(textDiff.getRightDiffLineList());
+    this.addPlaceholders(textDiff.getLeftDiffLineList(), leftBlockLines);
+    this.addPlaceholders(textDiff.getRightDiffLineList(), rightBlockLines);
 
     this.applyChanges(textDiff.getLeftDiffLineList(), leftBlockLines);
     this.applyChanges(textDiff.getRightDiffLineList(), rightBlockLines);
-
-    this.addPlaceholders(textDiff.getLeftDiffLineList(), leftBlockLines);
-    this.addPlaceholders(textDiff.getRightDiffLineList(), rightBlockLines);
 
     if (leftBlockLines.length !== rightBlockLines.length) {
       throw new Error(
@@ -53,21 +50,6 @@ Right lines: ${rightBlockLines.length}`,
           0,
           this.lineService.createPlaceholder(),
         );
-      }
-    });
-  }
-
-  // TODO: remove the method, when the issue will be fix
-  tempFixChangesLineNumber(diffLines: DiffLine[]): void {
-    let delimiter: number = 0;
-    diffLines.forEach(diffLine => {
-      switch (diffLine.getType()) {
-        case ChangeType.DELETE:
-        case ChangeType.ADD:
-          diffLine.setDiffLineNumber(diffLine.getDiffLineNumber() - delimiter);
-          break;
-        case ChangeType.LINE_PLACEHOLDER:
-          delimiter++;
       }
     });
   }
