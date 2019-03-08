@@ -67,6 +67,7 @@ public class Proxy {
           StreamObserver<FileUploadResponse> responseObserver) {
         this.responseObserver = responseObserver;
         this.protoClient = protoClient;
+        // TODO(vmax): use a real file instead and write directly to disk
         this.buffer = new ByteArrayOutputStream();
         this.accessManager = accessManager;
       }
@@ -99,13 +100,14 @@ public class Proxy {
         String sha256 = Hashing.sha256().hashBytes(buffer.toByteArray()).toString();
         File tempFile;
         try {
+          // TODO(vmax): add to cache as soon as uploaded
           tempFile = File.createTempFile(sha256, ".tmp");
         } catch (IOException e) {
           e.printStackTrace();
           responseObserver.onError(e);
           return;
         }
-        try(FileOutputStream outputStream = new FileOutputStream(tempFile)) {
+        try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
           outputStream.write(buffer.toByteArray());
           outputStream.close();
 
@@ -179,7 +181,9 @@ public class Proxy {
     String serviceAccountJson = args[0];
 
     Server grpcServer =
-        ServerBuilder.forPort(6000).addService(new CasService(serviceAccountJson, new PublicAccess())).build();
+        ServerBuilder.forPort(6000)
+            .addService(new CasService(serviceAccountJson, new PublicAccess()))
+            .build();
     grpcServer.start();
     grpcServer.awaitTermination();
     Runtime.getRuntime()
