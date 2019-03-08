@@ -134,7 +134,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
       // If whole file is opened, we have only 1 group
       this.sections = [{
         startLineNumber: 0,
-        endLineNumber: leftBlockLines.length,
+        endLineNumber: this.amountOfLines,
       }];
     }
 
