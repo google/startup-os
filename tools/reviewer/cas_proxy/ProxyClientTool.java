@@ -17,10 +17,10 @@
 package com.google.startupos.tools.reviewer.cas_proxy;
 
 import com.google.protobuf.ByteString;
-import com.google.startupos.tools.reviewer.proxy.AuthProtos;
-import com.google.startupos.tools.reviewer.proxy.CASProxyServiceGrpc;
-import com.google.startupos.tools.reviewer.proxy.CASProxyServiceGrpc.CASProxyServiceBlockingStub;
-import com.google.startupos.tools.reviewer.proxy.CASProxyServiceGrpc.CASProxyServiceStub;
+import com.google.startupos.tools.reviewer.cas_proxy.AuthProtos;
+import com.google.startupos.tools.reviewer.cas_proxy.CASProxyServiceGrpc;
+import com.google.startupos.tools.reviewer.cas_proxy.CASProxyServiceGrpc.CASProxyServiceBlockingStub;
+import com.google.startupos.tools.reviewer.cas_proxy.CASProxyServiceGrpc.CASProxyServiceStub;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -32,7 +32,13 @@ import java.util.concurrent.Executors;
 
 public class ProxyClientTool {
 
-  public static void uploadFile(CASProxyServiceStub nonBlockingStub, String fileName)
+  public static final String GRPC_HOST = "localhost";
+  public static final int GRPC_PORT = 6000;
+  public static final int BUFFER_SIZE = 1024;
+
+  // TODO: Daggerize this
+
+  public static void uploadFile(CASProxyServiceStub nonBlockingStub, String absFilename)
       throws Exception {
     StreamObserver<AuthProtos.FileUploadRequest> req =
         nonBlockingStub.uploadFile(
@@ -43,8 +49,8 @@ public class ProxyClientTool {
               }
 
               @Override
-              public void onError(java.lang.Throwable t) {
-                t.printStackTrace();
+              public void onError(Throwable throwable) {
+                throwable.printStackTrace();
               }
 
               @Override
@@ -53,10 +59,10 @@ public class ProxyClientTool {
               }
             });
 
-    File upl = Paths.get(fileName).toFile();
-    FileInputStream stream = new FileInputStream(upl);
+    File fileToUpload = Paths.get(absFilename).toFile();
+    FileInputStream stream = new FileInputStream(fileToUpload);
 
-    byte[] chunk = new byte[1024];
+    byte[] chunk = new byte[BUFFER_SIZE];
 
     int bytesRead;
 
@@ -89,7 +95,7 @@ public class ProxyClientTool {
 
   public static void main(String[] args) throws Exception {
     ManagedChannel channel =
-        ManagedChannelBuilder.forAddress("localhost", 6000).usePlaintext().build();
+        ManagedChannelBuilder.forAddress(GRPC_HOST, GRPC_PORT).usePlaintext().build();
     CASProxyServiceBlockingStub stub = CASProxyServiceGrpc.newBlockingStub(channel);
     CASProxyServiceStub nonBlockingStub = CASProxyServiceGrpc.newStub(channel);
 

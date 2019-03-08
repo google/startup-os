@@ -27,5 +27,10 @@ public class PublicAccess implements AccessManager {
   public boolean hasWriteAccess(String token) {
     return true;
   }
+
+  @Override
+  public boolean hasDeleteAccess(String token, String sha256) {
+    return true;
+  }
 }
 

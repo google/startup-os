@@ -19,11 +19,10 @@ package com.google.startupos.tools.reviewer.cas_proxy;
 import com.google.common.hash.Hashing;
 import com.google.protobuf.ByteString;
 import com.google.startupos.common.firestore.FirestoreProtoClient;
-import com.google.startupos.tools.reviewer.proxy.AuthProtos.FileDownloadRequest;
-import com.google.startupos.tools.reviewer.proxy.AuthProtos.FileDownloadResponse;
-import com.google.startupos.tools.reviewer.proxy.AuthProtos.FileUploadRequest;
-import com.google.startupos.tools.reviewer.proxy.AuthProtos.FileUploadResponse;
-import com.google.startupos.tools.reviewer.proxy.CASProxyServiceGrpc;
+import com.google.startupos.tools.reviewer.cas_proxy.AuthProtos.FileDownloadRequest;
+import com.google.startupos.tools.reviewer.cas_proxy.AuthProtos.FileDownloadResponse;
+import com.google.startupos.tools.reviewer.cas_proxy.AuthProtos.FileUploadRequest;
+import com.google.startupos.tools.reviewer.cas_proxy.AuthProtos.FileUploadResponse;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -44,10 +43,15 @@ public class Proxy {
 
   static class AccessDeniedException extends Exception {}
 
-  static class Service extends CASProxyServiceGrpc.CASProxyServiceImplBase {
+  static class CasService extends CASProxyServiceGrpc.CASProxyServiceImplBase {
     private FirestoreProtoClient client;
     private AccessManager accessManager;
     private HashMap<String, String> fileCache = new HashMap<>();
+
+    public CasService(String serviceAccountPath, AccessManager accessManager) {
+      this.client = new FirestoreProtoClient(serviceAccountPath);
+      this.accessManager = accessManager;
+    }
 
     static class FileUploader implements StreamObserver<FileUploadRequest> {
 
@@ -96,7 +100,12 @@ public class Proxy {
         File tempFile;
         try {
           tempFile = File.createTempFile(sha256, ".tmp");
-          FileOutputStream outputStream = new FileOutputStream(tempFile);
+        } catch (IOException e) {
+          e.printStackTrace();
+          responseObserver.onError(e);
+          return;
+        }
+        try(FileOutputStream outputStream = new FileOutputStream(tempFile)) {
           outputStream.write(buffer.toByteArray());
           outputStream.close();
 
@@ -160,19 +169,6 @@ public class Proxy {
         StreamObserver<FileUploadResponse> responseObserver) {
       return new FileUploader(this.client, this.accessManager, responseObserver);
     }
-
-    public Service(String serviceAccountPath, AccessManager accessManager) {
-      this.client = new FirestoreProtoClient(serviceAccountPath);
-      if (accessManager == null) {
-        this.accessManager = new PublicAccess();
-      } else {
-        this.accessManager = accessManager;
-      }
-    }
-
-    public Service(String serviceAccountPath) {
-      this(serviceAccountPath, null);
-    }
   }
 
   public static void main(String[] args) throws Exception {
@@ -183,7 +179,7 @@ public class Proxy {
     String serviceAccountJson = args[0];
 
     Server grpcServer =
-        ServerBuilder.forPort(6000).addService(new Service(serviceAccountJson)).build();
+        ServerBuilder.forPort(6000).addService(new CasService(serviceAccountJson, new PublicAccess())).build();
     grpcServer.start();
     grpcServer.awaitTermination();
     Runtime.getRuntime()

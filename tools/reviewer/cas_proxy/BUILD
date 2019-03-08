@@ -25,7 +25,7 @@ java_binary(
         "Proxy.java",
         "PublicAccess.java",
     ],
-    main_class = "com.google.startupos.tools.reviewer.proxy.CASProxy",
+    main_class = "com.google.startupos.tools.reviewer.cas_proxy.CASProxy",
     deps = [
         ":grpc_proxy_service_proto",
         "//common/firestore",
@@ -45,7 +45,7 @@ checkstyle_test(
 java_binary(
     name = "cas_proxy_client_tool",
     srcs = ["ProxyClientTool.java"],
-    main_class = "com.google.startupos.tools.reviewer.proxy.CASProxyClientTool",
+    main_class = "com.google.startupos.tools.reviewer.cas_proxy.CASProxyClientTool",
     deps = [
         ":grpc_proxy_service_proto",
         "//common/firestore",
