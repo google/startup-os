@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 readonly ZIPNAME=third_party_deps.zip
 

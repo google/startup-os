@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 readonly FILENAME=third_party_deps.prototxt
 readonly ZIPNAME=third_party_deps.zip
@@ -16,18 +16,8 @@ done
 # get third party target names
 third_party_folder_path="$repo_path/third_party"
 declare -a third_party_targets
-for entry in $(find $third_party_folder_path -follow); do
-  if [[ $entry =~ .*/BUILD ]]; then
-    while read line; do
-      if [[ $line =~ .*name[[:space:]]'='[[:space:]]* ]]; then
-        name=${line//name = \"/}
-        name=${name//\",/}
-        third_party_target=${entry//$repo_path/\/}
-        third_party_target=${third_party_target//\/BUILD/}
-        third_party_targets=("${third_party_targets[@]}" "$third_party_target:$name")
-      fi
-    done <$entry
-  fi
+for entry in $(bazel query //third_party/...); do
+  third_party_targets=("${third_party_targets[@]}" "$entry")
 done
 
 rm -f $FILENAME
