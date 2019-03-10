@@ -48,8 +48,7 @@ import javax.inject.Inject;
 // TODO: Add the support full classnames(package + classname) inside the code. It will allow
 // auto-generating BUILD file for `tools.reviewer.job.sync.tests.DiffConverterTest`
 public class BuildFileGenerator {
-  private static final String THIRD_PARTY_ZIP_PATH =
-      "tools/build_file_generator/third_party_deps/third_party_deps.zip";
+  private static final String THIRD_PARTY_ZIP_PATH = "third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
   private static final String CHECKSTYLE_BZL_FILE_PATH = "//tools/checkstyle:checkstyle.bzl";
   private static final String CHECKSTYLE_SYMBOL = "checkstyle_test";
