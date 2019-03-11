@@ -14,9 +14,9 @@ npm publish
 ```
 
 If you're not admin:
-* Ask one of the npm package admins to publish
+* Ask one of the npm package admins to publish  
 or
-* Ask one of the npm package admins to add you as package admin
+* Ask one of the npm package admins to add you as package admin  
 [Managing npm team access](https://docs.npmjs.com/managing-team-access-to-org-packages)
 
 ## workspacerun apps
