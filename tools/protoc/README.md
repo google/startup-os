@@ -1,7 +1,7 @@
 # How to create proto functions
 
 ## Installation 
-Run `npm install` to install node modules
+Run from this folder: `npm install` to install node modules of protoc.  
 
 ## Setting
 A project must contain `proto.json` file with required paths.  
@@ -21,17 +21,10 @@ Example:
 ```
 
 ## Running
-Run `node protoc.js <relative path to your project>` to generate proto functions.  
-E.g. `node protoc.js hasadna/projects/angular-proto-firestore`  
+Run from your project: `workspacerun protoc` to generate proto functions. [More info](https://github.com/google/startup-os/blob/master/tools/workspacerun/README.md)  
 
-No need to set path to your project, if you run the script from project root.  
-`node /path/to/script/protoc.js`  
-
-## Workspace apps runner
-You can run protoc with `workspacerun`:
-```
-workspacerun protoc
-```
+Alternative way, if you need to generate proto functions from outside of project root.  
+Example: `node /path/to/script/protoc.js hasadna/projects/angular-proto-firestore`
 
 ## Supported platforms
 Supported on Linux and Mac only.

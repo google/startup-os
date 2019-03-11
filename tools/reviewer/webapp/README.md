@@ -19,7 +19,7 @@ Optional:
 
 Run `npm install` to install npm modules  
 
-Run `npm run protoc` to generate proto functions.  
+Run `npm run protoc` to generate proto functions. [More info](https://github.com/google/startup-os/blob/master/tools/protoc/README.md).
 
 ## Running the server locally
 Run `npm start` to start a dev server. Navigate to `http://localhost:4200/`  
