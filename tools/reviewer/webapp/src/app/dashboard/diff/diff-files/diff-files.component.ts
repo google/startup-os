@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, zip } from 'rxjs';
 
 import { Diff, File, Reviewer, Thread } from '@/core/proto';
 import {
@@ -169,28 +169,26 @@ export class DiffFilesComponent implements OnInit, OnChanges {
     }
 
     // Load all files
-    Observable
-      .zip(...subscribers)
-      .subscribe((textDiffReturns: TextDiffReturn[]) => {
-        for (const textDiffReturn of textDiffReturns) {
-          const filename: string = textDiffReturn.leftFile.getFilenameWithRepo();
-          this.changeFileMap[filename] = {
-            file: textDiffReturn.rightFile,
-            data: textDiffReturn,
-            sections: this.changeFileMap[filename].sections,
-            isExpanded: expand ? true : this.changeFileMap[filename].isExpanded,
-            checkbox: this.getReviewCheckbox(textDiffReturn.rightFile),
-          };
-        }
-        this.isExpanded = true;
-        this.isLoading = false;
-      }, error => {
-        if (error.message === 'File not found') {
-          this.notificationService.error(
-            'Fallback server does not contain some files from the list',
-          );
-        }
-        this.isLoading = false;
-      });
+    zip(...subscribers).subscribe((textDiffReturns: TextDiffReturn[]) => {
+      for (const textDiffReturn of textDiffReturns) {
+        const filename: string = textDiffReturn.leftFile.getFilenameWithRepo();
+        this.changeFileMap[filename] = {
+          file: textDiffReturn.rightFile,
+          data: textDiffReturn,
+          sections: this.changeFileMap[filename].sections,
+          isExpanded: expand ? true : this.changeFileMap[filename].isExpanded,
+          checkbox: this.getReviewCheckbox(textDiffReturn.rightFile),
+        };
+      }
+      this.isExpanded = true;
+      this.isLoading = false;
+    }, error => {
+      if (error.message === 'File not found') {
+        this.notificationService.error(
+          'Fallback server does not contain some files from the list',
+        );
+      }
+      this.isLoading = false;
+    });
   }
 }

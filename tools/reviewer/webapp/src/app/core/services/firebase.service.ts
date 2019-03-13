@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import {
   AngularFirestore,
   AngularFirestoreCollection,
-} from 'angularfire2/firestore';
-import { Observable } from 'rxjs/Observable';
+} from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Diff } from '@/core/proto';
 import { EncodingService } from './encoding.service';
@@ -27,27 +28,29 @@ export class FirebaseService {
 
   getDiffs(): Observable<Diff[]> {
     return this.diffs
-      .snapshotChanges()
-      .map(actions => {
-        return actions.map(action => {
-          const firebaseElement = action.payload.doc.data() as FirebaseElement;
-          return this.convertFirebaseElementToDiff(firebaseElement);
-        });
-      });
+      .snapshotChanges().pipe(
+        map(actions => {
+          return actions.map(action => {
+            const firebaseElement = action.payload.doc.data() as FirebaseElement;
+            return this.convertFirebaseElementToDiff(firebaseElement);
+          });
+        }),
+      );
   }
 
   getDiff(id: string): Observable<Diff> {
     return this.diffs
       .doc(id)
-      .snapshotChanges()
-      .map(action => {
-        const firebaseElement = action.payload.data() as FirebaseElement;
-        if (firebaseElement === undefined) {
-          // Diff not found
-          return;
-        }
-        return this.convertFirebaseElementToDiff(firebaseElement);
-      });
+      .snapshotChanges().pipe(
+        map(action => {
+          const firebaseElement = action.payload.data() as FirebaseElement;
+          if (firebaseElement === undefined) {
+            // Diff not found
+            return;
+          }
+          return this.convertFirebaseElementToDiff(firebaseElement);
+        }),
+      );
   }
 
   updateDiff(diff: Diff): Observable<void> {
@@ -60,14 +63,8 @@ export class FirebaseService {
       this.diffs
         .doc(diff.getId().toString())
         .update(this.convertDiffToFirebaseElement(diff))
-        .then(() => {
-          // Accessed
-          observer.next();
-        })
-        .catch(() => {
-          // Permission denied
-          observer.error();
-        });
+        .then(() => observer.next())
+        .catch(() => observer.error());
     });
   }
 
@@ -76,14 +73,8 @@ export class FirebaseService {
       this.diffs
         .doc(id)
         .delete()
-        .then(() => {
-          // Accessed
-          observer.next();
-        })
-        .catch(() => {
-          // Permission denied
-          observer.error();
-        });
+        .then(() => observer.next())
+        .catch(() => observer.error());
     });
   }
 

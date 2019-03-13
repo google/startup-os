@@ -1,5 +1,8 @@
 .titlebar {
   >.title {
     margin-right: 30px;
+    >span {
+      margin-right: 5px;
+    }
   }
 }
