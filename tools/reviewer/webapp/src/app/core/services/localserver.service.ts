@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs';
 
 import {
@@ -26,7 +26,7 @@ export class LocalserverService {
   server: string = LOCAL_SERVER;
 
   constructor(
-    private http: Http,
+    private http: HttpClient,
     private encodingService: EncodingService,
     private notificationService: NotificationService,
   ) { }
@@ -43,8 +43,7 @@ export class LocalserverService {
 
       // Send the request to local server
       this.http
-        .get(this.server + '/get_diff_files?request=' + requestBase64)
-        .map(response => response.text())
+        .get(this.server + '/get_diff_files?request=' + requestBase64, { responseType: 'text' })
         .subscribe(diffFilesResponseBase64 => {
           // Decode response
           const diffFilesResponseBinary: Uint8Array = this.encodingService
@@ -83,8 +82,7 @@ export class LocalserverService {
 
       // Send the request to local server
       this.http
-        .get(this.server + '/get_text_diff?request=' + requestBase64)
-        .map(response => response.text())
+        .get(this.server + '/get_text_diff?request=' + requestBase64, { responseType: 'text' })
         .subscribe(textDiffResponseBase64 => {
           // Decode response
           const textDiffResponseBinary: Uint8Array = this.encodingService

@@ -1,16 +1,12 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-# compiled output
-/dist
-/tmp
-/out-tsc
-/src/app/core/proto
-.firebase
-
-# dependencies
 /node_modules
+/dist
+/src/app/core/proto
 
-# IDEs and editors
+# extra
+chrome-profiler-events.json
+speed-measure-plugin.json
 /.idea
 .project
 .classpath
@@ -18,23 +14,18 @@
 *.launch
 .settings/
 *.sublime-workspace
-
-# IDE - VSCode
-/.vscode
-
-# misc
+.vscode/*
+.history/*
 /.sass-cache
 /connect.lock
 /coverage
 /libpeerconnection.log
 npm-debug.log
+yarn-error.log
 testem.log
 /typings
-
-# e2e
-/e2e/*.js
-/e2e/*.map
-
-# System Files
 .DS_Store
 Thumbs.db
+/tmp
+/out-tsc
+.firebase

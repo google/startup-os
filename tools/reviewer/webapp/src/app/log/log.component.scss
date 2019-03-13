@@ -5,6 +5,9 @@ $border: 1px solid #c1c1c1;
     border-bottom: $border;
     >.title {
       margin-right: 30px;
+      >span {
+        margin-left: 5px;
+      }
       >.diff {
         outline: none;
         cursor: pointer;

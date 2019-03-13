@@ -1,13 +1,13 @@
 import { FactoryProvider, NgModule } from '@angular/core';
+import { AngularFireModule, FirebaseOptionsToken } from '@angular/fire';
+import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
+import { AngularFireDatabase } from '@angular/fire/database';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import firebase from '@firebase/app';
-import { AngularFireModule, FirebaseApp } from 'angularfire2';
-import { AngularFireAuth, AngularFireAuthModule } from 'angularfire2/auth';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFirestoreModule } from 'angularfire2/firestore';
 
 const CustomFirebaseInit: FactoryProvider = {
-  provide: FirebaseApp,
+  provide: FirebaseOptionsToken,
   deps: [],
   useFactory: () => {
     const reviewerConfig = platformBrowserDynamic().injector.get('reviewerConfig');

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, Subscription } from 'rxjs';
-import { of } from 'rxjs/observable/of';
+import { Observable, of, Subject, Subscription } from 'rxjs';
 
 import { Diff } from '@/core/proto';
 import { FirebaseService } from './firebase.service';

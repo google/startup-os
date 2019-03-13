@@ -10,9 +10,7 @@
     ><span [ngClass]="{
       'username': true,
       'bold': diff.getAuthor().getNeedsAttention()
-    }">
-      {{ getAuthor() }}
-    </span></user-popup>
+    }">{{ getAuthor() }}</span></user-popup>
   </div>
   <diff-status [diff]="diff"></diff-status>
   <div class="buttons" fxFlex>

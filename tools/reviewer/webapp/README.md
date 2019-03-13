@@ -5,8 +5,8 @@ To set up your development environment, follow these steps:
 
 ## Installation
 Install these:
-* [node](https://nodejs.org/) version 8.11.4  
-* [npm](https://www.npmjs.com/) version 5.6.0  
+* [node](https://nodejs.org/) version 10.15.3  
+* [npm](https://www.npmjs.com/) version 6.4.1  
 * [google-protobuf](https://github.com/protocolbuffers/protobuf/releases), version 3.6.1  
 
 (Installation of exact versions is not required, but recommended. We can't guarantee that webapp will work properly with different versions.)
@@ -17,7 +17,7 @@ Optional:
 * [firebase](https://firebase.google.com/docs/hosting/quickstart), to be able to deploy.  
 * [angular](https://angular.io/), to use `ng` features.  
 
-Run `npm install` to install npm modules  
+Run `npm ci` to install npm modules  
 
 Run `npm run protoc` to generate proto functions. [More info](https://github.com/google/startup-os/blob/master/tools/protoc/README.md).
 

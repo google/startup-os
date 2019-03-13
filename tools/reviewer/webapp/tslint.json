@@ -63,7 +63,6 @@
     "prefer-conditional-expression": true,
     "strict-boolean-expressions": false,
     "strict-type-predicates": false,
-    "deprecation": true,
     "eofline": true,
     "indent": [true, "spaces", 2],
     "arrow-return-shorthand": true,
