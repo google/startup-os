@@ -7,6 +7,9 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_jar")
 
 load("//third_party/maven:package-lock.bzl", "maven_dependencies")
 
+RULES_JVM_EXTERNAL_TAG = "1.0"
+RULES_JVM_EXTERNAL_SHA = "48e0f1aab74fabba98feb8825459ef08dcc75618d381dff63ec9d4dd9860deaa"
+
 maven_dependencies()
 
 http_archive(
@@ -56,9 +59,9 @@ grpc_java_repositories(
 # Google Maven Repository
 http_archive(
     name = "gmaven_rules",
-    sha256 = "da44017f6d7bc5148a73cfd9bf8dbb1ee5a1301a596edad9181c5dc7648076ae",
-    strip_prefix = "gmaven_rules-20180513-1",
-    url = "https://github.com/bazelbuild/gmaven_rules/archive/20180513-1.tar.gz",
+    strip_prefix = "rules_jvm_external-%s" % RULES_JVM_EXTERNAL_TAG,
+    sha256 = RULES_JVM_EXTERNAL_SHA,
+    url = "https://github.com/bazelbuild/rules_jvm_external/archive/%s.zip" % RULES_JVM_EXTERNAL_TAG,
 )
 
 load("@gmaven_rules//:gmaven.bzl", "gmaven_rules")
