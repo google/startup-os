@@ -1,3 +1,5 @@
+# THIS FILE IS AUTO-GENERATED
+
 package(default_visibility = ["//visibility:public"])
 
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
@@ -13,25 +15,28 @@ java_proto_library(
 )
 
 java_library(
-    name = "repo",
-    srcs = [
-        "GitRepo.java",
-        "Repo.java",
-    ],
+    name = "git_repo",
+    srcs = ["GitRepo.java"],
     deps = [
+        ":repo",
         ":repo_java_proto",
         "//common",
-        "//common:auto_factory",
-        "//common:auto_factory_plugin",
-        "//common:dagger_with_annotation_processor",
-        "//third_party/maven/com/google/auto/value:auto_value",
-        "//third_party/maven/com/google/auto/value:auto_value_annotations",
-        "//third_party/maven/com/google/auto/value:auto_value_plugin",
+        "//third_party/maven/com/google/auto/factory:auto_factory",
         "//third_party/maven/com/google/guava",
-        "//third_party/maven/com/jcraft:jsch",
-        "//third_party/maven/javax/annotation:javax_annotation_api",
-        "//third_party/maven/javax/inject:javax_inject",
-        "//tools/reviewer/local_server/service:code_review_java_proto",
+    ],
+)
+
+checkstyle_test(
+    name = "git_repo-checkstyle",
+    target = ":git_repo",
+)
+
+java_library(
+    name = "repo",
+    srcs = ["Repo.java"],
+    deps = [
+        ":repo_java_proto",
+        "//third_party/maven/com/google/guava",
     ],
 )
 

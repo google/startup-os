@@ -1,22 +1,22 @@
+# THIS FILE IS AUTO-GENERATED
+
 package(default_visibility = ["//visibility:public"])
 
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
-
-exports_files(["global_registry.prototxt"])
 
 proto_library(
     name = "reviewer_proto",
     srcs = ["reviewer.proto"],
 )
 
-java_proto_library(
-    name = "reviewer_java_proto",
-    deps = [":reviewer_proto"],
-)
-
 proto_library(
     name = "reviewer_registry_proto",
     srcs = ["reviewer_registry.proto"],
+    deps = ["//tools/reviewer:reviewer_proto"],
+)
+
+java_proto_library(
+    name = "reviewer_java_proto",
     deps = [":reviewer_proto"],
 )
 
@@ -36,47 +36,39 @@ checkstyle_test(
 )
 
 java_test(
-    name = "GlobalRegistryTest",
-    srcs = [
-        "GlobalRegistryTest.java",
-    ],
-    data = ["//tools/reviewer:global_registry.prototxt"],
+    name = "global_registry_test",
+    srcs = ["GlobalRegistryTest.java"],
     test_class = "com.google.startupos.tools.reviewer.GlobalRegistryTest",
     deps = [
-        ":reviewer_java_proto",
         ":reviewer_registry_java_proto",
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//third_party/maven/com/google/guava",
-        "//third_party/maven/javax/annotation:javax_annotation_api",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/junit",
     ],
 )
 
 checkstyle_test(
-    name = "GlobalRegistryTest-checkstyle",
-    target = ":GlobalRegistryTest",
+    name = "global_registry_test-checkstyle",
+    target = ":global_registry_test",
 )
 
 java_test(
-    name = "ReviewerConfigTest",
-    srcs = [
-        "ReviewerConfigTest.java",
-    ],
-    data = ["//:reviewer_config.prototxt"],
+    name = "reviewer_config_test",
+    srcs = ["ReviewerConfigTest.java"],
     test_class = "com.google.startupos.tools.reviewer.ReviewerConfigTest",
     deps = [
         ":reviewer_java_proto",
-        ":reviewer_registry_java_proto",
         "//common",
         "//common:dagger_with_annotation_processor",
-        "//third_party/maven/com/google/guava",
-        "//third_party/maven/javax/annotation:javax_annotation_api",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
+        "//third_party/maven/junit",
     ],
 )
 
 checkstyle_test(
-    name = "ReviewerConfigTest-checkstyle",
-    target = ":ReviewerConfigTest",
+    name = "reviewer_config_test-checkstyle",
+    target = ":reviewer_config_test",
 )
