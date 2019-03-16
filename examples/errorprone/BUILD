@@ -1,7 +1,26 @@
+# THIS FILE IS AUTO-GENERATED
+
+package(default_visibility = ["//visibility:public"])
+
 load("//tools/checkstyle:checkstyle.bzl", "checkstyle_test")
 
-java_plugin(
-    name = "StringFmtInPrintMethodsCheckPlugin",
+java_library(
+    name = "protobuf_check",
+    srcs = ["ProtobufCheck.java"],
+    deps = [
+        "//third_party/maven/com/google/auto/service:auto_service",
+        "//third_party/maven/com/google/errorprone:error_prone_ant",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
+    ],
+)
+
+checkstyle_test(
+    name = "protobuf_check-checkstyle",
+    target = ":protobuf_check",
+)
+
+java_library(
+    name = "string_fmt_in_print_methods_check",
     srcs = ["StringFmtInPrintMethodsCheck.java"],
     deps = [
         "//third_party/maven/com/google/auto/service:auto_service",
@@ -11,38 +30,18 @@ java_plugin(
 )
 
 checkstyle_test(
-    name = "StringFmtInPrintMethodsCheckPlugin-checkstyle",
-    target = ":StringFmtInPrintMethodsCheckPlugin",
-)
-
-java_plugin(
-    name = "ProtobufCheckPlugin",
-    srcs = ["ProtobufCheck.java"],
-    deps = [
-        "//third_party/maven/com/google/auto/service:auto_service",
-        "//third_party/maven/com/google/errorprone:error_prone_ant",
-        "//third_party/maven/com/google/guava",
-        "//third_party/maven/com/google/protobuf:protobuf_java",
-    ],
-)
-
-checkstyle_test(
-    name = "ProtobufCheckPlugin-checkstyle",
-    target = ":ProtobufCheckPlugin",
+    name = "string_fmt_in_print_methods_check-checkstyle",
+    target = ":string_fmt_in_print_methods_check",
 )
 
 java_binary(
-    name = "Hello",
+    name = "hello",
     srcs = ["Hello.java"],
     main_class = "com.google.startupos.examples.errorprone.Hello",
-    plugins = [
-        ":StringFmtInPrintMethodsCheckPlugin",
-        ":ProtobufCheckPlugin",
-    ],
-    deps = ["//examples/proto_vs_json:data_java_proto"],
+    deps = ["//third_party/maven/com/google/flogger:flogger_system_backend"],
 )
 
 checkstyle_test(
-    name = "Hello-checkstyle",
-    target = ":Hello",
+    name = "hello-checkstyle",
+    target = ":hello",
 )
