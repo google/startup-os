@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 public class RemoteServer {
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
-  private static int HTTP_PORT = 8080;
   private static final int HTTP_STATUS_CODE_OK = 200;
   private static final int HTTP_STATUS_CODE_UNAUTHORIZED = 403;
 
@@ -189,7 +188,7 @@ public class RemoteServer {
   }
 
   private RemoteServer(String clientId, String clientSecret) throws IOException {
-    httpServer = HttpServer.create(new InetSocketAddress(RemoteServer.HTTP_PORT), 0);
+    httpServer = HttpServer.create(new InetSocketAddress(Integer.parseInt(System.getenv("PORT"))), 0);
     httpServer.createContext("/gcode", new InitialAuthHandler(clientId, clientSecret));
     httpServer.createContext("/refresh", new RefreshTokenHandler(clientId, clientSecret));
   }
