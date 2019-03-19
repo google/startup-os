@@ -371,6 +371,9 @@ public class BuildFileGenerator {
       if (target.contains("code_review_service_grpc")) {
         target = target.replace("_service_grpc", "_java_grpc");
       }
+      if (target.contains("auth_service_grpc")) {
+        target = target.replace("_grpc", "_java_grpc");
+      }
       if (target.endsWith("_java_proto")
           && javaClass.getClassName().endsWith("Service")
           && isProtoFileContainService(target, protoFiles)) {
