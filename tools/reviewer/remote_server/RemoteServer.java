@@ -42,8 +42,8 @@ import java.net.URL;
 import java.util.stream.Collectors;
 
 public class RemoteServer {
-  @FlagDesc(name = "port", description = "HTTP port to run server on")
-  private static final Flag<Integer> port = Flag.create(-1);
+  @FlagDesc(name = "port", description = "HTTP port to run server on", required = true)
+  private static final Flag<Integer> port = Flag.create(8080);
 
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
