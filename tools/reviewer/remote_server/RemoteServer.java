@@ -185,8 +185,7 @@ public class RemoteServer {
   }
 
   private RemoteServer(String clientId, String clientSecret) throws IOException {
-    httpServer =
-        HttpServer.create(new InetSocketAddress(port.get()), 0);
+    httpServer = HttpServer.create(new InetSocketAddress(port.get()), 0);
     httpServer.createContext("/gcode", new InitialAuthHandler(clientId, clientSecret));
     httpServer.createContext("/refresh", new RefreshTokenHandler(clientId, clientSecret));
   }
