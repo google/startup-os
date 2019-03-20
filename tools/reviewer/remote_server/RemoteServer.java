@@ -22,9 +22,12 @@ import com.google.common.flogger.FluentLogger;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
-import com.google.startupos.tools.reviewer.local_server.Protos.AuthResponse;
-import com.google.startupos.tools.reviewer.local_server.Protos.InitialAuthRequest;
-import com.google.startupos.tools.reviewer.local_server.Protos.RefreshTokenRequest;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.flags.Flags;
+import com.google.startupos.tools.reviewer.remote_server.Protos.AuthResponse;
+import com.google.startupos.tools.reviewer.remote_server.Protos.InitialAuthRequest;
+import com.google.startupos.tools.reviewer.remote_server.Protos.RefreshTokenRequest;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -39,6 +42,9 @@ import java.net.URL;
 import java.util.stream.Collectors;
 
 public class RemoteServer {
+  @FlagDesc(name = "port", description = "HTTP port to run server on")
+  private static final Flag<Integer> port = Flag.create(-1);
+
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   private static final int HTTP_STATUS_CODE_OK = 200;
@@ -55,7 +61,6 @@ public class RemoteServer {
     }
   }
 
-  @SuppressWarnings("Duplicates")
   private static String httpPost(URL url, String data) throws Exception {
     byte[] postDataBytes = data.getBytes(UTF_8);
     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -80,16 +85,16 @@ public class RemoteServer {
     byte[] responseJson = JsonFormat.printer().print(proto).getBytes();
 
     exchange.sendResponseHeaders(HTTP_STATUS_CODE_OK, responseJson.length);
-    try (OutputStream os = exchange.getResponseBody()) {
-      os.write(responseJson);
+    try (OutputStream outputStream = exchange.getResponseBody()) {
+      outputStream.write(responseJson);
     }
   }
 
   private static AuthResponse parseGoogleResponse(String response)
       throws InvalidProtocolBufferException {
-    AuthResponse.Builder resp = AuthResponse.newBuilder();
-    JsonFormat.parser().ignoringUnknownFields().merge(response, resp);
-    return resp.build();
+    AuthResponse.Builder responseProto = AuthResponse.newBuilder();
+    JsonFormat.parser().ignoringUnknownFields().merge(response, responseProto);
+    return responseProto.build();
   }
 
   static class InitialAuthHandler implements HttpHandler {
@@ -111,7 +116,7 @@ public class RemoteServer {
           code, this.clientId, this.clientSecret);
     }
 
-    private AuthResponse codeExchangeRequest(InitialAuthRequest request) throws Exception {
+    private AuthResponse requestTokensFromGoogle(InitialAuthRequest request) throws Exception {
       URL url = new URL(TOKEN_URL);
       String response = httpPost(url, buildExchangeParams(request.getCode()));
       return parseGoogleResponse(response);
@@ -119,19 +124,15 @@ public class RemoteServer {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange
-          .getResponseHeaders()
-          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.atInfo().log("Handling initial auth request");
 
-        InitialAuthRequest.Builder req = InitialAuthRequest.newBuilder();
-        JsonFormat.parser().merge(getPostParamsString(httpExchange), req);
+        InitialAuthRequest.Builder request = InitialAuthRequest.newBuilder();
+        JsonFormat.parser().merge(getPostParamsString(httpExchange), request);
         AuthResponse response = null;
 
         try {
-          response = codeExchangeRequest(req.build());
+          response = requestTokensFromGoogle(request.build());
         } catch (Exception e) {
           e.printStackTrace();
           httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_UNAUTHORIZED, -1);
@@ -165,10 +166,6 @@ public class RemoteServer {
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-      httpExchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-      httpExchange
-          .getResponseHeaders()
-          .add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.atInfo().log("Handling refresh token request");
 
@@ -189,7 +186,7 @@ public class RemoteServer {
 
   private RemoteServer(String clientId, String clientSecret) throws IOException {
     httpServer =
-        HttpServer.create(new InetSocketAddress(Integer.parseInt(System.getenv("PORT"))), 0);
+        HttpServer.create(new InetSocketAddress(port.get()), 0);
     httpServer.createContext("/gcode", new InitialAuthHandler(clientId, clientSecret));
     httpServer.createContext("/refresh", new RefreshTokenHandler(clientId, clientSecret));
   }
@@ -199,6 +196,8 @@ public class RemoteServer {
   }
 
   public static void main(String[] args) throws IOException {
+    Flags.parseCurrentPackage(args);
+
     RemoteServer server =
         new RemoteServer(
             System.getenv("REMOTESERVER_CLIENT_ID"), System.getenv("REMOTESERVER_CLIENT_SECRET"));

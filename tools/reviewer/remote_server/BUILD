@@ -16,6 +16,7 @@ java_binary(
     main_class = "com.google.startupos.tools.reviewer.remote_server.RemoteServer",
     deps = [
         ":messages_java_proto",
+        "//common/flags",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/com/google/protobuf:protobuf_java",

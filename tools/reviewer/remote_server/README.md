@@ -4,8 +4,8 @@
 
 
 ## Initial Auth
-1. Client authenticates with Google and gets `{code: <ex_code>}` message
-1. Client posts `{code: <ex_code>}` message to `/gcode` endpoint
+1. Client authenticates with Google and gets `{code: <exchange_code>}` message
+1. Client posts `{code: <exchange_code>}` message to `/gcode` endpoint
 1. Server exchange code for `accessToken`/`refreshToken` pair 
 1. `/gcode` endpoint responds with `accessToken`/`refreshToken` pair
 

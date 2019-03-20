@@ -2,16 +2,14 @@ syntax = "proto3";
 
 package com.google.startupos.tools.reviewer.remove_server;
 
-option java_package = "com.google.startupos.tools.reviewer.local_server";
+option java_package = "com.google.startupos.tools.reviewer.remote_server";
 option java_outer_classname = "Protos";
 
 message InitialAuthRequest { string code = 1; }
 
-message RefreshTokenRequest { string refreshToken = 1; }
+message RefreshTokenRequest { string refresh_token = 1; }
 
 message AuthResponse {
-  // fields are named witb snake_case to parse
-  // Google-provided response
   string access_token = 1;
   string refresh_token = 2;
 }
