@@ -15,3 +15,20 @@
 1. Server requests new `accessToken` by providing `refreshToken` 
 and `clientId`/`clientSecret` pair
 1. `/refresh` endpoint responds with new `accessToken`
+
+
+# Testing locally
+
+1. Serve `index.html` in this directory locally. The easiest way to do it is using `python`:
+
+`python2 -m SimpleHTTPServer 7000`
+-or-
+`python3 -m http.server 7000`
+
+Specifying port *is* important because there’s a 
+whitelist set in Google Cloud’s console.
+
+
+2. Go to `localhost:7000`, open Google Chrome Dev Tools, 
+authenticate with Google and watch for `{code: <>}` message 
+in dev console

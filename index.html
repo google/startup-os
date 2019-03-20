@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Log-in with Google</title>
+  <style>
+    .google {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+    .gbutton {
+      cursor: pointer;
+      // display: none;
+    }
+    button {
+      padding: 5px 10px;
+    }
+    .chrome {
+      display: none;
+      font-family: Arial;
+      font-size: 18px;
+      color: #7e7e7e;
+      margin-top: 10px;
+    }
+  </style>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script src="https://apis.google.com/js/client:platform.js?onload=onLoadCallback" async defer></script>
+
+    <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.8.1/firebase-auth.js"></script>
+  <script>
+
+    window.onLoadCallback = function(){
+      window.auth2 = gapi.auth2.init({
+        client_id: '160348327132-4rhk97ket6mgv86gapqlscjs27i0pigh.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/cloud-platform'
+      });
+    };
+
+    $(function () {
+
+      function signInCallback(credential) {
+        console.log('SignInCallback: ' + JSON.stringify(credential));
+     }
+
+      $('#login').click(function () {
+        window.auth2.grantOfflineAccess().then(signInCallback);
+      });
+
+      $('#logout').click(function () {
+        window.auth2.signOut();
+      });
+
+    });
+  </script>
+</head>
+<body>
+  <div class="google">
+    <div class="gbutton" id="login">
+      <button>
+        Log-in with google
+      </button>
+    </div>
+    <div class="gbutton" id="logout">
+      <button>
+        Log Out
+      </button>
+    </div>
+    <div class="chrome" id="chrome">For best support please open Chrome</div>
+  </div>
+</body>
+</html>
