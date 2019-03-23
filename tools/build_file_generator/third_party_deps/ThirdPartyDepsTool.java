@@ -28,7 +28,7 @@ import javax.inject.Singleton;
  * Path to the zip-archive: "<project_root>/third_party_deps.zip"
  *
  * Usage:
- * bazel run //tools/build_file_generator:third_party_deps_tool
+ * bazel run //tools/build_file_generator/third_party_deps:third_party_deps_tool
  */
 public class ThirdPartyDepsTool {
 
