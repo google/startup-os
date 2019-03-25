@@ -66,15 +66,19 @@ public class ThirdPartyDepsAnalyzer {
 
   private ImmutableList<String> getThirdPartyTargets(String repoName) {
     final String rootPackageName = repoName.replace("-", "");
-    final String absBuildFilePath =
-        fileUtils.joinPaths(
-            fileUtils.getCurrentWorkingDirectory(),
-            this.getClass()
-                .getPackage()
-                .getName()
-                .split(rootPackageName + ".")[1]
-                .replace(".", "/"),
-            "BUILD");
+    String packageName = this.getClass().getPackage().getName();
+    final String absBuildFilePath;
+    if (packageName.contains(rootPackageName + ".")) {
+      absBuildFilePath =
+          fileUtils.joinPaths(
+              fileUtils.getCurrentWorkingDirectory(),
+              packageName.split(rootPackageName + ".")[1].replace(".", "/"),
+              "BUILD");
+    } else {
+      absBuildFilePath =
+          fileUtils.joinPaths(
+              fileUtils.getCurrentWorkingDirectory(), packageName.replace(".", "/"), "BUILD");
+    }
     BuildFile buildFile = buildFileParser.getBuildFile(absBuildFilePath);
     if (buildFile.getJavaBinaryCount() == 0) {
       log.atWarning().log("%s file doesn't contain any java_binaries", absBuildFilePath);
