@@ -91,8 +91,8 @@ java_library(
         ":google_cloud_core_grpc",
         "//third_party/maven/com/google/api:api_common",
         "//third_party/maven/com/google/api:gax_grpc",
+        "//third_party/maven/com/google/api/grpc:proto_google_cloud_firestore_v1",
         "//third_party/maven/com/google/api/grpc:proto_google_cloud_firestore_v1beta1",
-        "//third_party/maven/com/google/auto/value:auto_value",
         "//third_party/maven/io/grpc:grpc_auth",
         "//third_party/maven/io/grpc:grpc_netty_shaded",
         "//third_party/maven/io/grpc:grpc_stub",
@@ -117,6 +117,7 @@ java_library(
         ":google_cloud_core",
         ":google_cloud_core_http",
         "//third_party/maven/com/google/apis:google_api_services_storage",
+        "//third_party/maven/com/google/http_client:google_http_client_apache",
         "//third_party/maven/javax/annotation:javax_annotation_api",
     ],
 )

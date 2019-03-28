@@ -13,6 +13,24 @@ java_library(
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/j2objc:j2objc_annotations",
+        "//third_party/maven/io/opencensus:opencensus_api",
+        "//third_party/maven/io/opencensus:opencensus_contrib_http_util",
+    ],
+)
+
+java_library(
+    name = "google_http_client_apache",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/http_client/google_http_client_apache",
+    ],
+    runtime_deps = [
+        ":google_http_client",
         "//third_party/maven/org/apache/httpcomponents:httpclient",
     ],
 )

@@ -21,7 +21,7 @@ dependencies:
     google:
       lang: java
       modules: [ "auth-library-credentials", "auth-library-oauth2-http" ]
-      version: "0.12.0"
+      version: "0.13.0"
 
   com.google.auto:
     auto-common:
@@ -54,10 +54,10 @@ dependencies:
       modules: [ "cloud-core", "cloud-core-grpc" ]
     google-cloud-firestore:
       lang: java
-      version: "0.74.0-beta"
+      version: "0.82.0-beta"
     google-cloud-storage:
       lang: java
-      version: "1.62.0"
+      version: "1.64.0"
 
   com.google.code.findbugs:
     jsr305:
@@ -73,7 +73,7 @@ dependencies:
     dagger:
       lang: java
       modules: [ "", "compiler" ]
-      version: "2.20"
+      version: "2.21"
 
   com.google.errorprone:
     error_prone_ant:
@@ -83,7 +83,7 @@ dependencies:
   com.google.firebase:
     firebase-admin:
       lang: java
-      version: "6.6.0"
+      version: "6.7.0"
 
   com.google.flogger:
     flogger:
@@ -120,7 +120,7 @@ dependencies:
   com.puppycrawl.tools:
     checkstyle:
       lang: java
-      version: "8.15"
+      version: "8.18"
 
   com.squareup.okhttp:
     okhttp:
@@ -130,7 +130,7 @@ dependencies:
   com.squareup.okio:
     okio:
       lang: java
-      version: "1.16.0"
+      version: "1.17.3"
 
   commons-logging:
     commons-logging:
@@ -141,20 +141,20 @@ dependencies:
     grpc:
       lang: java
       modules: [ "core", "netty", "protobuf", "services", "stub" ]
-      version: "1.16.1"
+      version: "1.18.0"
 
   io.netty:
     netty-codec-http2:
       lang: java
-      version: "4.1.32.Final"
+      version: "4.1.33.Final"
     netty-tcnative-boringssl-static:
       lang: java
-      version: "2.0.20.Final"
+      version: "2.0.22.Final"
 
   io.opencensus:
     opencensus-contrib-grpc-metrics:
       lang: java
-      version: "0.18.0"
+      version: "0.19.2"
 
   javax.annotation:
     javax.annotation-api:
@@ -182,15 +182,15 @@ dependencies:
   org.apache.httpcomponents:
     fluent-hc:
       lang: java
-      version: "4.5.6"
+      version: "4.5.7"
 
   org.apache.pdfbox:
     fontbox:
       lang: java
-      version: "2.0.13"
+      version: "2.0.14"
     pdfbox:
       lang: java
-      version: "2.0.13"
+      version: "2.0.14"
 
   org.javassist:
     javassist:
@@ -210,7 +210,7 @@ dependencies:
   org.mockito:
     mockito-core:
       lang: java
-      version: "2.23.4"
+      version: "2.25.0"
 
   org.objenesis:
     objenesis:
@@ -220,9 +220,9 @@ dependencies:
   org.slf4j:
     slf4j-simple:
       lang: java
-      version: "1.7.25"
+      version: "1.7.26"
 
   org.yaml:
     snakeyaml:
       lang: java
-      version: "1.23"
+      version: "1.24"
