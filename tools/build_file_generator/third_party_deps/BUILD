@@ -21,6 +21,8 @@ checkstyle_test(
     target = ":third_party_deps_analyzer",
 )
 
+# '%START%' and '%END%' are markers for 'third_party_deps_updater.sh' script.
+# Don't delete it while 'third_party_deps_updater.sh' script is used.
 THIRD_PARTY_DEPS_GROUP = [
     # %START%
     "//third_party/maven/com/google/api:api_common",
