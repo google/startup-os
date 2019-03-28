@@ -63,7 +63,9 @@ export class FirebaseService {
       this.diffs
         .doc(diff.getId().toString())
         .update(this.convertDiffToFirebaseElement(diff))
-        .then(() => observer.next())
+        .then(() => {
+          observer.next();
+        })
         .catch(() => observer.error());
     });
   }

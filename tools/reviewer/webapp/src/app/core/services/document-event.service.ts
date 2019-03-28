@@ -8,7 +8,7 @@ export class DocumentEventService {
 
   constructor() {
     document.onmouseup = (event: MouseEvent) => {
-      if (event.which === 1) { // left mouse button
+      if (event.button === 0) { // left mouse button
         this.mouseup.next();
       }
     };

@@ -11,7 +11,6 @@ if (environment.production) {
 }
 
 GlobalRegistry.getConfig().subscribe(reviewerConfig => {
-  platformBrowserDynamic([
-    { provide: 'reviewerConfig', useValue: reviewerConfig.toObject() },
-  ]).bootstrapModule(AppModule);
+  window['reviewerConfig'] = reviewerConfig.toObject();
+  platformBrowserDynamic().bootstrapModule(AppModule);
 });

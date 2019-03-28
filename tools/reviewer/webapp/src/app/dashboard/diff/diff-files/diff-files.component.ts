@@ -81,6 +81,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
 
       // When checkbox is clicked
       checkbox.valueChanges.subscribe(checkboxReviewed => {
+        this.reviewer = this.userService.getReviewer(this.diff, this.userService.email);
         this.userService.toogleFileReview(checkboxReviewed, this.reviewer, file);
         this.diffUpdateService.reviewFile(this.diff, checkboxReviewed);
       });
