@@ -58,7 +58,7 @@ export class UserService {
     checkboxReviewed: boolean,
     reviewer: Reviewer,
     file: File,
-  ) {
+  ): void {
     const isFileReviewed: boolean = this.isFileReviewed(reviewer, file);
     if (checkboxReviewed && !isFileReviewed) {
       // Add current file to reviewed files

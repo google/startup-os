@@ -3,7 +3,6 @@ import {
   ElementRef,
   Input,
   OnInit,
-  Renderer,
 } from '@angular/core';
 
 // Focuses an element
@@ -13,14 +12,11 @@ import {
 export class FocusDirective implements OnInit {
   @Input('focus') isFocused: boolean;
 
-  constructor(
-    private hostElement: ElementRef,
-    private renderer: Renderer,
-  ) { }
+  constructor(private hostElement: ElementRef) { }
 
   ngOnInit() {
     if (this.isFocused) {
-      this.renderer.invokeElementMethod(this.hostElement.nativeElement, 'focus');
+      this.hostElement.nativeElement.focus();
     }
   }
 }

@@ -3,14 +3,15 @@ import { AngularFireModule, FirebaseOptionsToken } from '@angular/fire';
 import { AngularFireAuth, AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import firebase from '@firebase/app';
+
+import { Config } from './config.interface';
 
 const CustomFirebaseInit: FactoryProvider = {
   provide: FirebaseOptionsToken,
   deps: [],
   useFactory: () => {
-    const reviewerConfig = platformBrowserDynamic().injector.get('reviewerConfig');
+    const reviewerConfig: Config = window['reviewerConfig'];
     return firebase.initializeApp(reviewerConfig);
   },
 };

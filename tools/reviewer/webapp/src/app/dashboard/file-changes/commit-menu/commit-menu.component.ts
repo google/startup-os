@@ -131,7 +131,7 @@ export class CommitMenuComponent implements OnInit, OnDestroy {
 
   // When user clicks on drag element
   mousedown(event: MouseEvent, dragElement: DragElement): void {
-    if (event.which === 1) { // left mouse button
+    if (event.button === 0) { // left mouse button
       if (this.menuOffset === undefined) {
         // We gets mouse x on whole screen, but we need x on menu component only
         this.menuOffset = event.pageX - event.layerX - dragElement.x;
