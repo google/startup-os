@@ -55,9 +55,7 @@ public class PatchCommand implements AaCommand {
 
     String branchName = String.format("D%d", diffNumber.get());
     try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
+      fileUtils.listContents(workspacePath).stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(path -> fileUtils.folderExists(path))
           .forEach(

@@ -46,8 +46,7 @@ public class GithubPatch {
   public GithubPatch(String diffPatchStr) {
     newlineSymbols = getMatches(diffPatchStr, NEW_LINES_PATTERN);
     diffHunkHeaders =
-        getMatches(diffPatchStr, DIFF_HUNKS_PATTERN)
-            .stream()
+        getMatches(diffPatchStr, DIFF_HUNKS_PATTERN).stream()
             .map(DiffHunkHeader::new)
             .collect(Collectors.toList());
   }

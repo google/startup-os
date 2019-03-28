@@ -310,8 +310,7 @@ public class GitRepo implements Repo {
   public boolean isMerged(String branch) {
     CommandResult commandResult = runCommand("branch --merged master");
     List<String> mergedBranches =
-        splitLines(commandResult.stdout)
-            .stream()
+        splitLines(commandResult.stdout).stream()
             .map(line -> line.trim().replaceAll("\\*", ""))
             .collect(Collectors.toList());
     return mergedBranches.contains(branch);
@@ -337,8 +336,7 @@ public class GitRepo implements Repo {
   public ImmutableList<String> listBranches() {
     CommandResult commandResult = runCommand("branch -a");
     return ImmutableList.copyOf(
-        splitLines(commandResult.stdout)
-            .stream()
+        splitLines(commandResult.stdout).stream()
             .map(branch -> branch.substring(2))
             .collect(Collectors.toList()));
   }

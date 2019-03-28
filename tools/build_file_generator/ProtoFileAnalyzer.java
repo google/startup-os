@@ -113,8 +113,7 @@ public class ProtoFileAnalyzer {
 
   private ImmutableList<String> getImports(String fileContent) {
     return ImmutableList.copyOf(
-        getLinesStartWith(fileContent, "import", "")
-            .stream()
+        getLinesStartWith(fileContent, "import", "").stream()
             .map(line -> line.replace("import ", "").replace("\"", "").replace(";", ""))
             .collect(Collectors.toList()));
   }

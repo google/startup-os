@@ -87,9 +87,7 @@ public class SubmitCommand implements AaCommand {
     final String diffBranchName = String.format("D%s", diffBuilder.getId());
 
     try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
+      fileUtils.listContents(workspacePath).stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(
@@ -98,8 +96,7 @@ public class SubmitCommand implements AaCommand {
                 GitRepo repo = this.gitRepoFactory.create(path);
 
                 boolean hasDiffBranch =
-                    repo.listBranches()
-                        .stream()
+                    repo.listBranches().stream()
                         .anyMatch(branchName -> branchName.equals(diffBranchName));
 
                 if (!hasDiffBranch) {

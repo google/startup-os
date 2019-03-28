@@ -72,8 +72,7 @@ public class ThirdPartyDepsAnalyzer {
   }
 
   private List<String> getJavaClassesFromJar(String path) throws IOException {
-    return runCommand("jar tf " + path, "")
-        .stream()
+    return runCommand("jar tf " + path, "").stream()
         .filter(item -> item.endsWith(".class"))
         .filter(item -> !item.contains("$"))
         .collect(Collectors.toList());

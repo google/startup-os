@@ -85,8 +85,7 @@ public class DiffConverter {
     ImmutableList.Builder<ReviewComment> result = ImmutableList.builder();
     ImmutableList<Thread> codeThreadsByRepo =
         ImmutableList.copyOf(
-            codeThreads
-                .stream()
+            codeThreads.stream()
                 .filter(thread -> thread.getRepoId().equals(repoName))
                 .collect(Collectors.toList()));
 
@@ -179,8 +178,7 @@ public class DiffConverter {
     ImmutableList.Builder<IssueComment> result = ImmutableList.builder();
     ImmutableList<Thread> diffThreadsByRepo =
         ImmutableList.copyOf(
-            diffThreads
-                .stream()
+            diffThreads.stream()
                 .filter(thread -> thread.getRepoId().equals(repoName))
                 .collect(Collectors.toList()));
     for (Thread thread : diffThreadsByRepo) {

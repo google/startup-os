@@ -192,9 +192,7 @@ public class BuildFileGenerator {
 
   private List<String> getFilesByExtension(String packagePath, String fileExtension)
       throws IOException {
-    return fileUtils
-        .listContents(packagePath)
-        .stream()
+    return fileUtils.listContents(packagePath).stream()
         .filter(file -> file.endsWith(fileExtension))
         .collect(Collectors.toList());
   }
@@ -204,9 +202,7 @@ public class BuildFileGenerator {
         .setName(protoFile.getFileName() + "_proto")
         .addSrcs(protoFile.getFileName())
         .addAllDeps(
-            protoFile
-                .getImportsList()
-                .stream()
+            protoFile.getImportsList().stream()
                 .map(this::getProtoLibraryNameFromProtoImportStatement)
                 .collect(Collectors.toList()))
         .build();
@@ -296,9 +292,7 @@ public class BuildFileGenerator {
     String resourcesPath = fileUtils.joinPaths(packagePath, "resources");
     if (fileUtils.fileOrFolderExists(resourcesPath)) {
       try {
-        return fileUtils
-            .listContents(resourcesPath)
-            .stream()
+        return fileUtils.listContents(resourcesPath).stream()
             .map(resource -> "resources/" + resource)
             .collect(Collectors.toList());
       } catch (IOException e) {
@@ -352,8 +346,7 @@ public class BuildFileGenerator {
         // If the class exists in several third party deps we choose the smallest one
         // since the other ones probably contain it
         target =
-            thirdPartyTargets
-                .stream()
+            thirdPartyTargets.stream()
                 .sorted(Comparator.comparing(ThirdPartyDep::getJavaClassCount))
                 .collect(Collectors.toList())
                 .get(0)
@@ -474,9 +467,7 @@ public class BuildFileGenerator {
     ImmutableList.Builder<ProtoFile> result = ImmutableList.builder();
     try {
       List<String> protoPaths =
-          fileUtils
-              .listContentsRecursively(fileUtils.getCurrentWorkingDirectory())
-              .stream()
+          fileUtils.listContentsRecursively(fileUtils.getCurrentWorkingDirectory()).stream()
               .filter(p -> p.endsWith(".proto"))
               .collect(Collectors.toList());
       for (String protoPath : protoPaths) {

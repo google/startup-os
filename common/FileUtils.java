@@ -205,8 +205,7 @@ public class FileUtils {
       throw new IllegalStateException("Folder does not exist");
     }
     return ImmutableList.sortedCopyOf(
-        listContents(path)
-            .stream()
+        listContents(path).stream()
             .filter(x -> folderExists(joinPaths(path, x)))
             .collect(Collectors.toList()));
   }

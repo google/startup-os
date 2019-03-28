@@ -116,9 +116,7 @@ public class DiffCommand implements AaCommand {
 
     Map<GitRepo, String> repoToInitialBranch = new HashMap<>();
     try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
+      fileUtils.listContents(workspacePath).stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(
@@ -187,9 +185,7 @@ public class DiffCommand implements AaCommand {
     List<String> existingGithubRepoNames =
         diffBuilder.getGithubPrList().stream().map(GithubPr::getRepo).collect(Collectors.toList());
     try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
+      fileUtils.listContents(workspacePath).stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(

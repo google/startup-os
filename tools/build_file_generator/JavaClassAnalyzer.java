@@ -276,8 +276,7 @@ public class JavaClassAnalyzer {
         }
       }
     }
-    return getJavaClassnames(javaCodeLines)
-        .stream()
+    return getJavaClassnames(javaCodeLines).stream()
         .filter(classname -> !innerClasses.contains(classname))
         .collect(Collectors.toList());
   }
