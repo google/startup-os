@@ -31,6 +31,7 @@ bazel run //tools/formatter -- \
 # Print error if on CircleCI and dependencies were not up-to-date
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
   echo "$RED[!] Dependency tree does not match dependencies.yaml$RESET"
+  git status
   echo "Please run ''$0'' to fix it"
   exit 1
 fi
