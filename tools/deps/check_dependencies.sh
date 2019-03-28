@@ -32,6 +32,7 @@ bazel run //tools/formatter -- \
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then
   echo "$RED[!] Dependency tree does not match dependencies.yaml$RESET"
   git status
+  git diff
   echo "Please run ''$0'' to fix it"
   exit 1
 fi
