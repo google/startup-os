@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.Protos;
 import com.google.startupos.tools.reviewer.job.sync.DiffConverter;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.PullRequest;
 import com.google.startupos.tools.reviewer.job.sync.GithubPullRequestProtos.ReviewComment;
@@ -85,7 +86,7 @@ public class DiffConverterTest {
                     .setRepoId("test-repo")
                     .setCommitId(FEATURE_BRANCH_COMMIT_ID)
                     .setFile(
-                        com.google.startupos.common.repo.Protos.File.newBuilder()
+                        Protos.File.newBuilder()
                             .setFilename("test_file.txt")
                             .setWorkspace("ws1")
                             .setRepoId("test-repo")
@@ -153,7 +154,7 @@ public class DiffConverterTest {
                     .setRepoId("test-repo")
                     .setCommitId(BASE_BRANCH_COMMIT_ID)
                     .setFile(
-                        com.google.startupos.common.repo.Protos.File.newBuilder()
+                        Protos.File.newBuilder()
                             .setFilename("test_file.txt")
                             .setWorkspace("ws1")
                             .setRepoId("test-repo")
