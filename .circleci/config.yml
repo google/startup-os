@@ -28,7 +28,7 @@ jobs:
       - checkout:
           <<: *post_checkout
       - restore_cache:
-          key: "v6-bazel_cache"
+          key: "v7-bazel_cache"
       - run: './tools/pre-commit.sh'
       # Fixes Debian upstream repos: https://discuss.circleci.com/t/failed-to-fetch-jessie-updates/29246
       - run: |
@@ -53,7 +53,7 @@ jobs:
           key: "android_sdk"
 
       - restore_cache:
-          key: "v6-bazel_cache"
+          key: "v7-bazel_cache"
 
       # Fixes Debian upstream repos: https://discuss.circleci.com/t/failed-to-fetch-jessie-updates/29246
       - run: |
@@ -96,7 +96,7 @@ jobs:
             - "/home/circleci/android_sdk"
 
       - save_cache:
-          key: "v6-bazel_cache"
+          key: "v7-bazel_cache"
           paths:
             - "/home/circleci/.cache/bazel/"
 
