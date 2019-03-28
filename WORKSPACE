@@ -79,8 +79,8 @@ android_sdk_repository(
 http_file(
     name = "buildifier",
     executable = True,
-    sha256 = "25159de982ec8896fc8213499df0a7003dfb4a03dd861f90fa5679d16faf0f99",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier"],
+    sha256 = "d7d41def74991a34dfd2ac8a73804ff11c514c024a901f64ab07f45a3cf0cfef",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier"],
 )
 
 http_file(
