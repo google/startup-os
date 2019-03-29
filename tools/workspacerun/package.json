@@ -1,7 +1,7 @@
 {
   "name": "workspacerun",
   "description": "Workspace apps runner",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "scripts": {
     "start": "node index.js"
   },

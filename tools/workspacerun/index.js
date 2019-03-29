@@ -32,7 +32,11 @@ for (const app of apps) {
 if (command) {
   // Run app
   exec(command, (err, data) => {
-    process.stdout.write(data);
+    if (err) {
+      throw err;
+    } else {
+      process.stdout.write(data);
+    }
   });
 } else {
   error(`${appName} not found`);
