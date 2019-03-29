@@ -46,6 +46,8 @@ import com.google.startupos.tools.reviewer.local_server.service.Protos.TextDiffR
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -275,17 +277,23 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
     checkAuth();
     FirestoreProtoClient client =
         new FirestoreProtoClient(authService.getProjectId(), authService.getToken());
-    DiffNumberResponse diffNumberResponse =
-        (DiffNumberResponse)
-            client.getProtoDocument(
-                ReviewerConstants.LAST_DIFF_NUMBER_DOCUMENT, DiffNumberResponse.newBuilder());
-    diffNumberResponse =
-        diffNumberResponse
-            .toBuilder()
-            .setLastDiffId(diffNumberResponse.getLastDiffId() + 1)
-            .build();
-    client.setProtoDocument(ReviewerConstants.LAST_DIFF_NUMBER_DOCUMENT, diffNumberResponse);
-    responseObserver.onNext(diffNumberResponse);
+    try {
+      DiffNumberResponse diffNumberResponse =
+          (DiffNumberResponse)
+              client.getProtoDocument(
+                  ReviewerConstants.LAST_DIFF_NUMBER_DOCUMENT, DiffNumberResponse.newBuilder());
+      diffNumberResponse =
+          diffNumberResponse
+              .toBuilder()
+              .setLastDiffId(diffNumberResponse.getLastDiffId() + 1)
+              .build();
+      client.setProtoDocument(ReviewerConstants.LAST_DIFF_NUMBER_DOCUMENT, diffNumberResponse);
+      responseObserver.onNext(diffNumberResponse);
+    } catch (Exception e) {
+      StringWriter errors = new StringWriter();
+      e.printStackTrace(new PrintWriter(errors));
+      throw e;
+    }
     responseObserver.onCompleted();
   }
 

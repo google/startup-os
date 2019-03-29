@@ -14,9 +14,9 @@ maven_dependencies()
 
 http_archive(
     name = "io_grpc_grpc_java",
-    sha256 = "48425cd631afb117fd355fd961deb313b3ac8e43f2b95c1598f35fbfcf684fbc",
-    strip_prefix = "grpc-java-1.16.1",
-    urls = ["https://github.com/grpc/grpc-java/archive/v1.16.1.tar.gz"],
+    sha256 = "0b86e44f9530fd61eb044b3c64c7579f21857ba96bcd9434046fd22891483a6d",
+    strip_prefix = "grpc-java-1.18.0",
+    urls = ["https://github.com/grpc/grpc-java/archive/v1.18.0.tar.gz"],
 )
 
 load("@io_grpc_grpc_java//:repositories.bzl", "grpc_java_repositories")
@@ -79,110 +79,57 @@ android_sdk_repository(
 http_file(
     name = "buildifier",
     executable = True,
-    sha256 = "d7d41def74991a34dfd2ac8a73804ff11c514c024a901f64ab07f45a3cf0cfef",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier"],
+    sha256 = "25159de982ec8896fc8213499df0a7003dfb4a03dd861f90fa5679d16faf0f99",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier"],
 )
 
 http_file(
     name = "buildifier_osx",
     executable = True,
-    sha256 = "3cbd708ff77f36413cfaef89cd5790a1137da5dfc3d9b3b3ca3fac669fbc298b",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier.osx"],
+    sha256 = "ceeedbd3ae0479dc2a5161e17adf7eccaba146b650b07063976df58bc37d7c44",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier.osx"],
 )
 
 http_file(
     name = "buildozer",
     executable = True,
-    sha256 = "3226cfd3ac706b48fe69fc4581c6c163ba5dfa71a752a44d3efca4ae489f1105",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer"],
+    sha256 = "7750fe5bfb1247e8a858f3c87f63a5fb554ee43cb10efc1ce46c2387f1720064",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildozer"],
 )
 
 http_file(
     name = "buildozer_osx",
     executable = True,
-    sha256 = "48109a542da2ad4bf10e7df962514a58ac19a32033e2dae8e682938ed11f4775",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildozer.osx"],
+    sha256 = "f2bcb59b96b1899bc27d5791f17a218f9ce76261f5dcdfdbd7ad678cf545803f",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildozer.osx"],
 )
 
 http_file(
     name = "unused_deps",
     executable = True,
-    sha256 = "686f8943610e1a5e3d196e2209dcb35f463c3b583a056dd8ae355acdc2a089d8",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps"],
+    sha256 = "bc8a45bdeabdf4db642ebe2f602a653362f7f3c0ca28717fc14441735910eeb0",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/unused_deps"],
 )
 
 http_file(
     name = "unused_deps_osx",
     executable = True,
-    sha256 = "dd8d58429a258b094b20a1435be3086ecee5d036b87c0e766309842766bc345b",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/unused_deps.osx"],
+    sha256 = "c7053d0d371812f98a14f811ebfe680b5537f4e8f3d545b2e76bb3f9d142bf2d",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/unused_deps.osx"],
 )
-
-http_archive(
-    name = "com_google_googletest",
-    sha256 = "d5ea270c46a25bf3d16643b5333273f2c8e97e73ca8c47586691a92fab476d83",
-    strip_prefix = "googletest-08d5b1f33af8c18785fb8ca02792b5fac81e248f",
-    urls = ["https://github.com/google/googletest/archive/08d5b1f33af8c18785fb8ca02792b5fac81e248f.zip"],
-)
-
-http_archive(
-    name = "com_github_google_benchmark",
-    sha256 = "3a94ccd74b7d7db1c4e4a9a22d8e56101023c01b378b752eeeee5b2907fcbca1",
-    strip_prefix = "benchmark-6d74c0625b8e88c1afce72b4f383c91b9a99dbe6",
-    urls = ["https://github.com/google/benchmark/archive/6d74c0625b8e88c1afce72b4f383c91b9a99dbe6.zip"],
-)
-
-http_archive(
-    name = "com_google_absl",
-    sha256 = "1375c123bda19875941625fb34a7280b8663bb4ed99344736f85ac5ddb955721",
-    strip_prefix = "abseil-cpp-59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7",
-    urls = ["https://github.com/abseil/abseil-cpp/archive/59ae4d5a0e833bedd9d7cc059ac15a9dc130e3f7.zip"],
-)
-
-# TODO: Once we move to Angular Bazel,
-# remove all below and changes in commit that added it
-# (you can find it by running git blame)
-
-http_archive(
-    name = "io_bazel_rules_webtesting",
-    url = "https://github.com/bazelbuild/rules_webtesting/archive/ca7b8062d9cf4ef2fde9193c7d37a0764c4262d7.zip",
-    strip_prefix = "rules_webtesting-ca7b8062d9cf4ef2fde9193c7d37a0764c4262d7",
-    sha256 = "28c73cf9d310fa6dba30e66bdb98071341c99c3feb8662f2d3883a632de97d72",
-)
-
-http_archive(
-    name = "build_bazel_rules_nodejs",
-    url = "https://github.com/bazelbuild/rules_nodejs/archive/0.8.0.zip",
-    strip_prefix = "rules_nodejs-0.8.0",
-    sha256 = "4e40dd49ae7668d245c3107645f2a138660fcfd975b9310b91eda13f0c973953",
-)
-
-load("@build_bazel_rules_nodejs//:defs.bzl", "node_repositories")
-
-node_repositories(package_json = ["//:package.json"])
-
-http_archive(
-    name = "build_bazel_rules_typescript",
-    url = "https://github.com/bazelbuild/rules_typescript/archive/v0.13.0.zip",
-    strip_prefix = "rules_typescript-0.13.0",
-    sha256 = "8f2767ff56ad68c80c62e9a1cdc2ba2c2ba0b19d350f713365e5333045df02e3",
-)
-
-load("@build_bazel_rules_typescript//:defs.bzl", "ts_setup_workspace")
-ts_setup_workspace()
 
 # Rules for examples/docker/
-
 http_archive(
     name = "io_bazel_rules_docker",
     strip_prefix = "rules_docker-0.5.1",
+    sha256 = "29d109605e0d6f9c892584f07275b8c9260803bf0c6fcb7de2623b2bedc910bd",
     urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.5.1.tar.gz"],
 )
 
 http_jar(
     name = "grpc_polyglot",
-    sha256 = "c2a453921632c0c3559f9df92e1699b69c784181f36a316f9927b70f52e5a7d5",
-    url = "https://github.com/grpc-ecosystem/polyglot/releases/download/v1.6.0/polyglot.jar"
+    sha256 = "df48c8ec38a39d4dd4d134250655ee1f1880e953bf30ce54144e1b04d0be0baf",
+    url = "https://github.com/grpc-ecosystem/polyglot/releases/download/v2.0.0/polyglot.jar"
 )
 
 http_file(
@@ -268,15 +215,15 @@ http_file(
 http_file(
     name = "shfmt",
     executable = True,
-    sha256 = "bdf8e832a903a80806b93a9ad80d8f95a70966fbec3258a565ed5edc2ae5bcdc",
-    urls = ["https://github.com/mvdan/sh/releases/download/v2.6.2/shfmt_v2.6.2_linux_amd64"]
+    sha256 = "adb6022679f230270c87fd447de0eca08e694189a18bcc9490cd3971917fbcb4",
+    urls = ["https://github.com/mvdan/sh/releases/download/v2.6.3/shfmt_v2.6.3_linux_amd64"]
 )
 
 http_file(
     name = "shfmt_osx",
     executable = True,
-    sha256 = "aaaa7d639acb30853e2f5008f56526c8dd54a366219ebdc5fa7f13a15277dd0b",
-    urls = ["https://github.com/mvdan/sh/releases/download/v2.6.2/shfmt_v2.6.2_darwin_amd64"]
+    sha256 = "5e1659999df29f06ec90e533670aff336957b43ce434c31d5bbc3e268a85dfae",
+    urls = ["https://github.com/mvdan/sh/releases/download/v2.6.3/shfmt_v2.6.3_darwin_amd64"]
 )
 
 http_jar(
