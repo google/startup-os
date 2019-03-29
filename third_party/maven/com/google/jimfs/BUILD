@@ -1,15 +1,17 @@
 java_library(
     name = "jimfs",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvncom/google/jimfs/jimfs",
+        "//external:jar/mvncom/google/jimfs/jimfs"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/com/google/guava",
+        "//third_party/maven/com/google/guava:guava"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+

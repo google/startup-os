@@ -1,12 +1,14 @@
 java_library(
     name = "Saxon_HE",
+    exports = [
+        "//external:jar/mvnnet/sf/saxon/Saxon_HE"
+    ],
     licenses = [
-        "permissive",
+        "permissive"
     ],
     visibility = [
-        "//third_party/maven:__subpackages__",
-    ],
-    exports = [
-        "//external:jar/mvnnet/sf/saxon/Saxon_HE",
-    ],
+        "//third_party/maven:__subpackages__"
+    ]
 )
+
+

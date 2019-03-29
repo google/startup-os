@@ -1,15 +1,17 @@
 java_library(
     name = "okhttp",
-    licenses = [
-        "permissive",
-    ],
-    visibility = [
-        "//visibility:public",
-    ],
     exports = [
-        "//external:jar/mvncom/squareup/okhttp/okhttp",
+        "//external:jar/mvncom/squareup/okhttp/okhttp"
+    ],
+    licenses = [
+        "permissive"
     ],
     runtime_deps = [
-        "//third_party/maven/com/squareup/okio",
+        "//third_party/maven/com/squareup/okio:okio"
     ],
+    visibility = [
+        "//visibility:public"
+    ]
 )
+
+
