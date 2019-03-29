@@ -1,96 +1,86 @@
 java_library(
     name = "google_http_client",
-    exports = [
-        "//external:jar/mvncom/google/http_client/google_http_client"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/http_client/google_http_client",
     ],
     runtime_deps = [
         "//third_party/maven/com/google/code/findbugs:jsr305",
-        "//third_party/maven/com/google/guava:guava",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/j2objc:j2objc_annotations",
         "//third_party/maven/io/opencensus:opencensus_api",
-        "//third_party/maven/io/opencensus:opencensus_contrib_http_util"
+        "//third_party/maven/io/opencensus:opencensus_contrib_http_util",
     ],
-    visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
 )
-
-
 
 java_library(
     name = "google_http_client_apache",
-    exports = [
-        "//external:jar/mvncom/google/http_client/google_http_client_apache"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/org/apache/httpcomponents:httpclient",
-        ":google_http_client"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/http_client/google_http_client_apache",
+    ],
+    runtime_deps = [
+        ":google_http_client",
+        "//third_party/maven/org/apache/httpcomponents:httpclient",
+    ],
 )
-
-
 
 java_library(
     name = "google_http_client_appengine",
-    exports = [
-        "//external:jar/mvncom/google/http_client/google_http_client_appengine"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        ":google_http_client"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/http_client/google_http_client_appengine",
+    ],
+    runtime_deps = [
+        ":google_http_client",
+    ],
 )
-
-
 
 java_library(
     name = "google_http_client_gson",
-    exports = [
-        "//external:jar/mvncom/google/http_client/google_http_client_gson"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/com/google/code/gson:gson",
-        ":google_http_client"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/http_client/google_http_client_gson",
+    ],
+    runtime_deps = [
+        ":google_http_client",
+        "//third_party/maven/com/google/code/gson",
+    ],
 )
-
-
 
 java_library(
     name = "google_http_client_jackson2",
-    exports = [
-        "//external:jar/mvncom/google/http_client/google_http_client_jackson2"
-    ],
     licenses = [
-        "permissive"
-    ],
-    runtime_deps = [
-        "//third_party/maven/com/fasterxml/jackson/core:jackson_core",
-        ":google_http_client"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/google/http_client/google_http_client_jackson2",
+    ],
+    runtime_deps = [
+        ":google_http_client",
+        "//third_party/maven/com/fasterxml/jackson/core:jackson_core",
+    ],
 )
-
-

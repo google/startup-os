@@ -86,7 +86,9 @@ public class LocalServer {
 
       // Pull all repos in head
       try {
-        fileUtils.listContents(headPath).stream()
+        fileUtils
+            .listContents(headPath)
+            .stream()
             .map(path -> fileUtils.joinToAbsolutePath(headPath, path))
             .filter(fileUtils::folderExists)
             .forEach(

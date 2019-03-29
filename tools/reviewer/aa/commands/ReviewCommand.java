@@ -88,7 +88,9 @@ public class ReviewCommand implements AaCommand {
     diffBuilder.setStatus(Status.UNDER_REVIEW).build();
 
     try {
-      fileUtils.listContents(workspacePath).stream()
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(

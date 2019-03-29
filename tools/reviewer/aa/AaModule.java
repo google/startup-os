@@ -118,7 +118,9 @@ public class AaModule {
       GitRepoFactory gitRepoFactory) {
     try {
       String firstWorkspacePath =
-          fileUtils.listContents(workspacePath).stream()
+          fileUtils
+              .listContents(workspacePath)
+              .stream()
               .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
               .filter(fileUtils::folderExists)
               .findFirst()
@@ -130,7 +132,8 @@ public class AaModule {
       }
 
       GitRepo repo = gitRepoFactory.create(firstWorkspacePath);
-      return repo.listBranches().stream()
+      return repo.listBranches()
+          .stream()
           .filter(branchName -> branchName.startsWith("D"))
           .mapToInt(branchName -> safeParsePositiveInt(branchName.replace("D", "")))
           .filter(number -> number > 0)

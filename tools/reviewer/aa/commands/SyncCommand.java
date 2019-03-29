@@ -54,7 +54,9 @@ public class SyncCommand implements AaCommand {
   public boolean run(String[] args) {
     // Pull all repos in head
     try {
-      fileUtils.listContents(headPath).stream()
+      fileUtils
+          .listContents(headPath)
+          .stream()
           .map(path -> fileUtils.joinToAbsolutePath(headPath, path))
           .filter(fileUtils::folderExists)
           .forEach(
@@ -74,7 +76,9 @@ public class SyncCommand implements AaCommand {
     //   `git reset --hard master` # now `A` and `master` are the same
     //   `git am -3 < ~/patch-file-we-moved-out`
     try {
-      fileUtils.listContents(workspacePath).stream()
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(

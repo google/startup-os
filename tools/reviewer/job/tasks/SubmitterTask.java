@@ -113,7 +113,8 @@ public class SubmitterTask implements Task {
           fileUtils.mkdirs("submitter");
         }
 
-        diffs.stream()
+        diffs
+            .stream()
             // Get Diffs that:
             // - Are in SUBMITTING state
             // - Have at least one CiResponse
@@ -122,7 +123,8 @@ public class SubmitterTask implements Task {
                 diff ->
                     diff.getStatus().equals(Diff.Status.SUBMITTING)
                         && !diff.getCiResponseList().isEmpty()
-                        && diff.getCiResponse(diff.getCiResponseCount() - 1).getResultList()
+                        && diff.getCiResponse(diff.getCiResponseCount() - 1)
+                            .getResultList()
                             .stream()
                             .allMatch(x -> x.getStatus() == Status.SUCCESS))
             .forEach(diff -> trySubmitDiff(diff));

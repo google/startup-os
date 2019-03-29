@@ -184,7 +184,8 @@ public class LineNumberConverter {
         } else {
           List<Integer> availablePositions = new ArrayList<>(lineNumberToPositionLeftSide.keySet());
           int closestPositionKey =
-              availablePositions.stream()
+              availablePositions
+                  .stream()
                   .min(Comparator.comparingInt(i -> Math.abs(i - number)))
                   .orElseThrow(
                       () ->

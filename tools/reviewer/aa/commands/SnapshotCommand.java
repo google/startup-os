@@ -71,7 +71,9 @@ public class SnapshotCommand implements AaCommand {
     }
     String branchName = String.format("D%d", diffNumber);
     try {
-      fileUtils.listContents(workspacePath).stream()
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(

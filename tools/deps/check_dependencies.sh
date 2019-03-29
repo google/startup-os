@@ -9,24 +9,32 @@ RESET=$(tput sgr0)
 
 git diff --name-only origin/master | grep --quiet dependencies.yaml
 if [ $? -eq 0 ]; then
-  echo "$RED[!] ""dependencies.yaml was modified, running the check$RESET"
+  echo "$RED[!] dependencies.yaml was modified, running the check$RESET"
 else
-  echo "$GREEN[!] ""dependencies.yaml was not modified, exiting (code $?) $RESET"
+  echo "$GREEN[!] dependencies.yaml was not modified, exiting (code $?) $RESET"
   exit 0
 fi
 
 # Regenerate dependencies
-bazel run //tools:bazel_deps -- generate \
-  -r $(pwd) \
-  -s third_party/maven/package-lock.bzl \
-  -d dependencies.yaml \
-  &>/dev/null
+OUTPUT=$(
+  bazel run //tools:bazel_deps -- generate \
+    -r $(pwd) \
+    -s third_party/maven/package-lock.bzl \
+    -d dependencies.yaml 2>&1
+)
+if [ $? -ne 0 ]; then
+  echo "$RED[!] bazel_deps failed. Output:"
+  echo $OUTPUT
+  exit 1
+fi
 
 # Format generated BUILD files
-bazel run //tools/formatter -- \
-  --path $(pwd)/third_party/maven/ \
-  --build \
-  &>/dev/null
+OUTPUT=$(bazel run //tools/formatter -- --path $(pwd)/third_party/maven/ --build 2>&1)
+if [ $? -ne 0 ]; then
+  echo "$RED[!] formatter failed. Output:"
+  echo $OUTPUT
+  exit 1
+fi
 
 # Print error if on CircleCI and dependencies were not up-to-date
 if [[ ! -z "$CIRCLECI" && ! -z $(git status -s) ]]; then

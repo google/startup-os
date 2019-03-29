@@ -72,7 +72,9 @@ class RulesUpdater {
     String rules =
         String.format(
             RULES_TEMPLATE,
-            reviewerConfig.getUserList().stream()
+            reviewerConfig
+                .getUserList()
+                .stream()
                 .map(ReviewerProtos.User::getEmail)
                 .map(email -> String.format(EMAIL_CLAUSE, email))
                 .collect(Collectors.joining(" || ")));

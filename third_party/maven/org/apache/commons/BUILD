@@ -1,29 +1,25 @@
 java_library(
     name = "commons_csv",
-    exports = [
-        "//external:jar/mvnorg/apache/commons/commons_csv"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnorg/apache/commons/commons_csv",
+    ],
 )
-
-
 
 java_library(
     name = "commons_lang3",
-    exports = [
-        "//external:jar/mvnorg/apache/commons/commons_lang3"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//visibility:public"
-    ]
+        "//visibility:public",
+    ],
+    exports = [
+        "//external:jar/mvnorg/apache/commons/commons_lang3",
+    ],
 )
-
-

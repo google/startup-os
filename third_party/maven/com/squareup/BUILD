@@ -1,14 +1,12 @@
 java_library(
     name = "javapoet",
-    exports = [
-        "//external:jar/mvncom/squareup/javapoet"
-    ],
     licenses = [
-        "permissive"
+        "permissive",
     ],
     visibility = [
-        "//third_party/maven:__subpackages__"
-    ]
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvncom/squareup/javapoet",
+    ],
 )
-
-

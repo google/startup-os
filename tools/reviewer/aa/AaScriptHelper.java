@@ -58,7 +58,8 @@ public class AaScriptHelper {
   }
 
   private String getMatches(ImmutableList<String> words, String word) {
-    return words.stream()
+    return words
+        .stream()
         .filter(x -> x.startsWith(word))
         .sorted()
         .collect(Collectors.joining("\n"));

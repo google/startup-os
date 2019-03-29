@@ -316,7 +316,8 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   private ImmutableList<File> addWorkspaceAndRepoToFiles(
       List<File> files, String workspace, String repoId) {
     return ImmutableList.copyOf(
-        files.stream()
+        files
+            .stream()
             .map(
                 file ->
                     file.toBuilder()
@@ -379,7 +380,9 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
 
     DiffFilesResponse.Builder response = DiffFilesResponse.newBuilder();
     try {
-      fileUtils.listContents(workspacePath).stream()
+      fileUtils
+          .listContents(workspacePath)
+          .stream()
           .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
           .filter(fileUtils::folderExists)
           .forEach(

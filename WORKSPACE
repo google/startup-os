@@ -79,14 +79,14 @@ android_sdk_repository(
 http_file(
     name = "buildifier",
     executable = True,
-    sha256 = "d7d41def74991a34dfd2ac8a73804ff11c514c024a901f64ab07f45a3cf0cfef",
-    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.11.1/buildifier"],
+    sha256 = "25159de982ec8896fc8213499df0a7003dfb4a03dd861f90fa5679d16faf0f99",
+    urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier"],
 )
 
 http_file(
     name = "buildifier_osx",
     executable = True,
-    sha256 = "f2bcb59b96b1899bc27d5791f17a218f9ce76261f5dcdfdbd7ad678cf545803f",
+    sha256 = "ceeedbd3ae0479dc2a5161e17adf7eccaba146b650b07063976df58bc37d7c44",
     urls = ["https://github.com/bazelbuild/buildtools/releases/download/0.22.0/buildifier.osx"],
 )
 
@@ -122,6 +122,7 @@ http_file(
 http_archive(
     name = "io_bazel_rules_docker",
     strip_prefix = "rules_docker-0.5.1",
+    sha256 = "29d109605e0d6f9c892584f07275b8c9260803bf0c6fcb7de2623b2bedc910bd",
     urls = ["https://github.com/bazelbuild/rules_docker/archive/v0.5.1.tar.gz"],
 )
 

@@ -186,7 +186,9 @@ public class BuildFileParser {
             try {
               result.addAll(getFilesByExtension(intermediatePaths, fileExtension));
               List<String> folderPaths =
-                  fileUtils.listContentsRecursively(intermediatePaths).stream()
+                  fileUtils
+                      .listContentsRecursively(intermediatePaths)
+                      .stream()
                       .filter(item -> fileUtils.folderExists(item))
                       .collect(Collectors.toList());
 
@@ -207,7 +209,9 @@ public class BuildFileParser {
 
   private List<String> getFilesByExtension(String path, String fileExtension) {
     try {
-      return fileUtils.listContents(path).stream()
+      return fileUtils
+          .listContents(path)
+          .stream()
           .map(item -> fileUtils.joinPaths(path, item))
           .filter(item -> fileUtils.fileExists(item))
           .filter(file -> file.endsWith("." + fileExtension))
