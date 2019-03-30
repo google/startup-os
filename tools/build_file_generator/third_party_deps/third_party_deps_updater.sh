@@ -12,12 +12,20 @@ for entry in $(bazel query 'attr("visibility", "//visibility:public", //third_pa
   actual_third_party_targets+=("$entry")
 done
 
-# Deleting text between %START% and %END%, while preserving the markers
-sed -i.bak '/# %START%/,/# %END%/{//!d;}' ${BUILD_FILE_ABS_PATH} && rm ${BUILD_FILE_ABS_PATH}.bak
+# Deleting text between %THIRD_PARTY_DEPS_START% and %THIRD_PARTY_DEPS_END%, while preserving the markers
+sed -i.bak '/# %THIRD_PARTY_DEPS_START%/,/# %THIRD_PARTY_DEPS_END%/{//!d;}' ${BUILD_FILE_ABS_PATH} && rm ${BUILD_FILE_ABS_PATH}.bak
 
 for target_to_add in "${actual_third_party_targets[@]}"; do
+  target_folder_and_name="${target_to_add##*\/}"
+  target_folder="${target_folder_and_name%:*}"
+  target_name="${target_folder_and_name##*:}"
+  # Removing target name if it has the same name as target folder
+  # E.g. "//third_party/maven/com/google/dagger:dagger" >> "//third_party/maven/com/google/dagger"
+  if [[ "$target_folder" == "$target_name" ]]; then
+    target_to_add=${target_to_add//:${target_name}/}
+  fi
   # Adding target_to_add as next line under %START% marker
-  sed -i.bak "/# %START%/a \"${target_to_add}\"," ${BUILD_FILE_ABS_PATH} && rm ${BUILD_FILE_ABS_PATH}.bak
+  sed -i.bak "/# %THIRD_PARTY_DEPS_START%/a \"${target_to_add}\"," ${BUILD_FILE_ABS_PATH} && rm ${BUILD_FILE_ABS_PATH}.bak
 done
 
 echo "Third party targets are updated"
