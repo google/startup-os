@@ -1,4 +1,28 @@
 java_library(
+    name = "grpc_alts",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/grpc/grpc_alts",
+    ],
+    runtime_deps = [
+        ":grpc_auth",
+        ":grpc_core",
+        ":grpc_grpclb",
+        ":grpc_netty_shaded",
+        ":grpc_protobuf",
+        ":grpc_stub",
+        "//third_party/maven/com/google/auth:google_auth_library_oauth2_http",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/org/apache/commons:commons_lang3",
+    ],
+)
+
+java_library(
     name = "grpc_auth",
     licenses = [
         "permissive",
@@ -47,7 +71,28 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/io/opencensus:opencensus_api",
         "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
+        "//third_party/maven/org/checkerframework:checker_compat_qual",
         "//third_party/maven/org/codehaus/mojo:animal_sniffer_annotations",
+    ],
+)
+
+java_library(
+    name = "grpc_grpclb",
+    licenses = [
+        "permissive",
+    ],
+    visibility = [
+        "//third_party/maven:__subpackages__",
+    ],
+    exports = [
+        "//external:jar/mvnio/grpc/grpc_grpclb",
+    ],
+    runtime_deps = [
+        ":grpc_core",
+        ":grpc_protobuf",
+        ":grpc_stub",
+        "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/com/google/protobuf:protobuf_java_util",
     ],
 )
 
@@ -102,6 +147,7 @@ java_library(
         "//third_party/maven/com/google/api/grpc:proto_google_common_protos",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
+        "//third_party/maven/org/checkerframework:checker_compat_qual",
     ],
 )
 
@@ -119,6 +165,7 @@ java_library(
     runtime_deps = [
         ":grpc_core",
         "//third_party/maven/com/google/guava",
+        "//third_party/maven/org/checkerframework:checker_compat_qual",
     ],
 )
 

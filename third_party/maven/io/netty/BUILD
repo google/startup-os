@@ -26,6 +26,8 @@ java_library(
         "//external:jar/mvnio/netty/netty_codec",
     ],
     runtime_deps = [
+        ":netty_buffer",
+        ":netty_common",
         ":netty_transport",
     ],
 )
@@ -42,7 +44,10 @@ java_library(
         "//external:jar/mvnio/netty/netty_codec_http",
     ],
     runtime_deps = [
+        ":netty_buffer",
         ":netty_codec",
+        ":netty_common",
+        ":netty_transport",
     ],
 )
 
@@ -58,8 +63,12 @@ java_library(
         "//external:jar/mvnio/netty/netty_codec_http2",
     ],
     runtime_deps = [
+        ":netty_buffer",
+        ":netty_codec",
         ":netty_codec_http",
+        ":netty_common",
         ":netty_handler",
+        ":netty_transport",
     ],
 )
 
@@ -106,6 +115,7 @@ java_library(
     runtime_deps = [
         ":netty_buffer",
         ":netty_codec",
+        ":netty_common",
         ":netty_transport",
     ],
 )
@@ -170,6 +180,7 @@ java_library(
     ],
     runtime_deps = [
         ":netty_buffer",
+        ":netty_common",
         ":netty_resolver",
     ],
 )

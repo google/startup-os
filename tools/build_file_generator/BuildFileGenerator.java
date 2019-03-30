@@ -48,8 +48,7 @@ import javax.inject.Inject;
 // TODO: Add the support full classnames(package + classname) inside the code. It will allow
 // auto-generating BUILD file for `tools.reviewer.job.sync.tests.DiffConverterTest`
 public class BuildFileGenerator {
-  private static final String THIRD_PARTY_ZIP_PATH =
-      "tools/build_file_generator/third_party_deps.zip";
+  private static final String THIRD_PARTY_ZIP_PATH = "third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
   private static final String CHECKSTYLE_BZL_FILE_PATH = "//tools/checkstyle:checkstyle.bzl";
   private static final String CHECKSTYLE_SYMBOL = "checkstyle_test";
@@ -360,6 +359,7 @@ public class BuildFileGenerator {
                 .getTarget();
       }
       if (target.equals("//third_party/maven/com/google/dagger:dagger")
+          || target.equals("//third_party/maven/com/google/dagger")
           || target.equals("//common:dagger_common_component")) {
         target = "//common:dagger_with_annotation_processor";
       }
@@ -368,30 +368,29 @@ public class BuildFileGenerator {
       if (target.equals("//common/repo:git_repo_factory")) {
         target = "//common/repo:repo";
       }
-      if (target.contains("code_review_service_grpc")) {
-        target = target.replace("_service_grpc", "_java_grpc");
-      }
-      if (target.endsWith("_java_proto")
-          && javaClass.getClassName().endsWith("Service")
-          && isProtoFileContainService(target, protoFiles)) {
-        result.add(target.replace("_proto", "_grpc"));
-      }
       if (!target.isEmpty()) {
         result.add(target);
       }
     }
-    return result
-        .stream()
-        .filter(item -> !item.endsWith("code_review_service_grpc"))
-        .filter(item -> !item.endsWith("auth_service_grpc"))
-        .sorted()
-        .collect(Collectors.toList());
+    return result.stream().sorted().collect(Collectors.toList());
   }
 
   private String getInternalProjectDep(
       Import importProto, List<ProtoFile> protoFiles, String packageToCreateBuildFile) {
     String path = importProto.getPackage().replace("com.google.startupos.", "//").replace(".", "/");
     for (ProtoFile protoFile : protoFiles) {
+      for (String service : protoFile.getServicesList()) {
+        if ((service + "Grpc").equals(importProto.getRootClass())) {
+          String javaGrpcName = ":" + protoFile.getFileName() + "_java_grpc";
+          if (importProto.getPackage().equals(packageToCreateBuildFile)) {
+            return javaGrpcName;
+          } else {
+            return protoFile.getPackage().replace("com.google.startupos.", "//").replace(".", "/")
+                + javaGrpcName;
+          }
+        }
+      }
+
       String javaProtoName = ":" + protoFile.getFileName() + "_java_proto";
       if ((importProto.getPackage().equals(protoFile.getJavaPackage())
           && importProto.getRootClass().equals(protoFile.getJavaOuterClassname()))) {
@@ -413,14 +412,23 @@ public class BuildFileGenerator {
   private List<String> getInternalPackageDeps(JavaClass javaClass, List<ProtoFile> protoFiles) {
     List<String> result = new ArrayList<>();
     Map<String, List<String>> protoFilenameToMessage = new HashMap<>();
+    Map<String, List<String>> protoFilenameToService = new HashMap<>();
     for (ProtoFile protoFile : protoFiles) {
       List<String> protoMessages = new ArrayList<>();
       protoMessages.addAll(protoFile.getMessagesList());
       protoMessages.add(protoFile.getJavaOuterClassname());
       protoFilenameToMessage.put(protoFile.getFileName(), protoMessages);
+      protoFilenameToService.put(protoFile.getFileName(), protoFile.getServicesList());
     }
     for (String classname : javaClass.getUsedClassesFromTheSamePackageList()) {
       String dep = "";
+      for (Map.Entry<String, List<String>> entry : protoFilenameToService.entrySet()) {
+        for (String service : entry.getValue()) {
+          if ((service + "Grpc").equals(classname)) {
+            dep = ":" + entry.getKey() + "_java_grpc";
+          }
+        }
+      }
       for (Map.Entry<String, List<String>> entry : protoFilenameToMessage.entrySet()) {
         if (entry.getValue().contains(classname)) {
           dep = ":" + entry.getKey() + "_java_proto";
@@ -433,16 +441,6 @@ public class BuildFileGenerator {
       result.add(dep);
     }
     return result.stream().distinct().collect(Collectors.toList());
-  }
-
-  private boolean isProtoFileContainService(String target, List<ProtoFile> protoFiles) {
-    String protoFileName = target.replace(":", "").replace("_java_proto", "");
-    for (ProtoFile protoFile : protoFiles) {
-      if (protoFile.getFileName().equals(protoFileName) && protoFile.getServicesCount() != 0) {
-        return true;
-      }
-    }
-    return false;
   }
 
   // TODO: Add supporting glob function

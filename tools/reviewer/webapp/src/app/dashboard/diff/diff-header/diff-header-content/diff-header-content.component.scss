@@ -60,7 +60,6 @@ $transparent-grey: rgba(0,0,0,0.54);
       >pre {
         font-family: opensans;
         margin: 0;
-        padding-bottom: 10px;
       }
       >.empty {
         color: #979797;
@@ -79,7 +78,7 @@ $transparent-grey: rgba(0,0,0,0.54);
       font-size: 14px;
       resize: none;
       width: calc(100% - 14px);
-      padding: 10px 7px 0 7px;
+      padding: 10px 7px 10px 7px;
       border-radius: 4px;
       background: white;
       vertical-align: bottom;

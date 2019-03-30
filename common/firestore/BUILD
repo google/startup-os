@@ -27,6 +27,7 @@ java_library(
         "//third_party/maven/com/google/code/findbugs:jsr305",
         "//third_party/maven/com/google/code/gson",
         "//third_party/maven/com/google/firebase:firebase_admin",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/com/google/protobuf:protobuf_java",
         "//third_party/maven/com/google/protobuf:protobuf_java_util",

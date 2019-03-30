@@ -35,6 +35,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.flogger.FluentLogger;
 import com.google.common.io.Files;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
@@ -54,6 +55,7 @@ import javax.annotation.Nullable;
 
 /** A proto wrapper for Firestore's client, that uses protos' binary format. */
 public class FirestoreProtoClient {
+  private static final FluentLogger logger = FluentLogger.forEnclosingClass();
   private static final String PROTO_FIELD = "proto";
 
   Firestore client;
