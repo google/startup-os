@@ -45,6 +45,15 @@ public class RemoteServer {
   @FlagDesc(name = "port", description = "HTTP port to run server on", required = true)
   private static final Flag<Integer> port = Flag.create(8080);
 
+  @FlagDesc(name = "client_id", description = "client_id obtained from Google", required = true)
+  private static final Flag<String> clientId = Flag.create("");
+
+  @FlagDesc(
+      name = "client_secret",
+      description = "client_secret obtained from Google",
+      required = true)
+  private static final Flag<String> clientSecret = Flag.create("");
+
   private static final FluentLogger logger = FluentLogger.forEnclosingClass();
 
   private static final int HTTP_STATUS_CODE_OK = 200;
@@ -169,11 +178,11 @@ public class RemoteServer {
       if ("post".equalsIgnoreCase(httpExchange.getRequestMethod())) {
         logger.atInfo().log("Handling refresh token request");
 
-        RefreshTokenRequest.Builder req = RefreshTokenRequest.newBuilder();
-        JsonFormat.parser().merge(getPostParamsString(httpExchange), req);
+        RefreshTokenRequest.Builder request = RefreshTokenRequest.newBuilder();
+        JsonFormat.parser().merge(getPostParamsString(httpExchange), request);
         AuthResponse response = null;
         try {
-          response = tokenRefreshRequest(req.build());
+          response = tokenRefreshRequest(request.build());
         } catch (Exception e) {
           e.printStackTrace();
           httpExchange.sendResponseHeaders(HTTP_STATUS_CODE_UNAUTHORIZED, -1);
@@ -197,9 +206,7 @@ public class RemoteServer {
   public static void main(String[] args) throws IOException {
     Flags.parseCurrentPackage(args);
 
-    RemoteServer server =
-        new RemoteServer(
-            System.getenv("REMOTESERVER_CLIENT_ID"), System.getenv("REMOTESERVER_CLIENT_SECRET"));
+    RemoteServer server = new RemoteServer(clientId.get(), clientSecret.get());
     server.start();
   }
 }

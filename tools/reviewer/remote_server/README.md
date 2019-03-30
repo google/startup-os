@@ -9,6 +9,7 @@
 1. Server exchange code for `accessToken`/`refreshToken` pair 
 1. `/gcode` endpoint responds with `accessToken`/`refreshToken` pair
 
+Note: server has to be secured by HTTPS so code and tokens are secure in transit.
 
 ## Refreshing token
 1. Client posts `refreshToken` to `/refresh` endpoint
