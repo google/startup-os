@@ -21,10 +21,11 @@ checkstyle_test(
     target = ":third_party_deps_analyzer",
 )
 
-# '%START%' and '%END%' are markers for 'third_party_deps_updater.sh' script and ThirdPartyDepsAnalyzer class.
+# '%THIRD_PARTY_DEPS_START%' and '%THIRD_PARTY_DEPS_END%' are markers for 'third_party_deps_updater.sh' script
+# and ThirdPartyDepsAnalyzer class.
 # Don't delete it while 'third_party_deps_updater.sh' script and ThirdPartyDepsAnalyzer class are used.
 THIRD_PARTY_DEPS_GROUP = [
-    # %START%
+    # %THIRD_PARTY_DEPS_START%
     "//third_party/maven/com/google/api:api_common",
     "//third_party/maven/com/google/auth:google_auth_library_credentials",
     "//third_party/maven/com/google/auth:google_auth_library_oauth2_http",
@@ -39,22 +40,22 @@ THIRD_PARTY_DEPS_GROUP = [
     "//third_party/maven/com/google/cloud:google_cloud_core_grpc",
     "//third_party/maven/com/google/cloud:google_cloud_firestore",
     "//third_party/maven/com/google/cloud:google_cloud_storage",
-    "//third_party/maven/com/google/code/gson:gson",
-    "//third_party/maven/com/google/dagger:dagger",
+    "//third_party/maven/com/google/code/gson",
+    "//third_party/maven/com/google/dagger",
     "//third_party/maven/com/google/dagger:dagger_compiler",
     "//third_party/maven/com/google/errorprone:error_prone_ant",
     "//third_party/maven/com/google/firebase:firebase_admin",
-    "//third_party/maven/com/google/flogger:flogger",
+    "//third_party/maven/com/google/flogger",
     "//third_party/maven/com/google/flogger:flogger_system_backend",
     "//third_party/maven/com/google/googlejavaformat:google_java_format",
-    "//third_party/maven/com/google/guava:guava",
-    "//third_party/maven/com/google/jimfs:jimfs",
+    "//third_party/maven/com/google/guava",
+    "//third_party/maven/com/google/jimfs",
     "//third_party/maven/com/google/protobuf:protobuf_java",
     "//third_party/maven/com/google/protobuf:protobuf_java_util",
     "//third_party/maven/com/jcraft:jsch",
     "//third_party/maven/com/puppycrawl/tools:checkstyle",
-    "//third_party/maven/com/squareup/okhttp:okhttp",
-    "//third_party/maven/com/squareup/okio:okio",
+    "//third_party/maven/com/squareup/okhttp",
+    "//third_party/maven/com/squareup/okio",
     "//third_party/maven/commons_logging:commons_logging",
     "//third_party/maven/io/grpc:grpc_core",
     "//third_party/maven/io/grpc:grpc_netty",
@@ -66,21 +67,21 @@ THIRD_PARTY_DEPS_GROUP = [
     "//third_party/maven/io/opencensus:opencensus_contrib_grpc_metrics",
     "//third_party/maven/javax/annotation:javax_annotation_api",
     "//third_party/maven/javax/inject:javax_inject",
-    "//third_party/maven/junit:junit",
+    "//third_party/maven/junit",
     "//third_party/maven/org/apache/commons:commons_csv",
     "//third_party/maven/org/apache/commons:commons_lang3",
     "//third_party/maven/org/apache/httpcomponents:fluent_hc",
     "//third_party/maven/org/apache/pdfbox:fontbox",
-    "//third_party/maven/org/apache/pdfbox:pdfbox",
-    "//third_party/maven/org/javassist:javassist",
-    "//third_party/maven/org/json:json",
-    "//third_party/maven/org/jsoup:jsoup",
+    "//third_party/maven/org/apache/pdfbox",
+    "//third_party/maven/org/javassist",
+    "//third_party/maven/org/json",
+    "//third_party/maven/org/jsoup",
     "//third_party/maven/org/mockito:mockito_core",
     "//third_party/maven/org/objenesis:objenesis",
     "//third_party/maven/org/slf4j:slf4j_simple",
     "//third_party/maven/org/yaml:snakeyaml",
     "//third_party/maven/com/google/code/findbugs:jsr305",
-    # %END%
+    # %THIRD_PARTY_DEPS_END%
 ]
 
 java_binary(
