@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.google.startupos.tools.reviewer.remove_server;
+
+option java_package = "com.google.startupos.tools.reviewer.remote_server";
+option java_outer_classname = "Protos";
+
+message InitialAuthRequest { string code = 1; }
+
+message RefreshTokenRequest { string refresh_token = 1; }
+
+message AuthResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
