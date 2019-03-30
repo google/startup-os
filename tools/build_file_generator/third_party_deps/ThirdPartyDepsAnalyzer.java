@@ -31,8 +31,8 @@ import javax.inject.Inject;
 
 public class ThirdPartyDepsAnalyzer {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
-  private static final String THIRD_PARTY_DEPS_MARKER_START = "# %START%";
-  private static final String THIRD_PARTY_DEPS_MARKER_END = "# %END%";
+  private static final String THIRD_PARTY_DEPS_MARKER_START = "# %THIRD_PARTY_DEPS_START%";
+  private static final String THIRD_PARTY_DEPS_MARKER_END = "# %THIRD_PARTY_DEPS_END%";
   private FileUtils fileUtils;
 
   @Inject
