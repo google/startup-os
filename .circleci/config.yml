@@ -1,71 +1,63 @@
-# Based on config from github.com/alexeagle/angular-bazel-example
-version: 2
+version: 2.1
+commands:
+  install-bazel:
+    steps:
+      - run:
+          name: Install bazel
+          command: |
+            curl -OL https://github.com/bazelbuild/bazel/releases/download/0.24.0/bazel-0.24.0-installer-linux-x86_64.sh
+            chmod +x bazel-0.24.0-installer-linux-x86_64.sh
+            sudo ./bazel-0.24.0-installer-linux-x86_64.sh
+            rm ./bazel-0.24.0-installer-linux-x86_64.sh
+            bazel info release
+  install-deps:
+    steps:
+      - run:
+          name: Install extra dependencies
+          command: |
+            sudo apt update && sudo apt install -y libstdc++6
+            pip install yapf
+  restore-caches:
+    steps:
+      - restore_cache:
+          key: "android_sdk"
+      - restore_cache:
+          key: "v8-bazel_cache"
+  save-caches:
+    steps:
+      - save_cache:
+          key: "android_sdk"
+          paths:
+            - "/home/circleci/android_sdk"
 
-# We use a docker image as the basis for our build, so that all the toolchains we use
-# are already installed and the build can start running right away. It also guarantees
-# the environment is portable and reproducible on your local machine.
-var_1: &docker_image angular/ngcontainer:0.10.0
-
-# Each job will inherit these defaults
-anchor_1: &job_defaults
-  working_directory: ~/ng
-  docker:
-    - image: *docker_image
-
-# After checkout, rebase on top of master, because we want to test the proposed merge of a
-# onto the target branch, not just test what's on the user's fork.
-# Similar to travis behavior, but not quite the same.
-# See https://discuss.circleci.com/t/1662
-anchor_2: &post_checkout
-  post: git pull --ff-only origin "refs/pull/${CI_PULL_REQUEST//*pull\//}/merge"
-
-
-# These jobs will run in parallel, and report separate statuses to GitHub PRs
+      - save_cache:
+          key: "v8-bazel_cache"
+          paths:
+            - "/home/circleci/.cache/bazel/"
 jobs:
   lint:
-    <<: *job_defaults
+    working_directory: ~/ng/
+    machine:
+      enabled: true
+      image: ubuntu-1604:201903-01
     steps:
-      - checkout:
-          <<: *post_checkout
-      - restore_cache:
-          key: "v7-bazel_cache"
-      - run: './tools/pre-commit.sh'
-      # Fixes Debian upstream repos: https://discuss.circleci.com/t/failed-to-fetch-jessie-updates/29246
-      - run: |
-          sudo rm /etc/apt/sources.list
-          echo "deb http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
-          echo "Acquire::Check-Valid-Until false;" | sudo tee -a /etc/apt/apt.conf.d/10-nocheckvalid
-          echo 'Package: *\nPin: origin "archive.debian.org"\nPin-Priority: 500' | sudo tee -a /etc/apt/preferences.d/10-archive-pin
-          sudo apt-get update
-      - run: sudo apt -y install yapf3 python3-pkg-resources libstdc++6
-      - run: sudo ln -s /usr/bin/yapf3 /usr/bin/yapf
+      - checkout
+      - install-bazel
+      - install-deps
+      - restore-caches
       - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
 
   build:
-    <<: *job_defaults
+    working_directory: ~/ng/
+    machine:
+      enabled: true
+      image: ubuntu-1604:201903-01
     steps:
-      - checkout:
-          <<: *post_checkout
-
-      - restore_cache:
-          key: "android_sdk"
-
-      - restore_cache:
-          key: "v7-bazel_cache"
-
-      # Fixes Debian upstream repos: https://discuss.circleci.com/t/failed-to-fetch-jessie-updates/29246
-      - run: |
-          sudo rm /etc/apt/sources.list
-          echo "deb http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
-          echo "deb-src http://archive.debian.org/debian/ jessie-backports main" | sudo tee -a /etc/apt/sources.list
-          echo "Acquire::Check-Valid-Until false;" | sudo tee -a /etc/apt/apt.conf.d/10-nocheckvalid
-          echo 'Package: *\nPin: origin "archive.debian.org"\nPin-Priority: 500' | sudo tee -a /etc/apt/preferences.d/10-archive-pin
-          sudo apt-get update
-      - run: sudo apt -y install libstdc++6
-      - run: sudo cp .circleci/bazel.rc /etc/bazel.bazelrc
-      - run: bazel info release
+      - checkout
+      - install-bazel
+      - install-deps
+      - restore-caches
       - run: './tools/get_android_sdk.sh'
       - run:
           name: "StartupOS: building"
@@ -77,7 +69,6 @@ jobs:
           command: ./test.sh
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
-      # also test hasadna/hasadna as it depends on StartupOS's HEAD
       - run:
           name: "Hasadna: cloning the repo"
           command: git clone https://github.com/hasadna/hasadna /home/circleci/hasadna/
@@ -89,19 +80,9 @@ jobs:
           command: cd /home/circleci/hasadna/ && ./compile.sh build
           environment:
             ANDROID_HOME: /home/circleci/android_sdk/
-
-      - save_cache:
-          key: "android_sdk"
-          paths:
-            - "/home/circleci/android_sdk"
-
-      - save_cache:
-          key: "v7-bazel_cache"
-          paths:
-            - "/home/circleci/.cache/bazel/"
+      - save-caches
 
 workflows:
-  version: 2
   default_workflow:
     jobs:
       - lint
