@@ -15,7 +15,6 @@ commands:
       - run:
           name: Install extra dependencies
           command: |
-            sudo apt update && sudo apt install -y libstdc++6
             pip install yapf
   restore-caches:
     steps:
