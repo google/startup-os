@@ -11,26 +11,13 @@ commands:
             rm ./bazel-0.24.0-installer-linux-x86_64.sh
             bazel info release
   restore-caches:
-    parameters:
-      restore_android_sdk:
-        type: boolean
-        default: true
-      restore_build_cache:
-        type: boolean
-        default: true
     steps:
-      - when:
-          condition: << parameters.restore_android_sdk >>
-          steps:
-            - restore_cache:
-                keys:
-                  - "android_sdk"
-      - when:
-          condition: << parameters.restore_build_cache >>
-          steps:
-            - restore_cache:
-                keys:
-                  - "v8-bazel_cache"
+      - restore_cache:
+          keys:
+            - "android_sdk"
+      - restore_cache:
+          keys:
+            - "v8-bazel_cache"
 
   save-caches:
     steps:
@@ -52,8 +39,6 @@ jobs:
     steps:
       - checkout
       - install-bazel
-      - restore-caches:
-          restore_build_cache: false
       - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
 
