@@ -10,18 +10,28 @@ commands:
             sudo ./bazel-0.24.0-installer-linux-x86_64.sh
             rm ./bazel-0.24.0-installer-linux-x86_64.sh
             bazel info release
-  install-deps:
-    steps:
-      - run:
-          name: Install extra dependencies
-          command: |
-            pip install yapf
   restore-caches:
+    parameters:
+      restore_android_sdk:
+        type: boolean
+        default: true
+      restore_build_cache:
+        type: boolean
+        default: true
     steps:
-      - restore_cache:
-          key: "android_sdk"
-      - restore_cache:
-          key: "v8-bazel_cache"
+      - when:
+          condition: << parameters.restore_android_sdk >>
+          steps:
+            - restore_cache:
+                keys:
+                  - "android_sdk"
+      - when:
+          condition: << parameters.restore_build_cache >>
+          steps:
+            - restore_cache:
+                keys:
+                  - "v8-bazel_cache"
+
   save-caches:
     steps:
       - save_cache:
@@ -42,8 +52,8 @@ jobs:
     steps:
       - checkout
       - install-bazel
-      - install-deps
-      - restore-caches
+      - restore-caches:
+          restore_build_cache: false
       - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
 
@@ -55,7 +65,6 @@ jobs:
     steps:
       - checkout
       - install-bazel
-      - install-deps
       - restore-caches
       - run: './tools/get_android_sdk.sh'
       - run:
