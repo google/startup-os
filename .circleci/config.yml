@@ -10,6 +10,12 @@ commands:
             sudo ./bazel-0.24.0-installer-linux-x86_64.sh
             rm ./bazel-0.24.0-installer-linux-x86_64.sh
             bazel info release
+  install-deps:
+    steps:
+      - run:
+          name: Install extra dependencies (yapf3)
+          command: |
+            pip install yapf
   restore-caches:
     steps:
       - restore_cache:
@@ -32,24 +38,26 @@ commands:
             - "/home/circleci/.cache/bazel/"
 jobs:
   lint:
-    working_directory: ~/ng/
+    working_directory: ~/code/
     machine:
       enabled: true
       image: ubuntu-1604:201903-01
     steps:
       - checkout
       - install-bazel
+      - install-deps
       - run: './tools/deps/check_dependencies.sh'
       - run: './tools/fix_formatting.sh'
 
   build:
-    working_directory: ~/ng/
+    working_directory: ~/code/
     machine:
       enabled: true
       image: ubuntu-1604:201903-01
     steps:
       - checkout
       - install-bazel
+      - install-deps
       - restore-caches
       - run: './tools/get_android_sdk.sh'
       - run:

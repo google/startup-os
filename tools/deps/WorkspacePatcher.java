@@ -37,7 +37,7 @@ public class WorkspacePatcher {
     return workpaceContents.replaceAll(
         // (?s) enables multiline matching
         "(?s)# MARK: StartupOS start.*# MARK: StartupOS end",
-        "local_repository(name=\"startup_os\",path=\"/home/circleci/ng/\")");
+        "local_repository(name=\"startup_os\",path=\"/home/circleci/code/\")");
   }
 
   public static void main(String[] args) throws IOException {
