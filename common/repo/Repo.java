@@ -75,7 +75,7 @@ public interface Repo {
 
   /**
    * Resets the index and working tree. Any changes to tracked files in the working tree since
-   * <commitId> are discarded.
+   * `commitId` are discarded.
    */
   void resetHard(String commitId);
 
