@@ -18,6 +18,7 @@ package com.google.startupos.tools.build_file_generator.http_archive_deps;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 import dagger.Component;
@@ -33,21 +34,14 @@ public class HttpArchiveDepsTool {
   }
 
   public static void main(String[] args) throws IOException {
+    Flags.parseCurrentPackage(args);
     HttpArchiveDepsTool.HttpArchiveDepsToolComponent component =
         DaggerHttpArchiveDepsTool_HttpArchiveDepsToolComponent.create();
 
     FileUtils fileUtils = component.getFileUtils();
     WorkspaceFile workspaceFile = component.getWorkspaceParser().getWorkspaceFile();
-    String projectName =
-        fileUtils
-            .getCurrentWorkingDirectory()
-            .substring(fileUtils.getCurrentWorkingDirectory().lastIndexOf('/') + 1);
-    String absRepoPath =
-        fileUtils.joinPaths(
-            fileUtils.getCurrentWorkingDirectory(),
-            String.format("bazel-%s/external/%s", projectName, projectName.replace("-", "_")));
     HttpArchiveDeps httpArchiveDeps =
-        component.getHttpArchiveDepsGenerator().getHttpArchiveDeps(workspaceFile, absRepoPath);
+        component.getHttpArchiveDepsGenerator().getHttpArchiveDeps(workspaceFile);
     new HttpArchiveDepsTool()
         .write(
             fileUtils,

@@ -9,6 +9,9 @@ java_library(
     srcs = ["HttpArchiveDepsGenerator.java"],
     deps = [
         "//common",
+        "//common/flags",
+        "//common/repo",
+        "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/build_file_generator:build_file_generator_java_proto",
@@ -47,6 +50,7 @@ java_binary(
         ":workspace_parser",
         "//common",
         "//common:dagger_with_annotation_processor",
+        "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/build_file_generator:build_file_generator_java_proto",

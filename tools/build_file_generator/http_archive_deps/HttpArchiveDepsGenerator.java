@@ -17,7 +17,12 @@
 package com.google.startupos.tools.build_file_generator.http_archive_deps;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
+import com.google.startupos.common.repo.GitRepo;
+import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.build_file_generator.BuildFileParser;
 import com.google.startupos.tools.build_file_generator.JavaClassAnalyzer;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
@@ -27,36 +32,55 @@ import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 public class HttpArchiveDepsGenerator {
-  private static final String STARTUP_OS_HTTP_ARCHIVE_NAME = "startup_os";
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
+  private static final String BUILD_GENERATOR_TEMP_FOLDER = "build_generator_tmp";
+
+  @FlagDesc(name = "http_archive_names", description = "http_archive names to process")
+  static final Flag<List<String>> httpArchiveNames =
+      Flag.createStringsListFlag(Collections.singletonList("startup_os"));
+
   private BuildFileParser buildFileParser;
   private JavaClassAnalyzer javaClassAnalyzer;
   private FileUtils fileUtils;
-  private String projectName;
+  private GitRepoFactory gitRepoFactory;
 
   @Inject
   public HttpArchiveDepsGenerator(
-      BuildFileParser buildFileParser, JavaClassAnalyzer javaClassAnalyzer, FileUtils fileUtils) {
+      BuildFileParser buildFileParser,
+      JavaClassAnalyzer javaClassAnalyzer,
+      FileUtils fileUtils,
+      GitRepoFactory gitRepoFactory) {
     this.buildFileParser = buildFileParser;
     this.javaClassAnalyzer = javaClassAnalyzer;
     this.fileUtils = fileUtils;
-    projectName =
-        fileUtils
-            .getCurrentWorkingDirectory()
-            .substring(fileUtils.getCurrentWorkingDirectory().lastIndexOf('/') + 1);
+    this.gitRepoFactory = gitRepoFactory;
   }
 
-  public HttpArchiveDeps getHttpArchiveDeps(WorkspaceFile workspaceFile, String absRepoPath)
-      throws IOException {
+  public HttpArchiveDeps getHttpArchiveDeps(WorkspaceFile workspaceFile) throws IOException {
     HttpArchiveDeps.Builder result = HttpArchiveDeps.newBuilder();
+    for (String httpArchiveName : httpArchiveNames.get()) {
+      WorkspaceFile.HttpArchive httpArchive = WorkspaceFile.HttpArchive.getDefaultInstance();
+      for (WorkspaceFile.HttpArchive currentHttpArchive : workspaceFile.getHttpArchiveList()) {
+        if (currentHttpArchive.getName().equals(httpArchiveName)) {
+          httpArchive = currentHttpArchive;
+        }
+      }
+      if (httpArchive.getName().equals(httpArchiveName)) {
+        String url = httpArchive.getUrls(0).split("/archive")[0] + ".git";
+        String repoName = url.substring(url.lastIndexOf('/') + 1).replace(".git", "");
 
-    for (WorkspaceFile.HttpArchive httpArchive : workspaceFile.getHttpArchiveList()) {
-      if (httpArchive.getName().equals(STARTUP_OS_HTTP_ARCHIVE_NAME)) {
-        System.out.println(fileUtils.folderExists(absRepoPath));
+        GitRepo gitRepo = createRepo(url, repoName);
+        switchToCommit(gitRepo, httpArchive.getStripPrefix());
+
+        String absRepoPath =
+            fileUtils.joinPaths(
+                fileUtils.getCurrentWorkingDirectory(), BUILD_GENERATOR_TEMP_FOLDER, repoName);
         ImmutableList<String> getBuildFilesAbsPaths = getBuildFilesAbsPaths(absRepoPath);
         for (String path : getBuildFilesAbsPaths) {
           BuildFile buildFile = buildFileParser.getBuildFile(path);
@@ -67,10 +91,34 @@ public class HttpArchiveDepsGenerator {
             addDeps(absRepoPath, result, path, javaBinary.getSrcsList(), javaBinary.getName());
           }
         }
-        result.setCommitId(getCommitId(httpArchive.getUrls(0)));
+        result.setCommitId(getCommitId(httpArchive.getStripPrefix()));
+        fileUtils.clearDirectoryUnchecked(
+            fileUtils.joinPaths(
+                fileUtils.getCurrentWorkingDirectory(), BUILD_GENERATOR_TEMP_FOLDER));
+      } else {
+        log.atWarning().log("Can't find http_archive with name: %s", httpArchiveName);
       }
     }
+    fileUtils.deleteFileOrDirectoryIfExists(
+        fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), BUILD_GENERATOR_TEMP_FOLDER));
     return result.build();
+  }
+
+  private GitRepo createRepo(String url, String repoName) {
+    String absRepoPath =
+        fileUtils.joinPaths(
+            fileUtils.getCurrentWorkingDirectory(), BUILD_GENERATOR_TEMP_FOLDER, repoName);
+    GitRepo gitRepo = gitRepoFactory.create(absRepoPath);
+    gitRepo.cloneRepo(url, absRepoPath);
+    return gitRepo;
+  }
+
+  private void switchToCommit(GitRepo gitRepo, String stripPrefix) {
+    gitRepo.resetHard(getCommitId(stripPrefix));
+  }
+
+  private String getCommitId(String stripPrefix) {
+    return stripPrefix.substring(stripPrefix.lastIndexOf('-') + 1);
   }
 
   private ImmutableList<String> getBuildFilesAbsPaths(String absRepoPath) {
@@ -101,7 +149,7 @@ public class HttpArchiveDepsGenerator {
         result.addHttpArchiveDep(
             HttpArchiveDep.newBuilder()
                 .setJavaClass(
-                    getProjectPackageSuffix(javaClass.getPackage())
+                    getProjectPackageSuffix(javaClass.getPackage(), absRepoPath)
                         + absBuildFilePath
                             .replace("/BUILD", ".")
                             .replace(absRepoPath, "")
@@ -114,11 +162,11 @@ public class HttpArchiveDepsGenerator {
     }
   }
 
-  private String getProjectPackageSuffix(String classPackage) {
+  private String getProjectPackageSuffix(String classPackage, String absRepoPath) {
+    String projectName = absRepoPath.substring(absRepoPath.lastIndexOf('/') + 1);
     String[] classPackageParts = classPackage.split(projectName.replace("-", ""));
     String absFilesystemPackagePath =
-        fileUtils.getCurrentWorkingDirectory()
-            + classPackageParts[classPackageParts.length - 1].replace(".", "/");
+        absRepoPath + classPackageParts[classPackageParts.length - 1].replace(".", "/");
     String[] absPathParts = absFilesystemPackagePath.split(projectName);
     String filesystemPackage =
         absPathParts[absPathParts.length - 1]
@@ -129,10 +177,6 @@ public class HttpArchiveDepsGenerator {
       return classPackage.replace(filesystemPackage, "").replaceAll(".$", "");
     }
     return "";
-  }
-
-  private String getCommitId(String repoUrl) {
-    return repoUrl.substring(repoUrl.lastIndexOf('/') + 1).replace(".zip", "");
   }
 }
 
