@@ -9,7 +9,6 @@ java_library(
     srcs = ["HttpArchiveDepsGenerator.java"],
     deps = [
         "//common",
-        "//common/flags",
         "//common/repo",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/com/google/guava",

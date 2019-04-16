@@ -19,8 +19,6 @@ package com.google.startupos.tools.build_file_generator.http_archive_deps;
 import com.google.common.collect.ImmutableList;
 import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
-import com.google.startupos.common.flags.Flag;
-import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.build_file_generator.BuildFileParser;
@@ -32,7 +30,6 @@ import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -40,10 +37,6 @@ import javax.inject.Inject;
 public class HttpArchiveDepsGenerator {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
   private static final String BUILD_GENERATOR_TEMP_FOLDER = "build_generator_tmp";
-
-  @FlagDesc(name = "http_archive_names", description = "http_archive names to process")
-  static final Flag<List<String>> httpArchiveNames =
-      Flag.createStringsListFlag(Collections.singletonList("startup_os"));
 
   private BuildFileParser buildFileParser;
   private JavaClassAnalyzer javaClassAnalyzer;
@@ -62,9 +55,10 @@ public class HttpArchiveDepsGenerator {
     this.gitRepoFactory = gitRepoFactory;
   }
 
-  public HttpArchiveDeps getHttpArchiveDeps(WorkspaceFile workspaceFile) throws IOException {
+  public HttpArchiveDeps getHttpArchiveDeps(
+      WorkspaceFile workspaceFile, List<String> httpArchiveNames) throws IOException {
     HttpArchiveDeps.Builder result = HttpArchiveDeps.newBuilder();
-    for (String httpArchiveName : httpArchiveNames.get()) {
+    for (String httpArchiveName : httpArchiveNames) {
       WorkspaceFile.HttpArchive httpArchive = WorkspaceFile.HttpArchive.getDefaultInstance();
       for (WorkspaceFile.HttpArchive currentHttpArchive : workspaceFile.getHttpArchiveList()) {
         if (currentHttpArchive.getName().equals(httpArchiveName)) {

@@ -18,16 +18,24 @@ package com.google.startupos.tools.build_file_generator.http_archive_deps;
 
 import com.google.startupos.common.CommonModule;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.common.flags.Flag;
+import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 import dagger.Component;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import javax.inject.Singleton;
 
 public class HttpArchiveDepsTool {
   private static final String HTTP_ARCHIVE_DEPS_FILENAME = "http_archive_deps.prototxt";
+
+  @FlagDesc(name = "http_archive_names", description = "http_archive names to process")
+  static final Flag<List<String>> httpArchiveNames =
+      Flag.createStringsListFlag(Collections.singletonList("startup_os"));
 
   public void write(FileUtils fileUtils, HttpArchiveDeps httpArchiveDeps, String absPath) {
     fileUtils.writePrototxtUnchecked(httpArchiveDeps, absPath);
@@ -41,7 +49,9 @@ public class HttpArchiveDepsTool {
     FileUtils fileUtils = component.getFileUtils();
     WorkspaceFile workspaceFile = component.getWorkspaceParser().getWorkspaceFile();
     HttpArchiveDeps httpArchiveDeps =
-        component.getHttpArchiveDepsGenerator().getHttpArchiveDeps(workspaceFile);
+        component
+            .getHttpArchiveDepsGenerator()
+            .getHttpArchiveDeps(workspaceFile, httpArchiveNames.get());
     new HttpArchiveDepsTool()
         .write(
             fileUtils,
