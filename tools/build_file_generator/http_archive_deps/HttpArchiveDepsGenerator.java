@@ -26,6 +26,7 @@ import com.google.startupos.tools.build_file_generator.JavaClassAnalyzer;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDep;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDepsList;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 
@@ -37,6 +38,8 @@ import javax.inject.Inject;
 public class HttpArchiveDepsGenerator {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
   private static final String BUILD_GENERATOR_TEMP_FOLDER = "build_generator_tmp";
+
+  static final String HTTP_ARCHIVE_DEPS_FILENAME = "http_archive_deps.prototxt";
 
   private BuildFileParser buildFileParser;
   private JavaClassAnalyzer javaClassAnalyzer;
@@ -55,9 +58,9 @@ public class HttpArchiveDepsGenerator {
     this.gitRepoFactory = gitRepoFactory;
   }
 
-  public HttpArchiveDeps getHttpArchiveDeps(
+  public HttpArchiveDepsList getHttpArchiveDeps(
       WorkspaceFile workspaceFile, List<String> httpArchiveNames) throws IOException {
-    HttpArchiveDeps.Builder result = HttpArchiveDeps.newBuilder();
+    HttpArchiveDepsList.Builder result = HttpArchiveDepsList.newBuilder();
     for (String httpArchiveName : httpArchiveNames) {
       WorkspaceFile.HttpArchive httpArchive = WorkspaceFile.HttpArchive.getDefaultInstance();
       for (WorkspaceFile.HttpArchive currentHttpArchive : workspaceFile.getHttpArchiveList()) {
@@ -65,7 +68,15 @@ public class HttpArchiveDepsGenerator {
           httpArchive = currentHttpArchive;
         }
       }
+      if (areCommitIdsTheSame(httpArchiveName, getCommitId(httpArchive.getStripPrefix()))) {
+        log.atInfo().log(
+            "Commit id in WORKSPACE file and commit id in \'%s\' file for \'%s\' http_archive "
+                + "are the same. Nothing to update.",
+            HTTP_ARCHIVE_DEPS_FILENAME, httpArchiveName);
+        continue;
+      }
       if (httpArchive.getName().equals(httpArchiveName)) {
+        HttpArchiveDeps.Builder builder = HttpArchiveDeps.newBuilder();
         String url = httpArchive.getUrls(0).split("/archive")[0] + ".git";
         String repoName = url.substring(url.lastIndexOf('/') + 1).replace(".git", "");
 
@@ -79,13 +90,16 @@ public class HttpArchiveDepsGenerator {
         for (String path : getBuildFilesAbsPaths) {
           BuildFile buildFile = buildFileParser.getBuildFile(path);
           for (BuildFile.JavaLibrary javaLibrary : buildFile.getJavaLibraryList()) {
-            addDeps(absRepoPath, result, path, javaLibrary.getSrcsList(), javaLibrary.getName());
+            addDeps(absRepoPath, builder, path, javaLibrary.getSrcsList(), javaLibrary.getName());
           }
           for (BuildFile.JavaBinary javaBinary : buildFile.getJavaBinaryList()) {
-            addDeps(absRepoPath, result, path, javaBinary.getSrcsList(), javaBinary.getName());
+            addDeps(absRepoPath, builder, path, javaBinary.getSrcsList(), javaBinary.getName());
           }
         }
-        result.setCommitId(getCommitId(httpArchive.getStripPrefix()));
+        builder
+            .setName(getCommitId(httpArchive.getName()))
+            .setCommitId(getCommitId(httpArchive.getStripPrefix()));
+        result.addHttpArchiveDeps(builder.build());
         fileUtils.clearDirectoryUnchecked(
             fileUtils.joinPaths(
                 fileUtils.getCurrentWorkingDirectory(), BUILD_GENERATOR_TEMP_FOLDER));
@@ -171,6 +185,25 @@ public class HttpArchiveDepsGenerator {
       return classPackage.replace(filesystemPackage, "").replaceAll(".$", "");
     }
     return "";
+  }
+
+  private boolean areCommitIdsTheSame(String httpArchiveName, String workspaceCommitId) {
+    String absPrototxtPath =
+        fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), HTTP_ARCHIVE_DEPS_FILENAME);
+    if (!fileUtils.fileExists(absPrototxtPath)) {
+      return false;
+    }
+    HttpArchiveDepsList httpArchiveDepsList =
+        (HttpArchiveDepsList)
+            fileUtils.readPrototxtUnchecked(absPrototxtPath, HttpArchiveDepsList.newBuilder());
+    String prototxtCommitId = "";
+    for (HttpArchiveDeps httpArchiveDeps : httpArchiveDepsList.getHttpArchiveDepsList()) {
+      if (httpArchiveDeps.getName().equals(httpArchiveName)) {
+        prototxtCommitId = httpArchiveDeps.getCommitId();
+        break;
+      }
+    }
+    return workspaceCommitId.equals(prototxtCommitId);
   }
 }
 

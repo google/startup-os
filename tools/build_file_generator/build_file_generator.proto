@@ -115,6 +115,9 @@ message HttpArchiveDep {
 }
 
 message HttpArchiveDeps {
-  repeated HttpArchiveDep http_archive_dep = 1;
+  string name = 1;
   string commit_id = 2;
+  repeated HttpArchiveDep http_archive_dep = 3;
 }
+
+message HttpArchiveDepsList { repeated HttpArchiveDeps httpArchiveDeps = 1; }
