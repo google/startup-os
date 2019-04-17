@@ -39,7 +39,7 @@ public class HttpArchiveDepsGenerator {
   private static final FluentLogger log = FluentLogger.forEnclosingClass();
   private static final String BUILD_GENERATOR_TEMP_FOLDER = "build_generator_tmp";
 
-  static final String HTTP_ARCHIVE_DEPS_FILENAME = "http_archive_deps.prototxt";
+  public static final String HTTP_ARCHIVE_DEPS_FILENAME = "http_archive_deps.prototxt";
 
   private BuildFileParser buildFileParser;
   private JavaClassAnalyzer javaClassAnalyzer;
