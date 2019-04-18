@@ -16,7 +16,7 @@ export class ToolbarComponent {
   ) { }
 
   logout(): void {
-    this.authService.logout();
+    this.authService.logOut().subscribe();
   }
 
   home(): void {

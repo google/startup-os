@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import * as firebase from 'firebase/app';
 
 import { FirebaseStateService } from './firebase-state.service';
@@ -31,14 +32,22 @@ export class AuthService {
     return userEmail.split('@')[0];
   }
 
-  loginWithGoogle(): Promise<any> {
-    return this.angularFireAuth.auth.signInWithPopup(
-      new firebase.auth.GoogleAuthProvider(),
-    );
+  logInWithGoogle(): Observable<void> {
+    return new Observable(observer => {
+      this.angularFireAuth.auth.signInWithPopup(
+        new firebase.auth.GoogleAuthProvider(),
+      )
+        .then(() => observer.next())
+        .catch(() => observer.error());
+    });
   }
 
-  logout(): Promise<any> {
+  logOut(): Observable<void> {
     this.firebaseStateService.destroy();
-    return this.angularFireAuth.auth.signOut();
+    return new Observable(observer => {
+      this.angularFireAuth.auth.signOut()
+        .then(() => observer.next())
+        .catch(() => observer.error());
+    });
   }
 }
