@@ -92,6 +92,7 @@ java_binary(
         ":third_party_deps_analyzer",
         "//common",
         "//common:dagger_with_annotation_processor",
+        "//common/flags",
     ],
 )
 
