@@ -28,6 +28,9 @@ import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaProt
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaTest;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.LoadExtensionStatement;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.ProtoLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDep;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDepsList;
 import com.google.startupos.tools.build_file_generator.Protos.Import;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import com.google.startupos.tools.build_file_generator.Protos.ProtoFile;
@@ -50,6 +53,7 @@ import javax.inject.Inject;
 public class BuildFileGenerator {
   private static final String THIRD_PARTY_ZIP_PATH = "third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
+  private static final String HTTP_ARCHIVE_DEPS_PATH = "http_archive_deps.prototxt";
   private static final String CHECKSTYLE_BZL_FILE_PATH = "//tools/checkstyle:checkstyle.bzl";
   private static final String CHECKSTYLE_SYMBOL = "checkstyle_test";
   private static final String JAVA_GRPC_LIBRARY_BZL_FILE_PATH =
@@ -87,6 +91,11 @@ public class BuildFileGenerator {
     return (ThirdPartyDeps)
         fileUtils.readPrototxtFromZipUnchecked(
             THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
+  }
+
+  private HttpArchiveDepsList getHttpArchiveDepsList() {
+    return (HttpArchiveDepsList)
+        fileUtils.readPrototxtUnchecked(HTTP_ARCHIVE_DEPS_PATH, HttpArchiveDepsList.newBuilder());
   }
 
   // Returns absolute paths where exists java classes and/or proto files.
@@ -157,6 +166,7 @@ public class BuildFileGenerator {
 
     List<String> javaClasses = getFilesByExtension(packagePath, ".java");
     List<ThirdPartyDep> thirdPartyDeps = getThirdPartyDeps().getThirdPartyDepList();
+    HttpArchiveDepsList httpArchiveDepsList = getHttpArchiveDepsList();
     if (!javaClasses.isEmpty()) {
       buildFile.addExtension(
           getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
@@ -168,18 +178,33 @@ public class BuildFileGenerator {
         String targetName;
         if (javaClass.getHasMainMethod()) {
           JavaBinary javaBinary =
-              getJavaBinary(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles);
+              getJavaBinary(
+                  javaClass,
+                  thirdPartyDeps,
+                  httpArchiveDepsList,
+                  protoFiles,
+                  wholeProjectProtoFiles);
           targetName = javaBinary.getName();
           buildFile.addJavaBinary(javaBinary);
         } else if (javaClass.getIsTestClass()) {
           JavaTest javaTest =
               getJavaTest(
-                  javaClass, packagePath, thirdPartyDeps, protoFiles, wholeProjectProtoFiles);
+                  javaClass,
+                  packagePath,
+                  thirdPartyDeps,
+                  httpArchiveDepsList,
+                  protoFiles,
+                  wholeProjectProtoFiles);
           targetName = javaTest.getName();
           buildFile.addJavaTest(javaTest);
         } else {
           JavaLibrary javaLibrary =
-              getJavaLibrary(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles);
+              getJavaLibrary(
+                  javaClass,
+                  thirdPartyDeps,
+                  httpArchiveDepsList,
+                  protoFiles,
+                  wholeProjectProtoFiles);
           targetName = javaLibrary.getName();
           buildFile.addJavaLibrary(javaLibrary);
         }
@@ -243,25 +268,31 @@ public class BuildFileGenerator {
   private JavaLibrary getJavaLibrary(
       JavaClass javaClass,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
       List<ProtoFile> wholeProjectProtoFiles) {
     return JavaLibrary.newBuilder()
         .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
-        .addAllDeps(getDeps(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles))
+        .addAllDeps(
+            getDeps(
+                javaClass, thirdPartyDeps, httpArchiveDepsList, protoFiles, wholeProjectProtoFiles))
         .build();
   }
 
   private JavaBinary getJavaBinary(
       JavaClass javaClass,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
       List<ProtoFile> wholeProjectProtoFiles) {
     return JavaBinary.newBuilder()
         .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .setMainClass(javaClass.getPackage() + "." + javaClass.getClassName())
         .addSrcs(javaClass.getClassName() + ".java")
-        .addAllDeps(getDeps(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles))
+        .addAllDeps(
+            getDeps(
+                javaClass, thirdPartyDeps, httpArchiveDepsList, protoFiles, wholeProjectProtoFiles))
         // TODO: Add it to each java_binary only when we really need it.
         .addDeps("//third_party/maven/com/google/flogger:flogger_system_backend")
         .build();
@@ -271,13 +302,16 @@ public class BuildFileGenerator {
       JavaClass javaClass,
       String packagePath,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
       List<ProtoFile> wholeProjectProtoFiles) {
     return JavaTest.newBuilder()
         .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
         .setTestClass(javaClass.getPackage() + "." + javaClass.getClassName())
-        .addAllDeps(getDeps(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles))
+        .addAllDeps(
+            getDeps(
+                javaClass, thirdPartyDeps, httpArchiveDepsList, protoFiles, wholeProjectProtoFiles))
         // TODO: Add it to each java_binary only when we really need it.
         .addDeps("//third_party/maven/com/google/flogger:flogger_system_backend")
         .addAllResources(getResources(packagePath))
@@ -311,6 +345,7 @@ public class BuildFileGenerator {
   private List<String> getDeps(
       JavaClass javaClass,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
       List<ProtoFile> wholeProjectProtoFiles) {
     Set<String> result = new HashSet<>();
@@ -335,15 +370,36 @@ public class BuildFileGenerator {
         }
       }
 
+      String httpArchiveTarget = "";
+      if (httpArchiveTarget.isEmpty()) {
+        for (HttpArchiveDeps httpArchiveDeps : httpArchiveDepsList.getHttpArchiveDepsList()) {
+          for (HttpArchiveDep httpArchiveDep : httpArchiveDeps.getHttpArchiveDepList()) {
+            if (httpArchiveDep
+                .getJavaClass()
+                .contains(importProto.getPackage() + "." + importProto.getRootClass())) {
+              httpArchiveTarget = '@' + httpArchiveDeps.getName() + httpArchiveDep.getTarget();
+              break;
+            }
+          }
+          if (!httpArchiveTarget.isEmpty()) {
+            break;
+          }
+        }
+      }
+
       String target;
       if (thirdPartyTargets.isEmpty()) {
         // It isn't third party dep.
-        String classNameWithPackage = importProto.getPackage() + "." + importProto.getRootClass();
-        if (internalProjectDeps.containsKey(classNameWithPackage)) {
-          target = internalProjectDeps.get(classNameWithPackage);
+        if (httpArchiveTarget.isEmpty()) {
+          String classNameWithPackage = importProto.getPackage() + "." + importProto.getRootClass();
+          if (internalProjectDeps.containsKey(classNameWithPackage)) {
+            target = internalProjectDeps.get(classNameWithPackage);
+          } else {
+            target =
+                getInternalProjectDep(importProto, wholeProjectProtoFiles, javaClass.getPackage());
+          }
         } else {
-          target =
-              getInternalProjectDep(importProto, wholeProjectProtoFiles, javaClass.getPackage());
+          target = httpArchiveTarget;
         }
       } else if (thirdPartyTargets.size() == 1) {
         target = thirdPartyTargets.get(0).getTarget();
