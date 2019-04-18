@@ -24,12 +24,12 @@ import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.build_file_generator.BuildFileParser;
 import com.google.startupos.tools.build_file_generator.JavaClassAnalyzer;
 import com.google.startupos.tools.build_file_generator.ProtoFileAnalyzer;
-import com.google.startupos.tools.build_file_generator.Protos.ProtoFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDep;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDepsList;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
+import com.google.startupos.tools.build_file_generator.Protos.ProtoFile;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 
 import java.io.IOException;
@@ -106,7 +106,8 @@ public class HttpArchiveDepsGenerator {
                 buildFile.getJavaProtoLibraryList()) {
               if (javaProtoLibrary.getDepsList().contains(":" + protoLibrary.getName())) {
                 ProtoFile protoFile = protoFileAnalyzer.getProtoFile(absProtoFilePath);
-                if((!protoFile.getJavaPackage().isEmpty()) && (!protoFile.getJavaOuterClassname().isEmpty())) {
+                if ((!protoFile.getJavaPackage().isEmpty())
+                    && (!protoFile.getJavaOuterClassname().isEmpty())) {
                   String fullJavaClassName =
                       protoFile.getJavaPackage() + "." + protoFile.getJavaOuterClassname();
                   String target =
