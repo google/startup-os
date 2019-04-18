@@ -16,6 +16,7 @@ java_library(
         "//tools/build_file_generator:build_file_generator_java_proto",
         "//tools/build_file_generator:build_file_parser",
         "//tools/build_file_generator:java_class_analyzer",
+        "//tools/build_file_generator:proto_file_analyzer",
     ],
 )
 

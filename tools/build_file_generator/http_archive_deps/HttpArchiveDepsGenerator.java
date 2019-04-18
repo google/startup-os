@@ -23,6 +23,8 @@ import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.build_file_generator.BuildFileParser;
 import com.google.startupos.tools.build_file_generator.JavaClassAnalyzer;
+import com.google.startupos.tools.build_file_generator.ProtoFileAnalyzer;
+import com.google.startupos.tools.build_file_generator.Protos.ProtoFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDep;
 import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
@@ -43,6 +45,7 @@ public class HttpArchiveDepsGenerator {
 
   private BuildFileParser buildFileParser;
   private JavaClassAnalyzer javaClassAnalyzer;
+  private ProtoFileAnalyzer protoFileAnalyzer;
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
 
@@ -50,10 +53,12 @@ public class HttpArchiveDepsGenerator {
   public HttpArchiveDepsGenerator(
       BuildFileParser buildFileParser,
       JavaClassAnalyzer javaClassAnalyzer,
+      ProtoFileAnalyzer protoFileAnalyzer,
       FileUtils fileUtils,
       GitRepoFactory gitRepoFactory) {
     this.buildFileParser = buildFileParser;
     this.javaClassAnalyzer = javaClassAnalyzer;
+    this.protoFileAnalyzer = protoFileAnalyzer;
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
   }
@@ -86,14 +91,35 @@ public class HttpArchiveDepsGenerator {
         String absRepoPath =
             fileUtils.joinPaths(
                 fileUtils.getCurrentWorkingDirectory(), BUILD_GENERATOR_TEMP_FOLDER, repoName);
-        ImmutableList<String> getBuildFilesAbsPaths = getBuildFilesAbsPaths(absRepoPath);
-        for (String path : getBuildFilesAbsPaths) {
+        ImmutableList<String> buildFilesAbsPaths = getBuildFilesAbsPaths(absRepoPath);
+        for (String path : buildFilesAbsPaths) {
           BuildFile buildFile = buildFileParser.getBuildFile(path);
           for (BuildFile.JavaLibrary javaLibrary : buildFile.getJavaLibraryList()) {
             addDeps(absRepoPath, builder, path, javaLibrary.getSrcsList(), javaLibrary.getName());
           }
           for (BuildFile.JavaBinary javaBinary : buildFile.getJavaBinaryList()) {
             addDeps(absRepoPath, builder, path, javaBinary.getSrcsList(), javaBinary.getName());
+          }
+          for (BuildFile.ProtoLibrary protoLibrary : buildFile.getProtoLibraryList()) {
+            String absProtoFilePath = path.replace("BUILD", protoLibrary.getSrcs(0));
+            for (BuildFile.JavaProtoLibrary javaProtoLibrary :
+                buildFile.getJavaProtoLibraryList()) {
+              if (javaProtoLibrary.getDepsList().contains(":" + protoLibrary.getName())) {
+                ProtoFile protoFile = protoFileAnalyzer.getProtoFile(absProtoFilePath);
+                if((!protoFile.getJavaPackage().isEmpty()) && (!protoFile.getJavaOuterClassname().isEmpty())) {
+                  String fullJavaClassName =
+                      protoFile.getJavaPackage() + "." + protoFile.getJavaOuterClassname();
+                  String target =
+                      path.replace(absRepoPath, "/").replace("/BUILD", ":")
+                          + javaProtoLibrary.getName();
+                  builder.addHttpArchiveDep(
+                      HttpArchiveDep.newBuilder()
+                          .setTarget(target)
+                          .setJavaClass(fullJavaClassName)
+                          .build());
+                }
+              }
+            }
           }
         }
         builder
