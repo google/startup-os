@@ -382,6 +382,9 @@ public class BuildFileParser {
         case "target":
           result.setTarget(values.get(0));
           break;
+        case "config":
+          result.setConfig(values.get(0));
+          break;
         default:
           // Do nothing
       }
