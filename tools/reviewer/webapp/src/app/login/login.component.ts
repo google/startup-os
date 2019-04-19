@@ -15,7 +15,7 @@ export class LoginComponent {
   ) { }
 
   loginUsingGoogle(): void {
-    this.authService.loginWithGoogle().then(() => {
+    this.authService.logInWithGoogle().subscribe(() => {
       this.router.navigate(['/diffs']);
     });
   }

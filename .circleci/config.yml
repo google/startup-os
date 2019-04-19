@@ -84,6 +84,7 @@ jobs:
       - save-caches
 
 workflows:
+  version: 2
   default_workflow:
     jobs:
       - lint

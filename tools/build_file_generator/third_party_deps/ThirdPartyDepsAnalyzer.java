@@ -40,13 +40,13 @@ public class ThirdPartyDepsAnalyzer {
     this.fileUtils = fileUtils;
   }
 
-  public ThirdPartyDeps getThirdPartyDeps() throws IOException {
+  public ThirdPartyDeps getThirdPartyDeps(String absBuildFilePath) throws IOException {
     final String repoName =
         fileUtils
             .getCurrentWorkingDirectory()
             .substring(fileUtils.getCurrentWorkingDirectory().lastIndexOf('/') + 1);
     ThirdPartyDeps.Builder result = ThirdPartyDeps.newBuilder();
-    for (String target : getThirdPartyTargets(repoName)) {
+    for (String target : getThirdPartyTargets(absBuildFilePath)) {
       String folderName = getFolderNameByTarget(getThirdPartyFolderNames(repoName), target);
       if (!folderName.isEmpty()) {
         List<String> jarClasses =
@@ -61,25 +61,10 @@ public class ThirdPartyDepsAnalyzer {
     return result.build();
   }
 
-  private ImmutableList<String> getThirdPartyTargets(String repoName) {
+  private ImmutableList<String> getThirdPartyTargets(String absBuildFilePath) {
     ImmutableList.Builder<String> result = ImmutableList.builder();
-    final String rootPackageName = repoName.replace("-", "");
-    String packageName = this.getClass().getPackage().getName();
-    final String absBuildFilePath;
-    if (packageName.contains(rootPackageName + ".")) {
-      absBuildFilePath =
-          fileUtils.joinPaths(
-              fileUtils.getCurrentWorkingDirectory(),
-              packageName.split(rootPackageName + ".")[1].replace(".", "/"),
-              "BUILD");
-    } else {
-      absBuildFilePath =
-          fileUtils.joinPaths(
-              fileUtils.getCurrentWorkingDirectory(), packageName.replace(".", "/"), "BUILD");
-    }
     String[] buildFileContent =
         fileUtils.readFileUnchecked(absBuildFilePath).split(System.lineSeparator());
-
     boolean isThirdPartyDepsGroup = false;
     for (String line : buildFileContent) {
       if (line.contains(THIRD_PARTY_DEPS_MARKER_START)) {

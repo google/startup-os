@@ -48,8 +48,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
-// TODO: Add the support full classnames(package + classname) inside the code. It will allow
-// auto-generating BUILD file for `tools.reviewer.job.sync.tests.DiffConverterTest`
+// TODO: Add the support full classnames(package + classname) inside the code.
 public class BuildFileGenerator {
   private static final String THIRD_PARTY_ZIP_PATH = "third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
@@ -59,7 +58,8 @@ public class BuildFileGenerator {
   private static final String JAVA_GRPC_LIBRARY_BZL_FILE_PATH =
       "//third_party:java_grpc_library.bzl";
   private static final String JAVA_GRPC_LIBRARY_SYMBOL = "java_grpc_library";
-
+  private static final String CHECKSTYLE_TEST_CONFIG = "//tools/checkstyle:config.xml";
+  private static final String STARTUP_OS_PROJECT_NAME = "startup-os";
   private static final ImmutableList<String> BUILD_FILE_GENERATION_BLACKLIST =
       ImmutableList.of(
           // A `resources` folder can contain proto files. If the `resources` folder contains a
@@ -74,6 +74,7 @@ public class BuildFileGenerator {
   private ProtoFileAnalyzer protoFileAnalyzer;
   private JavaClassAnalyzer javaClassAnalyzer;
   private BuildFileParser buildFileParser;
+  private String projectName;
 
   @Inject
   public BuildFileGenerator(
@@ -85,6 +86,10 @@ public class BuildFileGenerator {
     this.protoFileAnalyzer = protoFileAnalyzer;
     this.javaClassAnalyzer = javaClassAnalyzer;
     this.buildFileParser = buildFileParser;
+    projectName =
+        fileUtils
+            .getCurrentWorkingDirectory()
+            .substring(fileUtils.getCurrentWorkingDirectory().lastIndexOf('/') + 1);
   }
 
   private ThirdPartyDeps getThirdPartyDeps() {
@@ -101,7 +106,7 @@ public class BuildFileGenerator {
   // Returns absolute paths where exists java classes and/or proto files.
   // These are places where we should create BUILD files.
   private ImmutableList<String> getPathsToCreateBuildFiles() {
-    ImmutableList.Builder<String> result = ImmutableList.builder();
+    Set<String> result = new HashSet<>();
     try {
       for (String path :
           fileUtils.listContentsRecursively(fileUtils.getCurrentWorkingDirectory())) {
@@ -125,7 +130,7 @@ public class BuildFileGenerator {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return result.build();
+    return ImmutableList.copyOf(result);
   }
 
   /* Returns Map<String, BuildFile> where
@@ -319,10 +324,13 @@ public class BuildFileGenerator {
   }
 
   private CheckstyleTestExtension getCheckstyleTest(String target) {
-    return CheckstyleTestExtension.newBuilder()
-        .setName(target + "-checkstyle")
-        .setTarget(":" + target)
-        .build();
+    CheckstyleTestExtension.Builder result = CheckstyleTestExtension.newBuilder();
+    result.setName(target + "-checkstyle").setTarget(":" + target);
+    if (projectName.equals(STARTUP_OS_PROJECT_NAME)) {
+      return result.build();
+    } else {
+      return result.setConfig(CHECKSTYLE_TEST_CONFIG).build();
+    }
   }
 
   private List<String> getResources(String packagePath) {
@@ -349,7 +357,7 @@ public class BuildFileGenerator {
       List<ProtoFile> protoFiles,
       List<ProtoFile> wholeProjectProtoFiles) {
     Set<String> result = new HashSet<>();
-    Map<String, String> internalProjectDeps = getStartuposJavaClassToTargetNameMap();
+    Map<String, String> internalProjectDeps = getInternalProjectJavaClassToTargetNameMap();
     List<String> internalPackageDeps = getInternalPackageDeps(javaClass, protoFiles);
     result.addAll(internalPackageDeps);
     for (Import importProto : javaClass.getImportList()) {
@@ -414,15 +422,23 @@ public class BuildFileGenerator {
                 .get(0)
                 .getTarget();
       }
-      if (target.equals("//third_party/maven/com/google/dagger:dagger")
-          || target.equals("//third_party/maven/com/google/dagger")
-          || target.equals("//common:dagger_common_component")) {
-        target = "//common:dagger_with_annotation_processor";
+      if (target.endsWith("//third_party/maven/com/google/dagger:dagger")
+          || target.endsWith("//third_party/maven/com/google/dagger")
+          || target.endsWith("//common:dagger_common_component")) {
+        if (projectName.equals(STARTUP_OS_PROJECT_NAME)) {
+          target = "//common:dagger_with_annotation_processor";
+        } else {
+          target = "@startup_os//common:dagger_with_annotation_processor";
+        }
       }
       // TODO: After //common/repo/BUILD file will be generated automatically change this. If
       // `//common/repo:git_repo` exists then we could generalize to remove `_factory`.
       if (target.equals("//common/repo:git_repo_factory")) {
-        target = "//common/repo:repo";
+        if (projectName.equals(STARTUP_OS_PROJECT_NAME)) {
+          target = "//common/repo:repo";
+        } else {
+          target = "@startup_os//common/repo:repo";
+        }
       }
       if (!target.isEmpty()) {
         result.add(target);
@@ -433,7 +449,9 @@ public class BuildFileGenerator {
 
   private String getInternalProjectDep(
       Import importProto, List<ProtoFile> protoFiles, String packageToCreateBuildFile) {
-    String path = importProto.getPackage().replace("com.google.startupos.", "//").replace(".", "/");
+    final String projectPackageSuffix = getProjectPackageSuffix(importProto.getPackage());
+    String path =
+        importProto.getPackage().replace(projectPackageSuffix + ".", "//").replace(".", "/");
     for (ProtoFile protoFile : protoFiles) {
       for (String service : protoFile.getServicesList()) {
         if ((service + "Grpc").equals(importProto.getRootClass())) {
@@ -441,7 +459,10 @@ public class BuildFileGenerator {
           if (importProto.getPackage().equals(packageToCreateBuildFile)) {
             return javaGrpcName;
           } else {
-            return protoFile.getPackage().replace("com.google.startupos.", "//").replace(".", "/")
+            return protoFile
+                    .getPackage()
+                    .replace(projectPackageSuffix + ".", "//")
+                    .replace(".", "/")
                 + javaGrpcName;
           }
         }
@@ -453,7 +474,7 @@ public class BuildFileGenerator {
         if (importProto.getPackage().equals(packageToCreateBuildFile)) {
           return javaProtoName;
         } else {
-          return protoFile.getPackage().replace("com.google.startupos.", "//").replace(".", "/")
+          return protoFile.getPackage().replace(projectPackageSuffix + ".", "//").replace(".", "/")
               + javaProtoName;
         }
       }
@@ -500,7 +521,7 @@ public class BuildFileGenerator {
   }
 
   // TODO: Add supporting glob function
-  private Map<String, String> getStartuposJavaClassToTargetNameMap() {
+  private Map<String, String> getInternalProjectJavaClassToTargetNameMap() {
     Map<String, String> result = new HashMap<>();
 
     for (String absPath : getPathsToCreateBuildFiles()) {
@@ -509,21 +530,46 @@ public class BuildFileGenerator {
 
       if (fileUtils.fileExists(absBuildFilePath)) {
         BuildFile buildFile = buildFileParser.getBuildFile(absBuildFilePath);
-        final String startuposImportSuffix = "com.google.startupos";
         for (JavaLibrary javaLibrary : buildFile.getJavaLibraryList()) {
-          String targetName = relPackagePath + ":" + javaLibrary.getName();
-          for (String src : javaLibrary.getSrcsList()) {
-            String fullClassName =
-                startuposImportSuffix
-                    + relPackagePath.replace("//", ".").replace("/", ".")
-                    + "."
-                    + src;
-            result.put(fullClassName.replace(".java", ""), targetName);
+          if (javaLibrary.getSrcsCount() > 0) {
+            String absClassPath = "/" + fileUtils.joinPaths(absPath, javaLibrary.getSrcs(0));
+            try {
+              JavaClass javaClass = javaClassAnalyzer.getJavaClass(absClassPath);
+              final String projectPackageSuffix = getProjectPackageSuffix(javaClass.getPackage());
+              String targetName = relPackagePath + ":" + javaLibrary.getName();
+              for (String src : javaLibrary.getSrcsList()) {
+                String fullClassName =
+                    relPackagePath.replace("//", "").replace("/", ".") + "." + src;
+                if (!projectPackageSuffix.isEmpty()) {
+                  fullClassName = projectPackageSuffix + "." + fullClassName;
+                }
+                result.put(fullClassName.replace(".java", ""), targetName);
+              }
+            } catch (IOException e) {
+              throw new RuntimeException("Can't find java class by path: " + absClassPath, e);
+            }
           }
         }
       }
     }
     return result;
+  }
+
+  private String getProjectPackageSuffix(String classPackage) {
+    String[] classPackageParts = classPackage.split(projectName.replace("-", ""));
+    String absFilesystemPackagePath =
+        fileUtils.getCurrentWorkingDirectory()
+            + classPackageParts[classPackageParts.length - 1].replace(".", "/");
+    String[] absPathParts = absFilesystemPackagePath.split(projectName);
+    String filesystemPackage =
+        absPathParts[absPathParts.length - 1]
+            .replaceFirst("/", "")
+            .replaceAll("/$", "")
+            .replace("/", ".");
+    if (classPackage.contains(filesystemPackage)) {
+      return classPackage.replace(filesystemPackage, "").replaceAll(".$", "");
+    }
+    return "";
   }
 
   private ImmutableList<ProtoFile> getWholeProjectProtoFiles() {
