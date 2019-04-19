@@ -6,7 +6,7 @@ import { Diff } from '@/core/proto';
 @Injectable()
 export class FirebaseMockService {
   getDiffs(): Observable<Diff[]> {
-    return of();
+    return of([new Diff()]);
   }
 
   getDiff(id: string): Observable<Diff> {

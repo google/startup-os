@@ -35,7 +35,7 @@ describe('DiffHeaderComponent', () => {
     expect(pre.textContent).toEqual('testuser');
   });
 
-  it('should display user', () => {
+  it('should display description', () => {
     const pre: HTMLElement = fixture.nativeElement.querySelector('.description .read-mode pre');
     expect(pre.textContent).toEqual('Lorem ipsum dolor sit amet, consectetur adipisicing elit.');
   });

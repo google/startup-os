@@ -7,7 +7,7 @@ import { CoreModule } from '@/core';
 import { SharedModule } from '@/shared';
 import { AuthService, FirebaseService } from '@/core/services';
 import { AuthMockService, FirebaseMockService } from '@/core/services/mock';
-import { DiffModule, DiffsModule } from './dashboard';
+import { DiffModule } from './dashboard';
 
 export function configureTestingModule(): void {
   TestBed.configureTestingModule({
@@ -18,7 +18,6 @@ export function configureTestingModule(): void {
       SharedModule,
       RouterTestingModule,
       DiffModule,
-      DiffsModule,
     ],
     providers: [AuthMockService, FirebaseMockService],
   })
