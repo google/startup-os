@@ -100,7 +100,9 @@ public class BuildFileGenerator {
 
   private HttpArchiveDepsList getHttpArchiveDepsList() {
     return (HttpArchiveDepsList)
-        fileUtils.readPrototxtUnchecked(HTTP_ARCHIVE_DEPS_PATH, HttpArchiveDepsList.newBuilder());
+        fileUtils.readPrototxtUnchecked(
+            fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), HTTP_ARCHIVE_DEPS_PATH),
+            HttpArchiveDepsList.newBuilder());
   }
 
   // Returns absolute paths where exists java classes and/or proto files.
