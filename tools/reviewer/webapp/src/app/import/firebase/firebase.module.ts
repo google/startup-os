@@ -5,13 +5,13 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import firebase from '@firebase/app';
 
-import { Config } from './config.interface';
+import { FirebaseConfig } from '@/core/proto';
 
 const CustomFirebaseInit: FactoryProvider = {
   provide: FirebaseOptionsToken,
   deps: [],
   useFactory: () => {
-    const reviewerConfig: Config = window['reviewerConfig'];
+    const reviewerConfig: FirebaseConfig.AsObject = window['reviewerConfig'];
     return firebase.initializeApp(reviewerConfig);
   },
 };
