@@ -76,6 +76,14 @@ android_sdk_repository(
     build_tools_version = "27.0.3",
 )
 
+http_archive(
+    name = "tsfmt",
+    # TODO(vmax): once deployed, replace with oferb/startupos-binaries
+    urls = ["https://github.com/vmax/startupos-binaries/releases/download/tsfmt/tsfmt.zip"],
+    sha256 = "d488f0748aea81c48fb82681ae1fd79e603986f7135a7eac76fc2faf16f79e0f",
+    build_file_content = "exports_files(['cli-linux', 'cli-macos'])"
+)
+
 http_file(
     name = "buildifier",
     executable = True,
