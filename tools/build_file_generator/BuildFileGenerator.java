@@ -149,7 +149,9 @@ public class BuildFileGenerator {
     Set<String> result = new HashSet<>();
     for (String path : getPathsContainJavaAndProtoFiles()) {
       for (String rootBlacklistFolder : buildFileGenerationBlacklist) {
-        if (path.endsWith(rootBlacklistFolder)) {
+        String pathPart =
+            rootBlacklistFolder.endsWith("/") ? rootBlacklistFolder : rootBlacklistFolder + "/";
+        if (path.endsWith(rootBlacklistFolder) || path.contains(pathPart)) {
           result.add(path);
           if (fileUtils.folderExists(path)) {
             try {
