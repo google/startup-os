@@ -42,7 +42,7 @@ export class SpeechArrowComponent implements OnInit {
       [this.size / 2 + this.border, this.border],
       [this.size + this.border, this.size + 1],
     ];
-    const d: string = 'M' + coords.map(coord => coord.join(',')).join(' L') + 'Z';
+    const d: string = 'M' + coords.map((coord: number[]) => coord.join(',')).join(' L') + 'Z';
     path.setAttributeNS(null, 'd', d);
     path.setAttributeNS(null, 'fill', this.color);
     path.setAttributeNS(null, 'filter', 'url(#shadow)');
@@ -60,7 +60,7 @@ export class SpeechArrowComponent implements OnInit {
       [this.size + this.border, this.size - this.border / 2],
       [this.width, this.size - this.border / 2],
     ];
-    const points: string = polylinecoords.map(coord => coord.join(',')).join(' ');
+    const points: string = polylinecoords.map((coord: number[]) => coord.join(',')).join(' ');
     polyline.setAttributeNS(null, 'points', points);
     polyline.setAttributeNS(null, 'fill', 'none');
     polyline.setAttributeNS(null, 'stroke', this.bordercolor);

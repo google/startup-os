@@ -11,8 +11,8 @@ const CustomFirebaseInit: FactoryProvider = {
   provide: FirebaseOptionsToken,
   deps: [],
   useFactory: () => {
-    const reviewerConfig: FirebaseConfig.AsObject = window['reviewerConfig'];
-    return firebase.initializeApp(reviewerConfig);
+    const firebaseConfig: FirebaseConfig.AsObject = window['firebaseConfig'];
+    return firebase.initializeApp(firebaseConfig);
   },
 };
 

@@ -31,7 +31,7 @@ export class BlocksService {
     const clearCodeLines: string[] = fileContent.split('\n');
 
     const blockLines: BlockLine[] = [];
-    highlightedLines.forEach((lineCode, index) => {
+    highlightedLines.forEach((lineCode: string, index: number) => {
       const clearLineCode: string = clearCodeLines[index];
       if (clearLineCode === undefined) {
         throw new Error("Highlighted and clear lines don't match");
@@ -60,7 +60,7 @@ export class BlocksService {
     const spans: HTMLCollectionOf<HTMLSpanElement> = htmlDocument
       .getElementsByTagName('span') as HTMLCollectionOf<HTMLSpanElement>;
     let multilineSpanList: HTMLSpanElement[] = [];
-    Array.from(spans).forEach(span => {
+    Array.from(spans).forEach((span: HTMLSpanElement) => {
       const innerLines: string[] = span.innerHTML.split('\n');
       if (innerLines.length > 1) {
         multilineSpanList.push(span);

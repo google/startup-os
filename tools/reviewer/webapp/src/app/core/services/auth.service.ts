@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import * as firebase from 'firebase/app';
 
 import { FirebaseStateService } from './firebase-state.service';
@@ -17,7 +17,7 @@ export class AuthService {
     private firebaseStateService: FirebaseStateService,
     private userService: UserService,
   ) {
-    this.angularFireAuth.authState.subscribe(userData => {
+    this.angularFireAuth.authState.subscribe((userData: firebase.User) => {
       this.isOnline = !!userData && !!userData.email;
       if (this.isOnline) {
         this.userService.email = userData.email;
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   logInWithGoogle(): Observable<void> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<void>) => {
       this.angularFireAuth.auth.signInWithPopup(
         new firebase.auth.GoogleAuthProvider(),
       )
@@ -44,7 +44,7 @@ export class AuthService {
 
   logOut(): Observable<void> {
     this.firebaseStateService.destroy();
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<void>) => {
       this.angularFireAuth.auth.signOut()
         .then(() => observer.next())
         .catch(() => observer.error());

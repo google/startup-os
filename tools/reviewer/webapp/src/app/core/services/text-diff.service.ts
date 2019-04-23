@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 
-import { BranchInfo, Diff, File, TextDiff, Thread } from '@/core/proto';
+import { BranchInfo, Diff, File, TextDiff, Thread, TextDiffResponse } from '@/core/proto';
 import { LocalserverService } from './localserver.service';
 
 export interface TextDiffReturn {
@@ -24,17 +24,20 @@ export class TextDiffService {
     defaultLeftCommitId?: string,
     defaultRightCommitId?: string,
   ): Observable<TextDiffReturn> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<TextDiffReturn>) => {
       // Get branchInfoList from localserver
       this.localserverService
         .getBranchInfoList(
           diff.getId(),
           diff.getWorkspace(),
         )
-        .subscribe(branchInfoList => {
+        .subscribe((branchInfoList: BranchInfo[]) => {
           // Get file and branchInfo from branchInfoList
           try {
-            const { branchInfo, file } = this.localserverService.getFileData(
+            const { branchInfo, file }: {
+              branchInfo: BranchInfo;
+              file: File;
+            } = this.localserverService.getFileData(
               filenameWithRepo,
               branchInfoList,
             );
@@ -44,6 +47,10 @@ export class TextDiffService {
               leftFile,
               rightFile,
               filesSortedByCommits,
+            }: {
+              leftFile: File;
+              rightFile: File;
+              filesSortedByCommits: File[];
             } = this.getFiles(
               file,
               branchInfo,
@@ -62,7 +69,7 @@ export class TextDiffService {
             // Load textDiff
             this.localserverService
               .getFileChanges(leftFile, rightFile)
-              .subscribe(textDiffResponse => {
+              .subscribe((textDiffResponse: TextDiffResponse) => {
                 const textDiff: TextDiff = textDiffResponse.getTextDiff();
 
                 observer.next({
@@ -140,7 +147,7 @@ export class TextDiffService {
 
   private getFileIndex(commitId: string, filesSortedByCommits: File[]): number {
     let fileIndex: number = -1;
-    filesSortedByCommits.some((file, index) => {
+    filesSortedByCommits.some((file: File, index: number) => {
       if (file.getCommitId() === commitId) {
         fileIndex = index;
         return true; // break
@@ -156,7 +163,7 @@ export class TextDiffService {
     rightCommitId: string,
   ): Thread[] {
     return diff.getCodeThreadList()
-      .filter(thread => {
+      .filter((thread: Thread) => {
         const filenamesAreEqual: boolean =
           thread.getFile().getFilenameWithRepo() ===
           file.getFilenameWithRepo();

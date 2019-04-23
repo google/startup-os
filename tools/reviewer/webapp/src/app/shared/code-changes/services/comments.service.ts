@@ -33,7 +33,7 @@ export class CommentsService {
   ): void {
     const blockLine: BlockLine = changesLine.blocks[blockIndex];
     const threads: Thread[] = blockLine.threads;
-    blockLine.threads = threads.filter(thread => {
+    blockLine.threads = threads.filter((thread: Thread) => {
       return thread.getCommentList().length === 0;
     });
 

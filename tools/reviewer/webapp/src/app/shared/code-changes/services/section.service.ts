@@ -22,7 +22,7 @@ export class SectionService {
     let sectionArray: number[] = [];
 
     // Leave only diffLines with changes
-    const changeDiffLines: DiffLine[] = diffLines.filter(diffLine => (
+    const changeDiffLines: DiffLine[] = diffLines.filter((diffLine: DiffLine) => (
       diffLine.getType() === ChangeType.DELETE ||
       diffLine.getType() === ChangeType.ADD ||
       diffLine.getType() === ChangeType.LINE_PLACEHOLDER
@@ -48,7 +48,7 @@ export class SectionService {
     }
 
     // Find sections
-    changeDiffLines.forEach((diffLine, index) => {
+    changeDiffLines.forEach((diffLine: DiffLine, index: number) => {
       const lineNumber: number = diffLine.getDiffLineNumber();
       const nextDiffLine: DiffLine = changeDiffLines[index + 1];
 
