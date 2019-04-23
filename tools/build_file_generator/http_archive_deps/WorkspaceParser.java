@@ -18,23 +18,24 @@ package com.google.startupos.tools.build_file_generator.http_archive_deps;
 
 import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
+import com.google.startupos.tools.build_file_generator.BuildFileGeneratorUtils;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile;
 import com.google.startupos.tools.build_file_generator.Protos.WorkspaceFile.HttpArchive;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 public class WorkspaceParser {
   private static final String TEXT_BETWEEN_DOUBLE_QUOTES_REGEX = "\"(.*?)\"";
   private FileUtils fileUtils;
+  private BuildFileGeneratorUtils buildFileGeneratorUtils;
 
   @Inject
-  public WorkspaceParser(FileUtils fileUtils) {
+  public WorkspaceParser(FileUtils fileUtils, BuildFileGeneratorUtils buildFileGeneratorUtils) {
     this.fileUtils = fileUtils;
+    this.buildFileGeneratorUtils = buildFileGeneratorUtils;
   }
 
   public WorkspaceFile getWorkspaceFile() {
@@ -62,18 +63,21 @@ public class WorkspaceParser {
         while (!lines.get(i).equals(")")) {
           if (lines.get(i).contains("name = ")) {
             httpArchive.setName(
-                getSubstringByRegex(lines.get(i), TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
+                buildFileGeneratorUtils
+                    .getSubstringByRegex(lines.get(i), TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
                     .replace("\"", ""));
           }
           if (lines.get(i).contains("strip_prefix = ")) {
             httpArchive.setStripPrefix(
-                getSubstringByRegex(lines.get(i), TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
+                buildFileGeneratorUtils
+                    .getSubstringByRegex(lines.get(i), TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
                     .replace("\"", ""));
           }
           // TODO: Add supporting several lines for `urls` argument
           if (lines.get(i).contains("url = ") || lines.get(i).contains("urls = ")) {
             httpArchive.addUrls(
-                getSubstringByRegex(lines.get(i), TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
+                buildFileGeneratorUtils
+                    .getSubstringByRegex(lines.get(i), TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
                     .replace("\"", ""));
           }
           i++;
@@ -82,20 +86,6 @@ public class WorkspaceParser {
       }
     }
     return result.build();
-  }
-
-  private String getSubstringByRegex(String line, String regex) {
-    String result = "";
-    Matcher matcher = Pattern.compile(regex).matcher(line);
-    int count = 0;
-    if (matcher.find()) {
-      result = matcher.group();
-      count++;
-    }
-    if (count != 1) {
-      result = "";
-    }
-    return result;
   }
 }
 

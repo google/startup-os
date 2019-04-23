@@ -33,6 +33,7 @@ java_library(
         "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
         "//tools/build_file_generator:build_file_generator_java_proto",
+        "//tools/build_file_generator:build_file_generator_utils",
     ],
 )
 

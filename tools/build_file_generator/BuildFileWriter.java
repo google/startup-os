@@ -227,10 +227,13 @@ public class BuildFileWriter {
             .append(String.format("  name = \"%s\",", checkstyleTest.getName()))
             .append(System.lineSeparator())
             .append(String.format("  target = \"%s\",", checkstyleTest.getTarget()))
-            .append(System.lineSeparator())
-            .append(")")
-            .append(System.lineSeparator())
             .append(System.lineSeparator());
+        if (!checkstyleTest.getConfig().isEmpty()) {
+          result
+              .append(String.format("  config = \"%s\",", checkstyleTest.getConfig()))
+              .append(System.lineSeparator());
+        }
+        result.append(")").append(System.lineSeparator()).append(System.lineSeparator());
         return result.toString();
       }
     }

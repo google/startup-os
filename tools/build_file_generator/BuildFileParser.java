@@ -26,21 +26,16 @@ import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaProt
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaTest;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.ProtoLibrary;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 // TODO: Figure out if there's a standard parser we can use to replace this one.
 public class BuildFileParser {
-
-  private static final String TEXT_BETWEEN_DOUBLE_QUOTES_REGEX = "\"(.*?)\"";
 
   private enum Rule {
     proto_library,
@@ -53,10 +48,12 @@ public class BuildFileParser {
   }
 
   private FileUtils fileUtils;
+  private BuildFileGeneratorUtils buildFileGeneratorUtils;
 
   @Inject
-  public BuildFileParser(FileUtils fileUtils) {
+  public BuildFileParser(FileUtils fileUtils, BuildFileGeneratorUtils buildFileGeneratorUtils) {
     this.fileUtils = fileUtils;
+    this.buildFileGeneratorUtils = buildFileGeneratorUtils;
   }
 
   public BuildFile getBuildFile(String path) {
@@ -142,96 +139,26 @@ public class BuildFileParser {
           }
         }
         result.put(
-            currentAttribute, getFilenamesByGlob(globBody.toString(), path.replace("/BUILD", "")));
+            currentAttribute,
+            buildFileGeneratorUtils.getFilenamesByGlob(
+                globBody.toString(), path.replace("/BUILD", "")));
         continue;
       }
       if (line.endsWith("[") || line.startsWith("]") || line.startsWith("#")) {
         continue;
       }
-      String attributeValue = getSubstringByRegex(line, TEXT_BETWEEN_DOUBLE_QUOTES_REGEX);
+      String attributeValue =
+          buildFileGeneratorUtils.getSubstringByRegex(
+              line, BuildFileGeneratorUtils.TEXT_BETWEEN_DOUBLE_QUOTES_REGEX);
       if (!attributeValue.isEmpty()) {
         result
             .get(currentAttribute)
-            .add(getSubstringByRegex(line, TEXT_BETWEEN_DOUBLE_QUOTES_REGEX).replace("\"", ""));
+            .add(
+                buildFileGeneratorUtils
+                    .getSubstringByRegex(
+                        line, BuildFileGeneratorUtils.TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)
+                    .replace("\"", ""));
       }
-    }
-    return result;
-  }
-
-  // TODO: Support all cases in glob function
-  // (https://docs.bazel.build/versions/master/be/functions.html#glob)
-  private List<String> getFilenamesByGlob(String globBody, String path) {
-    List<String> result = new ArrayList<>();
-    List<String> globValues = new ArrayList<>();
-    for (String line : globBody.split(System.lineSeparator())) {
-      String globValue = getSubstringByRegex(line, TEXT_BETWEEN_DOUBLE_QUOTES_REGEX);
-      if (!globValue.isEmpty()) {
-        globValues.add(globValue.replace("\"", ""));
-      }
-    }
-
-    for (String globValue : globValues) {
-      String fileExtension = globValue.substring(globValue.lastIndexOf('.') + 1);
-      String[] globValueParts = globValue.split("/");
-      if (globValueParts.length == 1) {
-        result.addAll(getFilesByExtension(path, fileExtension));
-      } else {
-        String intermediatePaths = path;
-        for (String currentGlobValuePart : globValueParts) {
-          if (currentGlobValuePart.endsWith("." + fileExtension)) {
-            result.addAll(getFilesByExtension(intermediatePaths, fileExtension));
-            continue;
-          }
-          if (currentGlobValuePart.equals("**")) {
-            try {
-              result.addAll(getFilesByExtension(intermediatePaths, fileExtension));
-              List<String> folderPaths =
-                  fileUtils
-                      .listContentsRecursively(intermediatePaths)
-                      .stream()
-                      .filter(item -> fileUtils.folderExists(item))
-                      .collect(Collectors.toList());
-
-              for (String folderPath : folderPaths) {
-                result.addAll(getFilesByExtension(folderPath, fileExtension));
-              }
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          } else {
-            intermediatePaths = fileUtils.joinPaths(intermediatePaths, currentGlobValuePart);
-          }
-        }
-      }
-    }
-    return result;
-  }
-
-  private List<String> getFilesByExtension(String path, String fileExtension) {
-    try {
-      return fileUtils
-          .listContents(path)
-          .stream()
-          .map(item -> fileUtils.joinPaths(path, item))
-          .filter(item -> fileUtils.fileExists(item))
-          .filter(file -> file.endsWith("." + fileExtension))
-          .map(file -> file.replace(path + "/", ""))
-          .collect(Collectors.toList());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private String getSubstringByRegex(String line, String regex) {
-    String result = "";
-    Matcher matcher = Pattern.compile(regex).matcher(line);
-    int count = 0;
-    if (matcher.find()) {
-      result = matcher.group();
-      count++;
-    }
-    if (count != 1) {
-      result = "";
     }
     return result;
   }
