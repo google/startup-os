@@ -189,7 +189,7 @@ public class HttpArchiveDepsGenerator {
                             .replace("/BUILD", ".")
                             .replace(absRepoPath, "")
                             .replace("/", ".")
-                        + javaClassName)
+                        + javaClassName.replace("/", "."))
                 .setTarget(
                     absBuildFilePath.replace(absRepoPath, "/").replace("/BUILD", ":") + targetName)
                 .build());
