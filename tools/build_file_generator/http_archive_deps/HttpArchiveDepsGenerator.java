@@ -181,6 +181,8 @@ public class HttpArchiveDepsGenerator {
       String absJavaClassPath = absBuildFilePath.replace("BUILD", javaClassName);
       if (fileUtils.fileExists(absJavaClassPath)) {
         JavaClass javaClass = javaClassAnalyzer.getJavaClass(absJavaClassPath);
+        String fullTargetName =
+            absBuildFilePath.replace(absRepoPath, "/").replace("/BUILD", ":") + targetName;
         result.addHttpArchiveDep(
             HttpArchiveDep.newBuilder()
                 .setJavaClass(
@@ -190,8 +192,7 @@ public class HttpArchiveDepsGenerator {
                             .replace(absRepoPath, "")
                             .replace("/", ".")
                         + javaClassName.replace("/", "."))
-                .setTarget(
-                    absBuildFilePath.replace(absRepoPath, "/").replace("/BUILD", ":") + targetName)
+                .setTarget(shortenTarget(fullTargetName))
                 .build());
       }
     }
@@ -231,6 +232,17 @@ public class HttpArchiveDepsGenerator {
       }
     }
     return workspaceCommitId.equals(prototxtCommitId);
+  }
+
+  private String shortenTarget(String fullTargetName) {
+    String targetFolderAndName = fullTargetName.substring(fullTargetName.lastIndexOf('/') + 1);
+    String targetFolder = targetFolderAndName.split(":")[0];
+    String targetName = targetFolderAndName.split(":")[1];
+    if (targetFolder.equals(targetName)) {
+      return fullTargetName.replace((":" + targetName), "");
+    } else {
+      return fullTargetName;
+    }
   }
 }
 
