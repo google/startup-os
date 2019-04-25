@@ -140,12 +140,13 @@ dependencies:
   io.grpc:
     grpc:
       lang: java
-      modules: [ "core", "netty", "protobuf", "services", "stub" ]
+      modules: [ "auth", "core", "netty", "protobuf", "services", "stub" ]
       version: "1.18.0"
 
   io.netty:
-    netty-codec-http2:
+    netty:
       lang: java
+      modules: [ "codec-http2", "handler" ]
       version: "4.1.33.Final"
     netty-tcnative-boringssl-static:
       lang: java
