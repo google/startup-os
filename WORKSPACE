@@ -78,9 +78,8 @@ android_sdk_repository(
 
 http_archive(
     name = "tsfmt",
-    # TODO(vmax): once deployed, replace with oferb/startupos-binaries
-    urls = ["https://github.com/vmax/startupos-binaries/releases/download/tsfmt/tsfmt.zip"],
-    sha256 = "d488f0748aea81c48fb82681ae1fd79e603986f7135a7eac76fc2faf16f79e0f",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.03/tsfmt.zip"],
+    sha256 = "b07799e1c6a2c8cd5a2e258833a80a9234b346968588ea53f7298eba76f610fc",
     build_file_content = "exports_files(['cli-linux', 'cli-macos'])"
 )
 
