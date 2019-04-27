@@ -30,9 +30,9 @@
       <div class="column-file"><a [routerLink]="changeFile.file.getFilenameWithRepo()">
         {{ changeFile.file.getFilenameWithRepo() }}
       </a></div>
-      <div class="column-comments"></div>
-      <div class="column-modified"></div>
-      <div class="column-delta"></div>
+      <div class="column-comments">{{ changeFile.amountOfComments }}</div>
+      <div class="column-modified">{{ changeFile.timestamp | time }}</div>
+      <div class="column-delta">{{ changeFile.delta }}</div>
       <div class="column-reviewed" *ngIf="reviewer">
         <mat-checkbox
           color="primary"
