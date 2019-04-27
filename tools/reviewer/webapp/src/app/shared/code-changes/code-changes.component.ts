@@ -145,13 +145,13 @@ export class CodeChangesComponent implements OnInit, OnChanges {
         changesLines,
         changesLinesMap,
       }: {
-        changesLines: ChangesLine[];
-        changesLinesMap: Dictionary[];
-      } = this.blocksService.synchronizeBlockLines(
-        leftBlockLines,
-        rightBlockLines,
-        section.startLineNumber,
-        section.endLineNumber,
+          changesLines: ChangesLine[];
+          changesLinesMap: Dictionary[];
+        } = this.blocksService.synchronizeBlockLines(
+          leftBlockLines,
+          rightBlockLines,
+          section.startLineNumber,
+          section.endLineNumber,
         );
 
       this.codeGroups.push({

@@ -153,9 +153,9 @@ export class LocalserverService {
     filenameWithRepo: string,
     branchInfoList: BranchInfo[],
   ): {
-    branchInfo: BranchInfo;
-    file: File;
-  } {
+      branchInfo: BranchInfo;
+      file: File;
+    } {
     for (const branchInfo of branchInfoList) {
       const files: File[] = this.getFilesFromBranchInfo(branchInfo);
       for (const file of files) {
