@@ -95,9 +95,9 @@ export class BlocksService {
     startLineNumber?: number,
     endLineNumber?: number,
   ): {
-    changesLines: ChangesLine[];
-    changesLinesMap: Dictionary[];
-  } {
+      changesLines: ChangesLine[];
+      changesLinesMap: Dictionary[];
+    } {
     const amountOfLines: number = rightBlockLines.length;
 
     const changesLines: ChangesLine[] = [];

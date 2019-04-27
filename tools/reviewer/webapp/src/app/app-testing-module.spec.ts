@@ -21,7 +21,7 @@ export function configureTestingModule(): void {
     ],
     providers: [AuthMockService, FirebaseMockService],
   })
-  .overrideProvider(AuthService, { useValue: new AuthMockService() })
-  .overrideProvider(FirebaseService, { useValue: new FirebaseMockService() })
-  .compileComponents();
+    .overrideProvider(AuthService, { useValue: new AuthMockService() })
+    .overrideProvider(FirebaseService, { useValue: new FirebaseMockService() })
+    .compileComponents();
 }

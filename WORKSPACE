@@ -76,6 +76,13 @@ android_sdk_repository(
     build_tools_version = "27.0.3",
 )
 
+http_archive(
+    name = "tsfmt",
+    urls = ["https://github.com/oferb/startupos-binaries/releases/download/0.1.03/tsfmt.zip"],
+    sha256 = "b07799e1c6a2c8cd5a2e258833a80a9234b346968588ea53f7298eba76f610fc",
+    build_file_content = "exports_files(['cli-linux', 'cli-macos'])"
+)
+
 http_file(
     name = "buildifier",
     executable = True,

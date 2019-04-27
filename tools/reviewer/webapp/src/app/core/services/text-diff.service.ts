@@ -30,7 +30,7 @@ export class TextDiffService {
         .getBranchInfoList(
           diff.getId(),
           diff.getWorkspace(),
-        )
+      )
         .subscribe(branchInfoList => {
           // Get file and branchInfo from branchInfoList
           try {
@@ -49,7 +49,7 @@ export class TextDiffService {
               branchInfo,
               defaultLeftCommitId,
               defaultRightCommitId,
-            );
+              );
 
             // Create local threads
             const localThread: Thread[] = this.getLocalThreads(
@@ -88,10 +88,10 @@ export class TextDiffService {
     leftCommitId: string,
     rightCommitId: string,
   ): {
-    leftFile: File;
-    rightFile: File;
-    filesSortedByCommits: File[];
-  } {
+      leftFile: File;
+      rightFile: File;
+      filesSortedByCommits: File[];
+    } {
     const filesSortedByCommits: File[] = this.localserverService.getFilesSortedByCommits(
       file,
       branchInfo,
