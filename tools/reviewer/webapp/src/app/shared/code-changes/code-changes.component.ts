@@ -152,7 +152,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
         rightBlockLines,
         section.startLineNumber,
         section.endLineNumber,
-      );
+        );
 
       this.codeGroups.push({
         changes: changesLines,

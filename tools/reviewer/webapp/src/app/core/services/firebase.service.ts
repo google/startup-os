@@ -38,7 +38,7 @@ export class FirebaseService {
             return this.convertFirebaseElementToDiff(firebaseElement);
           });
         }),
-      );
+    );
   }
 
   getDiff(id: string): Observable<Diff> {
@@ -53,7 +53,7 @@ export class FirebaseService {
           }
           return this.convertFirebaseElementToDiff(firebaseElement);
         }),
-      );
+    );
   }
 
   updateDiff(diff: Diff): Observable<void> {

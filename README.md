@@ -41,7 +41,7 @@ Protos, gRPC and Bazel are polyglot. The examples in this repo are mostly in Jav
 * [Docker example](https://github.com/google/startup-os/tree/master/examples/docker): building containers using Bazel (no dockerfile needed!).
 * [Kubernetes](https://github.com/google/startup-os/tree/master/examples/k8s): a config file showing how to run a container built with Bazel on k8s.
 * [CI example](https://github.com/google/startup-os/tree/master/.circleci): Using CircleCI to run CI (continuous integration) and test all Bazel targets.
-* [Firebase](https://firebase.google.com): Java client for storing Protocol Buffers [here](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreClient.java).
+* [Firebase](https://firebase.google.com): Java client for storing Protocol Buffers [here](https://github.com/google/startup-os/blob/master/common/firestore/FirestoreProtoClient.java).
 * [Dagger](https://github.com/google/dagger): Java Dependency Injection framework  ("Next gen Guice"), see examples [here](https://github.com/google/startup-os/tree/master/examples/dagger).
 * [Flogger](https://github.com/google/flogger): Java logger with fluent API, see examples [here](https://github.com/google/startup-os/search?q=com.google.common.flogger.FluentLogger&unscoped_q=com.google.common.flogger.FluentLogger).
 * [Android app](https://github.com/google/startup-os/tree/master/examples/android): An Android app built with Bazel and integrated to Firebase.

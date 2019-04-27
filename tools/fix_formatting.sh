@@ -13,7 +13,7 @@ bazel run //tools:bazel_deps -- format-deps \
 
 bazel run //tools/formatter -- \
   --path $(pwd) \
-  --java --python --proto --cpp --build --sh \
+  --java --python --proto --cpp --build --sh --ts \
   --ignore_directories $(find $(pwd) -name node_modules -type d | paste -s -d , -) \
   &>/dev/null
 

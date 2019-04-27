@@ -56,7 +56,7 @@ export class TextDiffService {
               branchInfo,
               defaultLeftCommitId,
               defaultRightCommitId,
-            );
+              );
 
             // Create local threads
             const localThread: Thread[] = this.getLocalThreads(
@@ -95,10 +95,10 @@ export class TextDiffService {
     leftCommitId: string,
     rightCommitId: string,
   ): {
-    leftFile: File;
-    rightFile: File;
-    filesSortedByCommits: File[];
-  } {
+      leftFile: File;
+      rightFile: File;
+      filesSortedByCommits: File[];
+    } {
     const filesSortedByCommits: File[] = this.localserverService.getFilesSortedByCommits(
       file,
       branchInfo,
