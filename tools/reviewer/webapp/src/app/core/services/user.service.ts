@@ -22,14 +22,14 @@ export class UserService {
   // Remove reviewer with the email from reviewer list
   removeFromReviewerList(diff: Diff, email: string): void {
     const reviewerList: Reviewer[] = diff.getReviewerList().filter(
-      reviewer => reviewer.getEmail() !== email,
+      (reviewer: Reviewer) => reviewer.getEmail() !== email,
     );
     diff.setReviewerList(reviewerList);
   }
 
   // Remove email from CC list
   removeFromCcList(diff: Diff, email: string): void {
-    const ccList: string[] = diff.getCcList().filter(cc => cc !== email);
+    const ccList: string[] = diff.getCcList().filter((cc: string) => cc !== email);
     diff.setCcList(ccList);
   }
 
@@ -66,7 +66,7 @@ export class UserService {
     } else if (isFileReviewed) {
       // Remove current file from reviewed files
       let reviewedFiles: File[] = reviewer.getReviewedList();
-      reviewedFiles = reviewedFiles.filter(reviewedFile => (
+      reviewedFiles = reviewedFiles.filter((reviewedFile: File) => (
         reviewedFile.getFilenameWithRepo() !== file.getFilenameWithRepo() ||
         reviewedFile.getCommitId() !== file.getCommitId()
       ));

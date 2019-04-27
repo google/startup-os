@@ -30,7 +30,7 @@ Right lines: ${rightBlockLines.length}`,
   }
 
   applyChanges(diffLines: DiffLine[], blockLines: BlockLine[]): void {
-    diffLines.forEach(diffLine => {
+    diffLines.forEach((diffLine: DiffLine) => {
       switch (diffLine.getType()) {
         case ChangeType.DELETE:
         case ChangeType.ADD:
@@ -42,7 +42,7 @@ Right lines: ${rightBlockLines.length}`,
   }
 
   addPlaceholders(diffLines: DiffLine[], blockLines: BlockLine[]): void {
-    diffLines.forEach(diffLine => {
+    diffLines.forEach((diffLine: DiffLine) => {
       if (diffLine.getType() === ChangeType.LINE_PLACEHOLDER) {
         // Add placeholder
         blockLines.splice(

@@ -14,7 +14,6 @@ export * from './document-event.service';
 export * from './text-diff.service';
 export * from './select-dashboard.service';
 
-// Services
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { CiService } from './ci.service';

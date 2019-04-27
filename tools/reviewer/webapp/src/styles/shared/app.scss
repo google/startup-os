@@ -1,0 +1,22 @@
+// Small global classes
+
+body {
+  textarea {
+    font-family: $default-font;
+    border: solid 1px #c1c1c1;
+  }
+
+  .bold {
+    font-weight: 600;
+  }
+
+  .approved {
+    color: #0d912c;
+  }
+  
+  .ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
