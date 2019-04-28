@@ -1,0 +1,58 @@
+// Shared classes of titlebar, header, table panels etc
+
+body {
+  .cr-titlebar {
+    height: 40px;
+    background: #cdecff;
+    border: none;
+    padding: 0 23px;
+    display: flex;
+    align-items: center;
+    >.title {
+      >span {
+        font-size: 16px;
+      }
+    }
+    >.buttons {
+      display: flex;
+      align-items: center;
+      user-select: none;
+      direction: rtl;
+      padding-bottom: 2px;
+      >button {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  @mixin cr-panel() {
+    border-top: 1px solid #c1c1c1;
+    border-bottom: 1px solid #c1c1c1;
+  }
+
+  .cr-panel {
+    @include cr-panel();
+  }
+
+  .cr-table-placeholder {
+    height: 42px;
+    padding: 0 23px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #5d5d5d;
+    @include cr-panel();
+  }
+  
+  .cr-header {
+    @include cr-panel();
+    display: flex;
+    background: #f3f3f3;
+    padding: 5px 23px;
+    >.column {
+      text-transform: capitalize;
+      font-size: 14px;
+      color: #5d5d5d;
+    }
+  }
+}

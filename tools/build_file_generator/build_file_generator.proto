@@ -80,6 +80,7 @@ message BuildFile {
   message CheckstyleTestExtension {
     string name = 1;
     string target = 2;
+    string config = 3;
   }
 
   message JavaGrpcLibrary {

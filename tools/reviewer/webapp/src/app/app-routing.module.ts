@@ -2,10 +2,7 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { AuthGuard } from '@/core';
-import { DiffModuleFactory, DiffsModuleFactory, FileChangesModuleFactory } from '@/dashboard';
-import { LogComponent } from './log';
-import { LoginComponent } from './login';
-import { PageNotFoundComponent } from './page-not-found';
+import { LoginComponent, PageNotFoundComponent } from '@/routes';
 
 const routes: Routes = [
   { path: '', redirectTo: 'diffs', pathMatch: 'full' },
@@ -13,18 +10,21 @@ const routes: Routes = [
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: 'diffs', loadChildren: DiffsModuleFactory },
-      { path: 'diff/:id', loadChildren: DiffModuleFactory },
+      { path: 'diffs', loadChildren: './routes/diffs/diffs.module#DiffsModule' },
+      { path: 'diff/:id', loadChildren: './routes/diff/diff.module#DiffModule' },
+      { path: 'log/:diffId/:repoId', loadChildren: './routes/log/log.module#LogModule' },
       {
         path: 'diff', children: [
           { path: '', component: PageNotFoundComponent },
-          { path: '**', loadChildren: FileChangesModuleFactory },
+          {
+            path: '**',
+            loadChildren: './routes/file-changes/file-changes.module#FileChangesModule',
+          },
         ],
       },
     ],
   },
   { path: 'login', component: LoginComponent },
-  { path: 'log/:diffId/:repoId', component: LogComponent },
   { path: '**', component: PageNotFoundComponent },
 ];
 

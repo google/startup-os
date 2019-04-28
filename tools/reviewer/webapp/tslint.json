@@ -20,10 +20,12 @@
       "check-preblock"
     ],
     "typedef": [
-      false, // TODO: false until all typedef issues are fix
+      true,
       "parameter",
-      "variable-declaration",
-      "member-variable-declaration"
+      "arrow-parameter",
+      "property-declaration",
+      "object-destructuring",
+      "array-destructuring"
     ],
     "typedef-whitespace": [
       true,

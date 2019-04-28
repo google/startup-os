@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 
 import { Diff, Thread } from '@/core/proto';
 import { FirebaseService } from './firebase.service';
@@ -29,7 +29,7 @@ export class DiffUpdateService {
   }
 
   private clearEmptyThreads(threads: Thread[]): Thread[] {
-    threads.forEach((thread, threadIndex) => {
+    threads.forEach((thread: Thread, threadIndex: number) => {
       if (thread.getCommentList().length === 0) {
         threads.splice(threadIndex, 1);
       }
@@ -43,7 +43,7 @@ export class DiffUpdateService {
   }
 
   submitReply(diff: Diff): Observable<void> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<void>) => {
       this.firebaseService.updateDiff(diff).subscribe(() => {
         observer.next();
         this.notificationService.success('Reply submitted');

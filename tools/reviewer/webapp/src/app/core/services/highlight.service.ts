@@ -10,7 +10,7 @@ export class HighlightService {
   // Replace html special chars with html entities
   htmlSpecialChars(code: string): string {
     const findSpecialChars: RegExp = /[&<>"'`=\/]/g;
-    return code.replace(findSpecialChars, char => {
+    return code.replace(findSpecialChars, (char: string) => {
       switch (char) {
         case '&': return '&amp;';
         case '<': return '&lt;';

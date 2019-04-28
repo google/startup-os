@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package com.google.startupos.common.grpc_auth;
+
+option java_package = "com.google.startupos.common.grpc_auth";
+option java_outer_classname = "Protos";
+
+service GrpcAuthTest { rpc getNextNumber(Request) returns (Response); }
+
+message Request { int32 number = 1; }
+
+message Response { int32 number = 1; }

@@ -73,7 +73,7 @@ export class TemplateService {
     let previousEndIndex: number = 0;
 
     // Highlight word changes
-    wordChanges.forEach(wordChange => {
+    wordChanges.forEach((wordChange: WordChange) => {
       // Cut code by indexes
       let codeBeforeWordChange: string = code.substr(
         previousEndIndex,

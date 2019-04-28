@@ -10,6 +10,7 @@ java_binary(
         ":clang_format",
         "//tools:buildifier",
         "//tools:shfmt",
+        "//tools:tsfmt",
     ],
     deps = [
         "//common/flags",

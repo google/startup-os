@@ -2,8 +2,11 @@ import { Injectable } from '@angular/core';
 import {
   AngularFirestore,
   AngularFirestoreCollection,
+  DocumentChangeAction,
+  Action,
+  DocumentSnapshot,
 } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Diff } from '@/core/proto';
@@ -29,28 +32,28 @@ export class FirebaseService {
   getDiffs(): Observable<Diff[]> {
     return this.diffs
       .snapshotChanges().pipe(
-        map(actions => {
-          return actions.map(action => {
-            const firebaseElement = action.payload.doc.data() as FirebaseElement;
+        map((actions: DocumentChangeAction<FirebaseElement>[]) => {
+          return actions.map((action: DocumentChangeAction<FirebaseElement>) => {
+            const firebaseElement: FirebaseElement = action.payload.doc.data();
             return this.convertFirebaseElementToDiff(firebaseElement);
           });
         }),
-      );
+    );
   }
 
   getDiff(id: string): Observable<Diff> {
     return this.diffs
       .doc(id)
       .snapshotChanges().pipe(
-        map(action => {
-          const firebaseElement = action.payload.data() as FirebaseElement;
+        map((action: Action<DocumentSnapshot<FirebaseElement>>) => {
+          const firebaseElement: FirebaseElement = action.payload.data();
           if (firebaseElement === undefined) {
             // Diff not found
             return;
           }
           return this.convertFirebaseElementToDiff(firebaseElement);
         }),
-      );
+    );
   }
 
   updateDiff(diff: Diff): Observable<void> {
@@ -59,7 +62,7 @@ export class FirebaseService {
     diff.setModifiedTimestamp(currentTimestampMs);
     diff.setModifiedBy(this.userService.email);
 
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<void>) => {
       this.diffs
         .doc(diff.getId().toString())
         .update(this.convertDiffToFirebaseElement(diff))
@@ -69,7 +72,7 @@ export class FirebaseService {
   }
 
   removeDiff(id: string): Observable<void> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<void>) => {
       this.diffs
         .doc(id)
         .delete()

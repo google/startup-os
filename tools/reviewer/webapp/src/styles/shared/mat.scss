@@ -1,0 +1,23 @@
+// Custom material settings
+
+body {
+  .mat-header-row {
+    min-height: 32px;
+  }
+  
+  .mat-checkbox {
+    font-family: $default-font;
+    .mat-checkbox-frame,
+    .mat-checkbox-background {
+      transform: scale(.9);
+    }
+    .mat-checkbox-frame {
+      background: white;
+      border-width: 1px;
+    }
+  }
+
+  .mat-table {
+    font-family: $default-font;
+  }
+}

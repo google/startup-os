@@ -144,12 +144,15 @@ export class CodeChangesComponent implements OnInit, OnChanges {
       const {
         changesLines,
         changesLinesMap,
-      } = this.blocksService.synchronizeBlockLines(
-        leftBlockLines,
-        rightBlockLines,
-        section.startLineNumber,
-        section.endLineNumber,
-      );
+      }: {
+          changesLines: ChangesLine[];
+          changesLinesMap: Dictionary[];
+        } = this.blocksService.synchronizeBlockLines(
+          leftBlockLines,
+          rightBlockLines,
+          section.startLineNumber,
+          section.endLineNumber,
+        );
 
       this.codeGroups.push({
         changes: changesLines,
@@ -190,7 +193,7 @@ export class CodeChangesComponent implements OnInit, OnChanges {
   // Updates comments, when data from firebase is received
   updateComments(threads: Thread[]): void {
     // Close open threads
-    this.openThreadsMap.forEach((lineIndexMap, blockIndex) => {
+    this.openThreadsMap.forEach((lineIndexMap: Dictionary, blockIndex: number) => {
       for (const lineNumber in lineIndexMap) {
         const groupIndex: number = this.sectionService.getGroupIndex(+lineNumber, this.sections);
         const lineIndex: number = lineIndexMap[lineNumber];
