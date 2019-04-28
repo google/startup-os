@@ -14,6 +14,9 @@ import { Section } from '@/shared/code-changes';
 
 interface ChangeFile {
   file: File;
+  amountOfComments: string;
+  timestamp: number;
+  delta?: number;
   isExpanded: boolean;
   checkbox?: FormControl;
   data?: TextDiffReturn;
@@ -51,6 +54,7 @@ export class DiffFilesComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.reviewer = this.userService.getReviewer(this.diff, this.userService.email);
     this.createChangeFileMap();
+    this.loadAllFiles(false);
   }
 
   ngOnChanges(ngChanges: SimpleChanges) {
@@ -67,10 +71,22 @@ export class DiffFilesComponent implements OnInit, OnChanges {
       const filename: string = file.getFilenameWithRepo();
       this.changeFileMap[filename] = {
         file: file,
+        amountOfComments: this.getAmountOfComments(file, this.diff),
+        timestamp: file.getTimestamp(),
         isExpanded: false,
         checkbox: this.getReviewCheckbox(file),
       };
     }
+  }
+
+  private getAmountOfComments(file: File, diff: Diff): string {
+    let amountOfComments: number = 0;
+    for (const thread of diff.getCodeThreadList()) {
+      if (thread.getFile().getFilenameWithRepo() === file.getFilenameWithRepo()) {
+        amountOfComments++;
+      }
+    }
+    return amountOfComments ? amountOfComments.toString() : '';
   }
 
   private getReviewCheckbox(file: File): FormControl {
@@ -173,15 +189,16 @@ export class DiffFilesComponent implements OnInit, OnChanges {
     zip(...observables).subscribe((textDiffReturns: TextDiffReturn[]) => {
       for (const textDiffReturn of textDiffReturns) {
         const filename: string = textDiffReturn.leftFile.getFilenameWithRepo();
-        this.changeFileMap[filename] = {
+        this.changeFileMap[filename] = Object.assign(this.changeFileMap[filename], {
           file: textDiffReturn.rightFile,
+          delta: textDiffReturn.textDiff.getRightDiffLineList().length,
           data: textDiffReturn,
           sections: this.changeFileMap[filename].sections,
           isExpanded: expand ? true : this.changeFileMap[filename].isExpanded,
           checkbox: this.getReviewCheckbox(textDiffReturn.rightFile),
-        };
+        });
+        this.isExpanded = this.isExpanded || this.changeFileMap[filename].isExpanded;
       }
-      this.isExpanded = true;
       this.isLoading = false;
     }, (error: Error) => {
       if (error.message === 'File not found') {
