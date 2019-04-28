@@ -1,6 +1,5 @@
 package com.google.startupos.common.grpc_auth;
 
-import com.google.startupos.common.grpc_auth.GrpcAuthTestGrpc;
 import com.google.startupos.common.grpc_auth.Protos.Request;
 import com.google.startupos.common.grpc_auth.Protos.Response;
 import io.grpc.stub.StreamObserver;
