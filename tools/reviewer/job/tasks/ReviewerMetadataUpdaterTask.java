@@ -62,8 +62,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private static final String GLOBAL_REGISTRY_FILE = "tools/reviewer/global_registry.prototxt";
   private static final String REPO_REGISTRY_FILE = "reviewer_config.prototxt";
   private static final String REPO_REGISTRY_FILE_PATH = "/root/reviewer_config.prototxt";
-  private static final String REPO_REGISTRY_URL =
-      "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
+  private static final String REPO_REGISTRY_URL = "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -75,16 +74,15 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private boolean firstRun = true;
 
   @Inject
-  public ReviewerMetadataUpdaterTask(
-      FileUtils fileUtils, GitRepoFactory gitRepoFactory, FirestoreProtoClient firestoreClient) {
+  public ReviewerMetadataUpdaterTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory,
+      FirestoreProtoClient firestoreClient) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
     this.firestoreClient = firestoreClient;
   }
 
   private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
-    firestoreClient.setProtoDocument(
-        REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
+    firestoreClient.setProtoDocument(REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
   }
 
   private static Stream<Integer> intStream(byte[] array) {
@@ -98,8 +96,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
       messageDigest.update(fileAsBytes);
       byte[] messageDigestBytes = messageDigest.digest();
       StringBuilder hashBuilder = new StringBuilder();
-      intStream(messageDigestBytes)
-          .map(digestByte -> String.format("%02X", Byte.toUnsignedInt(digestByte.byteValue())))
+      intStream(messageDigestBytes).map(digestByte -> String.format("%02X", Byte.toUnsignedInt(digestByte.byteValue())))
           .forEach(hashBuilder::append);
       return hashBuilder.toString();
     } catch (NoSuchAlgorithmException ex) {
@@ -121,21 +118,16 @@ public class ReviewerMetadataUpdaterTask implements Task {
           repo.pull();
         }
 
-        String globalRegistryFilePath =
-            fileUtils.joinToAbsolutePath(REPO_DIRECTORY, GLOBAL_REGISTRY_FILE);
+        String globalRegistryFilePath = fileUtils.joinToAbsolutePath(REPO_DIRECTORY, GLOBAL_REGISTRY_FILE);
         String newChecksum = md5ForFile(globalRegistryFilePath);
-        ReviewerRegistry registry =
-            (ReviewerRegistry)
-                fileUtils.readPrototxtUnchecked(
-                    globalRegistryFilePath, ReviewerRegistry.newBuilder());
+        ReviewerRegistry registry = (ReviewerRegistry) fileUtils.readPrototxtUnchecked(globalRegistryFilePath,
+            ReviewerRegistry.newBuilder());
 
         if (!newChecksum.equals(registryChecksum)) {
           if (firstRun) {
             log.atInfo().log("Storing on first run, checksum: %s", newChecksum);
           } else {
-            log.atInfo().log(
-                "New checksum not equal to stored one: new %s, stored %s",
-                newChecksum, registryChecksum);
+            log.atInfo().log("New checksum not equal to stored one: new %s, stored %s", newChecksum, registryChecksum);
           }
           uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;
@@ -157,8 +149,8 @@ public class ReviewerMetadataUpdaterTask implements Task {
   }
 
   public void sayHello() throws IOException {
-    ReviewerConfig reviewerConfig = 
-    (ReviewerConfig) fileUtils.readPrototxt(REPO_REGISTRY_FILE_PATH, ReviewerConfig.newBuilder());
+    ReviewerConfig reviewerConfig = (ReviewerConfig) fileUtils.readPrototxt(REPO_REGISTRY_FILE_PATH,
+        ReviewerConfig.newBuilder());
     System.out.println(reviewerConfig.toString());
   }
 }

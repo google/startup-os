@@ -41,20 +41,17 @@ public class ReviewerMetadataUpdaterTaskTool {
     Flags.parseCurrentPackage(args);
     System.out.println(serviceAccountJson.get());
     FirestoreProtoClient client = new FirestoreProtoClient(serviceAccountJson.get());
-    ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask =
-        DaggerReviewerMetadataUpdaterTaskTool_ReviewerMetadataUpdaterTaskToolComponent.builder()
-            .setFirestoreProtoClient(client)
-            .build()
-            .getReviewerMetadataUpdaterTask();
-      try {
-        reviewerMetadataUpdaterTask.sayHello(); 
-      } catch (Exception e) {
-        System.out.println(e);
-      }
+    ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask = DaggerReviewerMetadataUpdaterTaskTool_ReviewerMetadataUpdaterTaskToolComponent
+        .builder().setFirestoreProtoClient(client).build().getReviewerMetadataUpdaterTask();
+    try {
+      reviewerMetadataUpdaterTask.sayHello();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
   @Singleton
-  @Component(modules = {CommonModule.class})
+  @Component(modules = { CommonModule.class })
   public interface ReviewerMetadataUpdaterTaskToolComponent {
     ReviewerMetadataUpdaterTask getReviewerMetadataUpdaterTask();
 
