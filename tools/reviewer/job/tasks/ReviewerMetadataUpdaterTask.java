@@ -24,6 +24,7 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
+import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -60,6 +61,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private static final String REPO_DIRECTORY = "repo";
   private static final String GLOBAL_REGISTRY_FILE = "tools/reviewer/global_registry.prototxt";
   private static final String REPO_REGISTRY_FILE = "reviewer_config.prototxt";
+  private static final String REPO_REGISTRY_FILE_PATH = "/root/reviewer_config.prototxt";
   private static final String REPO_REGISTRY_URL =
       "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
 
@@ -153,5 +155,10 @@ public class ReviewerMetadataUpdaterTask implements Task {
   public Boolean shouldRun() {
     return !lock.isLocked();
   }
-}
 
+  public void sayHello() throws IOException {
+    ReviewerConfig reviewerConfig = 
+    (ReviewerConfig) fileUtils.readPrototxt(REPO_REGISTRY_FILE_PATH, ReviewerConfig.newBuilder());
+    System.out.println(reviewerConfig.toString());
+  }
+}
