@@ -37,12 +37,17 @@ import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -471,6 +476,65 @@ public class FileUtils {
 
   public File getFile(String path) {
     return new File(expandHomeDirectory(path));
+  }
+
+  /**
+   * Gets file names in path by pattern. The pattern can containing the * wildcard: this wildcard
+   * matches any string excluding the directory separator /. In addition, filename patterns can
+   * contain the recursive ** wildcard. Throws IllegalStateException if path is not a folder.
+   */
+  public ImmutableList<String> findFilesByGlobPattern(String path, String pattern)
+      throws IOException {
+    if (!folderExists(path)) {
+      throw new IllegalStateException("Folder does not exist");
+    }
+    ImmutableList.Builder<String> result = ImmutableList.builder();
+    String[] patternParts = pattern.split("/");
+    String filenamePattern = patternParts[patternParts.length - 1];
+
+    List<String> pathsToFindFiles = Collections.singletonList(path);
+    if (patternParts.length > 1) {
+      // We don't process the last item because it's the filename pattern
+      for (int i = 0; i < patternParts.length - 1; i++) {
+        String item = patternParts[i];
+        List<String> tempPaths = new ArrayList<>();
+        if (item.equals("**")) {
+          for (String pathToFindFile : pathsToFindFiles) {
+            for (String subfolder : listSubfolders(pathToFindFile)) {
+              tempPaths.add(joinPaths(pathToFindFile, subfolder));
+            }
+          }
+        } else {
+          for (String pathToFindFile : pathsToFindFiles) {
+            tempPaths.add(joinPaths(pathToFindFile, item));
+          }
+        }
+        pathsToFindFiles = new ArrayList<>(tempPaths);
+      }
+    }
+
+    final PathMatcher matcher = fileSystem.getPathMatcher("glob:" + filenamePattern);
+    for (String pathToFindFile : pathsToFindFiles) {
+      final Path targetDir = fileSystem.getPath(expandHomeDirectory(pathToFindFile));
+      FileVisitor<Path> matcherVisitor =
+          new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+              Path name = file.getFileName();
+              if (matcher.matches(name)) {
+                String relativeFilename =
+                    joinPaths(pathToFindFile.replace(path, ""), file.getFileName().toString());
+                if (relativeFilename.startsWith("/")) {
+                  relativeFilename = relativeFilename.replaceFirst("/", "");
+                }
+                result.add(relativeFilename);
+              }
+              return FileVisitResult.CONTINUE;
+            }
+          };
+      Files.walkFileTree(targetDir, matcherVisitor);
+    }
+    return result.build();
   }
 }
 

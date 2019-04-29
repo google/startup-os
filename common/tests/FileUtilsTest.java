@@ -955,5 +955,51 @@ public class FileUtilsTest {
         Files.isRegularFile(
             fileSystem.getPath("destination_folder" + "/path/to/folder_for_ignore/file2.txt")));
   }
+
+  @Test
+  public void testFindFilesByGlobPatternWhenFileInRootDir() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo2.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo.doc"));
+
+    assertEquals(
+        Arrays.asList("foo.txt", "foo2.txt"),
+        fileUtils.findFilesByGlobPattern(TEST_DIR_PATH, "*.{txt}"));
+  }
+
+  @Test
+  public void testFindFilesByGlobPatternWhenFilesInAllSubdirs() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder1"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder2"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder1/foo1.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder2/foo2.txt"));
+
+    assertEquals(
+        Arrays.asList("folder1/foo1.txt", "folder2/foo2.txt"),
+        fileUtils.findFilesByGlobPattern(TEST_DIR_PATH, "**/*.txt"));
+  }
+
+  @Test
+  public void testFindFilesByGlobPatternWhenFilesInSpecificSubdir() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder1"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder2"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder1/foo1.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder2/foo2.txt"));
+
+    assertEquals(
+        Arrays.asList("folder1/foo1.txt"),
+        fileUtils.findFilesByGlobPattern(TEST_DIR_PATH, "folder1/*.txt"));
+  }
 }
 
