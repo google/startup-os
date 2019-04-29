@@ -61,7 +61,6 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private static final String REPO_DIRECTORY = "repo";
   private static final String GLOBAL_REGISTRY_FILE = "tools/reviewer/global_registry.prototxt";
   private static final String REPO_REGISTRY_FILE = "reviewer_config.prototxt";
-  private static final String REPO_REGISTRY_FILE_PATH = "/root/reviewer_config.prototxt";
   private static final String REPO_REGISTRY_URL = "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
 
   private final ReentrantLock lock = new ReentrantLock();
@@ -149,7 +148,9 @@ public class ReviewerMetadataUpdaterTask implements Task {
   }
 
   public void sayHello() throws IOException {
-    ReviewerConfig reviewerConfig = (ReviewerConfig) fileUtils.readPrototxt(REPO_REGISTRY_FILE_PATH,
+    String localRegistryFilePath = fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(),
+        "reviewer_config.prototxt");
+    ReviewerConfig reviewerConfig = (ReviewerConfig) fileUtils.readPrototxt(localRegistryFilePath,
         ReviewerConfig.newBuilder());
     System.out.println(reviewerConfig.toString());
   }
