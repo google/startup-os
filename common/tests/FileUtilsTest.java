@@ -987,6 +987,37 @@ public class FileUtilsTest {
   }
 
   @Test
+  public void testFindFilesByGlobPatternWhenFilesInAllSubdirsAndRootDir() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder1"));
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH + "/folder2"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo1.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/folder2/foo2.txt"));
+
+    assertEquals(
+        Arrays.asList("foo.txt", "foo1.txt", "folder2/foo2.txt"),
+        fileUtils.findFilesByGlobPattern(TEST_DIR_PATH, "**/*.txt"));
+  }
+
+  @Test
+  public void testFindFilesByGlobPatternWhenWithoutSubdirs() throws IOException {
+    if (fileSystemName.equals("Windows")) {
+      return;
+    }
+    Files.createDirectories(fileSystem.getPath(TEST_DIR_PATH));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo1.txt"));
+    Files.createFile(fileSystem.getPath(TEST_DIR_PATH + "/foo2.txt"));
+
+    assertEquals(
+        Arrays.asList("foo.txt", "foo2.txt", "foo1.txt"),
+        fileUtils.findFilesByGlobPattern(TEST_DIR_PATH, "**/*.txt"));
+  }
+
+  @Test
   public void testFindFilesByGlobPatternWhenFilesInSpecificSubdir() throws IOException {
     if (fileSystemName.equals("Windows")) {
       return;

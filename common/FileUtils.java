@@ -47,8 +47,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -481,14 +483,15 @@ public class FileUtils {
   /**
    * Gets file names in path by pattern. The pattern can containing the * wildcard: this wildcard
    * matches any string excluding the directory separator /. In addition, filename patterns can
-   * contain the recursive ** wildcard. Throws IllegalStateException if path is not a folder.
+   * contain the recursive ** wildcard. This wildcard will match zero or more complete path segments
+   * separated by the directory separator /. Throws IllegalStateException if path is not a folder.
    */
   public ImmutableList<String> findFilesByGlobPattern(String path, String pattern)
       throws IOException {
     if (!folderExists(path)) {
       throw new IllegalStateException("Folder does not exist");
     }
-    ImmutableList.Builder<String> result = ImmutableList.builder();
+    Set<String> result = new HashSet<>();
     String[] patternParts = pattern.split("/");
     String filenamePattern = patternParts[patternParts.length - 1];
 
@@ -500,6 +503,7 @@ public class FileUtils {
         List<String> tempPaths = new ArrayList<>();
         if (item.equals("**")) {
           for (String pathToFindFile : pathsToFindFiles) {
+            tempPaths.add(pathToFindFile);
             for (String subfolder : listSubfolders(pathToFindFile)) {
               tempPaths.add(joinPaths(pathToFindFile, subfolder));
             }
@@ -523,7 +527,9 @@ public class FileUtils {
               Path name = file.getFileName();
               if (matcher.matches(name)) {
                 String relativeFilename =
-                    joinPaths(pathToFindFile.replace(path, ""), file.getFileName().toString());
+                    joinPaths(
+                        file.getParent().toString().replace(path, ""),
+                        file.getFileName().toString());
                 if (relativeFilename.startsWith("/")) {
                   relativeFilename = relativeFilename.replaceFirst("/", "");
                 }
@@ -534,7 +540,7 @@ public class FileUtils {
           };
       Files.walkFileTree(targetDir, matcherVisitor);
     }
-    return result.build();
+    return ImmutableList.copyOf(result);
   }
 }
 
