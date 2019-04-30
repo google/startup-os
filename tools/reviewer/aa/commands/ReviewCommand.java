@@ -102,7 +102,7 @@ public class ReviewCommand implements AaCommand {
       e.printStackTrace();
     }
 
-    codeReviewBlockingStub.createDiff(
+    codeReviewBlockingStub.createOrUpdateDiff(
         CreateDiffRequest.newBuilder().setDiff(diffBuilder.build()).build());
 
     return true;

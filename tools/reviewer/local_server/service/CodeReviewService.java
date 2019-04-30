@@ -178,7 +178,7 @@ public class CodeReviewService extends CodeReviewServiceGrpc.CodeReviewServiceIm
   }
 
   @Override
-  public void createDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
+  public void createOrUpdateDiff(CreateDiffRequest req, StreamObserver<Empty> responseObserver) {
     checkAuth();
     FirestoreProtoClient client =
         new FirestoreProtoClient(authService.getProjectId(), authService.getToken());

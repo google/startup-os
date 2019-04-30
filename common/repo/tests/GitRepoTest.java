@@ -174,7 +174,6 @@ public class GitRepoTest {
     fileUtils.writeStringUnchecked(
         TEST_FILE_CONTENTS, fileUtils.joinToAbsolutePath(repoFolder, TEST_FILE));
     gitRepo.addFile(TEST_FILE);
-    List<File> uncom = repo.getUncommittedFiles();
     assertEquals(1, repo.getUncommittedFiles().size());
   }
 

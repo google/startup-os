@@ -77,7 +77,7 @@ public class TestTool {
   private void createDiff(Diff diff) {
     final CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
     try {
-      blockingStub.createDiff(request);
+      blockingStub.createOrUpdateDiff(request);
     } catch (StatusRuntimeException e) {
       e.printStackTrace();
     }

@@ -216,7 +216,7 @@ public class ReviewerClient {
   }
 
   private void updateDiff(Diff diff) {
-    codeReviewBlockingStub.createDiff(CreateDiffRequest.newBuilder().setDiff(diff).build());
+    codeReviewBlockingStub.createOrUpdateDiff(CreateDiffRequest.newBuilder().setDiff(diff).build());
   }
 
   private Comment.Builder getCommentBuilder(
