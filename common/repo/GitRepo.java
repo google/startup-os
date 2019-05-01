@@ -512,9 +512,8 @@ public class GitRepo implements Repo {
   }
 
   @Override
-  public String getRepoName() {
-    String repoPath = runCommand("rev-parse --show-toplevel").stdout.trim();
-    return repoPath.substring(repoPath.lastIndexOf('/') + 1);
+  public String getAbsRepoPath() {
+    return runCommand("rev-parse --show-toplevel").stdout.trim();
   }
 }
 

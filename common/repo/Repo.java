@@ -110,6 +110,6 @@ public interface Repo {
 
   String getMostRecentCommitOfFile(String filename);
 
-  String getRepoName();
+  String getAbsRepoPath();
 }
 

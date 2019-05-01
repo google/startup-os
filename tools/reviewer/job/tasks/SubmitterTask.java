@@ -190,7 +190,8 @@ public class SubmitterTask implements Task {
       for (GitRepo repo : gitRepos) {
         boolean pushSuccessful = repo.push("master");
         if (!pushSuccessful) {
-          notPushedRepoNames.add(repo.getRepoName());
+          String absRepoPath = repo.getAbsRepoPath();
+          notPushedRepoNames.add(absRepoPath.substring(absRepoPath.lastIndexOf('/') + 1));
         }
       }
       if (notPushedRepoNames.isEmpty()) {
