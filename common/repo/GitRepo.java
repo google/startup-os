@@ -510,5 +510,11 @@ public class GitRepo implements Repo {
   public static String getProjectName(String githubUrl) {
     return githubUrl.split("/")[4];
   }
+
+  @Override
+  public String getRepoName() {
+    String repoPath = runCommand("rev-parse --show-toplevel").stdout.trim();
+    return repoPath.substring(repoPath.lastIndexOf('/') + 1);
+  }
 }
 

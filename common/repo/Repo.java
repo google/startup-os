@@ -109,5 +109,7 @@ public interface Repo {
   String getMostRecentCommitOfBranch(String branch);
 
   String getMostRecentCommitOfFile(String filename);
+
+  String getRepoName();
 }
 
