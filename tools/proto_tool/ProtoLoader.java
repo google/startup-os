@@ -50,9 +50,17 @@ public class ProtoLoader {
     args.add(Paths.get("./tools/protoc.sh").toAbsolutePath().toString());
 
     for (Path proto : protos) {
-      Path resutingFile =
+      Path resultingFile =
           Paths.get(tempDirectory.toAbsolutePath().toString(), proto.getFileName().toString());
 
+      /*
+       * Proto files may import other proto files
+       * In order to support this, on copying them to temporary directory,
+       * we *rewire* the imports to have flat structure
+       * Example: `import common/files/something.proto` becomes `import something.proto`
+       * Current limitation of this approach is not supporting files with same name
+       * by silently overwriting them.
+       */
       String updatedProto =
           Files.readAllLines(proto)
               .stream()
@@ -71,8 +79,8 @@ public class ProtoLoader {
                   })
               .collect(Collectors.joining("\n"));
 
-      Files.write(resutingFile, updatedProto.getBytes());
-      args.add(resutingFile.toString());
+      Files.write(resultingFile, updatedProto.getBytes());
+      args.add(resultingFile.toString());
     }
 
     args.add("-I");
