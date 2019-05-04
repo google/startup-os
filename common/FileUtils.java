@@ -44,8 +44,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -489,57 +488,54 @@ public class FileUtils {
   public ImmutableList<String> findFilesByGlobPattern(String path, String pattern)
       throws IOException {
     if (!folderExists(path)) {
-      throw new IllegalStateException("Folder does not exist");
+      throw new IllegalStateException(String.format("%s folder does not exist", path));
     }
     Set<String> result = new HashSet<>();
-    String[] patternParts = pattern.split("/");
-    String filenamePattern = patternParts[patternParts.length - 1];
-
-    List<String> pathsToFindFiles = Collections.singletonList(path);
-    if (patternParts.length > 1) {
-      // We don't process the last item because it's the filename pattern
-      for (int i = 0; i < patternParts.length - 1; i++) {
-        String item = patternParts[i];
-        List<String> tempPaths = new ArrayList<>();
-        if (item.equals("**")) {
-          for (String pathToFindFile : pathsToFindFiles) {
-            tempPaths.add(pathToFindFile);
-            for (String subfolder : listSubfolders(pathToFindFile)) {
-              tempPaths.add(joinPaths(pathToFindFile, subfolder));
-            }
-          }
-        } else {
-          for (String pathToFindFile : pathsToFindFiles) {
-            tempPaths.add(joinPaths(pathToFindFile, item));
-          }
-        }
-        pathsToFindFiles = new ArrayList<>(tempPaths);
-      }
-    }
-
+    final String filenamePattern = pattern.substring(pattern.lastIndexOf('/') + 1);
     final PathMatcher matcher = fileSystem.getPathMatcher("glob:" + filenamePattern);
-    for (String pathToFindFile : pathsToFindFiles) {
-      final Path targetDir = fileSystem.getPath(expandHomeDirectory(pathToFindFile));
-      FileVisitor<Path> matcherVisitor =
-          new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-              Path name = file.getFileName();
-              if (matcher.matches(name)) {
-                String relativeFilename =
-                    joinPaths(
-                        file.getParent().toString().replace(path, ""),
-                        file.getFileName().toString());
-                if (relativeFilename.startsWith("/")) {
-                  relativeFilename = relativeFilename.replaceFirst("/", "");
-                }
+    final Path targetDir = fileSystem.getPath(expandHomeDirectory(path));
+    FileVisitor<Path> matcherVisitor =
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            Path name = file.getFileName();
+            if (matcher.matches(name)) {
+              String relativeFilename =
+                  joinPaths(
+                      file.getParent().toString().replace(path, ""), file.getFileName().toString());
+              if (relativeFilename.startsWith("/")) {
+                relativeFilename = relativeFilename.replaceFirst("/", "");
+              }
+              if (areFoldersMatchingPattern(pattern, relativeFilename)) {
                 result.add(relativeFilename);
               }
-              return FileVisitResult.CONTINUE;
             }
-          };
-      Files.walkFileTree(targetDir, matcherVisitor);
-    }
+            return FileVisitResult.CONTINUE;
+          }
+
+          private boolean areFoldersMatchingPattern(String pattern, String relativeFilename) {
+            if (!pattern.contains("/") && !relativeFilename.contains("/")) {
+              return true;
+            }
+            List<String> patternFolders =
+                Arrays.asList(pattern.substring(0, pattern.lastIndexOf("/")).split("/"));
+
+            String foundedFilename =
+                relativeFilename.substring(relativeFilename.lastIndexOf('/') + 1);
+            List<String> foundedFolders =
+                Arrays.asList(relativeFilename.replace(foundedFilename, "").split("/"));
+
+            for (int i = 0; i < foundedFolders.size(); i++) {
+              String foundedFolder = foundedFolders.get(i);
+              String patternFolder = patternFolders.get(i);
+              if (patternFolder.equals("**") || patternFolder.equals(foundedFolder)) {
+                return true;
+              }
+            }
+            return false;
+          }
+        };
+    Files.walkFileTree(targetDir, matcherVisitor);
     return ImmutableList.copyOf(result);
   }
 }
