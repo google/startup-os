@@ -6,7 +6,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { MaterialModule } from '@/import';
-
 import { CodeChangesComponent } from './code-changes';
 import { DiffStatusComponent } from './diff-status';
 import { DirectiveList } from './directives';
@@ -44,7 +43,6 @@ const Modules = [
     ...Modules,
   ],
   declarations: Declarations,
-  providers: [],
   exports: [
     ...Declarations,
     ...Modules,

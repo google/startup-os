@@ -7,7 +7,7 @@ import { CoreModule } from '@/core';
 import { SharedModule } from '@/shared';
 import { AuthService, FirebaseService } from '@/core/services';
 import { AuthMockService, FirebaseMockService } from '@/core/services/mock';
-import { DiffModule } from './dashboard';
+import { DiffModule } from '@/routes';
 
 export function configureTestingModule(): void {
   TestBed.configureTestingModule({
@@ -21,7 +21,7 @@ export function configureTestingModule(): void {
     ],
     providers: [AuthMockService, FirebaseMockService],
   })
-  .overrideProvider(AuthService, { useValue: new AuthMockService() })
-  .overrideProvider(FirebaseService, { useValue: new FirebaseMockService() })
-  .compileComponents();
+    .overrideProvider(AuthService, { useValue: new AuthMockService() })
+    .overrideProvider(FirebaseService, { useValue: new FirebaseMockService() })
+    .compileComponents();
 }

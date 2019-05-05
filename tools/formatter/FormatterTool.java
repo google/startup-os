@@ -143,6 +143,15 @@ public class FormatterTool {
     }
   }
 
+  static class TsFormatter implements BaseFormatter {
+
+    @Override
+    public void format(Path path) throws IOException {
+      executeWithProcess(
+          "/usr/bin/env", "bash", "tools/bazel_tools/tsfmt.sh", path.toAbsolutePath().toString());
+    }
+  }
+
   @FlagDesc(name = "path", description = "Format files in this path, recursively")
   private static final Flag<String> path = Flag.create(".");
 
@@ -166,6 +175,9 @@ public class FormatterTool {
 
   @FlagDesc(name = "sh", description = "Format shell files")
   private static final Flag<Boolean> sh = Flag.create(false);
+
+  @FlagDesc(name = "ts", description = "Format TypeScript files")
+  private static final Flag<Boolean> ts = Flag.create(false);
 
   @FlagDesc(name = "ignore_directories", description = "Ignored directories, split by comma")
   private static final Flag<String> ignoreDirectories = Flag.create("");
@@ -193,6 +205,10 @@ public class FormatterTool {
     return getExtension(file).equals(".sh");
   }
 
+  private static boolean isTs(Path file) {
+    return getExtension(file).equals(".ts");
+  }
+
   private static boolean isBuild(Path file) {
     return file.getFileName().toString().equals("BUILD")
         || file.getFileName().toString().equals("BUILD.bazel");
@@ -214,7 +230,8 @@ public class FormatterTool {
             || (isPython(file) && python.get())
             || (isCpp(file) && cpp.get())
             || (isBuild(file) && build.get())
-            || (isSh(file) && sh.get()));
+            || (isSh(file) && sh.get())
+            || (isTs(file) && ts.get()));
     if (ignoreNodeModules.get()) {
       if (file.normalize().toString().contains("node_modules")) {
         return false;
@@ -233,6 +250,7 @@ public class FormatterTool {
           .put(".bazel", new BuildFormatter())
           .put("", new BuildFormatter())
           .put(".sh", new ShFormatter())
+          .put(".ts", new TsFormatter())
           .build();
 
   public static void main(String[] args) {

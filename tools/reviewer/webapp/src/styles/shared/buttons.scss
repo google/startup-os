@@ -1,0 +1,91 @@
+// Global button classes
+
+$palette-grey: #d1d1d1;
+
+body {
+  .mat-button {
+    font-family: $default-font;
+  }
+
+  @mixin cr-button() {
+    line-height: 0;
+    border-radius: 8px;
+    border: solid 1px #8c8c8c;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .cr-button {
+    @include cr-button();
+  }
+
+  .cr-light-button {
+    @include cr-button();
+    width: 120px;
+    height: 28px;
+    font-size: 16px;
+    color: black;
+  }
+
+  .cr-thread-button {
+    @include cr-button();
+    width: 97px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .blue-button {
+    $palette-blue: #6daeff;
+    background: $palette-blue;
+    &[disabled] {
+      background: $palette-grey;
+    }
+  }
+
+  .sky-button {
+    $palette-sky: #86d1ff;
+    background: $palette-sky;
+    &[disabled] {
+      background: $palette-grey;
+    }
+  }
+  
+  .sea-button {
+    $palette-sea: #1daaff;
+    background: $palette-sea;
+    &[disabled] {
+      background: $palette-grey;
+    }
+  }
+
+  .orange-button {
+    $palette-orange: #ffc75a;
+    background: $palette-orange;
+    &[disabled] {
+      background: $palette-grey;
+    }
+  }
+
+  .grey-button {
+    background: $palette-grey;
+  }
+
+  .ivory-button {
+    $palette-ivory: #ebebeb;
+    background: $palette-ivory;
+  }
+
+  .red-button {
+    $palette-red: #fc7273;
+    background: $palette-red;
+    margin-left: 15px;
+    min-width: 163px;
+  }
+
+  .cr-dialog-button {
+    width: auto;
+    min-width: 136px;
+    color: #232323;
+  }
+}

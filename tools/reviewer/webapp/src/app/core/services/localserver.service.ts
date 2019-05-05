@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 
 import {
   BranchInfo,
@@ -12,11 +12,6 @@ import {
 } from '@/core/proto';
 import { EncodingService } from './encoding.service';
 import { NotificationService } from './notification.service';
-
-export interface FileData {
-  branchInfo: BranchInfo;
-  file: File;
-}
 
 const LOCAL_SERVER: string = 'http://localhost:7000';
 const CLOUD_FUNCTIONS: string = 'https://us-central1-startupos-5f279.cloudfunctions.net';
@@ -32,7 +27,7 @@ export class LocalserverService {
   ) { }
 
   getBranchInfoList(id: number, workspace: string): Observable<BranchInfo[]> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<BranchInfo[]>) => {
       // Create diff files request
       const diffFilesRequest: DiffFilesRequest = new DiffFilesRequest();
       diffFilesRequest.setDiffId(id);
@@ -44,7 +39,7 @@ export class LocalserverService {
       // Send the request to local server
       this.http
         .get(this.server + '/get_diff_files?request=' + requestBase64, { responseType: 'text' })
-        .subscribe(diffFilesResponseBase64 => {
+        .subscribe((diffFilesResponseBase64: string) => {
           // Decode response
           const diffFilesResponseBinary: Uint8Array = this.encodingService
             .decodeBase64StringToUint8Array(diffFilesResponseBase64);
@@ -60,7 +55,7 @@ export class LocalserverService {
         }, () => {
           this.fallback().subscribe(() => {
             this.getBranchInfoList(id, workspace).subscribe(
-              branchInfo => observer.next(branchInfo),
+              (branchInfo: BranchInfo[]) => observer.next(branchInfo),
             );
           }, () => observer.error());
         });
@@ -71,7 +66,7 @@ export class LocalserverService {
     leftFile: File,
     rightFile: File,
   ): Observable<TextDiffResponse> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<TextDiffResponse>) => {
       // Create text diff request
       const textDiffRequest: TextDiffRequest = new TextDiffRequest();
       textDiffRequest.setLeftFile(leftFile);
@@ -83,7 +78,7 @@ export class LocalserverService {
       // Send the request to local server
       this.http
         .get(this.server + '/get_text_diff?request=' + requestBase64, { responseType: 'text' })
-        .subscribe(textDiffResponseBase64 => {
+        .subscribe((textDiffResponseBase64: string) => {
           // Decode response
           const textDiffResponseBinary: Uint8Array = this.encodingService
             .decodeBase64StringToUint8Array(textDiffResponseBase64);
@@ -94,7 +89,7 @@ export class LocalserverService {
         }, () => {
           this.fallback().subscribe(() => {
             this.getFileChanges(leftFile, rightFile).subscribe(
-              textDiffResponse => observer.next(textDiffResponse),
+              (textDiffResponse: TextDiffResponse) => observer.next(textDiffResponse),
             );
           }, () => observer.error());
         });
@@ -102,7 +97,7 @@ export class LocalserverService {
   }
 
   private fallback(): Observable<void> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<void>) => {
       // Error is received from the server
       if (this.server === LOCAL_SERVER) {
         // If it's local server then use fallback server instead
@@ -119,8 +114,8 @@ export class LocalserverService {
 
   // Get all newest files of a diff by id and workspace
   getDiffFiles(id: number, workspace: string): Observable<File[]> {
-    return new Observable(observer => {
-      this.getBranchInfoList(id, workspace).subscribe(branchInfoList => {
+    return new Observable((observer: Subscriber<File[]>) => {
+      this.getBranchInfoList(id, workspace).subscribe((branchInfoList: BranchInfo[]) => {
         let files: File[] = [];
         for (const branchInfo of branchInfoList) {
           const branchFiles: File[] = this.getFilesFromBranchInfo(branchInfo);
@@ -157,7 +152,10 @@ export class LocalserverService {
   getFileData(
     filenameWithRepo: string,
     branchInfoList: BranchInfo[],
-  ): FileData {
+  ): {
+      branchInfo: BranchInfo;
+      file: File;
+    } {
     for (const branchInfo of branchInfoList) {
       const files: File[] = this.getFilesFromBranchInfo(branchInfo);
       for (const file of files) {

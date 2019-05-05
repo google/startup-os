@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 
 import { BranchInfo, CiResponse, Commit, Diff } from '@/core/proto';
 import { LocalserverService } from './localserver.service';
@@ -21,11 +21,11 @@ export class CiService {
 
   // Gets statuses for each repo on diff page
   loadStatusList(diff: Diff): Observable<Status[]> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<Status[]>) => {
       // Get branchInfoList from localserver
       this.localserverService
         .getBranchInfoList(diff.getId(), diff.getWorkspace())
-        .subscribe(branchInfoList => {
+        .subscribe((branchInfoList: BranchInfo[]) => {
           // Find all statuses that match repo id and last commit id
           const statusList: Status[] = [];
           for (const branchInfo of branchInfoList) {
@@ -44,11 +44,11 @@ export class CiService {
 
   // Gets status and log for specific repo on log page
   loadCiLog(diff: Diff, repoId: string): Observable<CiLog> {
-    return new Observable(observer => {
+    return new Observable((observer: Subscriber<CiLog>) => {
       // Get branchInfoList from localserver
       this.localserverService
         .getBranchInfoList(diff.getId(), diff.getWorkspace())
-        .subscribe(branchInfoList => {
+        .subscribe((branchInfoList: BranchInfo[]) => {
           const ciLog: CiLog = this.getCiLog(diff, repoId, branchInfoList);
           if (ciLog) {
             observer.next(ciLog);

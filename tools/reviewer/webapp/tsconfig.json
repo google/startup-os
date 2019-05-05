@@ -11,6 +11,7 @@
     "declaration": false,
     "module": "es2015",
     "moduleResolution": "node",
+    "newLine": "LF",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,

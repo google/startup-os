@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of, Subject, Subscription } from 'rxjs';
+import { Observable, of, Subject, Subscription, Subscriber } from 'rxjs';
 
 import { Diff } from '@/core/proto';
 import { FirebaseService } from './firebase.service';
@@ -25,8 +25,8 @@ export class FirebaseStateService {
     } else {
       // Diff isn't loaded yet.
       // Wait until loaded then return.
-      return new Observable(observer => {
-        const subscription: Subscription = this.diffChanges.subscribe(diff => {
+      return new Observable((observer: Subscriber<Diff>) => {
+        const subscription: Subscription = this.diffChanges.subscribe((diff: Diff) => {
           subscription.unsubscribe();
           observer.next(diff);
         });
@@ -41,8 +41,8 @@ export class FirebaseStateService {
     } else {
       // Diffs aren't loaded yet.
       // Wait until loaded then return.
-      return new Observable(observer => {
-        const subscription: Subscription = this.diffsChanges.subscribe(diffs => {
+      return new Observable((observer: Subscriber<Diff[]>) => {
+        const subscription: Subscription = this.diffsChanges.subscribe((diffs: Diff[]) => {
           subscription.unsubscribe();
           observer.next(diffs);
         });
@@ -54,7 +54,7 @@ export class FirebaseStateService {
     if (!this.diff || id !== this.diff.getId().toString()) {
       this.isDiffLoading = true;
       this.diffSubscription.unsubscribe();
-      this.diffSubscription = this.firebaseService.getDiff(id).subscribe(diff => {
+      this.diffSubscription = this.firebaseService.getDiff(id).subscribe((diff: Diff) => {
         this.diff = diff;
         this.isDiffLoading = false;
         this.diffChanges.next(diff);
@@ -66,7 +66,7 @@ export class FirebaseStateService {
     if (this.diffs.length === 0) {
       this.isDiffsLoading = true;
       this.diffsSubscription.unsubscribe();
-      this.diffsSubscription = this.firebaseService.getDiffs().subscribe(diffs => {
+      this.diffsSubscription = this.firebaseService.getDiffs().subscribe((diffs: Diff[]) => {
         this.diffs = diffs;
         this.isDiffsLoading = false;
         this.diffsChanges.next(diffs);

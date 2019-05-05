@@ -36,6 +36,15 @@ sh_binary(
     ],
 )
 
+sh_binary(
+    name = "tsfmt",
+    srcs = ["bazel_tools/tsfmt.sh"],
+    data = [
+        "@tsfmt//:cli-linux",
+        "@tsfmt//:cli-macos",
+    ],
+)
+
 java_binary(
     name = "grpc_polyglot",
     main_class = "me.dinowernli.grpc.polyglot.Main",
