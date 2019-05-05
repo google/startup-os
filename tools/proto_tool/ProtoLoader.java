@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.tools.JavaCompiler;
@@ -49,9 +50,11 @@ public class ProtoLoader {
     args.add("bash");
     args.add(Paths.get("./tools/protoc.sh").toAbsolutePath().toString());
 
+    HashSet<String> writtenProtoFiles = new HashSet<>();
+
     for (Path proto : protos) {
-      Path resultingFile =
-          Paths.get(tempDirectory.toAbsolutePath().toString(), proto.getFileName().toString());
+      String fileName = proto.getFileName().toString();
+      Path resultingFile = Paths.get(tempDirectory.toAbsolutePath().toString(), fileName);
 
       /*
        * Proto files may import other proto files
@@ -59,7 +62,7 @@ public class ProtoLoader {
        * we *rewire* the imports to have flat structure
        * Example: `import common/files/something.proto` becomes `import something.proto`
        * Current limitation of this approach is not supporting files with same name
-       * by silently overwriting them.
+       * by throwing an error
        */
       String updatedProto =
           Files.readAllLines(proto)
@@ -79,8 +82,13 @@ public class ProtoLoader {
                   })
               .collect(Collectors.joining("\n"));
 
-      Files.write(resultingFile, updatedProto.getBytes());
-      args.add(resultingFile.toString());
+      if (writtenProtoFiles.contains(fileName)) {
+        throw new Exception(String.format("There is more than one file with name %s", fileName));
+      } else {
+        Files.write(resultingFile, updatedProto.getBytes());
+        args.add(resultingFile.toString());
+        writtenProtoFiles.add(fileName);
+      }
     }
 
     args.add("-I");
