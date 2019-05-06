@@ -128,7 +128,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
           } else {
             log.atInfo().log("New checksum not equal to stored one: new %s, stored %s", newChecksum, registryChecksum);
           }
-          uploadReviewerRegistryToFirestore(registry);
+          //uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;
         } else {
           log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
@@ -147,11 +147,20 @@ public class ReviewerMetadataUpdaterTask implements Task {
     return !lock.isLocked();
   }
 
-  public void sayHello() throws IOException {
+  public void printStartupOsReviewerConfig() throws IOException {
     String localRegistryFilePath = fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(),
         "reviewer_config.prototxt");
     ReviewerConfig reviewerConfig = (ReviewerConfig) fileUtils.readPrototxt(localRegistryFilePath,
         ReviewerConfig.newBuilder());
-    System.out.println(reviewerConfig.toString());
+    System.out.println("StartupOs ReviewerConfig:\n"  + reviewerConfig.toString());
+  }
+
+  public void printHasadnaReviewerConfig() throws IOException {
+    String targetDirectory = fileUtils.expandHomeDirectory("~/hasadna");
+    String localHasadnaRegistryFilePath = fileUtils.joinPaths(targetDirectory,
+      "reviewer_config.prototxt");
+    ReviewerConfig reviewerConfigHasadna = (ReviewerConfig) fileUtils.readPrototxt(localHasadnaRegistryFilePath,
+        ReviewerConfig.newBuilder());
+    System.out.println("Hasadna ReviewerConfig:\n" + reviewerConfigHasadna.toString());
   }
 }

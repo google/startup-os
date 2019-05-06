@@ -44,7 +44,12 @@ public class ReviewerMetadataUpdaterTaskTool {
     ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask = DaggerReviewerMetadataUpdaterTaskTool_ReviewerMetadataUpdaterTaskToolComponent
         .builder().setFirestoreProtoClient(client).build().getReviewerMetadataUpdaterTask();
     try {
-      reviewerMetadataUpdaterTask.sayHello();
+      reviewerMetadataUpdaterTask.printStartupOsReviewerConfig();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    try {
+      reviewerMetadataUpdaterTask.printHasadnaReviewerConfig();
     } catch (Exception e) {
       System.out.println(e);
     }
