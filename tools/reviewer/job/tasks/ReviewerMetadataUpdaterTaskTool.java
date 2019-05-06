@@ -21,6 +21,7 @@ import com.google.startupos.common.firestore.FirestoreProtoClient;
 import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
+import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
 import dagger.BindsInstance;
 import dagger.Component;
 
@@ -43,13 +44,20 @@ public class ReviewerMetadataUpdaterTaskTool {
     FirestoreProtoClient client = new FirestoreProtoClient(serviceAccountJson.get());
     ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask = DaggerReviewerMetadataUpdaterTaskTool_ReviewerMetadataUpdaterTaskToolComponent
         .builder().setFirestoreProtoClient(client).build().getReviewerMetadataUpdaterTask();
+    ReviewerConfig startupOsReviewerConfig = null;
+    ReviewerConfig hasadnaReviewerConfig = null;
     try {
-      reviewerMetadataUpdaterTask.printStartupOsReviewerConfig();
+      startupOsReviewerConfig = reviewerMetadataUpdaterTask.printStartupOsReviewerConfig();
     } catch (Exception e) {
       System.out.println(e);
     }
     try {
-      reviewerMetadataUpdaterTask.printHasadnaReviewerConfig();
+      hasadnaReviewerConfig = reviewerMetadataUpdaterTask.printHasadnaReviewerConfig();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+    try {
+      reviewerMetadataUpdaterTask.compareReviewerConfigData(startupOsReviewerConfig, hasadnaReviewerConfig);
     } catch (Exception e) {
       System.out.println(e);
     }

@@ -117,5 +117,6 @@ java_binary(
         "//common/flags",
         "//third_party/maven/com/google/flogger:flogger_system_backend",
         "//third_party/maven/javax/inject:javax_inject",
+        "//tools/reviewer:reviewer_java_proto",
     ],
 )
