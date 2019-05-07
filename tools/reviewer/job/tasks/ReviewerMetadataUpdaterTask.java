@@ -159,7 +159,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
         "reviewer_config.prototxt");
     ReviewerConfig reviewerConfig = (ReviewerConfig) fileUtils.readPrototxt(localRegistryFilePath,
         ReviewerConfig.newBuilder());
-    System.out.println("StartupOs ReviewerConfig:\n" + reviewerConfig.toString());
+    //System.out.println("StartupOs ReviewerConfig:\n" + reviewerConfig.toString());
     return reviewerConfig;
   }
 
@@ -168,7 +168,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
     String localHasadnaRegistryFilePath = fileUtils.joinPaths(targetDirectory, "reviewer_config.prototxt");
     ReviewerConfig reviewerConfigHasadna = (ReviewerConfig) fileUtils.readPrototxt(localHasadnaRegistryFilePath,
         ReviewerConfig.newBuilder());
-    System.out.println("Hasadna ReviewerConfig:\n" + reviewerConfigHasadna.toString());
+    //System.out.println("Hasadna ReviewerConfig:\n" + reviewerConfigHasadna.toString());
     return reviewerConfigHasadna;
   }
 
@@ -207,8 +207,10 @@ public class ReviewerMetadataUpdaterTask implements Task {
       {
         User user1 = reviewerConfig1.getUser(i);
         User user2 = reviewerConfig2.getUser(j);
-        if (user1.getId().toLowerCase() == user2.getId().toLowerCase())
+        System.out.println(user1.getId() + " == " + user2.getId() + " ? " + user1.getId().equals(user2.getId()));
+        if (user1.getId().equals(user2.getId()))
         { 
+          System.out.println("ENTERED user merge clause");
           String lastName = null;
           String email = null;
           String imageUrl = null;
@@ -225,7 +227,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
           //If the user has an email - get it and compare to the other file
           if (user1.getEmail() != null)
           {
-            if (user1.getEmail() != user2.getEmail())
+            if (!user1.getEmail().equals(user2.getEmail()))
             {
               System.out.println("***Emails for user " + user1.getId() + " differ between files.");
             }
@@ -234,7 +236,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
           //If the user has an image_url - get it and compare to the other file
           if (user1.getImageUrl() != null)
           {
-            if (user1.getImageUrl() != user2.getImageUrl())
+            if (!user1.getImageUrl().equals(user2.getImageUrl()))
             {
             System.out.println("***Image Urls for user " + user1.getId() + " differ between files.");
             }
@@ -299,6 +301,15 @@ public class ReviewerMetadataUpdaterTask implements Task {
           .addAllTopContribution(mergedUserContributions);
           User mergedUser = mergedUserBuilder.build();
           mergedUsersList.add(mergedUser);
+          if (i < reviewerConfig1UserCount - 1)
+          {
+            i++;
+            j = -1;
+          }
+          else
+          {
+            break;
+          }
         }
         else if (j == reviewerConfig2UserCount - 1)
         {
@@ -311,7 +322,8 @@ public class ReviewerMetadataUpdaterTask implements Task {
     .setDisplayName(displayName)
     .addAllRepo(repoList)
     .addAllProject(projectList)
-    .addAllUser(mergedUsersList);
+    .addAllUser(mergedUsersList)
+    .setTotalCrystal(reviewerConfig1.getTotalCrystal());
     //Print the merged ReviewerConfig
     System.out.println("Merged ReviewerConfig:\n" + mergedReviewerConfig.toString());
   }
