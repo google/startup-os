@@ -22,6 +22,7 @@ import com.google.startupos.common.flags.Flag;
 import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.flags.Flags;
 import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
+import java.io.IOException;
 import dagger.BindsInstance;
 import dagger.Component;
 
