@@ -42,29 +42,27 @@ public class ReviewerMetadataUpdaterTaskTool {
     Flags.parseCurrentPackage(args);
     System.out.println(serviceAccountJson.get());
     FirestoreProtoClient client = new FirestoreProtoClient(serviceAccountJson.get());
-    ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask = DaggerReviewerMetadataUpdaterTaskTool_ReviewerMetadataUpdaterTaskToolComponent
-        .builder().setFirestoreProtoClient(client).build().getReviewerMetadataUpdaterTask();
-    ReviewerConfig startupOsReviewerConfig = null;
-    ReviewerConfig hasadnaReviewerConfig = null;
+    ReviewerMetadataUpdaterTask reviewerMetadataUpdaterTask =
+        DaggerReviewerMetadataUpdaterTaskTool_ReviewerMetadataUpdaterTaskToolComponent.builder()
+            .setFirestoreProtoClient(client)
+            .build()
+            .getReviewerMetadataUpdaterTask();
     try {
-      startupOsReviewerConfig = reviewerMetadataUpdaterTask.printStartupOsReviewerConfig();
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-    try {
-      hasadnaReviewerConfig = reviewerMetadataUpdaterTask.printHasadnaReviewerConfig();
-    } catch (Exception e) {
-      System.out.println(e);
-    }
-    try {
-      reviewerMetadataUpdaterTask.compareReviewerConfigData(startupOsReviewerConfig, hasadnaReviewerConfig);
-    } catch (Exception e) {
+      ReviewerConfig startupOsReviewerConfig =
+          reviewerMetadataUpdaterTask.getReviewerConfig(
+              reviewerMetadataUpdaterTask.getStartupOsReviewerConfigPath());
+      ReviewerConfig hasadnaReviewerConfig =
+          reviewerMetadataUpdaterTask.getReviewerConfig(
+              reviewerMetadataUpdaterTask.getHasadnaReviewerConfigPath());
+      reviewerMetadataUpdaterTask.compareReviewerConfigData(
+          startupOsReviewerConfig, hasadnaReviewerConfig);
+    } catch (IOException e) {
       System.out.println(e);
     }
   }
 
   @Singleton
-  @Component(modules = { CommonModule.class })
+  @Component(modules = {CommonModule.class})
   public interface ReviewerMetadataUpdaterTaskToolComponent {
     ReviewerMetadataUpdaterTask getReviewerMetadataUpdaterTask();
 
@@ -78,3 +76,4 @@ public class ReviewerMetadataUpdaterTaskTool {
     }
   }
 }
+

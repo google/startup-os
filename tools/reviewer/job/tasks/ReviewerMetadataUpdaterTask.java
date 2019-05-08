@@ -43,7 +43,6 @@ import java.util.stream.Stream;
 import java.util.LinkedHashSet;
 import javax.inject.Inject;
 
-
 /*
  * This task periodically updates the reviewer configs in Firestore.
  *
@@ -68,7 +67,8 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private static final String REPO_DIRECTORY = "repo";
   private static final String GLOBAL_REGISTRY_FILE = "tools/reviewer/global_registry.prototxt";
   private static final String REPO_REGISTRY_FILE = "reviewer_config.prototxt";
-  private static final String REPO_REGISTRY_URL = "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
+  private static final String REPO_REGISTRY_URL =
+      "https://raw.githubusercontent.com/%s/%s/master/reviewer_config.prototxt";
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -80,15 +80,16 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private boolean firstRun = true;
 
   @Inject
-  public ReviewerMetadataUpdaterTask(FileUtils fileUtils, GitRepoFactory gitRepoFactory,
-      FirestoreProtoClient firestoreClient) {
+  public ReviewerMetadataUpdaterTask(
+      FileUtils fileUtils, GitRepoFactory gitRepoFactory, FirestoreProtoClient firestoreClient) {
     this.fileUtils = fileUtils;
     this.gitRepoFactory = gitRepoFactory;
     this.firestoreClient = firestoreClient;
   }
 
   private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
-    firestoreClient.setProtoDocument(REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
+    firestoreClient.setProtoDocument(
+        REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
   }
 
   private static Stream<Integer> intStream(byte[] array) {
@@ -102,7 +103,8 @@ public class ReviewerMetadataUpdaterTask implements Task {
       messageDigest.update(fileAsBytes);
       byte[] messageDigestBytes = messageDigest.digest();
       StringBuilder hashBuilder = new StringBuilder();
-      intStream(messageDigestBytes).map(digestByte -> String.format("%02X", Byte.toUnsignedInt(digestByte.byteValue())))
+      intStream(messageDigestBytes)
+          .map(digestByte -> String.format("%02X", Byte.toUnsignedInt(digestByte.byteValue())))
           .forEach(hashBuilder::append);
       return hashBuilder.toString();
     } catch (NoSuchAlgorithmException ex) {
@@ -124,16 +126,21 @@ public class ReviewerMetadataUpdaterTask implements Task {
           repo.pull();
         }
 
-        String globalRegistryFilePath = fileUtils.joinToAbsolutePath(REPO_DIRECTORY, GLOBAL_REGISTRY_FILE);
+        String globalRegistryFilePath =
+            fileUtils.joinToAbsolutePath(REPO_DIRECTORY, GLOBAL_REGISTRY_FILE);
         String newChecksum = md5ForFile(globalRegistryFilePath);
-        ReviewerRegistry registry = (ReviewerRegistry) fileUtils.readPrototxtUnchecked(globalRegistryFilePath,
-            ReviewerRegistry.newBuilder());
+        ReviewerRegistry registry =
+            (ReviewerRegistry)
+                fileUtils.readPrototxtUnchecked(
+                    globalRegistryFilePath, ReviewerRegistry.newBuilder());
 
         if (!newChecksum.equals(registryChecksum)) {
           if (firstRun) {
             log.atInfo().log("Storing on first run, checksum: %s", newChecksum);
           } else {
-            log.atInfo().log("New checksum not equal to stored one: new %s, stored %s", newChecksum, registryChecksum);
+            log.atInfo().log(
+                "New checksum not equal to stored one: new %s, stored %s",
+                newChecksum, registryChecksum);
           }
           // uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;
@@ -154,177 +161,155 @@ public class ReviewerMetadataUpdaterTask implements Task {
     return !lock.isLocked();
   }
 
-  public ReviewerConfig printStartupOsReviewerConfig() throws IOException {
-    String localRegistryFilePath = fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(),
-        "reviewer_config.prototxt");
-    ReviewerConfig reviewerConfig = (ReviewerConfig) fileUtils.readPrototxt(localRegistryFilePath,
-        ReviewerConfig.newBuilder());
-    //System.out.println("StartupOs ReviewerConfig:\n" + reviewerConfig.toString());
+  public ReviewerConfig getReviewerConfig(String filePath) throws IOException {
+    ReviewerConfig reviewerConfig =
+        (ReviewerConfig) fileUtils.readPrototxt(filePath, ReviewerConfig.newBuilder());
     return reviewerConfig;
   }
 
-  public ReviewerConfig printHasadnaReviewerConfig() throws IOException {
-    String targetDirectory = fileUtils.expandHomeDirectory("~/hasadna");
-    String localHasadnaRegistryFilePath = fileUtils.joinPaths(targetDirectory, "reviewer_config.prototxt");
-    ReviewerConfig reviewerConfigHasadna = (ReviewerConfig) fileUtils.readPrototxt(localHasadnaRegistryFilePath,
-        ReviewerConfig.newBuilder());
-    //System.out.println("Hasadna ReviewerConfig:\n" + reviewerConfigHasadna.toString());
-    return reviewerConfigHasadna;
+  public String getStartupOsReviewerConfigPath() {
+    String localRegistryFilePath =
+        fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "reviewer_config.prototxt");
+    return localRegistryFilePath;
   }
 
-  public void compareReviewerConfigData(ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) throws IOException {
+  public String getHasadnaReviewerConfigPath() {
+    String targetDirectory = fileUtils.expandHomeDirectory("~/hasadna");
+    String localHasadnaRegistryFilePath =
+        fileUtils.joinPaths(targetDirectory, "reviewer_config.prototxt");
+    return localHasadnaRegistryFilePath;
+  }
+
+  public void compareReviewerConfigData(
+      ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) throws IOException {
     String displayName = reviewerConfig1.getDisplayName();
-    LinkedHashSet<Repo> repoList = new LinkedHashSet<Repo>();
-    //Getting ReviewerConfig1's repos
-    for (Repo repo: reviewerConfig1.getRepoList())
-    {
-      repoList.add(repo);
-    }
-    //Getting ReviewerConfig2's repos
-    for (Repo repo: reviewerConfig2.getRepoList())
-    {
-      repoList.add(repo);
-    }
-    LinkedHashSet<Project> projectList = new LinkedHashSet<Project>();
-    //Getting ReviewerConfig1's projects
-    for (Project project: reviewerConfig1.getProjectList())
-    {
+    LinkedHashSet<Repo> repoList = new LinkedHashSet<>();
+    // Getting ReviewerConfig1's repos
+    repoList.addAll(reviewerConfig1.getRepoList());
+    // Getting ReviewerConfig2's repos
+    repoList.addAll(reviewerConfig2.getRepoList());
+    LinkedHashSet<Project> projectList = new LinkedHashSet<>();
+    // Getting ReviewerConfig1's projects
+    for (Project project : reviewerConfig1.getProjectList()) {
       projectList.add(project);
     }
-    //Getting ReviewerConfig2's projects
-    for (Project project: reviewerConfig2.getProjectList())
-    {
+    // Getting ReviewerConfig2's projects
+    for (Project project : reviewerConfig2.getProjectList()) {
       projectList.add(project);
     }
-    LinkedHashSet<User> mergedUsersList = new LinkedHashSet<User>();
-    //Getting ReviewerConfig1's user count
+    LinkedHashSet<User> mergedUsersList = new LinkedHashSet<>();
+    // Getting ReviewerConfig1's user count
     int reviewerConfig1UserCount = reviewerConfig1.getUserCount();
-    //Getting ReviewerConfig2's user count
+    // Getting ReviewerConfig2's user count
     int reviewerConfig2UserCount = reviewerConfig2.getUserCount();
-    for (int i = 0; i < reviewerConfig1UserCount; i++)
-    {
-      for (int j = 0; j < reviewerConfig2UserCount; j++)
-      {
+    for (int i = 0; i < reviewerConfig1UserCount; i++) {
+      for (int j = 0; j < reviewerConfig2UserCount; j++) {
         User user1 = reviewerConfig1.getUser(i);
         User user2 = reviewerConfig2.getUser(j);
-        System.out.println(user1.getId() + " == " + user2.getId() + " ? " + user1.getId().equals(user2.getId()));
-        if (user1.getId().equals(user2.getId()))
-        { 
+        System.out.println(
+            user1.getId() + " == " + user2.getId() + " ? " + user1.getId().equals(user2.getId()));
+        if (user1.getId().equals(user2.getId())) {
           System.out.println("ENTERED user merge clause");
           String lastName = null;
           String email = null;
           String imageUrl = null;
           int crystals = 0;
-          LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<SocialNetwork>();
-          LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<String>();
-          LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<String>();
+          LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
+          LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
+          LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
           LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<Contribution>();
-          //If the user has a last name - get it
-          if (user1.getLastName() != null)
-          {
+          // If the user has a last name - get it
+          if (user1.getLastName() != null) {
             lastName = user1.getLastName();
           }
-          //If the user has an email - get it and compare to the other file
-          if (user1.getEmail() != null)
-          {
-            if (!user1.getEmail().equals(user2.getEmail()))
-            {
+          // If the user has an email - get it and compare to the other file
+          if (user1.getEmail() != null) {
+            if (!user1.getEmail().equals(user2.getEmail())) {
               System.out.println("***Emails for user " + user1.getId() + " differ between files.");
             }
             email = user1.getEmail();
           }
-          //If the user has an image_url - get it and compare to the other file
-          if (user1.getImageUrl() != null)
-          {
-            if (!user1.getImageUrl().equals(user2.getImageUrl()))
-            {
-            System.out.println("***Image Urls for user " + user1.getId() + " differ between files.");
+          // If the user has an image_url - get it and compare to the other file
+          if (user1.getImageUrl() != null) {
+            if (!user1.getImageUrl().equals(user2.getImageUrl())) {
+              System.out.println(
+                  "***Image Urls for user " + user1.getId() + " differ between files.");
             }
             imageUrl = user1.getImageUrl();
           }
-          //If the user has crystals - get their amount and compare to the other file
-          if (user1.getCrystals() != user2.getCrystals())
-          {
-            System.out.println("***Crystals amount for user " + user1.getId() + " differ between files.");
+          // If the user has crystals - get their amount and compare to the other file
+          if (user1.getCrystals() != user2.getCrystals()) {
+            System.out.println(
+                "***Crystals amount for user " + user1.getId() + " differ between files.");
           }
           crystals = user1.getCrystals();
-          //Get the user's social networks from the first file
-          for (SocialNetwork socialNetwork: user1.getSocialNetworkList())
-          {
+          // Get the user's social networks from the first file
+          for (SocialNetwork socialNetwork : user1.getSocialNetworkList()) {
             mergedUserSocialNetworks.add(socialNetwork);
           }
-          //Get the user's social networks from the second file
-          for (SocialNetwork socialNetwork: user2.getSocialNetworkList())
-          {
+          // Get the user's social networks from the second file
+          for (SocialNetwork socialNetwork : user2.getSocialNetworkList()) {
             mergedUserSocialNetworks.add(socialNetwork);
           }
-          //Get the user's skill list from the first file
-          for (String skill: user1.getSkillList())
-          {
+          // Get the user's skill list from the first file
+          for (String skill : user1.getSkillList()) {
             mergedUserSkillList.add(skill);
           }
-          //Get the user's skill list from the second file
-          for (String skill: user2.getSkillList())
-          {
+          // Get the user's skill list from the second file
+          for (String skill : user2.getSkillList()) {
             mergedUserSkillList.add(skill);
           }
-          //Get the user's project ids from the first file
-          for (String projectId: user1.getProjectIdList())
-          {
+          // Get the user's project ids from the first file
+          for (String projectId : user1.getProjectIdList()) {
             mergedUserProjectIdList.add(projectId);
           }
-          //Get the user's project ids from the second file
-          for (String projectId: user2.getProjectIdList())
-          {
+          // Get the user's project ids from the second file
+          for (String projectId : user2.getProjectIdList()) {
             mergedUserProjectIdList.add(projectId);
           }
-          //Get the user's top contributions from the first file
-          for (Contribution contribution: user1.getTopContributionList())
-          {
+          // Get the user's top contributions from the first file
+          for (Contribution contribution : user1.getTopContributionList()) {
             mergedUserContributions.add(contribution);
           }
-          //Get the user's top contributions from the second file
-          for (Contribution contribution: user2.getTopContributionList())
-          {
+          // Get the user's top contributions from the second file
+          for (Contribution contribution : user2.getTopContributionList()) {
             mergedUserContributions.add(contribution);
           }
-          User.Builder mergedUserBuilder = User.newBuilder()
-          .setId(user1.getId())
-          .setFirstName(user1.getFirstName())
-          .setLastName(lastName)
-          .setEmail(email)
-          .setImageUrl(imageUrl)
-          .setCrystals(crystals)
-          .addAllSocialNetwork(mergedUserSocialNetworks)
-          .addAllSkill(mergedUserSkillList)
-          .addAllProjectId(mergedUserProjectIdList)
-          .addAllTopContribution(mergedUserContributions);
+          User.Builder mergedUserBuilder =
+              User.newBuilder()
+                  .setId(user1.getId())
+                  .setFirstName(user1.getFirstName())
+                  .setLastName(lastName)
+                  .setEmail(email)
+                  .setImageUrl(imageUrl)
+                  .setCrystals(crystals)
+                  .addAllSocialNetwork(mergedUserSocialNetworks)
+                  .addAllSkill(mergedUserSkillList)
+                  .addAllProjectId(mergedUserProjectIdList)
+                  .addAllTopContribution(mergedUserContributions);
           User mergedUser = mergedUserBuilder.build();
           mergedUsersList.add(mergedUser);
-          if (i < reviewerConfig1UserCount - 1)
-          {
+          if (i < reviewerConfig1UserCount - 1) {
             i++;
             j = -1;
-          }
-          else
-          {
+          } else {
             break;
           }
-        }
-        else if (j == reviewerConfig2UserCount - 1)
-        {
+        } else if (j == reviewerConfig2UserCount - 1) {
           mergedUsersList.add(user1);
         }
       }
     }
     int totalCrystals = reviewerConfig1.getTotalCrystal();
-    ReviewerConfig.Builder mergedReviewerConfig = ReviewerConfig.newBuilder()
-    .setDisplayName(displayName)
-    .addAllRepo(repoList)
-    .addAllProject(projectList)
-    .addAllUser(mergedUsersList)
-    .setTotalCrystal(reviewerConfig1.getTotalCrystal());
-    //Print the merged ReviewerConfig
+    ReviewerConfig.Builder mergedReviewerConfig =
+        ReviewerConfig.newBuilder()
+            .setDisplayName(displayName)
+            .addAllRepo(repoList)
+            .addAllProject(projectList)
+            .addAllUser(mergedUsersList)
+            .setTotalCrystal(reviewerConfig1.getTotalCrystal());
+    // Print the merged ReviewerConfig
     System.out.println("Merged ReviewerConfig:\n" + mergedReviewerConfig.toString());
   }
 }
+
