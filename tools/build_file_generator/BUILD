@@ -40,6 +40,7 @@ java_library(
     srcs = ["BuildFileGeneratorUtils.java"],
     deps = [
         "//common",
+        "//third_party/maven/com/google/guava",
         "//third_party/maven/javax/inject:javax_inject",
     ],
 )

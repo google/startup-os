@@ -16,11 +16,22 @@
 
 package com.google.startupos.tools.build_file_generator;
 
+import com.google.common.collect.ImmutableList;
 import com.google.startupos.common.FileUtils;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,73 +47,88 @@ public class BuildFileGeneratorUtils {
     this.fileUtils = fileUtils;
   }
 
-  // TODO: Support all cases in glob function
-  // (https://docs.bazel.build/versions/master/be/functions.html#glob)
-  public List<String> getFilenamesByGlob(String globBody, String path) {
+  public List<String> getFilenamesByGlob(String path, String globLine) {
     List<String> result = new ArrayList<>();
-    List<String> globValues = new ArrayList<>();
-    for (String line : globBody.split(System.lineSeparator())) {
-      String globValue = getSubstringByRegex(line, TEXT_BETWEEN_DOUBLE_QUOTES_REGEX);
-      if (!globValue.isEmpty()) {
-        globValues.add(globValue.replace("\"", ""));
-      }
-    }
-
-    for (String globValue : globValues) {
-      String fileExtension = globValue.substring(globValue.lastIndexOf('.') + 1);
-      String[] globValueParts = globValue.split("/");
-      if (globValueParts.length == 1) {
-        result.addAll(getFilesByExtension(path, fileExtension));
-      } else {
-        String intermediatePath = "";
-        for (String currentGlobValuePart : globValueParts) {
-          if (currentGlobValuePart.endsWith("." + fileExtension)) {
-            List<String> filenames =
-                getFilesByExtension(fileUtils.joinPaths(path, intermediatePath), fileExtension);
-            for (String filename : filenames) {
-              result.add(fileUtils.joinPaths(intermediatePath, filename));
-            }
-            continue;
-          }
-          if (currentGlobValuePart.equals("**")) {
-            try {
-              result.addAll(
-                  getFilesByExtension(fileUtils.joinPaths(path, intermediatePath), fileExtension));
-              List<String> folderPaths =
-                  fileUtils
-                      .listContentsRecursively(fileUtils.joinPaths(path, intermediatePath))
-                      .stream()
-                      .filter(item -> fileUtils.folderExists(item))
-                      .collect(Collectors.toList());
-
-              for (String folderPath : folderPaths) {
-                result.addAll(getFilesByExtension(folderPath, fileExtension));
-              }
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          } else {
-            intermediatePath = fileUtils.joinPaths(intermediatePath, currentGlobValuePart);
-          }
+    try {
+      for (String globBody : getSubstringsByRegex(globLine, "\\[(.*?)\\]")) {
+        for (String pattern : getSubstringsByRegex(globBody, TEXT_BETWEEN_DOUBLE_QUOTES_REGEX)) {
+          result.addAll(getFilenamesByGlobPattern(path, pattern.replace("\"", "")));
         }
       }
-    }
-    return result;
-  }
-
-  private List<String> getFilesByExtension(String path, String fileExtension) {
-    try {
-      return fileUtils
-          .listContents(path)
-          .stream()
-          .map(item -> fileUtils.joinPaths(path, item))
-          .filter(item -> fileUtils.fileExists(item))
-          .filter(file -> file.endsWith("." + fileExtension))
-          .map(file -> file.replace(path + "/", ""))
-          .collect(Collectors.toList());
+      return result;
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public ImmutableList<String> getSubstringsByRegex(String line, String regex) {
+    ImmutableList.Builder<String> result = ImmutableList.builder();
+    Matcher matcher = Pattern.compile(regex).matcher(line.replace(System.lineSeparator(), ""));
+    while (matcher.find()) {
+      result.add(matcher.group());
+    }
+    return result.build();
+  }
+
+  // TODO: Support `exclude` and `exclude_directories` arguments
+  // (https://docs.bazel.build/versions/master/be/functions.html#glob)
+  private List<String> getFilenamesByGlobPattern(String path, String pattern) throws IOException {
+    if (!fileUtils.folderExists(path)) {
+      throw new IllegalStateException(String.format("%s folder does not exist", path));
+    }
+    Set<String> result = new HashSet<>();
+    Set<String> dirsContainBuildFile = new HashSet<>();
+    final PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+    Files.walkFileTree(
+        Paths.get(path),
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+            // Relative path under `path`
+            String perlacedPatch = file.toString().replace(path, "");
+            int slashAmount = perlacedPatch.length() - perlacedPatch.replace("/", "").length();
+            if (slashAmount > 1 || (slashAmount == 1 && !pattern.startsWith("**"))) {
+              perlacedPatch = perlacedPatch.replaceFirst("/", "");
+            }
+            if (matcher.matches(Paths.get(perlacedPatch))) {
+              String relativeFilename =
+                  fileUtils.joinPaths(
+                      file.getParent().toString().replace(path, ""), file.getFileName().toString());
+              if (relativeFilename.startsWith("/")) {
+                relativeFilename = relativeFilename.replaceFirst("/", "");
+              }
+              result.add(relativeFilename);
+            }
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult preVisitDirectory(
+              Path dir, BasicFileAttributes basicFileAttributes) throws IOException {
+            if (fileUtils.listContents(dir.toString()).contains("BUILD")) {
+              String relativeDir = (dir.toString()).replace(path, "");
+              if (relativeDir.startsWith("/")) {
+                relativeDir = relativeDir.replaceFirst("/", "");
+              }
+              dirsContainBuildFile.add(relativeDir);
+            }
+            return FileVisitResult.CONTINUE;
+          }
+        });
+    return result
+        .stream()
+        .filter(
+            file -> {
+              // Remove results that are siblings of BUILD file
+              // https://docs.bazel.build/versions/master/be/functions.html#recursive_glob_example
+              if (file.contains("/")) {
+                String parentPath = file.substring(0, file.lastIndexOf("/"));
+                return !dirsContainBuildFile.contains(parentPath);
+              } else {
+                return true;
+              }
+            })
+        .collect(Collectors.toList());
   }
 
   public String getSubstringByRegex(String line, String regex) {

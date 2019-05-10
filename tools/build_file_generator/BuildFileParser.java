@@ -141,7 +141,7 @@ public class BuildFileParser {
         result.put(
             currentAttribute,
             buildFileGeneratorUtils.getFilenamesByGlob(
-                globBody.toString(), path.replace("/BUILD", "")));
+                path.replace("/BUILD", ""), globBody.toString()));
         continue;
       }
       if (line.endsWith("[") || line.startsWith("]") || line.startsWith("#")) {
