@@ -37,7 +37,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.LinkedHashSet;
@@ -180,6 +182,15 @@ public class ReviewerMetadataUpdaterTask implements Task {
     return localHasadnaRegistryFilePath;
   }
 
+  private User getUser(ReviewerConfig reviewerConfig, String userId) {
+    for (User user : reviewerConfig.getUserList()) {
+      if (user.getId().equals(userId)) {
+        return user;
+      }
+    }
+    return User.getDefaultInstance();
+  }
+
   public void compareReviewerConfigData(
       ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) throws IOException {
     String displayName = reviewerConfig1.getDisplayName();
@@ -190,116 +201,115 @@ public class ReviewerMetadataUpdaterTask implements Task {
     repoList.addAll(reviewerConfig2.getRepoList());
     LinkedHashSet<Project> projectList = new LinkedHashSet<>();
     // Getting ReviewerConfig1's projects
-    for (Project project : reviewerConfig1.getProjectList()) {
-      projectList.add(project);
-    }
+    projectList.addAll(reviewerConfig1.getProjectList());
     // Getting ReviewerConfig2's projects
-    for (Project project : reviewerConfig2.getProjectList()) {
-      projectList.add(project);
-    }
+    projectList.addAll(reviewerConfig2.getProjectList());
     LinkedHashSet<User> mergedUsersList = new LinkedHashSet<>();
-    // Getting ReviewerConfig1's user count
-    int reviewerConfig1UserCount = reviewerConfig1.getUserCount();
-    // Getting ReviewerConfig2's user count
-    int reviewerConfig2UserCount = reviewerConfig2.getUserCount();
-    for (int i = 0; i < reviewerConfig1UserCount; i++) {
-      for (int j = 0; j < reviewerConfig2UserCount; j++) {
-        User user1 = reviewerConfig1.getUser(i);
-        User user2 = reviewerConfig2.getUser(j);
-        System.out.println(
-            user1.getId() + " == " + user2.getId() + " ? " + user1.getId().equals(user2.getId()));
-        if (user1.getId().equals(user2.getId())) {
-          System.out.println("ENTERED user merge clause");
-          String lastName = null;
-          String email = null;
-          String imageUrl = null;
-          int crystals = 0;
-          LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
-          LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
-          LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
-          LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<Contribution>();
-          // If the user has a last name - get it
-          if (user1.getLastName() != null) {
-            lastName = user1.getLastName();
-          }
-          // If the user has an email - get it and compare to the other file
-          if (user1.getEmail() != null) {
-            if (!user1.getEmail().equals(user2.getEmail())) {
-              System.out.println("***Emails for user " + user1.getId() + " differ between files.");
-            }
-            email = user1.getEmail();
-          }
-          // If the user has an image_url - get it and compare to the other file
-          if (user1.getImageUrl() != null) {
-            if (!user1.getImageUrl().equals(user2.getImageUrl())) {
-              System.out.println(
-                  "***Image Urls for user " + user1.getId() + " differ between files.");
-            }
-            imageUrl = user1.getImageUrl();
-          }
-          // If the user has crystals - get their amount and compare to the other file
-          if (user1.getCrystals() != user2.getCrystals()) {
-            System.out.println(
-                "***Crystals amount for user " + user1.getId() + " differ between files.");
-          }
-          crystals = user1.getCrystals();
-          // Get the user's social networks from the first file
-          for (SocialNetwork socialNetwork : user1.getSocialNetworkList()) {
-            mergedUserSocialNetworks.add(socialNetwork);
-          }
-          // Get the user's social networks from the second file
-          for (SocialNetwork socialNetwork : user2.getSocialNetworkList()) {
-            mergedUserSocialNetworks.add(socialNetwork);
-          }
-          // Get the user's skill list from the first file
-          for (String skill : user1.getSkillList()) {
-            mergedUserSkillList.add(skill);
-          }
-          // Get the user's skill list from the second file
-          for (String skill : user2.getSkillList()) {
-            mergedUserSkillList.add(skill);
-          }
-          // Get the user's project ids from the first file
-          for (String projectId : user1.getProjectIdList()) {
-            mergedUserProjectIdList.add(projectId);
-          }
-          // Get the user's project ids from the second file
-          for (String projectId : user2.getProjectIdList()) {
-            mergedUserProjectIdList.add(projectId);
-          }
-          // Get the user's top contributions from the first file
-          for (Contribution contribution : user1.getTopContributionList()) {
-            mergedUserContributions.add(contribution);
-          }
-          // Get the user's top contributions from the second file
-          for (Contribution contribution : user2.getTopContributionList()) {
-            mergedUserContributions.add(contribution);
-          }
-          User.Builder mergedUserBuilder =
-              User.newBuilder()
-                  .setId(user1.getId())
-                  .setFirstName(user1.getFirstName())
-                  .setLastName(lastName)
-                  .setEmail(email)
-                  .setImageUrl(imageUrl)
-                  .setCrystals(crystals)
-                  .addAllSocialNetwork(mergedUserSocialNetworks)
-                  .addAllSkill(mergedUserSkillList)
-                  .addAllProjectId(mergedUserProjectIdList)
-                  .addAllTopContribution(mergedUserContributions);
-          User mergedUser = mergedUserBuilder.build();
-          mergedUsersList.add(mergedUser);
-          if (i < reviewerConfig1UserCount - 1) {
-            i++;
-            j = -1;
-          } else {
-            break;
-          }
-        } else if (j == reviewerConfig2UserCount - 1) {
-          mergedUsersList.add(user1);
+    for (User user1 : reviewerConfig1.getUserList()) {
+      User user2 = getUser(reviewerConfig2, user1.getId());
+      if (user2.getId().isEmpty()) {
+        // (user defined only in reviewerConfig1). Add `user1` to `mergedUsersList` without changes
+        mergedUsersList.add(user1);
+      } else {
+        // (users defined in both repos). Merge data and add merged result to `mergedUsersList`
+        String lastName = null;
+        String email = null;
+        String imageUrl = null;
+        int crystals = 0;
+        LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
+        LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
+        LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
+        LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<Contribution>();
+        // If the user has a last name - get it
+        if (user1.getLastName() != null) {
+          lastName = user1.getLastName();
         }
+        // If the user has an email - get it and compare to the other file
+        if (user1.getEmail() != null) {
+          if (!user1.getEmail().equals(user2.getEmail())) {
+            System.out.println("***Emails for user " + user1.getId() + " differ between files.");
+          }
+          email = user1.getEmail();
+        }
+        // If the user has an image_url - get it and compare to the other file
+        if (user1.getImageUrl() != null) {
+          if (!user1.getImageUrl().equals(user2.getImageUrl())) {
+            System.out.println(
+                "***Image Urls for user " + user1.getId() + " differ between files.");
+          }
+          imageUrl = user1.getImageUrl();
+        }
+        // If the user has crystals - get their amount and compare to the other file
+        if (user1.getCrystals() != user2.getCrystals()) {
+          System.out.println(
+              "***Crystals amount for user " + user1.getId() + " differ between files.");
+        }
+        crystals = user1.getCrystals();
+        // Get the user's social networks from the first file
+        for (SocialNetwork socialNetwork : user1.getSocialNetworkList()) {
+          mergedUserSocialNetworks.add(socialNetwork);
+        }
+        // Get the user's social networks from the second file
+        for (SocialNetwork socialNetwork : user2.getSocialNetworkList()) {
+          mergedUserSocialNetworks.add(socialNetwork);
+        }
+        // Get the user's skill list from the first file
+        for (String skill : user1.getSkillList()) {
+          mergedUserSkillList.add(skill);
+        }
+        // Get the user's skill list from the second file
+        for (String skill : user2.getSkillList()) {
+          mergedUserSkillList.add(skill);
+        }
+        // Get the user's project ids from the first file
+        for (String projectId : user1.getProjectIdList()) {
+          mergedUserProjectIdList.add(projectId);
+        }
+        // Get the user's project ids from the second file
+        for (String projectId : user2.getProjectIdList()) {
+          mergedUserProjectIdList.add(projectId);
+        }
+        // Get the user's top contributions from the first file
+        for (Contribution contribution : user1.getTopContributionList()) {
+          mergedUserContributions.add(contribution);
+        }
+        // Get the user's top contributions from the second file
+        for (Contribution contribution : user2.getTopContributionList()) {
+          mergedUserContributions.add(contribution);
+        }
+        User.Builder mergedUserBuilder =
+            User.newBuilder()
+                .setId(user1.getId())
+                .setFirstName(user1.getFirstName())
+                .setLastName(lastName)
+                .setEmail(email)
+                .setImageUrl(imageUrl)
+                .setCrystals(crystals)
+                .addAllSocialNetwork(mergedUserSocialNetworks)
+                .addAllSkill(mergedUserSkillList)
+                .addAllProjectId(mergedUserProjectIdList)
+                .addAllTopContribution(mergedUserContributions);
+        User mergedUser = mergedUserBuilder.build();
+        mergedUsersList.add(mergedUser);
       }
     }
+    List<User> usersDefinedOnlyInReviewerConfig2 =
+        reviewerConfig2
+            .getUserList()
+            .stream()
+            .filter(
+                user2 -> {
+                  boolean isUser2NotContainedInMergedUsers = true;
+                  for (User mergedUser : mergedUsersList) {
+                    if (mergedUser.getId().equals(user2.getId())) {
+                      isUser2NotContainedInMergedUsers = false;
+                      break;
+                    }
+                  }
+                  return isUser2NotContainedInMergedUsers;
+                })
+            .collect(Collectors.toList());
+    mergedUsersList.addAll(usersDefinedOnlyInReviewerConfig2);
     int totalCrystals = reviewerConfig1.getTotalCrystal();
     ReviewerConfig.Builder mergedReviewerConfig =
         ReviewerConfig.newBuilder()
