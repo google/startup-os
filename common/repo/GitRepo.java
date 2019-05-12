@@ -323,6 +323,11 @@ public class GitRepo implements Repo {
   }
 
   @Override
+  public void resetHard(String commitId) {
+    runCommand("reset --hard " + commitId);
+  }
+
+  @Override
   public void removeBranch(String branch) {
     runCommand("branch --quiet -D " + branch);
   }
