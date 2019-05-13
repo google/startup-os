@@ -24,25 +24,25 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
-import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
-import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
-import com.google.startupos.tools.reviewer.ReviewerProtos.User;
-import com.google.startupos.tools.reviewer.ReviewerProtos.Project;
-import com.google.startupos.tools.reviewer.ReviewerProtos.SocialNetwork;
 import com.google.startupos.tools.reviewer.ReviewerProtos.Contribution;
+import com.google.startupos.tools.reviewer.ReviewerProtos.Project;
+import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
+import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
+import com.google.startupos.tools.reviewer.ReviewerProtos.SocialNetwork;
+import com.google.startupos.tools.reviewer.ReviewerProtos.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import java.util.LinkedHashSet;
 import javax.inject.Inject;
 
 /*
@@ -194,7 +194,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
 
   public void compareReviewerConfigData(
       ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) {
-    String displayName = reviewerConfig1.getDisplayName();
+    final String displayName = reviewerConfig1.getDisplayName();
     LinkedHashSet<Repo> repoList = new LinkedHashSet<>();
     // Getting ReviewerConfig1's repos
     repoList.addAll(reviewerConfig1.getRepoList());
@@ -216,11 +216,6 @@ public class ReviewerMetadataUpdaterTask implements Task {
         String lastName = "";
         String email = "";
         String imageUrl = "";
-        int crystals = 0;
-        LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
-        LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
-        LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
-        LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<>();
         // If the user has a last name - get it
         if (!user1.getLastName().isEmpty()) {
           lastName = user1.getLastName();
@@ -245,19 +240,24 @@ public class ReviewerMetadataUpdaterTask implements Task {
           System.out.println(
               "***Crystals amount for user " + user1.getId() + " differ between files.");
         }
+        int crystals = 0;
         crystals = user1.getCrystals();
+        LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
         // Get the user's social networks from the first file
         mergedUserSocialNetworks.addAll(user1.getSocialNetworkList());
         // Get the user's social networks from the second file
         mergedUserSocialNetworks.addAll(user2.getSocialNetworkList());
+        LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
         // Get the user's skill list from the first file
         mergedUserSkillList.addAll(user1.getSkillList());
         // Get the user's skill list from the second file
         mergedUserSkillList.addAll(user2.getSkillList());
+        LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
         // Get the user's project ids from the first file
         mergedUserProjectIdList.addAll(user1.getProjectIdList());
         // Get the user's project ids from the second file
         mergedUserProjectIdList.addAll(user2.getProjectIdList());
+        LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<>();
         // Get the user's top contributions from the first file
         mergedUserContributions.addAll(user1.getTopContributionList());
         // Get the user's top contributions from the second file
