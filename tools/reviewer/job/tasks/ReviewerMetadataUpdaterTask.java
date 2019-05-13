@@ -54,6 +54,7 @@ import javax.inject.Inject;
  * 3. If it did, a newly updated version is posted to Firestore in proto and binary formats.
  * 4. Doing the same for the config of every Reviewer in the registry.
  */
+  // TODO - How to make sure the first repo to be cloned is ALWAYS startup-os?
 public class ReviewerMetadataUpdaterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
@@ -122,7 +123,6 @@ public class ReviewerMetadataUpdaterTask implements Task {
       try {
         GitRepo repo = gitRepoFactory.create(REPO_DIRECTORY);
 
-        // TODO - How to make sure the first repo to be cloned is ALWAYS startup-os?
         if (fileUtils.folderEmptyOrNotExists(REPO_DIRECTORY)) {
           repo.cloneRepo(repoUrl.get(), REPO_DIRECTORY);
         } else {
