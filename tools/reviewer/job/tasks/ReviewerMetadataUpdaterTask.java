@@ -212,27 +212,27 @@ public class ReviewerMetadataUpdaterTask implements Task {
         mergedUsersList.add(user1);
       } else {
         // (users defined in both repos). Merge data and add merged result to `mergedUsersList`
-        String lastName = null;
-        String email = null;
-        String imageUrl = null;
+        String lastName = "";
+        String email = "";
+        String imageUrl = "";
         int crystals = 0;
         LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
         LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
         LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
         LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<>();
         // If the user has a last name - get it
-        if (user1.getLastName() != null) {
+        if (!user1.getLastName().isEmpty()) {
           lastName = user1.getLastName();
         }
         // If the user has an email - get it and compare to the other file
-        if (user1.getEmail() != null) {
+        if (!user1.getEmail().isEmpty()) {
           if (!user1.getEmail().equals(user2.getEmail())) {
             System.out.println("***Emails for user " + user1.getId() + " differ between files.");
           }
           email = user1.getEmail();
         }
         // If the user has an image_url - get it and compare to the other file
-        if (user1.getImageUrl() != null) {
+        if (!user1.getImageUrl().isEmpty()) {
           if (!user1.getImageUrl().equals(user2.getImageUrl())) {
             System.out.println(
                 "***Image Urls for user " + user1.getId() + " differ between files.");
