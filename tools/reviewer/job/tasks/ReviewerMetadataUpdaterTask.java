@@ -122,6 +122,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
       try {
         GitRepo repo = gitRepoFactory.create(REPO_DIRECTORY);
 
+        //TODO - How to make sure the first repo to be cloned is ALWAYS startup-os?
         if (fileUtils.folderEmptyOrNotExists(REPO_DIRECTORY)) {
           repo.cloneRepo(repoUrl.get(), REPO_DIRECTORY);
         } else {
