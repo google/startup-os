@@ -74,7 +74,7 @@ public class HttpArchiveDepsGenerator {
         }
       }
       if (httpArchive.getName().isEmpty()) {
-        log.atWarning().log("Can't find %s http_archive in WORKSPACE file,", httpArchiveName);
+        log.atWarning().log("Can't find %s http_archive in WORKSPACE file", httpArchiveName);
         continue;
       }
       if (areCommitIdsTheSame(httpArchiveName, getCommitId(httpArchive.getStripPrefix()))) {
