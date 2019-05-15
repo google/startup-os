@@ -76,6 +76,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private final ReentrantLock lock = new ReentrantLock();
 
   private String registryChecksum;
+  private String configChecksum;
   private Map<String, Integer> reviewerConfigHashes = new HashMap();
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
@@ -93,6 +94,11 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
     firestoreClient.setProtoDocument(
         REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
+  }
+
+  private void uploadReviewerConfigToFirestore(ReviewerConfig config) {
+    firestoreClient.setProtoDocument(
+        REVIEWER_COLLECTION, REVIEWER_CONFIG_DOCUMENT_NAME_BIN, config);
   }
 
   private static Stream<Integer> intStream(byte[] array) {
@@ -149,6 +155,27 @@ public class ReviewerMetadataUpdaterTask implements Task {
           registryChecksum = newChecksum;
         } else {
           log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
+        }
+
+        String repoRegistryFilePath =
+            fileUtils.joinToAbsolutePath(REPO_DIRECTORY, REPO_REGISTRY_FILE);
+        String newConfigChecksum = md5ForFile(repoRegistryFilePath);
+        ReviewerConfig config =
+            (ReviewerConfig)
+                fileUtils.readPrototxtUnchecked(repoRegistryFilePath, ReviewerConfig.newBuilder());
+
+        if (!newConfigChecksum.equals(configChecksum)) {
+          if (firstRun) {
+            log.atInfo().log("Storing in first run, configChecksum: %s", newConfigChecksum);
+          } else {
+            log.atInfo().log(
+                "New configChecksum not equal to stored one: new %s, stored %s",
+                newConfigChecksum, configChecksum);
+          }
+          // uploadReviewerConfigToFirestore(config);
+          configChecksum = newConfigChecksum;
+        } else {
+          log.atInfo().log("New ConfigChecksum is equal to stored one: %s,", configChecksum);
         }
         firstRun = false;
       } catch (IOException exception) {
