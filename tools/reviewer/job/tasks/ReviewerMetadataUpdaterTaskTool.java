@@ -55,8 +55,10 @@ public class ReviewerMetadataUpdaterTaskTool {
       ReviewerConfig hasadnaReviewerConfig =
           reviewerMetadataUpdaterTask.getReviewerConfig(
               reviewerMetadataUpdaterTask.getHasadnaReviewerConfigPath());
-      reviewerMetadataUpdaterTask.compareReviewerConfigData(
-          startupOsReviewerConfig, hasadnaReviewerConfig);
+      ReviewerConfig mergedReviewerConfig =
+          reviewerMetadataUpdaterTask.compareReviewerConfigData(
+              startupOsReviewerConfig, hasadnaReviewerConfig);
+      System.out.println("Merged ReviewerConfig:\n" + mergedReviewerConfig.toString());
     } catch (IOException e) {
       System.out.println(e);
     }

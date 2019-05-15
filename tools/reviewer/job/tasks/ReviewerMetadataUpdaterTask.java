@@ -165,22 +165,17 @@ public class ReviewerMetadataUpdaterTask implements Task {
   }
 
   public ReviewerConfig getReviewerConfig(String filePath) throws IOException {
-    ReviewerConfig reviewerConfig =
-        (ReviewerConfig) fileUtils.readPrototxt(filePath, ReviewerConfig.newBuilder());
-    return reviewerConfig;
+    return (ReviewerConfig) fileUtils.readPrototxt(filePath, ReviewerConfig.newBuilder());
   }
 
   public String getStartupOsReviewerConfigPath() {
-    String localRegistryFilePath =
+    return (String)
         fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "reviewer_config.prototxt");
-    return localRegistryFilePath;
   }
 
   public String getHasadnaReviewerConfigPath() {
-    String targetDirectory = fileUtils.expandHomeDirectory("~/hasadna");
-    String localHasadnaRegistryFilePath =
-        fileUtils.joinPaths(targetDirectory, "reviewer_config.prototxt");
-    return localHasadnaRegistryFilePath;
+    return (String)
+        fileUtils.joinPaths(fileUtils.expandHomeDirectory("~/hasadna"), "reviewer_config.prototxt");
   }
 
   private User getUser(ReviewerConfig reviewerConfig, String userId) {
@@ -192,18 +187,14 @@ public class ReviewerMetadataUpdaterTask implements Task {
     return User.getDefaultInstance();
   }
 
-  public void compareReviewerConfigData(
+  public ReviewerConfig compareReviewerConfigData(
       ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) {
     final String displayName = reviewerConfig1.getDisplayName();
     LinkedHashSet<Repo> repoList = new LinkedHashSet<>();
-    // Getting ReviewerConfig1's repos
     repoList.addAll(reviewerConfig1.getRepoList());
-    // Getting ReviewerConfig2's repos
     repoList.addAll(reviewerConfig2.getRepoList());
     LinkedHashSet<Project> projectList = new LinkedHashSet<>();
-    // Getting ReviewerConfig1's projects
     projectList.addAll(reviewerConfig1.getProjectList());
-    // Getting ReviewerConfig2's projects
     projectList.addAll(reviewerConfig2.getProjectList());
     LinkedHashSet<User> mergedUsersList = new LinkedHashSet<>();
     for (User user1 : reviewerConfig1.getUserList()) {
@@ -216,18 +207,15 @@ public class ReviewerMetadataUpdaterTask implements Task {
         String lastName = "";
         String email = "";
         String imageUrl = "";
-        // If the user has a last name - get it
         if (!user1.getLastName().isEmpty()) {
           lastName = user1.getLastName();
         }
-        // If the user has an email - get it and compare to the other file
         if (!user1.getEmail().isEmpty()) {
           if (!user1.getEmail().equals(user2.getEmail())) {
             System.out.println("***Emails for user " + user1.getId() + " differ between files.");
           }
           email = user1.getEmail();
         }
-        // If the user has an image_url - get it and compare to the other file
         if (!user1.getImageUrl().isEmpty()) {
           if (!user1.getImageUrl().equals(user2.getImageUrl())) {
             System.out.println(
@@ -235,7 +223,6 @@ public class ReviewerMetadataUpdaterTask implements Task {
           }
           imageUrl = user1.getImageUrl();
         }
-        // If the user has crystals - get their amount and compare to the other file
         if (user1.getCrystals() != user2.getCrystals()) {
           System.out.println(
               "***Crystals amount for user " + user1.getId() + " differ between files.");
@@ -243,24 +230,16 @@ public class ReviewerMetadataUpdaterTask implements Task {
         int crystals = 0;
         crystals = user1.getCrystals();
         LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
-        // Get the user's social networks from the first file
         mergedUserSocialNetworks.addAll(user1.getSocialNetworkList());
-        // Get the user's social networks from the second file
         mergedUserSocialNetworks.addAll(user2.getSocialNetworkList());
         LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
-        // Get the user's skill list from the first file
         mergedUserSkillList.addAll(user1.getSkillList());
-        // Get the user's skill list from the second file
         mergedUserSkillList.addAll(user2.getSkillList());
         LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
-        // Get the user's project ids from the first file
         mergedUserProjectIdList.addAll(user1.getProjectIdList());
-        // Get the user's project ids from the second file
         mergedUserProjectIdList.addAll(user2.getProjectIdList());
         LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<>();
-        // Get the user's top contributions from the first file
         mergedUserContributions.addAll(user1.getTopContributionList());
-        // Get the user's top contributions from the second file
         mergedUserContributions.addAll(user2.getTopContributionList());
         User.Builder mergedUserBuilder =
             User.newBuilder()
@@ -303,8 +282,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
             .addAllProject(projectList)
             .addAllUser(mergedUsersList)
             .setTotalCrystal(totalCrystals);
-    // Print the merged ReviewerConfig
-    System.out.println("Merged ReviewerConfig:\n" + mergedReviewerConfig.toString());
+    return mergedReviewerConfig.build();
   }
 }
 
