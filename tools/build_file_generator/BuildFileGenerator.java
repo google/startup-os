@@ -18,6 +18,7 @@ package com.google.startupos.tools.build_file_generator;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
+import com.google.common.flogger.FluentLogger;
 import com.google.startupos.common.FileUtils;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.CheckstyleTestExtension;
@@ -28,6 +29,9 @@ import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaProt
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.JavaTest;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.LoadExtensionStatement;
 import com.google.startupos.tools.build_file_generator.Protos.BuildFile.ProtoLibrary;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDep;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDeps;
+import com.google.startupos.tools.build_file_generator.Protos.HttpArchiveDepsList;
 import com.google.startupos.tools.build_file_generator.Protos.Import;
 import com.google.startupos.tools.build_file_generator.Protos.JavaClass;
 import com.google.startupos.tools.build_file_generator.Protos.ProtoFile;
@@ -35,6 +39,14 @@ import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDep;
 import com.google.startupos.tools.build_file_generator.Protos.ThirdPartyDeps;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -47,8 +59,11 @@ import javax.inject.Inject;
 
 // TODO: Add the support full classnames(package + classname) inside the code.
 public class BuildFileGenerator {
+  private static final FluentLogger log = FluentLogger.forEnclosingClass();
+
   private static final String THIRD_PARTY_ZIP_PATH = "third_party_deps.zip";
   private static final String PROTOTXT_FILENAME_INSIDE_ZIP = "third_party_deps.prototxt";
+  private static final String HTTP_ARCHIVE_DEPS_PATH = "http_archive_deps.prototxt";
   private static final String CHECKSTYLE_BZL_FILE_PATH = "//tools/checkstyle:checkstyle.bzl";
   private static final String CHECKSTYLE_SYMBOL = "checkstyle_test";
   private static final String JAVA_GRPC_LIBRARY_BZL_FILE_PATH =
@@ -56,20 +71,14 @@ public class BuildFileGenerator {
   private static final String JAVA_GRPC_LIBRARY_SYMBOL = "java_grpc_library";
   private static final String CHECKSTYLE_TEST_CONFIG = "//tools/checkstyle:config.xml";
   private static final String STARTUP_OS_PROJECT_NAME = "startup-os";
-  private static final ImmutableList<String> BUILD_FILE_GENERATION_BLACKLIST =
-      ImmutableList.of(
-          // A `resources` folder can contain proto files. If the `resources` folder contains a
-          // BUILD file, it impossible to use proto files as a label in a `resources` argument.
-          "resources",
-          // It's a subfolder. BUILD file from them is in the parent folder.
-          "/tools/reviewer/aa/commands/checks",
-          // Currently, we don't support auto-generating BUIlD files for android projects
-          "/examples/android/activities");
+  private static final String GLOB_PATTERN_TO_FIND_SUBFOLDERS_RECURSIVELY = "glob:**/%s/**";
+  private static final String GLOB_PATTERN_TO_FIND_FOLDERS = "glob:**/%s";
 
   private FileUtils fileUtils;
   private ProtoFileAnalyzer protoFileAnalyzer;
   private JavaClassAnalyzer javaClassAnalyzer;
   private BuildFileParser buildFileParser;
+  private BuildFileGeneratorUtils buildFileGeneratorUtils;
   private String projectName;
 
   @Inject
@@ -77,11 +86,13 @@ public class BuildFileGenerator {
       FileUtils fileUtils,
       ProtoFileAnalyzer protoFileAnalyzer,
       JavaClassAnalyzer javaClassAnalyzer,
-      BuildFileParser buildFileParser) {
+      BuildFileParser buildFileParser,
+      BuildFileGeneratorUtils buildFileGeneratorUtils) {
     this.fileUtils = fileUtils;
     this.protoFileAnalyzer = protoFileAnalyzer;
     this.javaClassAnalyzer = javaClassAnalyzer;
     this.buildFileParser = buildFileParser;
+    this.buildFileGeneratorUtils = buildFileGeneratorUtils;
     projectName =
         fileUtils
             .getCurrentWorkingDirectory()
@@ -94,9 +105,23 @@ public class BuildFileGenerator {
             THIRD_PARTY_ZIP_PATH, PROTOTXT_FILENAME_INSIDE_ZIP, ThirdPartyDeps.newBuilder());
   }
 
+  private HttpArchiveDepsList getHttpArchiveDepsList() {
+    String absHttpArchiveDepsPath =
+        fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), HTTP_ARCHIVE_DEPS_PATH);
+    if (fileUtils.fileExists(absHttpArchiveDepsPath)) {
+      return (HttpArchiveDepsList)
+          fileUtils.readPrototxtUnchecked(
+              fileUtils.joinPaths(absHttpArchiveDepsPath), HttpArchiveDepsList.newBuilder());
+    } else {
+      log.atWarning().log(
+          "Can't find prototxt file with http archive deps by path: %s", absHttpArchiveDepsPath);
+      return HttpArchiveDepsList.getDefaultInstance();
+    }
+  }
+
   // Returns absolute paths where exists java classes and/or proto files.
   // These are places where we should create BUILD files.
-  private ImmutableList<String> getPathsToCreateBuildFiles() {
+  private ImmutableList<String> getPathsContainJavaAndProtoFiles() {
     Set<String> result = new HashSet<>();
     try {
       for (String path :
@@ -105,15 +130,7 @@ public class BuildFileGenerator {
           List<String> folderContent = fileUtils.listContents(path);
           for (String fileName : folderContent) {
             if (fileName.endsWith(".java") || fileName.endsWith(".proto")) {
-              boolean isPathToGenerationBuildFile = true;
-              for (String item : BUILD_FILE_GENERATION_BLACKLIST) {
-                if (path.endsWith(item)) {
-                  isPathToGenerationBuildFile = false;
-                }
-              }
-              if (isPathToGenerationBuildFile) {
-                result.add(path);
-              }
+              result.add(path);
             }
           }
         }
@@ -124,19 +141,79 @@ public class BuildFileGenerator {
     return ImmutableList.copyOf(result);
   }
 
+  private ImmutableList<String> getPathsToCreateBuildFiles(
+      List<String> buildFileGenerationBlacklist) {
+    ImmutableList.Builder<String> result = ImmutableList.builder();
+    List<String> absBlackListPaths =
+        getBuildFileGenerationBlacklistRecursively(buildFileGenerationBlacklist);
+    for (String path : getPathsContainJavaAndProtoFiles()) {
+      if (!absBlackListPaths.contains(path)) {
+        result.add(path);
+      }
+    }
+    return result.build();
+  }
+
+  private ImmutableList<String> getBuildFileGenerationBlacklistRecursively(
+      List<String> buildFileGenerationBlacklist) {
+    Set<String> result = new HashSet<>();
+    for (String folderToIgnore : buildFileGenerationBlacklist) {
+      PathMatcher matcherRootFolders =
+          FileSystems.getDefault()
+              .getPathMatcher(String.format(GLOB_PATTERN_TO_FIND_FOLDERS, folderToIgnore));
+      PathMatcher matcherSubfolders =
+          FileSystems.getDefault()
+              .getPathMatcher(
+                  String.format(GLOB_PATTERN_TO_FIND_SUBFOLDERS_RECURSIVELY, folderToIgnore));
+      try {
+        Files.walkFileTree(
+            Paths.get(fileUtils.getCurrentWorkingDirectory()),
+            new SimpleFileVisitor<Path>() {
+              @Override
+              public FileVisitResult preVisitDirectory(
+                  Path dir, BasicFileAttributes basicFileAttributes) {
+                if (matcherRootFolders.matches(dir) || matcherSubfolders.matches(dir)) {
+                  result.add(dir.toString());
+                }
+                return FileVisitResult.CONTINUE;
+              }
+            });
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    return ImmutableList.copyOf(result);
+  }
+
   /* Returns Map<String, BuildFile> where
   String key is an absolute path to a folder where BUILD file should be created,
   BuildFile is the proto message. */
-  Map<String, BuildFile> generateBuildFiles() throws IOException {
+  Map<String, BuildFile> generateBuildFiles(List<String> buildFileGenerationBlacklist)
+      throws IOException {
     Map<String, BuildFile> result = new HashMap<>();
     List<ProtoFile> wholeProjectProtoFiles = getWholeProjectProtoFiles();
-    for (String packagePath : getPathsToCreateBuildFiles()) {
-      result.put(packagePath, generateBuildFile(packagePath, wholeProjectProtoFiles));
+    List<ThirdPartyDep> thirdPartyDeps = getThirdPartyDeps().getThirdPartyDepList();
+    HttpArchiveDepsList httpArchiveDepsList = getHttpArchiveDepsList();
+    Map<String, String> internalProjectDeps = getInternalProjectJavaClassToTargetNameMap();
+    for (String packagePath : getPathsToCreateBuildFiles(buildFileGenerationBlacklist)) {
+      result.put(
+          packagePath,
+          generateBuildFile(
+              packagePath,
+              wholeProjectProtoFiles,
+              thirdPartyDeps,
+              httpArchiveDepsList,
+              internalProjectDeps));
     }
     return result;
   }
 
-  private BuildFile generateBuildFile(String packagePath, List<ProtoFile> wholeProjectProtoFiles)
+  private BuildFile generateBuildFile(
+      String packagePath,
+      List<ProtoFile> wholeProjectProtoFiles,
+      List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
+      Map<String, String> internalProjectDeps)
       throws IOException {
     BuildFile.Builder buildFile = BuildFile.newBuilder();
 
@@ -161,7 +238,6 @@ public class BuildFileGenerator {
     }
 
     List<String> javaClasses = getFilesByExtension(packagePath, ".java");
-    List<ThirdPartyDep> thirdPartyDeps = getThirdPartyDeps().getThirdPartyDepList();
     if (!javaClasses.isEmpty()) {
       buildFile.addExtension(
           getLoadExtensionStatement(CHECKSTYLE_BZL_FILE_PATH, CHECKSTYLE_SYMBOL));
@@ -173,18 +249,36 @@ public class BuildFileGenerator {
         String targetName;
         if (javaClass.getHasMainMethod()) {
           JavaBinary javaBinary =
-              getJavaBinary(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles);
+              getJavaBinary(
+                  javaClass,
+                  thirdPartyDeps,
+                  httpArchiveDepsList,
+                  protoFiles,
+                  wholeProjectProtoFiles,
+                  internalProjectDeps);
           targetName = javaBinary.getName();
           buildFile.addJavaBinary(javaBinary);
         } else if (javaClass.getIsTestClass()) {
           JavaTest javaTest =
               getJavaTest(
-                  javaClass, packagePath, thirdPartyDeps, protoFiles, wholeProjectProtoFiles);
+                  javaClass,
+                  packagePath,
+                  thirdPartyDeps,
+                  httpArchiveDepsList,
+                  protoFiles,
+                  wholeProjectProtoFiles,
+                  internalProjectDeps);
           targetName = javaTest.getName();
           buildFile.addJavaTest(javaTest);
         } else {
           JavaLibrary javaLibrary =
-              getJavaLibrary(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles);
+              getJavaLibrary(
+                  javaClass,
+                  thirdPartyDeps,
+                  httpArchiveDepsList,
+                  protoFiles,
+                  wholeProjectProtoFiles,
+                  internalProjectDeps);
           targetName = javaLibrary.getName();
           buildFile.addJavaLibrary(javaLibrary);
         }
@@ -242,31 +336,55 @@ public class BuildFileGenerator {
   }
 
   private LoadExtensionStatement getLoadExtensionStatement(String path, String symbol) {
-    return LoadExtensionStatement.newBuilder().setPath(path).setSymbol(symbol).build();
+    LoadExtensionStatement.Builder result = LoadExtensionStatement.newBuilder().setSymbol(symbol);
+    if (projectName.equals(STARTUP_OS_PROJECT_NAME)) {
+      result.setPath(path);
+    } else {
+      result.setPath("@startup_os" + path);
+    }
+    return result.build();
   }
 
   private JavaLibrary getJavaLibrary(
       JavaClass javaClass,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
-      List<ProtoFile> wholeProjectProtoFiles) {
+      List<ProtoFile> wholeProjectProtoFiles,
+      Map<String, String> internalProjectDeps) {
     return JavaLibrary.newBuilder()
         .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
-        .addAllDeps(getDeps(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles))
+        .addAllDeps(
+            getDeps(
+                javaClass,
+                thirdPartyDeps,
+                httpArchiveDepsList,
+                protoFiles,
+                wholeProjectProtoFiles,
+                internalProjectDeps))
         .build();
   }
 
   private JavaBinary getJavaBinary(
       JavaClass javaClass,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
-      List<ProtoFile> wholeProjectProtoFiles) {
+      List<ProtoFile> wholeProjectProtoFiles,
+      Map<String, String> internalProjectDeps) {
     return JavaBinary.newBuilder()
         .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .setMainClass(javaClass.getPackage() + "." + javaClass.getClassName())
         .addSrcs(javaClass.getClassName() + ".java")
-        .addAllDeps(getDeps(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles))
+        .addAllDeps(
+            getDeps(
+                javaClass,
+                thirdPartyDeps,
+                httpArchiveDepsList,
+                protoFiles,
+                wholeProjectProtoFiles,
+                internalProjectDeps))
         // TODO: Add it to each java_binary only when we really need it.
         .addDeps("//third_party/maven/com/google/flogger:flogger_system_backend")
         .build();
@@ -276,13 +394,22 @@ public class BuildFileGenerator {
       JavaClass javaClass,
       String packagePath,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
-      List<ProtoFile> wholeProjectProtoFiles) {
+      List<ProtoFile> wholeProjectProtoFiles,
+      Map<String, String> internalProjectDeps) {
     return JavaTest.newBuilder()
         .setName(convertUpperCamelToLowerUnderscore(javaClass.getClassName()))
         .addSrcs(javaClass.getClassName() + ".java")
         .setTestClass(javaClass.getPackage() + "." + javaClass.getClassName())
-        .addAllDeps(getDeps(javaClass, thirdPartyDeps, protoFiles, wholeProjectProtoFiles))
+        .addAllDeps(
+            getDeps(
+                javaClass,
+                thirdPartyDeps,
+                httpArchiveDepsList,
+                protoFiles,
+                wholeProjectProtoFiles,
+                internalProjectDeps))
         // TODO: Add it to each java_binary only when we really need it.
         .addDeps("//third_party/maven/com/google/flogger:flogger_system_backend")
         .addAllResources(getResources(packagePath))
@@ -319,15 +446,18 @@ public class BuildFileGenerator {
   private List<String> getDeps(
       JavaClass javaClass,
       List<ThirdPartyDep> thirdPartyDeps,
+      HttpArchiveDepsList httpArchiveDepsList,
       List<ProtoFile> protoFiles,
-      List<ProtoFile> wholeProjectProtoFiles) {
+      List<ProtoFile> wholeProjectProtoFiles,
+      Map<String, String> internalProjectDeps) {
     Set<String> result = new HashSet<>();
-    Map<String, String> internalProjectDeps = getInternalProjectJavaClassToTargetNameMap();
     List<String> internalPackageDeps = getInternalPackageDeps(javaClass, protoFiles);
     result.addAll(internalPackageDeps);
     for (Import importProto : javaClass.getImportList()) {
       if (importProto.getPackage().startsWith("java.")
-          || importProto.getPackage().startsWith("com.sun.net.")) {
+          || importProto.getPackage().startsWith("com.sun.net.")
+          || importProto.getPackage().startsWith("javax.imageio")
+          || importProto.getPackage().startsWith("javax.swing")) {
         continue;
       }
       List<ThirdPartyDep> thirdPartyTargets = new ArrayList<>();
@@ -343,15 +473,36 @@ public class BuildFileGenerator {
         }
       }
 
+      String httpArchiveTarget = "";
+      if (httpArchiveTarget.isEmpty()) {
+        for (HttpArchiveDeps httpArchiveDeps : httpArchiveDepsList.getHttpArchiveDepsList()) {
+          for (HttpArchiveDep httpArchiveDep : httpArchiveDeps.getHttpArchiveDepList()) {
+            if (httpArchiveDep
+                .getJavaClass()
+                .contains(importProto.getPackage() + "." + importProto.getRootClass())) {
+              httpArchiveTarget = '@' + httpArchiveDeps.getName() + httpArchiveDep.getTarget();
+              break;
+            }
+          }
+          if (!httpArchiveTarget.isEmpty()) {
+            break;
+          }
+        }
+      }
+
       String target;
       if (thirdPartyTargets.isEmpty()) {
         // It isn't third party dep.
-        String classNameWithPackage = importProto.getPackage() + "." + importProto.getRootClass();
-        if (internalProjectDeps.containsKey(classNameWithPackage)) {
-          target = internalProjectDeps.get(classNameWithPackage);
+        if (httpArchiveTarget.isEmpty()) {
+          String classNameWithPackage = importProto.getPackage() + "." + importProto.getRootClass();
+          if (internalProjectDeps.containsKey(classNameWithPackage)) {
+            target = internalProjectDeps.get(classNameWithPackage);
+          } else {
+            target =
+                getInternalProjectDep(importProto, wholeProjectProtoFiles, javaClass.getPackage());
+          }
         } else {
-          target =
-              getInternalProjectDep(importProto, wholeProjectProtoFiles, javaClass.getPackage());
+          target = httpArchiveTarget;
         }
       } else if (thirdPartyTargets.size() == 1) {
         target = thirdPartyTargets.get(0).getTarget();
@@ -393,9 +544,12 @@ public class BuildFileGenerator {
 
   private String getInternalProjectDep(
       Import importProto, List<ProtoFile> protoFiles, String packageToCreateBuildFile) {
-    final String projectPackageSuffix = getProjectPackageSuffix(importProto.getPackage());
+    final String projectPackageSuffix =
+        buildFileGeneratorUtils.getProjectPackageSuffix(projectName, importProto.getPackage());
     String path =
-        importProto.getPackage().replace(projectPackageSuffix + ".", "//").replace(".", "/");
+        "//"
+            + removeProjectPackageSuffix(importProto.getPackage(), projectPackageSuffix)
+                .replace(".", "/");
     for (ProtoFile protoFile : protoFiles) {
       for (String service : protoFile.getServicesList()) {
         if ((service + "Grpc").equals(importProto.getRootClass())) {
@@ -403,9 +557,8 @@ public class BuildFileGenerator {
           if (importProto.getPackage().equals(packageToCreateBuildFile)) {
             return javaGrpcName;
           } else {
-            return protoFile
-                    .getPackage()
-                    .replace(projectPackageSuffix + ".", "//")
+            return "//"
+                + removeProjectPackageSuffix(protoFile.getPackage(), projectPackageSuffix)
                     .replace(".", "/")
                 + javaGrpcName;
           }
@@ -418,7 +571,9 @@ public class BuildFileGenerator {
         if (importProto.getPackage().equals(packageToCreateBuildFile)) {
           return javaProtoName;
         } else {
-          return protoFile.getPackage().replace(projectPackageSuffix + ".", "//").replace(".", "/")
+          return "//"
+              + removeProjectPackageSuffix(protoFile.getPackage(), projectPackageSuffix)
+                  .replace(".", "/")
               + javaProtoName;
         }
       }
@@ -427,6 +582,14 @@ public class BuildFileGenerator {
       return path + ":" + convertUpperCamelToLowerUnderscore(importProto.getClassName());
     } else {
       return path + ":" + convertUpperCamelToLowerUnderscore(importProto.getRootClass());
+    }
+  }
+
+  private String removeProjectPackageSuffix(String fullPackage, String projectPackageSuffix) {
+    if (projectPackageSuffix.isEmpty()) {
+      return fullPackage;
+    } else {
+      return fullPackage.replace(projectPackageSuffix + ".", "");
     }
   }
 
@@ -464,30 +627,32 @@ public class BuildFileGenerator {
     return result.stream().distinct().collect(Collectors.toList());
   }
 
-  // TODO: Add supporting glob function
   private Map<String, String> getInternalProjectJavaClassToTargetNameMap() {
     Map<String, String> result = new HashMap<>();
 
-    for (String absPath : getPathsToCreateBuildFiles()) {
-      final String relPackagePath = absPath.replace(fileUtils.getCurrentWorkingDirectory(), "/");
+    for (String absPath : getPathsContainJavaAndProtoFiles()) {
+      final String relPackagePath =
+          "/" + absPath.replace(fileUtils.getCurrentWorkingDirectory(), "");
       final String absBuildFilePath = fileUtils.joinPaths(absPath, "BUILD");
 
       if (fileUtils.fileExists(absBuildFilePath)) {
         BuildFile buildFile = buildFileParser.getBuildFile(absBuildFilePath);
         for (JavaLibrary javaLibrary : buildFile.getJavaLibraryList()) {
           if (javaLibrary.getSrcsCount() > 0) {
-            String absClassPath = "/" + fileUtils.joinPaths(absPath, javaLibrary.getSrcs(0));
+            String absClassPath = fileUtils.joinPaths(absPath, javaLibrary.getSrcs(0));
             try {
               JavaClass javaClass = javaClassAnalyzer.getJavaClass(absClassPath);
-              final String projectPackageSuffix = getProjectPackageSuffix(javaClass.getPackage());
+              final String projectPackageSuffix =
+                  buildFileGeneratorUtils.getProjectPackageSuffix(
+                      projectName, javaClass.getPackage());
               String targetName = relPackagePath + ":" + javaLibrary.getName();
               for (String src : javaLibrary.getSrcsList()) {
                 String fullClassName =
-                    relPackagePath.replace("//", "").replace("/", ".") + "." + src;
+                    (relPackagePath.replace("//", "") + "." + src).replace("/", ".");
                 if (!projectPackageSuffix.isEmpty()) {
                   fullClassName = projectPackageSuffix + "." + fullClassName;
                 }
-                result.put(fullClassName.replace(".java", ""), targetName);
+                result.put(fullClassName.replaceAll(".java$", ""), targetName);
               }
             } catch (IOException e) {
               throw new RuntimeException("Can't find java class by path: " + absClassPath, e);
@@ -497,23 +662,6 @@ public class BuildFileGenerator {
       }
     }
     return result;
-  }
-
-  private String getProjectPackageSuffix(String classPackage) {
-    String[] classPackageParts = classPackage.split(projectName.replace("-", ""));
-    String absFilesystemPackagePath =
-        fileUtils.getCurrentWorkingDirectory()
-            + classPackageParts[classPackageParts.length - 1].replace(".", "/");
-    String[] absPathParts = absFilesystemPackagePath.split(projectName);
-    String filesystemPackage =
-        absPathParts[absPathParts.length - 1]
-            .replaceFirst("/", "")
-            .replaceAll("/$", "")
-            .replace("/", ".");
-    if (classPackage.contains(filesystemPackage)) {
-      return classPackage.replace(filesystemPackage, "").replaceAll(".$", "");
-    }
-    return "";
   }
 
   private ImmutableList<ProtoFile> getWholeProjectProtoFiles() {

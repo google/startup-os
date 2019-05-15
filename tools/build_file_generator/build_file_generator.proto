@@ -99,3 +99,26 @@ message BuildFile {
   repeated CheckstyleTestExtension checkstyle_test = 7;
   repeated JavaGrpcLibrary java_grpc_library = 8;
 }
+
+message WorkspaceFile {
+  message HttpArchive {
+    string name = 1;
+    string strip_prefix = 2;
+    repeated string urls = 3;
+  }
+
+  repeated HttpArchive http_archive = 1;
+}
+
+message HttpArchiveDep {
+  string java_class = 1;
+  string target = 2;
+}
+
+message HttpArchiveDeps {
+  string name = 1;
+  string commit_id = 2;
+  repeated HttpArchiveDep http_archive_dep = 3;
+}
+
+message HttpArchiveDepsList { repeated HttpArchiveDeps httpArchiveDeps = 1; }
