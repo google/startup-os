@@ -151,7 +151,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
                 "New checksum not equal to stored one: new %s, stored %s",
                 newChecksum, registryChecksum);
           }
-          // uploadReviewerRegistryToFirestore(registry);
+          // XXX uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;
         } else {
           log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
@@ -172,7 +172,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
                 "New configChecksum not equal to stored one: new %s, stored %s",
                 newConfigChecksum, configChecksum);
           }
-          // uploadReviewerConfigToFirestore(config);
+          // XXX uploadReviewerConfigToFirestore(config);
           configChecksum = newConfigChecksum;
         } else {
           log.atInfo().log("New ConfigChecksum is equal to stored one: %s,", configChecksum);
@@ -214,7 +214,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
     return User.getDefaultInstance();
   }
 
-  public ReviewerConfig compareReviewerConfigData(
+  public ReviewerConfig mergeReviewerConfigData(
       ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) {
     final String displayName = reviewerConfig1.getDisplayName();
     LinkedHashSet<Repo> repoList = new LinkedHashSet<>();
@@ -239,29 +239,25 @@ public class ReviewerMetadataUpdaterTask implements Task {
         }
         if (!user1.getEmail().isEmpty()) {
           if (!user1.getEmail().equals(user2.getEmail())) {
-            System.out.println("***Emails for user " + user1.getId() + " differ between files.");
+            log.atInfo().log("***Emails for user %s differ between files.", user1.getId());
           }
           email = user1.getEmail();
         }
         if (!user1.getImageUrl().isEmpty()) {
           if (!user1.getImageUrl().equals(user2.getImageUrl())) {
-            System.out.println(
-                "***Image Urls for user " + user1.getId() + " differ between files.");
+            log.atInfo().log("***Image Urls for user %s differ between files.", user1.getId());
           }
           imageUrl = user1.getImageUrl();
         }
         if (user1.getCrystals() != user2.getCrystals()) {
-          System.out.println(
-              "***Crystals amount for user " + user1.getId() + " differ between files.");
+          log.atInfo().log("***Crystals amount for user  %s differ between files.", user1.getId());
         }
         int crystals = 0;
         crystals = user1.getCrystals();
         LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
         mergedUserSocialNetworks.addAll(user1.getSocialNetworkList());
-        mergedUserSocialNetworks.addAll(user2.getSocialNetworkList());
         LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
         mergedUserSkillList.addAll(user1.getSkillList());
-        mergedUserSkillList.addAll(user2.getSkillList());
         LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
         mergedUserProjectIdList.addAll(user1.getProjectIdList());
         mergedUserProjectIdList.addAll(user2.getProjectIdList());
@@ -280,8 +276,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
                 .addAllSkill(mergedUserSkillList)
                 .addAllProjectId(mergedUserProjectIdList)
                 .addAllTopContribution(mergedUserContributions);
-        User mergedUser = mergedUserBuilder.build();
-        mergedUsersList.add(mergedUser);
+        mergedUsersList.add(mergedUserBuilder.build());
       }
     }
     List<User> usersDefinedOnlyInReviewerConfig2 =
