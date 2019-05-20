@@ -231,29 +231,19 @@ public class ReviewerMetadataUpdaterTask implements Task {
         mergedUsersList.add(user1);
       } else {
         // (users defined in both repos). Merge data and add merged result to `mergedUsersList`
-        String lastName = "";
-        String email = "";
-        String imageUrl = "";
-        if (!user1.getLastName().isEmpty()) {
-          lastName = user1.getLastName();
-        }
         if (!user1.getEmail().isEmpty()) {
           if (!user1.getEmail().equals(user2.getEmail())) {
             log.atInfo().log("***Emails for user %s differ between files.", user1.getId());
           }
-          email = user1.getEmail();
         }
         if (!user1.getImageUrl().isEmpty()) {
           if (!user1.getImageUrl().equals(user2.getImageUrl())) {
             log.atInfo().log("***Image Urls for user %s differ between files.", user1.getId());
           }
-          imageUrl = user1.getImageUrl();
         }
         if (user1.getCrystals() != user2.getCrystals()) {
           log.atInfo().log("***Crystals amount for user  %s differ between files.", user1.getId());
         }
-        int crystals = 0;
-        crystals = user1.getCrystals();
         LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
         mergedUserSocialNetworks.addAll(user1.getSocialNetworkList());
         LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
@@ -268,12 +258,12 @@ public class ReviewerMetadataUpdaterTask implements Task {
             User.newBuilder()
                 .setId(user1.getId())
                 .setFirstName(user1.getFirstName())
-                .setLastName(lastName)
-                .setEmail(email)
-                .setImageUrl(imageUrl)
-                .setCrystals(crystals)
-                .addAllSocialNetwork(mergedUserSocialNetworks)
-                .addAllSkill(mergedUserSkillList)
+                .setLastName(user1.getLastName())
+                .setEmail(user1.getEmail())
+                .setImageUrl(user1.getImageUrl())
+                .setCrystals(user1.getCrystals())
+                .addAllSocialNetwork(user1.getSocialNetworkList())
+                .addAllSkill(user1.getSkillList())
                 .addAllProjectId(mergedUserProjectIdList)
                 .addAllTopContribution(mergedUserContributions);
         mergedUsersList.add(mergedUserBuilder.build());
