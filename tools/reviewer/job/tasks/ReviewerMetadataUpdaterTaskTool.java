@@ -50,11 +50,11 @@ public class ReviewerMetadataUpdaterTaskTool {
             .getReviewerMetadataUpdaterTask();
     try {
       ReviewerConfig startupOsReviewerConfig =
-          reviewerMetadataUpdaterTask.getReviewerConfig(
-              reviewerMetadataUpdaterTask.getStartupOsReviewerConfigPath());
+          reviewerMetadataUpdaterTask.getRemoteReviewerConfig(
+              reviewerMetadataUpdaterTask.getRemoteStartupOsReviewerConfigPath());
       ReviewerConfig hasadnaReviewerConfig =
-          reviewerMetadataUpdaterTask.getReviewerConfig(
-              reviewerMetadataUpdaterTask.getHasadnaReviewerConfigPath());
+          reviewerMetadataUpdaterTask.getRemoteReviewerConfig(
+              reviewerMetadataUpdaterTask.getRemoteHasadnaReviewerConfigPath());
       ReviewerConfig mergedReviewerConfig =
           reviewerMetadataUpdaterTask.mergeReviewerConfigData(
               startupOsReviewerConfig, hasadnaReviewerConfig);

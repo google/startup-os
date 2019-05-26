@@ -195,14 +195,28 @@ public class ReviewerMetadataUpdaterTask implements Task {
     return (ReviewerConfig) fileUtils.readPrototxt(filePath, ReviewerConfig.newBuilder());
   }
 
+  public ReviewerConfig getRemoteReviewerConfig(String filePath) throws IOException {
+    String fileContent = fileUtils.downloadUrl(filePath);
+    return (ReviewerConfig)
+        fileUtils.readPrototxtFromString(fileContent, ReviewerConfig.newBuilder());
+  }
+
   public String getStartupOsReviewerConfigPath() {
     return (String)
         fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "reviewer_config.prototxt");
   }
 
+  public String getRemoteStartupOsReviewerConfigPath() {
+    return String.format(REPO_REGISTRY_URL, "google", "startup-os");
+  }
+
   public String getHasadnaReviewerConfigPath() {
     return (String)
         fileUtils.joinPaths(fileUtils.expandHomeDirectory("~/hasadna"), "reviewer_config.prototxt");
+  }
+
+  public String getRemoteHasadnaReviewerConfigPath() {
+    return String.format(REPO_REGISTRY_URL, "hasadna", "hasadna");
   }
 
   private User getUser(ReviewerConfig reviewerConfig, String userId) {
@@ -227,10 +241,9 @@ public class ReviewerMetadataUpdaterTask implements Task {
     for (User user1 : reviewerConfig1.getUserList()) {
       User user2 = getUser(reviewerConfig2, user1.getId());
       if (user2.getId().isEmpty()) {
-        // (user defined only in reviewerConfig1). Add `user1` to `mergedUsersList` without changes
         mergedUsersList.add(user1);
       } else {
-        // (users defined in both repos). Merge data and add merged result to `mergedUsersList`
+        // Users defined in both repos. Merging data.
         if (!user1.getEmail().isEmpty()) {
           if (!user1.getEmail().equals(user2.getEmail())) {
             log.atInfo().log("***Emails for user %s differ between files.", user1.getId());
