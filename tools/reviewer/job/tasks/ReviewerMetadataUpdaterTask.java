@@ -151,7 +151,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
                 "New checksum not equal to stored one: new %s, stored %s",
                 newChecksum, registryChecksum);
           }
-          // XXX uploadReviewerRegistryToFirestore(registry);
+          uploadReviewerRegistryToFirestore(registry);
           registryChecksum = newChecksum;
         } else {
           log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
@@ -172,7 +172,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
                 "New configChecksum not equal to stored one: new %s, stored %s",
                 newConfigChecksum, configChecksum);
           }
-          // XXX uploadReviewerConfigToFirestore(config);
+          uploadReviewerConfigToFirestore(config);
           configChecksum = newConfigChecksum;
         } else {
           log.atInfo().log("New ConfigChecksum is equal to stored one: %s,", configChecksum);
