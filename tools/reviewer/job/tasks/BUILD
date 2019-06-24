@@ -48,6 +48,7 @@ java_library(
         "//common/repo",
         "//third_party/maven/com/google/flogger",
         "//third_party/maven/javax/inject:javax_inject",
+        "//tools/reviewer:reviewer_java_proto",
         "//tools/reviewer:reviewer_registry_java_proto",
     ],
 )
@@ -102,4 +103,20 @@ java_library(
 checkstyle_test(
     name = "task_executor-checkstyle",
     target = ":task_executor",
+)
+
+java_binary(
+    name = "reviewer_metadata_updater_task_tool",
+    srcs = ["ReviewerMetadataUpdaterTaskTool.java"],
+    main_class = "com.google.startupos.tools.reviewer.job.tasks.ReviewerMetadataUpdaterTaskTool",
+    deps = [
+        ":reviewer_metadata_updater_task",
+        "//common",
+        "//common:dagger_with_annotation_processor",
+        "//common/firestore",
+        "//common/flags",
+        "//third_party/maven/com/google/flogger:flogger_system_backend",
+        "//third_party/maven/javax/inject:javax_inject",
+        "//tools/reviewer:reviewer_java_proto",
+    ],
 )

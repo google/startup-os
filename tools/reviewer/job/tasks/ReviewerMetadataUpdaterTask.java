@@ -24,14 +24,23 @@ import com.google.startupos.common.flags.FlagDesc;
 import com.google.startupos.common.repo.GitRepo;
 import com.google.startupos.common.repo.GitRepoFactory;
 import com.google.startupos.tools.reviewer.RegistryProtos.ReviewerRegistry;
+import com.google.startupos.tools.reviewer.ReviewerProtos.Contribution;
+import com.google.startupos.tools.reviewer.ReviewerProtos.Project;
+import com.google.startupos.tools.reviewer.ReviewerProtos.Repo;
+import com.google.startupos.tools.reviewer.ReviewerProtos.ReviewerConfig;
+import com.google.startupos.tools.reviewer.ReviewerProtos.SocialNetwork;
+import com.google.startupos.tools.reviewer.ReviewerProtos.User;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -45,6 +54,7 @@ import javax.inject.Inject;
  * 3. If it did, a newly updated version is posted to Firestore in proto and binary formats.
  * 4. Doing the same for the config of every Reviewer in the registry.
  */
+// TODO - How to make sure the first repo to be cloned is ALWAYS startup-os?
 public class ReviewerMetadataUpdaterTask implements Task {
   private static FluentLogger log = FluentLogger.forEnclosingClass();
 
@@ -66,6 +76,7 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private final ReentrantLock lock = new ReentrantLock();
 
   private String registryChecksum;
+  private String configChecksum;
   private Map<String, Integer> reviewerConfigHashes = new HashMap();
   private FileUtils fileUtils;
   private GitRepoFactory gitRepoFactory;
@@ -83,6 +94,11 @@ public class ReviewerMetadataUpdaterTask implements Task {
   private void uploadReviewerRegistryToFirestore(ReviewerRegistry registry) {
     firestoreClient.setProtoDocument(
         REVIEWER_COLLECTION, REVIEWER_REGISTRY_DOCUMENT_NAME_BIN, registry);
+  }
+
+  private void uploadReviewerConfigToFirestore(ReviewerConfig config) {
+    firestoreClient.setProtoDocument(
+        REVIEWER_COLLECTION, REVIEWER_CONFIG_DOCUMENT_NAME_BIN, config);
   }
 
   private static Stream<Integer> intStream(byte[] array) {
@@ -140,6 +156,27 @@ public class ReviewerMetadataUpdaterTask implements Task {
         } else {
           log.atInfo().log("Checksum equals to stored one: %s,", registryChecksum);
         }
+
+        String repoRegistryFilePath =
+            fileUtils.joinToAbsolutePath(REPO_DIRECTORY, REPO_REGISTRY_FILE);
+        String newConfigChecksum = md5ForFile(repoRegistryFilePath);
+        ReviewerConfig config =
+            (ReviewerConfig)
+                fileUtils.readPrototxtUnchecked(repoRegistryFilePath, ReviewerConfig.newBuilder());
+
+        if (!newConfigChecksum.equals(configChecksum)) {
+          if (firstRun) {
+            log.atInfo().log("Storing in first run, configChecksum: %s", newConfigChecksum);
+          } else {
+            log.atInfo().log(
+                "New configChecksum not equal to stored one: new %s, stored %s",
+                newConfigChecksum, configChecksum);
+          }
+          uploadReviewerConfigToFirestore(config);
+          configChecksum = newConfigChecksum;
+        } else {
+          log.atInfo().log("New ConfigChecksum is equal to stored one: %s,", configChecksum);
+        }
         firstRun = false;
       } catch (IOException exception) {
         exception.printStackTrace();
@@ -152,6 +189,125 @@ public class ReviewerMetadataUpdaterTask implements Task {
   @Override
   public Boolean shouldRun() {
     return !lock.isLocked();
+  }
+
+  public ReviewerConfig getReviewerConfig(String filePath) throws IOException {
+    return (ReviewerConfig) fileUtils.readPrototxt(filePath, ReviewerConfig.newBuilder());
+  }
+
+  public ReviewerConfig getRemoteReviewerConfig(String filePath) throws IOException {
+    String fileContent = fileUtils.downloadUrl(filePath);
+    return (ReviewerConfig)
+        fileUtils.readPrototxtFromString(fileContent, ReviewerConfig.newBuilder());
+  }
+
+  public String getStartupOsReviewerConfigPath() {
+    return (String)
+        fileUtils.joinPaths(fileUtils.getCurrentWorkingDirectory(), "reviewer_config.prototxt");
+  }
+
+  public String getRemoteStartupOsReviewerConfigPath() {
+    return String.format(REPO_REGISTRY_URL, "google", "startup-os");
+  }
+
+  public String getHasadnaReviewerConfigPath() {
+    return (String)
+        fileUtils.joinPaths(fileUtils.expandHomeDirectory("~/hasadna"), "reviewer_config.prototxt");
+  }
+
+  public String getRemoteHasadnaReviewerConfigPath() {
+    return String.format(REPO_REGISTRY_URL, "hasadna", "hasadna");
+  }
+
+  private User getUser(ReviewerConfig reviewerConfig, String userId) {
+    for (User user : reviewerConfig.getUserList()) {
+      if (user.getId().equals(userId)) {
+        return user;
+      }
+    }
+    return User.getDefaultInstance();
+  }
+
+  public ReviewerConfig mergeReviewerConfigData(
+      ReviewerConfig reviewerConfig1, ReviewerConfig reviewerConfig2) {
+    final String displayName = reviewerConfig1.getDisplayName();
+    LinkedHashSet<Repo> repoList = new LinkedHashSet<>();
+    repoList.addAll(reviewerConfig1.getRepoList());
+    repoList.addAll(reviewerConfig2.getRepoList());
+    LinkedHashSet<Project> projectList = new LinkedHashSet<>();
+    projectList.addAll(reviewerConfig1.getProjectList());
+    projectList.addAll(reviewerConfig2.getProjectList());
+    LinkedHashSet<User> mergedUsersList = new LinkedHashSet<>();
+    for (User user1 : reviewerConfig1.getUserList()) {
+      User user2 = getUser(reviewerConfig2, user1.getId());
+      if (user2.getId().isEmpty()) {
+        mergedUsersList.add(user1);
+      } else {
+        // Users defined in both repos. Merging data.
+        if (!user1.getEmail().isEmpty()) {
+          if (!user1.getEmail().equals(user2.getEmail())) {
+            log.atInfo().log("***Emails for user %s differ between files.", user1.getId());
+          }
+        }
+        if (!user1.getImageUrl().isEmpty()) {
+          if (!user1.getImageUrl().equals(user2.getImageUrl())) {
+            log.atInfo().log("***Image Urls for user %s differ between files.", user1.getId());
+          }
+        }
+        if (user1.getCrystals() != user2.getCrystals()) {
+          log.atInfo().log("***Crystals amount for user  %s differ between files.", user1.getId());
+        }
+        LinkedHashSet<SocialNetwork> mergedUserSocialNetworks = new LinkedHashSet<>();
+        mergedUserSocialNetworks.addAll(user1.getSocialNetworkList());
+        LinkedHashSet<String> mergedUserSkillList = new LinkedHashSet<>();
+        mergedUserSkillList.addAll(user1.getSkillList());
+        LinkedHashSet<String> mergedUserProjectIdList = new LinkedHashSet<>();
+        mergedUserProjectIdList.addAll(user1.getProjectIdList());
+        mergedUserProjectIdList.addAll(user2.getProjectIdList());
+        LinkedHashSet<Contribution> mergedUserContributions = new LinkedHashSet<>();
+        mergedUserContributions.addAll(user1.getTopContributionList());
+        mergedUserContributions.addAll(user2.getTopContributionList());
+        User.Builder mergedUserBuilder =
+            User.newBuilder()
+                .setId(user1.getId())
+                .setFirstName(user1.getFirstName())
+                .setLastName(user1.getLastName())
+                .setEmail(user1.getEmail())
+                .setImageUrl(user1.getImageUrl())
+                .setCrystals(user1.getCrystals())
+                .addAllSocialNetwork(user1.getSocialNetworkList())
+                .addAllSkill(user1.getSkillList())
+                .addAllProjectId(mergedUserProjectIdList)
+                .addAllTopContribution(mergedUserContributions);
+        mergedUsersList.add(mergedUserBuilder.build());
+      }
+    }
+    List<User> usersDefinedOnlyInReviewerConfig2 =
+        reviewerConfig2
+            .getUserList()
+            .stream()
+            .filter(
+                user2 -> {
+                  boolean isUser2NotContainedInMergedUsers = true;
+                  for (User mergedUser : mergedUsersList) {
+                    if (mergedUser.getId().equals(user2.getId())) {
+                      isUser2NotContainedInMergedUsers = false;
+                      break;
+                    }
+                  }
+                  return isUser2NotContainedInMergedUsers;
+                })
+            .collect(Collectors.toList());
+    mergedUsersList.addAll(usersDefinedOnlyInReviewerConfig2);
+    int totalCrystals = reviewerConfig1.getTotalCrystal();
+    ReviewerConfig.Builder mergedReviewerConfig =
+        ReviewerConfig.newBuilder()
+            .setDisplayName(displayName)
+            .addAllRepo(repoList)
+            .addAllProject(projectList)
+            .addAllUser(mergedUsersList)
+            .setTotalCrystal(totalCrystals);
+    return mergedReviewerConfig.build();
   }
 }
 
