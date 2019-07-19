@@ -186,16 +186,23 @@ public class SubmitterTask implements Task {
     }
 
     if (shouldPush) {
-      boolean allPushesSuccessful = gitRepos.stream().allMatch(repo -> repo.push("master"));
-      if (allPushesSuccessful) {
+      List<String> notPushedRepoNames = new ArrayList<>();
+      for (GitRepo repo : gitRepos) {
+        boolean pushSuccessful = repo.push("master");
+        if (!pushSuccessful) {
+          String absRepoPath = repo.getAbsRepoPath();
+          notPushedRepoNames.add(absRepoPath.substring(absRepoPath.lastIndexOf('/') + 1));
+        }
+      }
+      if (notPushedRepoNames.isEmpty()) {
         log.atInfo().log("All repos pushed successfully");
         diff = diff.toBuilder().setStatus(Diff.Status.SUBMITTED).build();
         firestoreClient.setProtoDocument(
             ReviewerConstants.DIFF_COLLECTION, String.valueOf(diff.getId()), diff);
         // TODO: store `SubmitterMergeResult`
       } else {
-        // TODO: find out which one.
-        log.atSevere().log("Some repo pushes failed");
+        notPushedRepoNames.forEach(
+            repoName -> log.atSevere().log("[%s] repo push failed", repoName));
       }
     } else {
       // TODO: Find out which repo caused it.
