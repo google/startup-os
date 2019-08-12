@@ -73,6 +73,10 @@ public class HttpArchiveDepsGenerator {
           httpArchive = currentHttpArchive;
         }
       }
+      if (httpArchive.getName().isEmpty()) {
+        log.atWarning().log("Can't find %s http_archive in WORKSPACE file", httpArchiveName);
+        continue;
+      }
       if (areCommitIdsTheSame(httpArchiveName, getCommitId(httpArchive.getStripPrefix()))) {
         log.atInfo().log(
             "Commit id in WORKSPACE file and commit id in \'%s\' file for \'%s\' http_archive "
@@ -231,7 +235,11 @@ public class HttpArchiveDepsGenerator {
         break;
       }
     }
-    return workspaceCommitId.equals(prototxtCommitId);
+    if (prototxtCommitId.isEmpty()) {
+      return false;
+    } else {
+      return workspaceCommitId.equals(prototxtCommitId);
+    }
   }
 
   private String shortenTarget(String fullTargetName) {
