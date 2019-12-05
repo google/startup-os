@@ -12,7 +12,7 @@ import "tools/reviewer/reviewer.proto";
 service CodeReviewService {
   // Get a text file's contents
   rpc getFile(FileRequest) returns (FileResponse);
-  rpc createDiff(CreateDiffRequest) returns (Empty);
+  rpc createOrUpdateDiff(CreateDiffRequest) returns (Empty);
   rpc getTextDiff(TextDiffRequest) returns (TextDiffResponse);
   // returns available diff number and increments stored value by one
   rpc getAvailableDiffNumber(Empty) returns (DiffNumberResponse);

@@ -81,7 +81,7 @@ public class SubmitCommand implements AaCommand {
     }
 
     System.out.println("Updating diff status: SUBMITTING");
-    codeReviewBlockingStub.createDiff(
+    codeReviewBlockingStub.createOrUpdateDiff(
         CreateDiffRequest.newBuilder().setDiff(diffBuilder.setStatus(Status.SUBMITTING)).build());
 
     final String diffBranchName = String.format("D%s", diffBuilder.getId());
@@ -122,7 +122,7 @@ public class SubmitCommand implements AaCommand {
     }
 
     System.out.println("Updating diff status: SUBMITTED");
-    codeReviewBlockingStub.createDiff(
+    codeReviewBlockingStub.createOrUpdateDiff(
         CreateDiffRequest.newBuilder().setDiff(diffBuilder.setStatus(Status.SUBMITTED)).build());
     return true;
   }

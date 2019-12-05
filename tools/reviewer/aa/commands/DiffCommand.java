@@ -33,6 +33,7 @@ import com.google.startupos.tools.reviewer.local_server.service.Protos.GithubPr;
 import com.google.startupos.tools.reviewer.local_server.service.Protos.Reviewer;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -116,11 +117,7 @@ public class DiffCommand implements AaCommand {
 
     Map<GitRepo, String> repoToInitialBranch = new HashMap<>();
     try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
-          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
-          .filter(fileUtils::folderExists)
+      getAbsRepoPaths()
           .forEach(
               path -> {
                 String repoName = Paths.get(path).getFileName().toString();
@@ -177,48 +174,68 @@ public class DiffCommand implements AaCommand {
 
     Diff diff = (diffNumber == -1) ? createDiff() : updateDiff(diffNumber);
     CreateDiffRequest request = CreateDiffRequest.newBuilder().setDiff(diff).build();
-    // TODO: Check if we changed diff, update only if changed. Write to output if no change.
-    // TODO: Rename createDiff to createOrUpdateDiff
-    codeReviewBlockingStub.createDiff(request);
+    if (isChangesExist("D" + diff.getId())) {
+      codeReviewBlockingStub.createOrUpdateDiff(request);
+    } else {
+      System.out.println(String.format("%s diff has no changes. Nothing to update.", diff.getId()));
+    }
     return true;
+  }
+
+  private boolean isChangesExist(String branchName) {
+    for (String path : getAbsRepoPaths()) {
+      GitRepo repo = this.gitRepoFactory.create(path);
+      if (repo.hasChanges(branchName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private void addGithubRepos(Diff.Builder diffBuilder) {
     List<String> existingGithubRepoNames =
         diffBuilder.getGithubPrList().stream().map(GithubPr::getRepo).collect(Collectors.toList());
-    try {
-      fileUtils
-          .listContents(workspacePath)
-          .stream()
-          .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
-          .filter(fileUtils::folderExists)
-          .forEach(
-              path -> {
-                GitRepo repo = this.gitRepoFactory.create(path);
-                if (repo.hasChanges(repo.currentBranch())) {
-                  // Example of repoUrl: https://github.com/google/startup-os.git
-                  String repoUrl = repo.getRemoteUrl();
-                  String repoOwner = repoUrl.split("/")[3];
-                  String repoName = repoUrl.split("/")[4].replace(".git", "").trim();
+    getAbsRepoPaths()
+        .forEach(
+            path -> {
+              GitRepo repo = this.gitRepoFactory.create(path);
+              if (repo.hasChanges(repo.currentBranch())) {
+                // Example of repoUrl: https://github.com/google/startup-os.git
+                String repoUrl = repo.getRemoteUrl();
+                String repoOwner = repoUrl.split("/")[3];
+                String repoName = repoUrl.split("/")[4].replace(".git", "").trim();
 
-                  String folderName = Paths.get(path).getFileName().toString();
-                  if (!repoName.equals(folderName)) {
-                    System.out.println(
-                        String.format(
-                            "Repository name from the URL(%s) and folder "
-                                + "name from workspace(%s) aren't the same.",
-                            repoName, folderName));
-                  }
-
-                  if (!existingGithubRepoNames.contains(repoName)) {
-                    diffBuilder.addGithubPr(
-                        GithubPr.newBuilder().setRepo(repoName).setOwner(repoOwner).build());
-                  }
+                String folderName = Paths.get(path).getFileName().toString();
+                if (!repoName.equals(folderName)) {
+                  System.out.println(
+                      String.format(
+                          "Repository name from the URL(%s) and folder "
+                              + "name from workspace(%s) aren't the same.",
+                          repoName, folderName));
                 }
-              });
-    } catch (Exception e) {
+
+                if (!existingGithubRepoNames.contains(repoName)) {
+                  diffBuilder.addGithubPr(
+                      GithubPr.newBuilder().setRepo(repoName).setOwner(repoOwner).build());
+                }
+              }
+            });
+  }
+
+  private ImmutableList<String> getAbsRepoPaths() {
+    ImmutableList.Builder<String> result = ImmutableList.builder();
+    try {
+      result.addAll(
+          fileUtils
+              .listContents(workspacePath)
+              .stream()
+              .map(path -> fileUtils.joinToAbsolutePath(workspacePath, path))
+              .filter(fileUtils::folderExists)
+              .collect(Collectors.toList()));
+    } catch (IOException e) {
       e.printStackTrace();
     }
+    return result.build();
   }
 }
 
