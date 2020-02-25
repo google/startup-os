@@ -12,7 +12,7 @@ def collect_sources_impl(target, ctx):
     files = []
     if hasattr(ctx.rule.attr, 'srcs'):
         for src in ctx.rule.attr.srcs:
-            for file in src.files:
+            for file in src.files.to_list():
                 if file.extension == 'java':
                     files.append(file)
     return [JavaSourceFiles(files = files)]
@@ -25,17 +25,14 @@ collect_sources = aspect(
 
 # `ctx` is rule context: https://docs.bazel.build/versions/master/skylark/lib/ctx.html
 def _checkstyle_test_impl(ctx):
-    # verify target name matches naming conventions
-    if "{}-checkstyle".format(ctx.attr.target.label.name) != ctx.attr.name:
-        fail("target should follow `{java_library target name}-checkstyle` pattern")
-
     suppressions = ctx.file.suppressions
     opts = ctx.attr.opts
     sopts = ctx.attr.string_opts
 
     # Checkstyle and its dependencies
-    checkstyle_dependencies = ctx.attr._checkstyle.java.transitive_runtime_deps
-    classpath = ":".join([file.path for file in checkstyle_dependencies])
+    checkstyle_dependencies = ctx.attr._checkstyle[JavaInfo].transitive_runtime_deps
+    classpath = ":".join([file.path for file in checkstyle_dependencies.to_list()])
+
 
     args = ""
     inputs = []
@@ -45,13 +42,27 @@ def _checkstyle_test_impl(ctx):
     if suppressions:
       inputs.append(suppressions)
 
+    # All the java files should be added to depset for executing the checkstyle script
+    sourcefiles = []
+    for target in ctx.attr.targets:
+        sourcefiles += target[JavaSourceFiles].files
+
+    # Create a file with all sourcefile paths to be passed to the command
+    filename = "targets.txt"
+    arg_file = ctx.actions.declare_file(filename)
+    file_paths = []
+    for file in sourcefiles:
+        file_paths.append(file.path)
+
+    ctx.actions.write(output = arg_file, content = " ".join(file_paths))
+
     # Build command to run Checkstyle test
     cmd = " ".join(
         ["java -cp %s com.puppycrawl.tools.checkstyle.Main" % classpath] +
         [args] +
         ["--%s" % x for x in opts] +
         ["--%s %s" % (k, sopts[k]) for k in sopts] +
-        [file.path for file in ctx.attr.target[JavaSourceFiles].files]
+        ["@%s" % arg_file.short_path]
     )
 
     # Wrap checkstyle command in a shell script so allow_failure is supported
@@ -65,7 +76,7 @@ def _checkstyle_test_impl(ctx):
         is_executable = True,
     )
 
-    files = [ctx.outputs.checkstyle_script, ctx.file.license] + ctx.attr.target[JavaSourceFiles].files + checkstyle_dependencies.to_list() + inputs
+    files = [ctx.outputs.checkstyle_script, ctx.file.license, arg_file] + sourcefiles + checkstyle_dependencies.to_list() + inputs
     runfiles = ctx.runfiles(
         files = files,
         collect_data = True
@@ -102,8 +113,8 @@ checkstyle_test = rule(
         "string_opts": attr.string_dict(
             doc = "Options to be passed on the command line that have an argument"
         ),
-        "target": attr.label(
-            doc = "The java_library target to check sources on",
+        "targets": attr.label_list(
+            doc = "The java_library targets to check sources on",
             aspects = [collect_sources],
             mandatory = True
         ),
