@@ -37,7 +37,7 @@
     "firebase": "^5.8.1",
     "google-protobuf": "^3.6.1",
     "hammerjs": "^2.0.8",
-    "highlight.js": "^9.15.6",
+    "highlight.js": "^10.1.2",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "^4.0.1",
